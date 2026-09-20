@@ -1,0 +1,45 @@
+# ─────────────────────────────────────────────────────────────
+# 知债：星穹学途（Knowledge Debt: Astral Path）· AstralPath
+# .gitignore —— 只纳管源码、契约、文档与金样；构建产物与大文件一律排除
+# ─────────────────────────────────────────────────────────────
+
+# .NET 构建产物
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+*.trx
+*.coverage
+*.nupkg
+
+# 上传的教材原始文件与解析中间产物
+#   ⚠ 这些是用户上传的**受版权保护的教材 PDF**（数百 MB），
+#     既不进版本库，也不应上传到公开仓库。
+materials-uploads/
+**/materials-uploads/
+*.pdf
+*.PDF
+*.epub
+*.docx
+*.pptx
+*.zip
+
+# OCR 运行时（本地虚拟环境与语言数据）
+tools/ocr-venv/
+tools/tessdata/
+*.traineddata
+_smoke_tmp/
+astralpath_smoke/
+
+# 运行时/临时
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo

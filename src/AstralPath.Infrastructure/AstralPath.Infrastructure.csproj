@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AstralPath.Core\AstralPath.Core.csproj" />
+    <ProjectReference Include="..\AstralPath.Graph\AstralPath.Graph.csproj" />
+    <ProjectReference Include="..\AstralPath.Contracts\AstralPath.Contracts.csproj" />
+  </ItemGroup>
+</Project>

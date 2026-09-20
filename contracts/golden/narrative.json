@@ -1,0 +1,23 @@
+{
+  "banned": ["不适合", "太笨", "比别人差", "没救", "别学了", "处分", "废物", "无可救药", "智商"],
+  "cases": [
+    {
+      "id": "G-NAR-1",
+      "draft": "你太笨了，别学了",
+      "slots": { "from_kp": "借贷记账法", "to_kp": "会计分录", "impact": 36.0, "score_from": 28.0, "score_to": 44.0 },
+      "expect": { "bannedHit": true, "slotFailed": false, "degradedTemplate": true }
+    },
+    {
+      "id": "G-NAR-2",
+      "draft": "你在会计分录相关练习上多次出错，回溯显示借贷记账法掌握度为 28.0，当前知识点掌握度为 44.0，影响分 36.0。",
+      "slots": { "from_kp": "借贷记账法", "to_kp": "会计分录", "impact": 36.0, "score_from": 28.0, "score_to": 44.0 },
+      "expect": { "bannedHit": false, "slotFailed": false, "degradedTemplate": false }
+    },
+    {
+      "id": "G-NAR-3",
+      "draft": "这个知识点随便看看就行，影响分 99.0",
+      "slots": { "from_kp": "借贷记账法", "to_kp": "会计分录", "impact": 36.0, "score_from": 28.0, "score_to": 44.0 },
+      "expect": { "bannedHit": false, "slotFailed": true, "degradedTemplate": true }
+    }
+  ]
+}

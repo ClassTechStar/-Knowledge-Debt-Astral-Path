@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/AstralPath.Api/AstralPath.Api.csproj" />
+    <Project Path="src/AstralPath.Contracts/AstralPath.Contracts.csproj" />
+    <Project Path="src/AstralPath.Core/AstralPath.Core.csproj" />
+    <Project Path="src/AstralPath.Desktop/AstralPath.Desktop.csproj" />
+    <Project Path="src/AstralPath.Graph/AstralPath.Graph.csproj" />
+    <Project Path="src/AstralPath.Infrastructure/AstralPath.Infrastructure.csproj" />
+    <Project Path="src/AstralPath.Mobile/AstralPath.Mobile.csproj" />
+    <Project Path="src/AstralPath.Shared/AstralPath.Shared.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AstralPath.Api.Tests/AstralPath.Api.Tests.csproj" />
+    <Project Path="tests/AstralPath.Core.Tests/AstralPath.Core.Tests.csproj" />
+    <Project Path="tests/AstralPath.Eval.Tests/AstralPath.Eval.Tests.csproj" />
+  </Folder>
+</Solution>
+
