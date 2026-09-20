@@ -104,6 +104,11 @@ def read_text(p: Path) -> str | None:
         return None
 
 
+# 「政策声明」语境标记：出现这些词的行是在**声明禁用/废弃**旧名，属于必要引用，
+# 不算实际使用。没有这层判断，README 里"禁止再使用旧名…"这样的政策文字会被误报
+# （本工具开发期已复现该误报）。
+POLICY_CONTEXT = ("禁止", "旧名", "不得", "不再", "废弃", "停用", "已统一替换", "禁用", "残留", "legacy", "Legacy")
+
 def scan() -> dict[str, list[tuple[str, int, str]]]:
     found: dict[str, list[tuple[str, int, str]]] = {name: [] for name, _ in RESIDUAL_PATTERNS}
     for p in iter_files():
@@ -115,6 +120,8 @@ def scan() -> dict[str, list[tuple[str, int, str]]]:
             for m in re.finditer(pat, text):
                 ln = text.count("\n", 0, m.start()) + 1
                 content = lines[ln - 1].strip() if ln - 1 < len(lines) else ""
+                if any(k in content for k in POLICY_CONTEXT):
+                    continue          # 政策声明语境 → 不计为残留
                 found[name].append((str(p.relative_to(ROOT)), ln, content[:160]))
     return found
 
