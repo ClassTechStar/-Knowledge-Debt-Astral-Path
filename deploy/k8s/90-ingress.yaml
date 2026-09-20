@@ -1,0 +1,40 @@
+---
+# 统一入口：单体演示台（/）与十个扩展服务（按路径前缀路由）
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: astralpath
+  namespace: astralpath
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "120"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: astralpath.example
+      http:
+        paths:
+          - path: /()(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: astralpath-api
+                port: { number: 80 }
+          - path: /diffusion(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: concept-diffusion-svc
+                port: { number: 80 }
+          - path: /cohorts(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: peer-cohort-svc
+                port: { number: 80 }
+          - path: /forecast(/|$)(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: knowledge-forecast-svc
+                port: { number: 80 }

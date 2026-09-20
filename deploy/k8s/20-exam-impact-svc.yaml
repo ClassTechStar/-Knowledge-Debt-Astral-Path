@@ -1,0 +1,108 @@
+---
+# exam-impact-svc —— 考试影响预测（§19.2）
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exam-impact-svc
+  namespace: astralpath
+  labels:
+    app: exam-impact-svc
+    app.kubernetes.io/name: exam-impact-svc
+    app.kubernetes.io/part-of: astralpath
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: exam-impact-svc
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0        # 滚动更新不中断：始终有可用副本
+  template:
+    metadata:
+      labels:
+        app: exam-impact-svc
+      annotations:
+        # 可观测性：注解驱动抓取（§25）
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+      containers:
+        - name: exam-impact-svc
+          image: ghcr.io/classtechstar/astralpath/exam-impact-svc:1.3.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: ASPNETCORE_URLS
+              value: "http://0.0.0.0:8080"
+            # 每个服务独立数据库（§19.11）：库名与服务同名
+            - name: ASTRALPATH_GRAPH_PACK
+              value: "/app/graph-packs/accounting-v1"
+            - name: Persistence__Mode
+              valueFrom:
+                configMapKeyRef:
+                  name: astralpath-config
+                  key: Persistence__Mode
+            - name: Persistence__ConnectionString
+              valueFrom:
+                secretKeyRef:
+                  name: astralpath-db
+                  key: connection-exam-impact-svc
+            - name: OpenTelemetry__OtlpEndpoint
+              valueFrom:
+                configMapKeyRef:
+                  name: astralpath-config
+                  key: OTLP_ENDPOINT
+            - name: OpenTelemetry__ServiceName
+              value: "exam-impact-svc"
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8080
+            initialDelaySeconds: 10
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: exam-impact-svc
+  namespace: astralpath
+  labels:
+    app: exam-impact-svc
+spec:
+  type: ClusterIP
+  selector:
+    app: exam-impact-svc
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080

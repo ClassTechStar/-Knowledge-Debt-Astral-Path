@@ -1,0 +1,25 @@
+# 告警规则（§25）：以可观测信号驱动值班响应
+groups:
+  - name: astralpath-services
+    rules:
+      - alert: ServiceNotReady
+        expr: kube_deployment_status_replicas_ready{namespace="astralpath"} < kube_deployment_spec_replicas{namespace="astralpath"}
+        for: 5m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.deployment }} 就绪副本数不足"
+          runbook: deploy/RUNBOOK.md
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(http_server_requests_duration_seconds_count{status=~"5..",namespace="astralpath"}[5m]))
+          / clamp_min(sum(rate(http_server_requests_duration_seconds_count{namespace="astralpath"}[5m])), 1) > 0.05
+        for: 10m
+        labels: { severity: critical }
+        annotations:
+          summary: "5xx 错误率 > 5%"
+      - alert: HighP95Latency
+        expr: histogram_quantile(0.95, sum(rate(http_server_requests_duration_seconds_bucket{namespace="astralpath"}[5m])) by (le)) > 1
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "P95 延迟 > 1s"

@@ -1,0 +1,44 @@
+---
+# 知债：星穹学途（Knowledge Debt: Astral Path）· Kubernetes 基础资源（§23）
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: astralpath
+  labels:
+    app.kubernetes.io/name: astralpath
+    pod-security.kubernetes.io/enforce: restricted
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: astralpath-config
+  namespace: astralpath
+data:
+  # 持久化模式：memory（本地/CI）| postgres（生产）
+  Persistence__Mode: "postgres"
+  Persistence__VectorDimensions: "1024"
+  Persistence__RrfK: "60"
+  Persistence__AutoMigrate: "false"
+  # 可观测性：OTLP 采集端（§25）；留空则仅输出控制台日志
+  OTLP_ENDPOINT: "http://otel-collector.observability.svc:4317"
+  ASPNETCORE_ENVIRONMENT: "Production"
+---
+# ⚠ 示例密钥占位：生产请改用 External Secrets / Sealed Secrets / Vault，
+#    切勿把真实连接串提交进版本库（本文件仅含占位符）。
+apiVersion: v1
+kind: Secret
+metadata:
+  name: astralpath-db
+  namespace: astralpath
+type: Opaque
+stringData:
+  connection-concept-diffusion-svc:     "Host=postgres.astralpath.svc;Database=diffusion;Username=astralpath;Password=CHANGE_ME"
+  connection-exam-impact-svc:           "Host=postgres.astralpath.svc;Database=exam;Username=astralpath;Password=CHANGE_ME"
+  connection-peer-cohort-svc:           "Host=postgres.astralpath.svc;Database=cohort;Username=astralpath;Password=CHANGE_ME"
+  connection-study-group-svc:           "Host=postgres.astralpath.svc;Database=studygroup;Username=astralpath;Password=CHANGE_ME"
+  connection-micro-lesson-svc:          "Host=postgres.astralpath.svc;Database=microlesson;Username=astralpath;Password=CHANGE_ME"
+  connection-learning-velocity-svc:     "Host=postgres.astralpath.svc;Database=velocity;Username=astralpath;Password=CHANGE_ME"
+  connection-spaced-review-svc:         "Host=postgres.astralpath.svc;Database=spacedreview;Username=astralpath;Password=CHANGE_ME"
+  connection-prerequisite-simulator-svc: "Host=postgres.astralpath.svc;Database=prereqsim;Username=astralpath;Password=CHANGE_ME"
+  connection-knowledge-forecast-svc:    "Host=postgres.astralpath.svc;Database=forecast;Username=astralpath;Password=CHANGE_ME"
+  connection-lab-bench-svc:             "Host=postgres.astralpath.svc;Database=labbench;Username=astralpath;Password=CHANGE_ME"

@@ -17,7 +17,10 @@
 |---|---|---|
 | Core | `src/AstralPath.Core` | BASELINE 纯函数：score / impact / K1–K5 / 销账 / 禁词 / 教练；§19 扩展服务算法；§44 受约束智能体路由 |
 | Graph | `src/AstralPath.Graph` | 图包加载、无环校验、版本化 |
-| Contracts | `src/AstralPath.Contracts` | DTO 与错误码（唯一契约出口） |
+| Contracts | `src/AstralPath.Contracts` | DTO、错误码与统一响应封装（唯一契约出口） |
+| Persistence | `src/AstralPath.Persistence` | 生产级持久化：PostgreSQL + pgvector（HNSW）+ 全文索引 + RRF 混合检索；可切换内存模式 |
+| Services | `src/AstralPath.Services` | §19 扩展服务的**单一路由来源**与独立服务宿主模板（ServiceHost） |
+| 独立服务 | `services/*`（10 个） | §19.11 拆分后的独立进程/容器，各自独立配置与数据库 |
 | Infrastructure | `src/AstralPath.Infrastructure` | 演示内存仓库、双学生种子、consent 缓存、§44/§45/§46 模块仓库、材料与 OCR 流水线 |
 | Api | `src/AstralPath.Api` | 统一契约 API + 演示 Web UI（`/`） |
 | Shared | `src/AstralPath.Shared` | 双端共享 UI 层：ViewModels / Views（`.axaml`）/ 主题样式 / 数据源抽象 / 导航 / 转换器 |
@@ -54,6 +57,31 @@ dotnet run --project src/AstralPath.Api -c Release --urls http://127.0.0.1:5190
 
 打开 <http://127.0.0.1:5190/> 使用演示台（起点 / 藏书阁 / 识网 / 知债 / 今日 / What-if / 教师端 / 账户）。
 Swagger：<http://127.0.0.1:5190/swagger>
+
+切换到真实 PostgreSQL（需 Docker）：
+
+```bash
+# 启动 PostgreSQL + pgvector（pgvector 0.8.6，支持 HNSW）
+docker run -d --name astralpath-pg -e POSTGRES_PASSWORD=astralpath -e POSTGRES_DB=astralpath \
+  -p 55432:5432 pgvector/pgvector:pg16
+
+# 以 postgres 模式运行（默认仍是 memory，用于本地调试）
+export Persistence__Mode=postgres
+export Persistence__ConnectionString="Host=127.0.0.1;Port=55432;Database=astralpath;Username=postgres;Password=astralpath"
+dotnet run --project src/AstralPath.Api -c Release
+```
+
+独立服务（§19.11）示例：
+
+```bash
+export ASTRALPATH_GRAPH_PACK="<repo>\graph-packs\accounting-v1"
+dotnet run --project services/concept-diffusion-svc -c Release --urls http://127.0.0.1:5191
+# 自身路由 200；其他服务路由 404（路由已按服务隔离）
+curl -s -o /dev/null -w "%{http_code}\n" -X POST http://127.0.0.1:5191/v1/diffusion/simulate \
+  -H "Content-Type: application/json" -d '{"studentId":"demo-student-a","intervention":{"K02":20}}'
+curl -s -o /dev/null -w "%{http_code}\n" -X POST http://127.0.0.1:5191/v1/cohorts/stats \
+  -H "Content-Type: application/json" -d '{"k":5,"scores":[1,2,3,4,5,6]}'
+```
 
 自检脚本：
 
@@ -213,6 +241,10 @@ dotnet build src/AstralPath.Mobile -c Release -p:EnableAndroidHead=true
 ## 数据与部署
 
 - PostgreSQL 初始 DDL：`deploy/sql/001_init.sql`（图包 / 掌握度 / 债边 / 计划 / 尝试 / consent / 知识库 / 画像 / 扩展服务 / 审计）
+- 持久化实现：`src/AstralPath.Persistence`（`Persistence:Mode = memory | postgres`；postgres 模式自动建 pgvector + HNSW + GIN 全文索引）
+- Kubernetes 清单：`deploy/k8s/`（Namespace / ConfigMap / Secret 占位 / Postgres StatefulSet / 10 个服务 Deployment+Service / Ingress / HPA + PDB）
+- 混沌演练：`deploy/chaos/`（`pod-kill.sh`、`db-outage.sh`，含预期结果与回滚）
+- 可观测性：`deploy/observability/`（OTel Collector、Prometheus 告警规则）
 - 运维手册：`deploy/RUNBOOK.md`
 - 环境变量统一使用 `ASTRALPATH_` 前缀（如 `ASTRALPATH_GRAPH_PACK`、`ASTRALPATH_OCR_PYTHON`、`ASTRALPATH_TESSERACT`）。旧 `ZZ_*` 前缀已废弃，启动时若检测到会打印迁移告警。
 

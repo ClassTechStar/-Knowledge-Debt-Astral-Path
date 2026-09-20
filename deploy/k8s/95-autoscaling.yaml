@@ -1,0 +1,43 @@
+---
+# 自动扩缩容与中断预算（§24 韧性）：以 concept-diffusion-svc 为例，其余服务同构
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: concept-diffusion-svc
+  namespace: astralpath
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: concept-diffusion-svc
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleUp:
+      stabilizationWindowSeconds: 60
+    scaleDown:
+      stabilizationWindowSeconds: 300      # 缩容更保守，避免抖动
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: concept-diffusion-svc
+  namespace: astralpath
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: concept-diffusion-svc
