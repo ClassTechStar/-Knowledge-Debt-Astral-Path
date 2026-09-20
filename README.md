@@ -8,7 +8,7 @@
 > - 全称：**知债：星穹学途（Knowledge Debt: Astral Path）** —— 用于文档标题、封面、申报书、答辩材料、对外介绍。
 > - 中文简称：**知债：星穹学途** —— 用于正文叙述、章节标题与图表标签。
 > - 英文标识：**AstralPath** —— 用于代码命名空间、解决方案名、包名、镜像名、数据库名与域名（如 `AstralPath.slnx` / `AstralPath.Core` / `api.astralpath.local`）。
-> - 禁止再使用旧名「知债图」「ZhiZhaiTu」「zhizhaitu」及任何派生标识符。可用 `python scripts/naming_consistency.py --check` 校验（旧名残留必须为 0）。
+
 
 
 ## 架构
