@@ -10,9 +10,6 @@
 > - 英文标识：**AstralPath** —— 用于代码命名空间、解决方案名、包名、镜像名、数据库名与域名（如 `AstralPath.slnx` / `AstralPath.Core` / `api.astralpath.local`）。
 > - 禁止再使用旧名「知债图」「ZhiZhaiTu」「zhizhaitu」及任何派生标识符。可用 `python scripts/naming_consistency.py --check` 校验（旧名残留必须为 0）。
 
-## 项目位置
-
-`C:\Users\18948\XiaomiMiMoProjects\Knowledge Debt Astral Path`
 
 ## 架构
 
