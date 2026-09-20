@@ -248,16 +248,23 @@ public sealed class AstralPathModules
         }
     }
 
-    public object OptOutProfile(string studentId)
+    /// <summary>关闭个性化（§46.3 的默认语义，等价于 <c>SetProfileOptOut(studentId, true)</c>）。</summary>
+    public object OptOutProfile(string studentId) => SetProfileOptOut(studentId, true);
+
+    /// <summary>
+    /// 设置个性化开关（§46.3）。可关闭也可重新开启——「可随时关闭」若不支持重新开启，
+    /// 学生就再也无法恢复个性化，与方案 §46 的授权语义不符。
+    /// </summary>
+    public object SetProfileOptOut(string studentId, bool optOut)
     {
         lock (_gate)
         {
             if (!_profiles.TryGetValue(studentId, out var profile))
-                profile = new LearningProfile(studentId, Array.Empty<UserProfileTag>(), true, DateTime.UtcNow);
+                profile = new LearningProfile(studentId, Array.Empty<UserProfileTag>(), optOut, DateTime.UtcNow);
             else
-                profile = profile with { OptOut = true, UpdatedAt = DateTime.UtcNow };
+                profile = profile with { OptOut = optOut, UpdatedAt = DateTime.UtcNow };
             _profiles[studentId] = profile;
-            return new { studentId, optOut = true, updatedAt = profile.UpdatedAt };
+            return new { studentId, optOut = profile.OptOut, updatedAt = profile.UpdatedAt };
         }
     }
 

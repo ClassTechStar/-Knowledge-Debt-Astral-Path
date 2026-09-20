@@ -1,9 +1,33 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>AstralPath.Shared</RootNamespace>
+    <AssemblyName>AstralPath.Shared</AssemblyName>
+    <!-- 编译绑定：AOT/裁剪友好，禁止反射绑定回退（方案 §11.1 / §14.10） -->
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.3.20" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.20" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+
+  <!-- 依赖方向单向：Shared → {Contracts, Core, Graph, Infrastructure}（方案 §11.2） -->
+  <ItemGroup>
+    <ProjectReference Include="..\AstralPath.Contracts\AstralPath.Contracts.csproj" />
+    <ProjectReference Include="..\AstralPath.Core\AstralPath.Core.csproj" />
+    <ProjectReference Include="..\AstralPath.Graph\AstralPath.Graph.csproj" />
+    <ProjectReference Include="..\AstralPath.Infrastructure\AstralPath.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\graph-packs\accounting-v1\**\*"
+          Link="graph-packs\accounting-v1\%(RecursiveDir)%(Filename)%(Extension)"
+          CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 
 </Project>

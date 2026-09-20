@@ -1,0 +1,168 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AstralPath.Shared.ViewModels"
+        xmlns:svc="using:AstralPath.Shared.Services"
+        xmlns:conv="using:AstralPath.Shared.Converters"
+        x:Class="AstralPath.Desktop.Views.MainWindow"
+        x:DataType="vm:ShellViewModel"
+        Title="知债：星穹学途"
+        Width="1440" Height="900" MinWidth="380" MinHeight="520"
+        Background="{StaticResource AppBackgroundBrush}">
+
+  <!--
+    桌面端主窗口（方案 §12.4）
+    - 三栏：左导航(220) / 内容(*) / 右信息栏(300)
+    - 响应式：宽度 < 900 收起左导航，宽度 < 1180 收起右信息栏（断点由 code-behind 回写）
+    - 快捷键：Ctrl+1/2 切学生、Ctrl+D 诊断、Ctrl+T 教师视图、Ctrl+R 撤销授权
+  -->
+  <Window.KeyBindings>
+    <KeyBinding Gesture="Ctrl+1" Command="{Binding SelectStudentCommand}" CommandParameter="demo-student-a" />
+    <KeyBinding Gesture="Ctrl+2" Command="{Binding SelectStudentCommand}" CommandParameter="demo-student-b" />
+    <KeyBinding Gesture="Ctrl+D" Command="{Binding NavigateToCommand}" CommandParameter="Graph" />
+    <KeyBinding Gesture="Ctrl+T" Command="{Binding OpenTeacherViewCommand}" />
+    <KeyBinding Gesture="Ctrl+R" Command="{Binding RevokeTeacherConsentCommand}" />
+    <KeyBinding Gesture="Ctrl+P" Command="{Binding NavigateToCommand}" CommandParameter="Plan" />
+    <KeyBinding Gesture="Ctrl+K" Command="{Binding NavigateToCommand}" CommandParameter="Knowledge" />
+  </Window.KeyBindings>
+
+  <Grid RowDefinitions="Auto,*,Auto">
+
+    <!-- ① 顶栏 -->
+    <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="16,10">
+      <Grid ColumnDefinitions="Auto,*,Auto">
+        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
+          <TextBlock Classes="h2" Text="知债" />
+          <TextBlock Classes="muted" Text="星穹学途" VerticalAlignment="Center" />
+          <Border Classes="badge">
+            <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding ModeLabel}" />
+          </Border>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10"
+                    HorizontalAlignment="Center" VerticalAlignment="Center">
+          <TextBlock Classes="muted" Text="学生" VerticalAlignment="Center" />
+          <ComboBox ItemsSource="{Binding Students}" SelectedItem="{Binding SelectedStudent}"
+                    MinWidth="220" AutomationProperties.Name="切换演示学生">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="svc:StudentSummary">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Classes="body" Text="{Binding DisplayName}" />
+                  <TextBlock Classes="muted" VerticalAlignment="Center"
+                             Text="{Binding OpenDebtCount, StringFormat='开放债边 {0}'}" />
+                </StackPanel>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <Button Classes="ghost" Content="切换" Command="{Binding ToggleStudentCommand}"
+                  ToolTip.Tip="Ctrl+1 / Ctrl+2" AutomationProperties.Name="切换到另一个演示学生" />
+        </StackPanel>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <Button Classes="ghost" Content="教师视图" Command="{Binding OpenTeacherViewCommand}"
+                  ToolTip.Tip="Ctrl+T" />
+          <Button Classes="ghost" Content="撤销授权" Command="{Binding RevokeTeacherConsentCommand}"
+                  ToolTip.Tip="Ctrl+R" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- ② 主体三栏 -->
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto">
+
+      <!-- 左导航 -->
+      <Border x:Name="LeftNav" Grid.Column="0" Width="220" Padding="10"
+              Background="{StaticResource SurfaceBrush}"
+              BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,1,0"
+              IsVisible="{Binding !IsNarrow}">
+        <ScrollViewer>
+          <StackPanel Spacing="4">
+            <ItemsControl ItemsSource="{Binding NavItems}" AutomationProperties.Name="主导航">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:NavItem">
+                  <Button Classes="nav" Classes.active="{Binding IsActive}"
+                          Command="{Binding Navigate}" CommandParameter="{Binding Page}"
+                          AutomationProperties.Name="{Binding Label}">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                      <TextBlock Text="{Binding Glyph}" FontSize="15" Width="20" />
+                      <TextBlock Text="{Binding Label}" />
+                    </StackPanel>
+                  </Button>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+
+      <!-- 内容区：VM → View 由 Shared/Views/ViewLocator 解析 -->
+      <ContentControl x:Name="PageHost" Grid.Column="1" Content="{Binding Current}" />
+
+      <!-- 右信息栏 -->
+      <Border x:Name="RightInfo" Grid.Column="2" Width="300" Padding="14"
+              Background="{StaticResource SurfaceBrush}"
+              BorderBrush="{StaticResource BorderBrush}" BorderThickness="1,0,0,0"
+              IsVisible="{Binding IsWide}">
+        <ScrollViewer>
+          <StackPanel Spacing="12">
+
+            <Border Classes="card">
+              <StackPanel Spacing="8">
+                <TextBlock Classes="h2" Text="教师可见性" />
+                <TextBlock Classes="body"
+                           Text="{Binding ConsentState, Converter={x:Static conv:AppConverters.ConsentToText}}" />
+                <TextBlock Classes="muted"
+                           Text="教师端只看到聚合后的班级热点，不含你的精确分数或个人明细。" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Button Classes="primary" Content="授权" Command="{Binding GrantTeacherConsentCommand}"
+                          IsVisible="{Binding !ConsentAllowTeacher}" />
+                  <Button Classes="ghost" Content="撤销" Command="{Binding RevokeTeacherConsentCommand}"
+                          IsVisible="{Binding ConsentAllowTeacher}" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="h2" Text="快捷键" />
+                <TextBlock Classes="muted" Text="Ctrl+1 / Ctrl+2　切换演示学生" />
+                <TextBlock Classes="muted" Text="Ctrl+D　　　　　打开知识债图谱（诊断）" />
+                <TextBlock Classes="muted" Text="Ctrl+T　　　　　打开教师视图" />
+                <TextBlock Classes="muted" Text="Ctrl+R　　　　　撤销教师可见性" />
+                <TextBlock Classes="muted" Text="Ctrl+P　　　　　打开 14 天计划" />
+                <TextBlock Classes="muted" Text="Ctrl+K　　　　　打开知识库" />
+              </StackPanel>
+            </Border>
+
+            <Border Classes="card">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="h2" Text="快捷操作" />
+                <Button Classes="ghost" HorizontalAlignment="Stretch" Content="重新生成 14 天计划"
+                        Command="{Binding RebuildPlanCommand}" />
+                <Button Classes="ghost" HorizontalAlignment="Stretch" Content="查看我的画像"
+                        Command="{Binding NavigateToCommand}" CommandParameter="Profile" />
+                <Button Classes="ghost" HorizontalAlignment="Stretch" Content="可访问性设置"
+                        Command="{Binding NavigateToCommand}" CommandParameter="Settings" />
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Grid>
+
+    <!-- ③ 底栏：状态播报 + 错误 + 免责声明 -->
+    <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0" Padding="16,8">
+      <StackPanel Spacing="4">
+        <TextBlock Classes="body" Foreground="#065F46"
+                   Text="{Binding StatusMessage}"
+                   IsVisible="{Binding StatusMessage, Converter={x:Static conv:AppConverters.TextToVisible}}"
+                   AutomationProperties.LiveSetting="Polite" />
+        <TextBlock Classes="body" Foreground="#991B1B"
+                   Text="{Binding ErrorMessage}"
+                   IsVisible="{Binding ErrorMessage, Converter={x:Static conv:AppConverters.TextToVisible}}" />
+        <TextBlock Classes="disclaimer" Text="{Binding FooterDisclaimer}" />
+      </StackPanel>
+    </Border>
+  </Grid>
+</Window>

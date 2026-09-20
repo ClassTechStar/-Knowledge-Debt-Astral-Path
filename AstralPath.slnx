@@ -12,7 +12,7 @@
   <Folder Name="/tests/">
     <Project Path="tests/AstralPath.Api.Tests/AstralPath.Api.Tests.csproj" />
     <Project Path="tests/AstralPath.Core.Tests/AstralPath.Core.Tests.csproj" />
+    <Project Path="tests/AstralPath.Desktop.Tests/AstralPath.Desktop.Tests.csproj" />
     <Project Path="tests/AstralPath.Eval.Tests/AstralPath.Eval.Tests.csproj" />
   </Folder>
 </Solution>
-

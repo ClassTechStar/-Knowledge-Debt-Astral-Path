@@ -1,0 +1,163 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AstralPath.Shared.ViewModels"
+             xmlns:conv="using:AstralPath.Shared.Converters"
+             x:Class="AstralPath.Shared.Views.WhatIfView"
+             x:DataType="vm:WhatIfViewModel">
+
+  <!--
+    What-if 影响推演页（方案 §12.5）
+    - 选择一条债边 → 4 个参数滑条（score_from / score_c / freq / days）→ 实时重算 impact
+    - 结果卡给出 API 返回值与端上复算值（同源，容差 1e-6）
+    - 对比卡：当前债边真实 impact 与推演 impact 并排，差值用箭头（↑ / ↓ / =）表示，不只靠颜色
+  -->
+  <ScrollViewer>
+    <StackPanel Margin="20" Spacing="14">
+
+      <!-- ① 选择债边 -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h1" Text="{Binding Title}" />
+          <TextBlock Classes="muted"
+                     Text="调参数看 impact 怎么变：这是「假设分析」，不会写入作答记录，也不改变任何学生数据。" />
+
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="6" IsVisible="{Binding HasEdges}">
+              <TextBlock Classes="muted" Text="选择一条债边" />
+              <ComboBox ItemsSource="{Binding Edges}"
+                        SelectedItem="{Binding SelectedEdge, Mode=TwoWay}"
+                        MinWidth="320" HorizontalAlignment="Left"
+                        AutomationProperties.Name="选择要推演的债边">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:WhatIfEdgeItem">
+                    <TextBlock Classes="body" Text="{Binding Label}" />
+                  </DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <TextBlock Classes="muted" Text="{Binding EdgeDetail}" />
+            </StackPanel>
+
+            <Button Grid.Column="1" Classes="ghost" Content="重新读取债边" VerticalAlignment="Top"
+                    Command="{Binding RefreshCommand}" AutomationProperties.Name="重新读取债边" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- ② 参数卡 -->
+      <Border Classes="card" IsVisible="{Binding HasEdges}">
+        <StackPanel Spacing="14">
+          <TextBlock Classes="h2" Text="参数（任意调整都会立即重算）" />
+
+          <StackPanel Spacing="4">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0" Classes="body" Text="起点掌握度 score_from（0–100）" />
+              <TextBlock Grid.Column="1" Classes="muted" Text="{Binding ScoreFromText}" />
+            </Grid>
+            <Slider Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                    Value="{Binding ScoreFromSlider, Mode=TwoWay}"
+                    AutomationProperties.Name="起点掌握度，0 到 100" />
+          </StackPanel>
+
+          <StackPanel Spacing="4">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0" Classes="body" Text="后继掌握度 score_c（0–100）" />
+              <TextBlock Grid.Column="1" Classes="muted" Text="{Binding ScoreToText}" />
+            </Grid>
+            <Slider Minimum="0" Maximum="100" TickFrequency="1" IsSnapToTickEnabled="True"
+                    Value="{Binding ScoreToSlider, Mode=TwoWay}"
+                    AutomationProperties.Name="后继掌握度，0 到 100" />
+          </StackPanel>
+
+          <StackPanel Spacing="4">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0" Classes="body" Text="近 7 天出错次数 freq（0–10）" />
+              <TextBlock Grid.Column="1" Classes="muted" Text="{Binding FreqText}" />
+            </Grid>
+            <Slider Minimum="0" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True"
+                    Value="{Binding FreqSlider, Mode=TwoWay}"
+                    AutomationProperties.Name="近 7 天出错次数，0 到 10" />
+          </StackPanel>
+
+          <StackPanel Spacing="4">
+            <Grid ColumnDefinitions="*,Auto">
+              <TextBlock Grid.Column="0" Classes="body" Text="距上次出错天数 days（0–30）" />
+              <TextBlock Grid.Column="1" Classes="muted" Text="{Binding DaysText}" />
+            </Grid>
+            <Slider Minimum="0" Maximum="30" TickFrequency="1" IsSnapToTickEnabled="True"
+                    Value="{Binding DaysSlider, Mode=TwoWay}"
+                    AutomationProperties.Name="距上次出错天数，0 到 30" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- ③ 结果卡 -->
+      <Border Classes="card" IsVisible="{Binding HasEdges}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="推演结果" />
+          <Grid ColumnDefinitions="Auto,*">
+            <TextBlock Grid.Column="0" FontSize="36" FontWeight="SemiBold" Foreground="#1E293B"
+                       VerticalAlignment="Center" Text="{Binding SimImpactText}"
+                       AutomationProperties.Name="推演 impact" />
+            <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center" Spacing="6">
+              <TextBlock Classes="body" Text="{Binding DetectedText}" />
+              <StackPanel Orientation="Horizontal" Spacing="8">
+                <TextBlock Classes="muted" Text="recency" VerticalAlignment="Center" />
+                <TextBlock Classes="body"
+                           Text="{Binding Recency, Converter={x:Static conv:AppConverters.RatioToPercent}}" />
+              </StackPanel>
+              <ProgressBar Value="{Binding Recency, Converter={x:Static conv:AppConverters.RatioToProgress}}"
+                           Minimum="0" Maximum="1" AutomationProperties.Name="新近度" />
+            </StackPanel>
+          </Grid>
+
+          <Border Classes="panel">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="body" Text="{Binding FormulaText}" />
+              <TextBlock Classes="muted" Text="{Binding FormulaNote}" />
+              <TextBlock Classes="muted" Text="{Binding RecomputeText}"
+                         IsVisible="{Binding RecomputeText, Converter={x:Static conv:AppConverters.TextToVisible}}" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Border>
+
+      <!-- ④ 对比卡：真实 impact 与推演 impact -->
+      <Border Classes="card" IsVisible="{Binding HasEdges}">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="对比：当前债边 与 推演" />
+          <Grid ColumnDefinitions="*,Auto,*">
+            <StackPanel Grid.Column="0" Spacing="4">
+              <TextBlock Classes="muted" Text="当前债边的真实 impact" />
+              <TextBlock Classes="h2" Text="{Binding RealImpactText}" />
+            </StackPanel>
+            <TextBlock Grid.Column="1" Classes="h1" Margin="16,0" VerticalAlignment="Center"
+                       Text="{Binding DeltaArrow}" AutomationProperties.Name="变化方向" />
+            <StackPanel Grid.Column="2" Spacing="4">
+              <TextBlock Classes="muted" Text="推演 impact" />
+              <TextBlock Classes="h2" Text="{Binding SimImpactText}" />
+            </StackPanel>
+          </Grid>
+          <TextBlock Classes="body" Text="{Binding DeltaText}" />
+        </StackPanel>
+      </Border>
+
+      <!-- ⑤ 错误条 -->
+      <Border Classes="panel" Background="#FEE2E2"
+              IsVisible="{Binding ErrorMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Foreground="#991B1B" Text="{Binding ErrorMessage}" />
+      </Border>
+
+      <!-- ⑥ 空态 -->
+      <Border Classes="card" IsVisible="{Binding IsEmpty}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="暂无可推演的债边" />
+          <TextBlock Classes="body" Text="{Binding EmptyReason}" />
+          <Button Classes="primary" Content="去图谱页看看" HorizontalAlignment="Left"
+                  Command="{Binding GoGraphCommand}" AutomationProperties.Name="去图谱页看看" />
+        </StackPanel>
+      </Border>
+
+      <TextBlock Classes="disclaimer" Text="{Binding FooterDisclaimer}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

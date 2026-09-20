@@ -1,0 +1,144 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AstralPath.Shared.ViewModels"
+             xmlns:conv="using:AstralPath.Shared.Converters"
+             x:Class="AstralPath.Shared.Views.ProgressView"
+             x:DataType="vm:ProgressViewModel">
+
+  <UserControl.Resources>
+    <!-- 掌握度横条：按容器实际宽度等比展开 -->
+    <conv:RatioToBarWidthConverter x:Key="BarWidth" />
+  </UserControl.Resources>
+
+  <!--
+    学习进度页（方案 §12.5）
+    · 顶部统计：平均 score、最弱 3 个知识点、band 分布计数
+    · 主体：知识点掌握度列表，行首 band 色块 + score + band 中文标签 + 等比横条
+    · 排序：按 score 升序 / 降序 / 按知识点 ID
+    · 伦理：只做知识点维度排序，不做学生分数排名
+  -->
+  <ScrollViewer>
+    <StackPanel Margin="20" Spacing="14">
+
+      <!-- ① 统计卡 -->
+      <Border Classes="card">
+        <StackPanel Spacing="12">
+          <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="6">
+              <TextBlock Classes="h1" Text="{Binding Title}" />
+              <TextBlock Classes="muted" Text="{Binding StudentLine}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+              <ComboBox ItemsSource="{Binding SortOptions}" SelectedItem="{Binding SelectedSort}"
+                        MinWidth="150" AutomationProperties.Name="掌握度排序方式" />
+              <Button Classes="ghost" Content="刷新"
+                      Command="{Binding RefreshCommand}"
+                      AutomationProperties.Name="刷新掌握度" />
+              <Button Classes="ghost" Content="查看债边清单"
+                      Command="{Binding OpenDebtListCommand}"
+                      AutomationProperties.Name="查看债边清单" />
+            </StackPanel>
+          </Grid>
+
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Border Classes="badge">
+              <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding AverageText}" />
+            </Border>
+            <Border Classes="badge">
+              <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding BandDistributionText}" />
+            </Border>
+          </StackPanel>
+
+          <StackPanel Spacing="6" IsVisible="{Binding HasWeakest}">
+            <TextBlock Classes="h2" Text="{Binding WeakestCaption}" />
+            <ItemsControl ItemsSource="{Binding Weakest}" AutomationProperties.Name="最弱知识点">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:MasteryRowItem">
+                  <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8" Margin="0,0,0,4"
+                        AutomationProperties.Name="{Binding AccessibleName}">
+                    <Border Grid.Column="0" Width="10" Height="10" CornerRadius="3" VerticalAlignment="Center"
+                            Background="{Binding Band, Converter={x:Static conv:AppConverters.BandToBrush}}" />
+                    <TextBlock Grid.Column="1" Classes="body" Text="{Binding Name}" />
+                    <TextBlock Grid.Column="2" Classes="muted" VerticalAlignment="Center" Text="{Binding ScoreText}" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- ② 公式与伦理边界说明 -->
+      <Border Classes="panel">
+        <StackPanel Spacing="4">
+          <TextBlock Classes="body" Text="{Binding FormulaText}" />
+          <TextBlock Classes="muted" Text="{Binding RankDisclaimer}" />
+        </StackPanel>
+      </Border>
+
+      <!-- ③ 错误条（数据源异常时可见，不静默失败） -->
+      <Border Classes="panel" Background="#FEE2E2"
+              IsVisible="{Binding ErrorMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Foreground="#991B1B" Text="{Binding ErrorMessage}" />
+      </Border>
+
+      <!-- ④ 掌握度列表 -->
+      <ItemsControl ItemsSource="{Binding Rows}" IsVisible="{Binding HasRows}"
+                    AutomationProperties.Name="知识点掌握度列表">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:MasteryRowItem">
+            <Border Classes="card" Margin="0,0,0,8"
+                    AutomationProperties.Name="{Binding AccessibleName}">
+              <StackPanel Spacing="8">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                  <Border Grid.Column="0" Width="12" Height="12" CornerRadius="3" VerticalAlignment="Center"
+                          Background="{Binding Band, Converter={x:Static conv:AppConverters.BandToBrush}}" />
+                  <TextBlock Grid.Column="1" Classes="h2" Text="{Binding Name}" />
+                  <TextBlock Grid.Column="2" Classes="muted" VerticalAlignment="Center" Text="{Binding ScoreText}" />
+                </Grid>
+
+                <Border Height="12" CornerRadius="6" ClipToBounds="True"
+                        Background="{StaticResource SurfaceAltBrush}"
+                        AutomationProperties.Name="{Binding BandText}">
+                  <Border HorizontalAlignment="Left" CornerRadius="6"
+                          Background="{Binding Band, Converter={x:Static conv:AppConverters.BandToBrush}}">
+                    <Border.Width>
+                      <MultiBinding Converter="{StaticResource BarWidth}">
+                        <Binding Path="Ratio" />
+                        <Binding Path="$parent[Border].Bounds.Width" />
+                      </MultiBinding>
+                    </Border.Width>
+                  </Border>
+                </Border>
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Border Classes="badge">
+                    <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding BandText}" />
+                  </Border>
+                  <TextBlock Classes="muted" VerticalAlignment="Center" Text="{Binding DetailText}" />
+                </StackPanel>
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- ⑤ 空态 -->
+      <Border Classes="card" IsVisible="{Binding IsEmpty}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="还没有掌握度数据" />
+          <TextBlock Classes="body"
+                     Text="完成一次小测后，系统会按知识点刷新掌握度；也可以先查看债边清单，了解哪些知识点欠了债。" />
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Classes="ghost" Content="刷新" Command="{Binding RefreshCommand}"
+                    AutomationProperties.Name="刷新掌握度" />
+            <Button Classes="primary" Content="查看债边清单" Command="{Binding OpenDebtListCommand}"
+                    AutomationProperties.Name="查看债边清单" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <TextBlock Classes="disclaimer" Text="{Binding FooterDisclaimer}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

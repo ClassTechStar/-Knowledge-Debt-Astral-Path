@@ -1,0 +1,134 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AstralPath.Shared.ViewModels"
+             xmlns:conv="using:AstralPath.Shared.Converters"
+             x:Class="AstralPath.Shared.Views.TeacherView"
+             x:DataType="vm:TeacherViewModel">
+
+  <!--
+    教师视图（方案 §15）：班级热点聚合页
+    - 首屏信息优先级：授权状态 → fail-closed 空态 / k-匿名抑制提示 → 热点列表
+    - 伦理硬约束：只展示聚合人数与平均 impact；不出现学生姓名、分数、排名
+    - 无障碍：列表项 AutomationProperties.Name 绑定完整语义；空态卡有标题与原因
+  -->
+  <ScrollViewer>
+    <StackPanel Margin="20" Spacing="14">
+
+      <!-- ① 顶栏：授权概况 -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Grid.Column="0" Spacing="6">
+            <TextBlock Classes="h1" Text="{Binding Title}" />
+            <TextBlock Classes="muted" Text="{Binding ClassId, StringFormat='班级：{0}'}" />
+            <TextBlock Classes="muted"
+                       Text="{Binding AuthorizedCount, StringFormat='有效授权学生数：{0} 人'}" />
+          </StackPanel>
+
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8"
+                      VerticalAlignment="Top">
+            <Border Classes="badge">
+              <TextBlock Classes="badge-text" Foreground="#1E293B"
+                         Text="{Binding ConsentState, Converter={x:Static conv:AppConverters.ConsentToText}}"
+                         AutomationProperties.Name="当前授权状态" />
+            </Border>
+            <Button Classes="ghost" Content="刷新" Command="{Binding RefreshCommand}"
+                    AutomationProperties.Name="刷新班级热点" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- ② 操作反馈状态条（授权 / 撤销后播报） -->
+      <Border Classes="panel" IsVisible="{Binding StatusMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Text="{Binding StatusMessage}" />
+      </Border>
+
+      <!-- ③ 数据源异常条：不静默失败 -->
+      <Border Classes="panel" Background="#FEE2E2"
+              IsVisible="{Binding ErrorMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Foreground="#991B1B" Text="{Binding ErrorMessage}" />
+      </Border>
+
+      <!-- ④ k-匿名抑制提示（方案 §19.3） -->
+      <Border Classes="panel" Background="#FEF3C7" IsVisible="{Binding ShowSuppressedNotice}"
+              AutomationProperties.Name="k 匿名抑制提示">
+        <TextBlock Classes="body" Foreground="#92400E" Text="{Binding SuppressedNotice}" />
+      </Border>
+
+      <!-- ⑤ fail-closed 空态卡：醒目、可解释、必须包含数据源给出的原因 -->
+      <Border Classes="card" Background="#FEF3C7" BorderBrush="#F59E0B" BorderThickness="2"
+              IsVisible="{Binding IsFailClosed}"
+              AutomationProperties.Name="教师端当前不可见">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="⚠ 教师端当前不可见（fail-closed）" Foreground="#92400E" />
+          <TextBlock Classes="body" Text="{Binding EmptyText}" />
+          <TextBlock Classes="body" FontWeight="SemiBold" Foreground="#92400E"
+                     Text="{Binding RevokedNotice}"
+                     IsVisible="{Binding ShowRevokedNotice}" />
+          <TextBlock Classes="muted"
+                     Text="学生可在下方授权区重新授权；授权前教师端不会缓存任何班级热点数据。" />
+        </StackPanel>
+      </Border>
+
+      <!-- ⑥ 班级热点列表（按平均 impact 降序） -->
+      <StackPanel Spacing="10" IsVisible="{Binding HasHotspots}">
+        <TextBlock Classes="h2" Text="班级热点（聚合视图）" />
+        <TextBlock Classes="muted" Text="按平均 impact 降序；仅显示受影响人数，不含任何学生身份信息。" />
+        <ItemsControl ItemsSource="{Binding Hotspots}" AutomationProperties.Name="班级热点列表">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:HotspotRow">
+              <Border Classes="card" Margin="0,0,0,10"
+                      AutomationProperties.Name="{Binding AccessibleName}">
+                <Grid ColumnDefinitions="*,Auto">
+                  <StackPanel Grid.Column="0" Spacing="5">
+                    <TextBlock Classes="h2" Text="{Binding Route}" />
+                    <TextBlock Classes="muted" Text="{Binding CountText}" />
+                  </StackPanel>
+                  <Border Grid.Column="1" Classes="badge" VerticalAlignment="Center"
+                          Background="#E8F0FE">
+                    <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding ImpactText}" />
+                  </Border>
+                </Grid>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+
+      <!-- ⑦ consent 管理区（学生视角演示） -->
+      <Border Classes="card" AutomationProperties.Name="授权管理">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="授权管理（学生视角演示）" />
+          <TextBlock Classes="muted"
+                     Text="学生可随时授权或撤销教师对本班热点的可见性；撤销立即生效，并同步清除教师端缓存。" />
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Border Classes="badge">
+              <TextBlock Classes="badge-text" Foreground="#1E293B"
+                         Text="{Binding ConsentState, Converter={x:Static conv:AppConverters.ConsentToText}}" />
+            </Border>
+            <TextBlock Classes="muted" VerticalAlignment="Center" Text="{Binding ConsentDetail}" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Classes="primary" Content="授权" Command="{Binding GrantConsentCommand}"
+                    AutomationProperties.Name="授权教师查看班级热点" />
+            <Button Classes="ghost" Content="撤销授权" Command="{Binding RevokeConsentCommand}"
+                    AutomationProperties.Name="撤销教师查看班级热点的授权" />
+            <Button Classes="ghost" Content="查看我的画像" Command="{Binding OpenProfileCommand}"
+                    AutomationProperties.Name="查看我的画像" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- ⑧ 合规说明卡 -->
+      <Border Classes="panel">
+        <StackPanel Spacing="6">
+          <TextBlock Classes="h2" Text="合规说明" />
+          <TextBlock Classes="body" Text="{Binding Compliance}" />
+          <TextBlock Classes="muted"
+                     Text="本页不提供任何个体化的处分、排名或评价结论；教师端可见性完全由学生授权决定。" />
+        </StackPanel>
+      </Border>
+
+      <TextBlock Classes="disclaimer" Text="{Binding FooterDisclaimer}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

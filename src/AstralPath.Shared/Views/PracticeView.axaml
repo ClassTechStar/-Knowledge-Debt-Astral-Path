@@ -1,0 +1,129 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AstralPath.Shared.ViewModels"
+             xmlns:conv="using:AstralPath.Shared.Converters"
+             x:Class="AstralPath.Shared.Views.PracticeView"
+             x:DataType="vm:PracticeViewModel">
+
+  <!--
+    答题页（方案 §12.3 / §13.1）
+    - 信息顺序：题头（知识点 / 为什么做这个）→ 题干与选项 → 信心值（必填）→ 提交 → 判题结果
+    - 必填约束：信心值未填时提交按钮禁用，并给出「请先选择信心值（1–5）」提示
+    - 无障碍：选项为单选按钮，带完整 AutomationProperties.Name；信心值同时提供滑条与 5 个单选按钮
+  -->
+  <ScrollViewer>
+    <StackPanel Margin="20" Spacing="14">
+
+      <!-- ① 题头卡：知识点、类型、难度、为什么做这个 -->
+      <Border Classes="card" IsVisible="{Binding HasTask}">
+        <StackPanel Spacing="6">
+          <TextBlock Classes="h1" Text="{Binding Title}" />
+          <TextBlock Classes="h2" Text="{Binding KpName}" />
+          <TextBlock Classes="muted" Text="{Binding TaskMeta}" />
+          <TextBlock Classes="body" Text="{Binding Why}" />
+          <TextBlock Classes="muted" Text="{Binding Difficulty, Converter={x:Static conv:AppConverters.DifficultyToDots}}"
+                     AutomationProperties.Name="难度" />
+        </StackPanel>
+      </Border>
+
+      <!-- ② 题干与选项 -->
+      <Border Classes="card" IsVisible="{Binding HasTask}">
+        <StackPanel Spacing="12">
+          <TextBlock Classes="h2" Text="题干" />
+          <TextBlock Classes="body" Text="{Binding Stem}" />
+
+          <ItemsControl ItemsSource="{Binding Options}" AutomationProperties.Name="选项列表">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:PracticeOption">
+                <RadioButton GroupName="PracticeOptionGroup"
+                             Margin="0,0,0,6"
+                             IsChecked="{Binding IsSelected, Mode=OneWay}"
+                             Command="{Binding $parent[ItemsControl].((vm:PracticeViewModel)DataContext).SelectOptionCommand}"
+                             CommandParameter="{Binding Index}"
+                             AutomationProperties.Name="{Binding AccessibleName}">
+                  <TextBlock Classes="body" Text="{Binding Display}" />
+                </RadioButton>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <!-- ③ 信心值（1–5 必填） -->
+      <Border Classes="card" IsVisible="{Binding HasTask}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="这一题你有几成把握？（必填）" />
+          <TextBlock Classes="muted" Text="信心值用于校准自我评估：作答正确率与信心值的偏差会参与掌握度与复习安排。" />
+
+          <Slider Minimum="0" Maximum="5" TickFrequency="1" IsSnapToTickEnabled="True"
+                  Value="{Binding ConfidenceSlider, Mode=TwoWay}"
+                  AutomationProperties.Name="信心值滑条，最左端表示未选择，1 到 5 为有效值" />
+
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Classes="muted" Text="快捷选择：" VerticalAlignment="Center" />
+            <RadioButton GroupName="ConfidenceGroup" Content="1"
+                         IsChecked="{Binding IsConf1, Mode=TwoWay}" AutomationProperties.Name="信心 1 分" />
+            <RadioButton GroupName="ConfidenceGroup" Content="2"
+                         IsChecked="{Binding IsConf2, Mode=TwoWay}" AutomationProperties.Name="信心 2 分" />
+            <RadioButton GroupName="ConfidenceGroup" Content="3"
+                         IsChecked="{Binding IsConf3, Mode=TwoWay}" AutomationProperties.Name="信心 3 分" />
+            <RadioButton GroupName="ConfidenceGroup" Content="4"
+                         IsChecked="{Binding IsConf4, Mode=TwoWay}" AutomationProperties.Name="信心 4 分" />
+            <RadioButton GroupName="ConfidenceGroup" Content="5"
+                         IsChecked="{Binding IsConf5, Mode=TwoWay}" AutomationProperties.Name="信心 5 分" />
+            <Border Classes="badge">
+              <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding ConfidenceText}" />
+            </Border>
+          </StackPanel>
+
+          <TextBlock Classes="body" Foreground="#92400E" Text="{Binding ConfidenceHint}"
+                     IsVisible="{Binding NeedsConfidence}" AutomationProperties.Name="信心值必填提示" />
+        </StackPanel>
+      </Border>
+
+      <!-- ④ 提交 / 下一题 -->
+      <StackPanel Orientation="Horizontal" Spacing="10" IsVisible="{Binding HasTask}">
+        <Button Classes="primary" Content="提交"
+                IsVisible="{Binding IsSubmitted, Converter={x:Static conv:AppConverters.NotToVisible}}"
+                Command="{Binding SubmitCommand}" AutomationProperties.Name="提交作答" />
+        <Button Classes="primary" Content="下一题"
+                IsVisible="{Binding IsSubmitted}"
+                Command="{Binding NextQuestionCommand}" AutomationProperties.Name="下一题" />
+        <Button Classes="ghost" Content="回到今日"
+                Command="{Binding GoTodayCommand}" AutomationProperties.Name="回到今日" />
+      </StackPanel>
+
+      <!-- ⑤ 判题结果卡 -->
+      <Border Classes="card" IsVisible="{Binding IsSubmitted}">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="{Binding ResultTitle}" />
+          <TextBlock Classes="body" Text="{Binding CorrectAnswerText}" />
+          <TextBlock Classes="body" Text="{Binding YourAnswerText}" />
+          <TextBlock Classes="muted" Text="{Binding ConfidenceText}" />
+          <TextBlock Classes="muted" Text="{Binding LatencyText}" />
+          <Border Classes="panel">
+            <TextBlock Classes="body" Text="{Binding ResultNote}" />
+          </Border>
+        </StackPanel>
+      </Border>
+
+      <!-- ⑥ 错误条：数据源异常时可见，不静默失败 -->
+      <Border Classes="panel" Background="#FEE2E2"
+              IsVisible="{Binding ErrorMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Foreground="#991B1B" Text="{Binding ErrorMessage}" />
+      </Border>
+
+      <!-- ⑦ 空态：给出下一步动作 -->
+      <Border Classes="card" IsVisible="{Binding IsEmpty}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="暂无题目" />
+          <TextBlock Classes="body" Text="{Binding EmptyReason}" />
+          <Button Classes="primary" Content="去今日看看" HorizontalAlignment="Left"
+                  Command="{Binding GoTodayCommand}" AutomationProperties.Name="去今日看看" />
+        </StackPanel>
+      </Border>
+
+      <TextBlock Classes="disclaimer" Text="{Binding FooterDisclaimer}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

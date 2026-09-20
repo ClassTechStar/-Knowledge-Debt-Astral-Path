@@ -1,0 +1,186 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AstralPath.Shared.ViewModels"
+             xmlns:conv="using:AstralPath.Shared.Converters"
+             x:Class="AstralPath.Shared.Views.KnowledgeView"
+             x:DataType="vm:KnowledgeViewModel">
+
+  <!--
+    知识库页（方案 §45）
+    - 文档清单：标题 + 可见性徽章 + 状态 + 版本（草稿为「-」）+ 标签
+    - 检索：结果按角色与可见性过滤（fail-closed），片段与匹配度（4 位小数）同屏
+    - 新建：标题 / 正文 / 可见性显式选择，落库为草稿
+  -->
+  <ScrollViewer>
+    <StackPanel Margin="20" Spacing="14">
+
+      <!-- ① 顶栏 -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Grid.Column="0" Spacing="4">
+            <TextBlock Classes="h1" Text="{Binding Title}" />
+            <TextBlock Classes="muted" Text="{Binding ModeLabel, StringFormat='数据源：{0}'}" />
+          </StackPanel>
+          <Button Grid.Column="1" Classes="ghost" Content="刷新清单" VerticalAlignment="Top"
+                  Command="{Binding RefreshCommand}" AutomationProperties.Name="刷新文档清单" />
+        </Grid>
+      </Border>
+
+      <!-- ② 状态条：一次性操作反馈 -->
+      <Border Classes="panel" IsVisible="{Binding StatusMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Text="{Binding StatusMessage}" AutomationProperties.Name="操作结果" />
+      </Border>
+
+      <!-- ③ 检索 -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="检索知识库" />
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBox Text="{Binding SearchQuery, Mode=TwoWay}" MinWidth="280"
+                     Watermark="关键词，如：折旧"
+                     AutomationProperties.Name="知识库检索关键词" />
+            <Button Classes="primary" Content="搜索" IsDefault="True"
+                    Command="{Binding SearchCommand}" AutomationProperties.Name="搜索知识库" />
+            <Button Classes="ghost" Content="清空"
+                    Command="{Binding ClearSearchCommand}" AutomationProperties.Name="清空检索" />
+          </StackPanel>
+          <TextBlock Classes="muted" Text="{Binding SearchHint}" IsVisible="{Binding IsQueryEmpty}" />
+        </StackPanel>
+      </Border>
+
+      <!-- 检索结果 -->
+      <ItemsControl ItemsSource="{Binding Hits}" IsVisible="{Binding HasHits}" AutomationProperties.Name="检索结果">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:KbHitItem">
+            <Border Classes="card" Margin="0,0,0,10" AutomationProperties.Name="{Binding AccessibleName}">
+              <StackPanel Spacing="6">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Classes="h2" Text="{Binding Title}" />
+                  <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                    <Border Classes="badge">
+                      <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding VisibilityLabel}" />
+                    </Border>
+                    <Border Classes="badge">
+                      <TextBlock Classes="badge-text" Foreground="#1E293B"
+                                 Text="{Binding ScoreText, StringFormat='匹配度 {0}'}" />
+                    </Border>
+                  </StackPanel>
+                </Grid>
+                <TextBlock Classes="body" Text="{Binding Snippet}" />
+                <TextBlock Classes="muted" Text="{Binding ChunkId}" />
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <Border Classes="panel"
+              IsVisible="{Binding SearchEmptyReason, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Text="{Binding SearchEmptyReason}" />
+      </Border>
+
+      <!-- ④ 新建文档 -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="新建文档" />
+          <TextBlock Classes="muted" Text="新建后为草稿状态，发布与可见性变更都需要显式操作。" />
+
+          <TextBox Text="{Binding NewTitle, Mode=TwoWay}" Watermark="文档标题"
+                   AutomationProperties.Name="新文档标题" />
+          <TextBox Text="{Binding NewText, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap"
+                   MinHeight="120" Watermark="正文（会切分为可检索片段）"
+                   AutomationProperties.Name="新文档正文" />
+
+          <Grid ColumnDefinitions="Auto,*">
+            <TextBlock Grid.Column="0" Classes="body" Text="可见性" VerticalAlignment="Center"
+                       Margin="0,0,10,0" />
+            <ComboBox Grid.Column="1" ItemsSource="{Binding VisibilityOptions}"
+                      SelectedItem="{Binding SelectedVisibility, Mode=TwoWay}"
+                      MinWidth="240" HorizontalAlignment="Left"
+                      AutomationProperties.Name="新文档可见性">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:VisibilityChoice">
+                  <TextBlock Classes="body" Text="{Binding Label}" />
+                </DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </Grid>
+
+          <Button Classes="primary" Content="创建" HorizontalAlignment="Left"
+                  Command="{Binding CreateCommand}" AutomationProperties.Name="创建文档" />
+        </StackPanel>
+      </Border>
+
+      <!-- ⑤ 权限说明 -->
+      <Border Classes="panel">
+        <StackPanel Spacing="4">
+          <TextBlock Classes="h2" Text="权限与可见性" />
+          <TextBlock Classes="body" Text="{Binding PermissionNote}" />
+        </StackPanel>
+      </Border>
+
+      <!-- ⑥ 文档清单 -->
+      <TextBlock Classes="h2" Text="文档清单" />
+      <ItemsControl ItemsSource="{Binding Documents}" IsVisible="{Binding HasDocuments}"
+                    AutomationProperties.Name="知识库文档列表">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:KbDocItem">
+            <Border Classes="card" Margin="0,0,0,10" AutomationProperties.Name="{Binding AccessibleName}">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="h2" Text="{Binding Title}" />
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <Border Classes="badge" Background="#64748B" IsVisible="{Binding IsPrivate}">
+                    <TextBlock Classes="badge-text" Text="{Binding VisibilityLabel}" />
+                  </Border>
+                  <Border Classes="badge" Background="#3B82F6" IsVisible="{Binding IsCourse}">
+                    <TextBlock Classes="badge-text" Text="{Binding VisibilityLabel}" />
+                  </Border>
+                  <Border Classes="badge" Background="#1B9E77" IsVisible="{Binding IsPublic}">
+                    <TextBlock Classes="badge-text" Text="{Binding VisibilityLabel}" />
+                  </Border>
+                  <Border Classes="badge">
+                    <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding StatusLabel}" />
+                  </Border>
+                  <Border Classes="badge">
+                    <TextBlock Classes="badge-text" Foreground="#1E293B"
+                               Text="{Binding VersionText, StringFormat='版本 {0}'}" />
+                  </Border>
+                </StackPanel>
+
+                <ItemsControl ItemsSource="{Binding Tags}" IsVisible="{Binding HasTags}">
+                  <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                      <StackPanel Orientation="Horizontal" Spacing="6" />
+                    </ItemsPanelTemplate>
+                  </ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="x:String">
+                      <Border Classes="badge" Background="#F1F5F9">
+                        <TextBlock Classes="badge-text" Foreground="#475569" Text="{Binding}" />
+                      </Border>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Classes="muted" Text="{Binding DocumentId}" />
+              </StackPanel>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <Border Classes="panel" IsVisible="{Binding IsDocumentsEmpty}">
+        <TextBlock Classes="body" Text="当前角色下没有可见的文档。可以先用上面的表单创建一份草稿。" />
+      </Border>
+
+      <!-- ⑦ 错误条 -->
+      <Border Classes="panel" Background="#FEE2E2"
+              IsVisible="{Binding ErrorMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Foreground="#991B1B" Text="{Binding ErrorMessage}" />
+      </Border>
+
+      <TextBlock Classes="disclaimer" Text="{Binding FooterDisclaimer}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

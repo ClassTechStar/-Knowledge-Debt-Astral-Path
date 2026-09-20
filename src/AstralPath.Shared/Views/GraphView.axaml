@@ -1,0 +1,120 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AstralPath.Shared.ViewModels"
+             xmlns:controls="using:AstralPath.Shared.Controls"
+             xmlns:conv="using:AstralPath.Shared.Converters"
+             x:Class="AstralPath.Shared.Views.GraphView"
+             x:DataType="vm:GraphViewModel">
+
+  <!--
+    图谱页（方案 §12.2）
+    - 左：深色自绘画布（#0F0F1A），节点=掌握度 band，债边=状态（颜色 + 线型双编码）
+    - 右：Top-N 债边列表 + 选中节点 Story 卡
+    - 窄屏时右栏自动收起（由 code-behind 回写 ShowSidePanel），画布占满
+  -->
+  <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,Auto">
+
+    <!-- 顶栏：Top-N 与图元信息 -->
+    <Border Grid.Row="0" Grid.ColumnSpan="2" Classes="card" Margin="16,16,16,0">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Grid.Column="0" Spacing="4">
+          <TextBlock Classes="h1" Text="{Binding Title}" />
+          <TextBlock Classes="muted" Text="{Binding GraphMeta}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+          <TextBlock Classes="muted" Text="Top-N" VerticalAlignment="Center" />
+          <ComboBox ItemsSource="{Binding TopNOptions}" SelectedItem="{Binding TopN}"
+                    MinWidth="88" AutomationProperties.Name="选择展示的债边数量" />
+          <Button Classes="ghost" Content="重新诊断" Command="{Binding RefreshCommand}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+
+    <!-- 画布 -->
+    <Border Grid.Row="1" Grid.Column="0" Margin="16" MinHeight="320"
+            CornerRadius="8" ClipToBounds="True" Background="#0F0F1A">
+      <controls:GraphCanvas x:Name="Canvas"
+                            Source="{Binding View}"
+                            SelectedNodeId="{Binding SelectedNodeId, Mode=TwoWay}"
+                            ColorBlindSafe="{Binding Settings.ColorBlindSafe}"
+                            ReduceMotion="{Binding Settings.ReduceMotion}" />
+    </Border>
+
+    <!-- 右栏 -->
+    <ScrollViewer Grid.Row="1" Grid.Column="1" Width="340" Margin="0,16,16,16"
+                  IsVisible="{Binding ShowSidePanel}">
+      <StackPanel Spacing="12">
+
+        <!-- 选中节点 Story 卡 -->
+        <Border Classes="card">
+          <StackPanel Spacing="8">
+            <TextBlock Classes="h2" Text="{Binding SelectedNodeTitle}" />
+            <TextBlock Classes="body" Text="{Binding SelectedNodeDetail}" />
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Button Classes="primary" Content="去今日练习" Command="{Binding OpenTodayCommand}" />
+              <Button Classes="ghost" Content="取消选中" Command="{Binding ClearSelectionCommand}" />
+            </StackPanel>
+          </StackPanel>
+        </Border>
+
+        <!-- Top-N 债边 -->
+        <TextBlock Classes="h2" Text="优先修复的债边" />
+        <ItemsControl ItemsSource="{Binding Debts}" IsVisible="{Binding HasDebts}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:DebtRow">
+              <Border Classes="card" Margin="0,0,0,10"
+                      AutomationProperties.Name="{Binding AccessibleName}">
+                <StackPanel Spacing="6">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0" Classes="h2" Text="{Binding Title}" />
+                    <Border Grid.Column="1" Classes="badge"
+                            Background="{Binding Status, Converter={x:Static conv:AppConverters.StatusToBrush}}">
+                      <TextBlock Classes="badge-text" Text="{Binding ImpactText}" />
+                    </Border>
+                  </Grid>
+                  <TextBlock Classes="muted" Text="{Binding FormulaText}" />
+                  <TextBlock Classes="body" Text="{Binding Story}" />
+                  <TextBlock Classes="muted" Text="{Binding SafetyText}"
+                             IsVisible="{Binding SafetyText, Converter={x:Static conv:AppConverters.TextToVisible}}" />
+                  <ItemsControl ItemsSource="{Binding Actions}" IsVisible="{Binding HasActions}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="x:String">
+                        <TextBlock Classes="body" Text="{Binding, StringFormat='· {0}'}" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <Button Classes="ghost" Content="在图谱中定位"
+                          HorizontalAlignment="Left"
+                          Command="{Binding $parent[ItemsControl].((vm:GraphViewModel)DataContext).SelectNodeCommand}"
+                          CommandParameter="{Binding FromKp}" />
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <Border Classes="panel" IsVisible="{Binding IsEmpty}">
+          <TextBlock Classes="body" Text="{Binding EmptyReason}" />
+        </Border>
+
+        <!-- 掌握度最弱的知识点（点击定位） -->
+        <TextBlock Classes="h2" Text="掌握度最弱" />
+        <ItemsControl ItemsSource="{Binding HotNodes}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:GraphNodePosRow">
+              <Button Classes="ghost" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"
+                      Margin="0,0,0,6"
+                      Command="{Binding $parent[ItemsControl].((vm:GraphViewModel)DataContext).SelectNodeCommand}"
+                      CommandParameter="{Binding Id}">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Grid.Column="0" Classes="body" Text="{Binding Name}" />
+                  <TextBlock Grid.Column="1" Classes="muted" Text="{Binding ScoreText}" />
+                </Grid>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

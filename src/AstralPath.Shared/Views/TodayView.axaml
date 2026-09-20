@@ -1,0 +1,107 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AstralPath.Shared.ViewModels"
+             xmlns:conv="using:AstralPath.Shared.Converters"
+             x:Class="AstralPath.Shared.Views.TodayView"
+             x:DataType="vm:TodayViewModel">
+
+  <!--
+    今日页（方案 §12.3 桌面 / §13.1 移动）
+    - 首屏信息优先级：今日预算胶囊 → 教练一句话 → 任务卡（含「为什么做这个」）
+    - 触达：按钮 ≥44px（桌面），卡片整块可点区域通过「开始」按钮承担
+    - 无障碍：卡片 AutomationProperties.Name 绑定完整语义描述
+  -->
+  <ScrollViewer>
+    <StackPanel Margin="20" Spacing="14">
+
+      <!-- ① 今日预算胶囊 + 日期切换 -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+          <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+            <TextBlock Classes="h1" Text="{Binding Title}" />
+            <TextBlock Classes="muted" Text="{Binding StudentName, StringFormat='学生：{0}'}" />
+          </StackPanel>
+
+          <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="8"
+                      VerticalAlignment="Top">
+            <Button Classes="ghost" Content="◀" Command="{Binding PreviousDayCommand}"
+                    ToolTip.Tip="前一天" AutomationProperties.Name="前一天" />
+            <TextBlock Classes="h2" VerticalAlignment="Center"
+                       Text="{Binding Day, StringFormat='第 {0} 天'}" />
+            <Button Classes="ghost" Content="▶" Command="{Binding NextDayCommand}"
+                    ToolTip.Tip="后一天" AutomationProperties.Name="后一天" />
+          </StackPanel>
+
+          <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Spacing="8" Margin="0,12,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+              <Border Classes="badge">
+                <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding BudgetText}" />
+              </Border>
+              <Border Classes="badge" IsVisible="{Binding IsOverBudget}" Background="#FEF3C7">
+                <TextBlock Classes="badge-text" Foreground="#92400E" Text="超出预算，可下调难度或顺延" />
+              </Border>
+            </StackPanel>
+            <ProgressBar Value="{Binding BudgetRatio}" Minimum="0" Maximum="1"
+                         AutomationProperties.Name="今日预算占用" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- ② 教练一句话 -->
+      <Border Classes="panel" IsVisible="{Binding CoachMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <StackPanel Spacing="4">
+          <TextBlock Classes="muted" Text="今日建议" />
+          <TextBlock Classes="body" Text="{Binding CoachMessage}" />
+        </StackPanel>
+      </Border>
+
+      <!-- ③ 错误条（数据源异常时可见，不静默失败） -->
+      <Border Classes="panel" Background="#FEE2E2"
+              IsVisible="{Binding ErrorMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Foreground="#991B1B" Text="{Binding ErrorMessage}" />
+      </Border>
+
+      <!-- ④ 任务列表 -->
+      <ItemsControl x:Name="TaskList" ItemsSource="{Binding Tasks}"
+                    IsVisible="{Binding HasTasks}"
+                    AutomationProperties.Name="今日任务列表">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:TodayTaskItem">
+            <Border Classes="card" Margin="0,0,0,10"
+                    AutomationProperties.Name="{Binding AccessibleName}">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Spacing="5">
+                  <TextBlock Classes="h2" Text="{Binding KpName}" />
+                  <TextBlock Classes="muted" Text="{Binding Meta}" />
+                  <TextBlock Classes="body" Text="{Binding Why}" />
+                  <TextBlock Classes="muted" Text="{Binding Difficulty, Converter={x:Static conv:AppConverters.DifficultyToDots}}"
+                             AutomationProperties.Name="难度" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="primary" Content="开始"
+                        VerticalAlignment="Center"
+                        Command="{Binding $parent[ItemsControl].((vm:TodayViewModel)DataContext).StartTaskCommand}"
+                        CommandParameter="{Binding}"
+                        AutomationProperties.Name="{Binding KpName, StringFormat='开始练习 {0}'}" />
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- ⑤ 空态：给出下一步动作，而不是空白页 -->
+      <Border Classes="card" IsVisible="{Binding IsEmpty}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="今天还没有任务" />
+          <TextBlock Classes="body"
+                     Text="先生成一次学习计划：系统会按知识债的 impact 排序，把最该还的债排进未来 14 天，并校验每日预算与前置依赖。" />
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Classes="primary" Content="生成计划" Command="{Binding GeneratePlanCommand}" />
+            <Button Classes="ghost" Content="查看图谱" Command="{Binding OpenGraphCommand}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <TextBlock Classes="disclaimer" Text="{Binding FooterDisclaimer}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

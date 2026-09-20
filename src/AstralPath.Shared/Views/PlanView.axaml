@@ -1,0 +1,177 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AstralPath.Shared.ViewModels"
+             xmlns:conv="using:AstralPath.Shared.Converters"
+             x:Class="AstralPath.Shared.Views.PlanView"
+             x:DataType="vm:PlanViewModel">
+
+  <!--
+    14 天计划页（方案 §12.3）
+    · 顶栏：计划元信息（计划 ID、图版本、每日预算、约束校验）+ 生成 / 重新生成
+    · 主体：14 行甘特，每行左侧天序号与合计分钟，右侧任务条横向排列
+    · 任务条宽度由 EstMin 换算；颜色按类型区分，同时以文字标注类型与分钟数
+    · 超预算的当天显示红色徽章；被放弃的任务降透明度并加删除线文案
+    · 窄屏：任务条区域可横向滚动
+  -->
+  <ScrollViewer>
+    <StackPanel Margin="20" Spacing="14">
+
+      <!-- ① 顶栏 -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+          <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+            <TextBlock Classes="h1" Text="{Binding Title}" />
+            <TextBlock Classes="muted" Text="{Binding StudentLine}" />
+          </StackPanel>
+
+          <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="8"
+                      VerticalAlignment="Top">
+            <Button Classes="primary" Content="生成 / 重新生成计划"
+                    Command="{Binding GeneratePlanCommand}"
+                    AutomationProperties.Name="生成或重新生成 14 天计划" />
+            <Button Classes="ghost" Content="刷新"
+                    Command="{Binding RefreshCommand}"
+                    AutomationProperties.Name="刷新计划" />
+          </StackPanel>
+
+          <StackPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Spacing="8" Margin="0,12,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+              <Border Classes="badge">
+                <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding PlanIdText}" />
+              </Border>
+              <Border Classes="badge">
+                <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding GraphVersionText}" />
+              </Border>
+              <Border Classes="badge">
+                <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding BudgetText}" />
+              </Border>
+              <Border Classes="badge">
+                <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding ConstraintsText}" />
+              </Border>
+              <Border Classes="badge" IsVisible="{Binding HasPlan}">
+                <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding TotalText}" />
+              </Border>
+            </StackPanel>
+            <TextBlock Classes="muted" Text="{Binding PlannerLine}"
+                       IsVisible="{Binding PlannerLine, Converter={x:Static conv:AppConverters.TextToVisible}}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- ② 错误条（数据源异常时可见，不静默失败） -->
+      <Border Classes="panel" Background="#FEE2E2"
+              IsVisible="{Binding ErrorMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Foreground="#991B1B" Text="{Binding ErrorMessage}" />
+      </Border>
+
+      <!-- ③ 14 天甘特 -->
+      <ItemsControl ItemsSource="{Binding Days}" IsVisible="{Binding HasPlan}"
+                    AutomationProperties.Name="14 天计划甘特">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:PlanDayRow">
+            <Border Classes="card" Padding="12" Margin="0,0,0,10"
+                    AutomationProperties.Name="{Binding AccessibleName}">
+              <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                <StackPanel Grid.Row="0" Grid.Column="0" Width="88" Spacing="2">
+                  <TextBlock Classes="h2" Text="{Binding DayLabel}" />
+                  <TextBlock Classes="muted" Text="{Binding MinutesText}" />
+                </StackPanel>
+
+                <Border Grid.Row="0" Grid.Column="1" Classes="badge" Background="#FEE2E2"
+                        HorizontalAlignment="Left" VerticalAlignment="Center"
+                        IsVisible="{Binding IsOverBudget}">
+                  <TextBlock Classes="badge-text" Foreground="#991B1B" Text="{Binding OverBudgetText}" />
+                </Border>
+
+                <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,8,0,0"
+                              HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+                  <ItemsControl ItemsSource="{Binding Tasks}" AutomationProperties.Name="{Binding DayLabel}">
+                    <ItemsControl.ItemsPanel>
+                      <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" Spacing="8" />
+                      </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:PlanTaskItem">
+                        <Border Width="{Binding EstMin, Converter={x:Static conv:AppConverters.MinToWidth}}"
+                                MinHeight="56"
+                                CornerRadius="6" Padding="6,4" ClipToBounds="True"
+                                Opacity="{Binding BarOpacity}"
+                                Background="{Binding BarColor, Converter={x:Static conv:AppConverters.HexToBrush}}"
+                                ToolTip.Tip="{Binding AccessibleName}"
+                                AutomationProperties.Name="{Binding AccessibleName}">
+                          <StackPanel Spacing="2">
+                            <TextBlock Classes="badge-text" Foreground="White"
+                                       TextTrimming="CharacterEllipsis"
+                                       Text="{Binding KpName}" />
+                            <TextBlock Classes="badge-text" Foreground="White"
+                                       TextTrimming="CharacterEllipsis"
+                                       Text="{Binding Meta}" />
+                            <TextBlock Classes="badge-text" Foreground="White"
+                                       TextTrimming="CharacterEllipsis"
+                                       TextDecorations="Strikethrough"
+                                       Text="{Binding DroppedNote}"
+                                       IsVisible="{Binding IsDropped}" />
+                          </StackPanel>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- ④ 约束违规（有违规逐条列出，无违规给出正向结论） -->
+      <Border Classes="card" IsVisible="{Binding HasViolations}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="约束校验未通过" />
+          <TextBlock Classes="muted" Text="以下条目由 K1 到 K5 约束检查器给出，用于说明计划为何被调整。" />
+          <ItemsControl ItemsSource="{Binding Violations}" AutomationProperties.Name="约束违规列表">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:ConstraintViolationRow">
+                <Border Classes="panel" Margin="0,0,0,6"
+                        AutomationProperties.Name="{Binding AccessibleName}">
+                  <StackPanel Spacing="4">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                      <Border Classes="badge" Background="#FEE2E2">
+                        <TextBlock Classes="badge-text" Foreground="#991B1B" Text="{Binding Code}" />
+                      </Border>
+                      <TextBlock Classes="muted" VerticalAlignment="Center" Text="{Binding DayText}" />
+                    </StackPanel>
+                    <TextBlock Classes="body" Text="{Binding Message}" />
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <Border Classes="panel" IsVisible="{Binding NoViolations}">
+        <TextBlock Classes="body" Text="K1–K5 约束全部通过" />
+      </Border>
+
+      <!-- ⑤ 空态：给出下一步动作，而不是空白页 -->
+      <Border Classes="card" IsVisible="{Binding IsEmpty}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="还没有计划" />
+          <TextBlock Classes="body"
+                     Text="生成一次 14 天计划：系统按知识债的 impact 排序，把最该还的债排进每日预算内，并校验前置依赖与预算等约束。" />
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Classes="primary" Content="生成计划"
+                    Command="{Binding GeneratePlanCommand}"
+                    AutomationProperties.Name="生成 14 天计划" />
+            <Button Classes="ghost" Content="查看图谱"
+                    Command="{Binding OpenGraphCommand}"
+                    AutomationProperties.Name="查看知识债图谱" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <TextBlock Classes="disclaimer" Text="{Binding FooterDisclaimer}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

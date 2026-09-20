@@ -1,0 +1,255 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AstralPath.Shared.ViewModels"
+             xmlns:conv="using:AstralPath.Shared.Converters"
+             x:Class="AstralPath.Shared.Views.ProfileView"
+             x:DataType="vm:ProfileViewModel">
+
+  <!--
+    用户画像页（方案 §46）
+    - 四件套：雷达图（Canvas 绝对定位）/ 时间线 / 标签云 / 7 × N 热力图
+    - opt-out 硬约束：关闭个性化后所有可视化必须隐藏，只留空态卡与「重新开启」
+    - 无障碍：图形之外一律同时给出数值文本，颜色不单独表意
+    - 绘制只用 Canvas + Line / Ellipse / Border / TextBlock，不新增自定义控件
+  -->
+  <ScrollViewer>
+    <StackPanel Margin="20" Spacing="14">
+
+      <!-- ① 顶部：摘要与样本数 -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Grid.Column="0" Spacing="6">
+            <TextBlock Classes="h1" Text="{Binding Title}" />
+            <TextBlock Classes="muted" Text="{Binding StudentName, StringFormat='学生：{0}'}" />
+            <TextBlock Classes="body" Text="{Binding Summary}" />
+            <TextBlock Classes="muted" Text="{Binding SampleText}" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+            <Button Classes="ghost" Content="刷新" Command="{Binding RefreshCommand}"
+                    AutomationProperties.Name="刷新画像" />
+            <Button Classes="ghost" Content="关闭个性化" Command="{Binding ClosePersonalizationCommand}"
+                    IsVisible="{Binding ShowVisualizations}"
+                    AutomationProperties.Name="关闭个性化" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- ② 操作反馈状态条 -->
+      <Border Classes="panel" IsVisible="{Binding StatusMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Text="{Binding StatusMessage}" />
+      </Border>
+
+      <!-- ③ 数据源异常条 -->
+      <Border Classes="panel" Background="#FEE2E2"
+              IsVisible="{Binding ErrorMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Foreground="#991B1B" Text="{Binding ErrorMessage}" />
+      </Border>
+
+      <!-- ④ opt-out 空态卡：此时不展示任何画像可视化 -->
+      <Border Classes="card" Background="#FEF3C7" BorderBrush="#F59E0B" BorderThickness="2"
+              IsVisible="{Binding ShowOptOutCard}"
+              AutomationProperties.Name="已关闭个性化">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="⏸ 已关闭个性化" Foreground="#92400E" />
+          <TextBlock Classes="body" Text="{Binding OptOutNotice}" />
+          <TextBlock Classes="muted"
+                     Text="关闭后：雷达图、标签云、时间线与热力图全部隐藏，推荐排序也不再使用行为画像。" />
+          <Button Classes="primary" Content="重新开启" HorizontalAlignment="Left"
+                  Command="{Binding ReopenPersonalizationCommand}"
+                  AutomationProperties.Name="重新开启个性化" />
+        </StackPanel>
+      </Border>
+
+      <!-- ⑤ 雷达图（Canvas 绝对定位，中心 (110,110)，半径 90） -->
+      <Border Classes="card" IsVisible="{Binding ShowVisualizations}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="能力雷达" />
+          <TextBlock Classes="muted"
+                     Text="各轴归一到 0 至 100；图形之外同时给出数值，便于读屏与色觉障碍用户。" />
+
+          <Border Classes="panel" Background="#FEF3C7" IsVisible="{Binding ShowRadarSuppressedHint}">
+            <TextBlock Classes="body" Foreground="#92400E" Text="{Binding SuppressedNotice}" />
+          </Border>
+
+          <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding ShowRadarCanvas}">
+            <Canvas Grid.Column="0" Width="220" Height="220" ClipToBounds="False"
+                    AutomationProperties.Name="能力雷达图">
+              <Ellipse Canvas.Left="20" Canvas.Top="20" Width="180" Height="180"
+                       Stroke="{StaticResource BorderBrush}" StrokeThickness="1" />
+              <ItemsControl Width="220" Height="220" ItemsSource="{Binding RadarAxes}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <Panel />
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:RadarAxisItem">
+                    <Canvas Width="220" Height="220">
+                      <Line StartPoint="{Binding StartPoint}" EndPoint="{Binding EndPoint}"
+                            Stroke="{StaticResource BorderBrush}" StrokeThickness="1" />
+                      <Ellipse Canvas.Left="{Binding DotX}" Canvas.Top="{Binding DotY}"
+                               Width="8" Height="8" Fill="{StaticResource PrimaryBrush}" />
+                      <TextBlock Canvas.Left="{Binding LabelX}" Canvas.Top="{Binding LabelY}"
+                                 Width="48" FontSize="10" TextAlignment="Center"
+                                 Foreground="{StaticResource TextMutedBrush}"
+                                 Text="{Binding LabelText}" />
+                    </Canvas>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Canvas>
+
+            <!-- 数值文本（无障碍：不能只给图形） -->
+            <ItemsControl Grid.Column="1" Margin="16,0,0,0" ItemsSource="{Binding RadarAxes}"
+                          VerticalAlignment="Center"
+                          AutomationProperties.Name="能力雷达数值">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:RadarAxisItem">
+                  <TextBlock Classes="body" Text="{Binding AccessibleName}" />
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- ⑥ 时间线 -->
+      <Border Classes="card" IsVisible="{Binding ShowVisualizations}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="作答时间线" />
+          <TextBlock Classes="muted"
+                     Text="逐日展示作答次数与正确率；条宽表示正确率，同时给出百分比文本。" />
+
+          <Border Classes="panel" Background="#FEF3C7"
+                  IsVisible="{Binding HasTimeline, Converter={x:Static conv:AppConverters.NotToVisible}}">
+            <TextBlock Classes="body" Text="暂无时间线数据（还没有作答记录）。" />
+          </Border>
+
+          <ItemsControl ItemsSource="{Binding Timeline}" IsVisible="{Binding HasTimeline}"
+                        AutomationProperties.Name="作答时间线">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:TimelineItem">
+                <StackPanel Spacing="4" Margin="0,0,0,10"
+                            AutomationProperties.Name="{Binding AccessibleName}">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <TextBlock Grid.Column="0" Classes="muted" Text="{Binding Date}" />
+                    <TextBlock Grid.Column="2" Classes="muted" Text="{Binding AttemptsText}" />
+                  </Grid>
+                  <Border Height="10" CornerRadius="5" Background="{StaticResource SurfaceAltBrush}">
+                    <Border Height="10" CornerRadius="5" HorizontalAlignment="Left"
+                            Background="{StaticResource PrimaryBrush}">
+                      <Border.Width>
+                        <MultiBinding>
+                          <MultiBinding.Converter>
+                            <conv:RatioToBarWidthConverter />
+                          </MultiBinding.Converter>
+                          <Binding Path="BarRatio" />
+                          <Binding Path="$parent[Border].Bounds.Width" />
+                        </MultiBinding>
+                      </Border.Width>
+                    </Border>
+                  </Border>
+                  <TextBlock Classes="muted" Text="{Binding AccuracyText}" />
+                </StackPanel>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <!-- ⑦ 标签云 -->
+      <Border Classes="card" IsVisible="{Binding ShowVisualizations}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="学习标签" />
+          <TextBlock Classes="muted" Text="标签字号随权重变化；权重同时以文字给出，不依赖视觉大小单独表意。" />
+
+          <Border Classes="panel" Background="#FEF3C7"
+                  IsVisible="{Binding HasTags, Converter={x:Static conv:AppConverters.NotToVisible}}">
+            <TextBlock Classes="body" Text="暂无画像标签（样本不足或已做 k-匿名抑制）。" />
+          </Border>
+
+          <ItemsControl ItemsSource="{Binding Tags}" IsVisible="{Binding HasTags}"
+                        AutomationProperties.Name="学习标签云">
+            <ItemsControl.ItemsPanel>
+              <ItemsPanelTemplate>
+                <WrapPanel Orientation="Horizontal" />
+              </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:TagItem">
+                <Border Classes="badge" Margin="0,0,8,8" Background="#E8F0FE"
+                        AutomationProperties.Name="{Binding AccessibleName}">
+                  <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Classes="badge-text" Foreground="#1E293B"
+                               FontSize="{Binding FontSize}" Text="{Binding Tag}" />
+                    <TextBlock Classes="muted" VerticalAlignment="Center" Text="{Binding Domain}" />
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+
+      <!-- ⑧ 热力图（7 行 × 每日一列，5 档深浅 + 数值文本） -->
+      <Border Classes="card" IsVisible="{Binding ShowVisualizations}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="作答热力图" />
+          <TextBlock Classes="muted"
+                     Text="7 格为一列（对应一天），颜色表示正确率档位：低于 30% / 50% / 70% / 85% 与以上共 5 档；每格同时给出数值。" />
+
+          <Border Classes="panel" Background="#FEF3C7"
+                  IsVisible="{Binding HasHeatColumns, Converter={x:Static conv:AppConverters.NotToVisible}}">
+            <TextBlock Classes="body" Text="暂无热力图数据（需要至少一天作答记录）。" />
+          </Border>
+
+          <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                        IsVisible="{Binding HasHeatColumns}">
+            <ItemsControl ItemsSource="{Binding HeatColumns}" AutomationProperties.Name="作答热力图">
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="6" />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:HeatColumn">
+                  <StackPanel Spacing="4" AutomationProperties.Name="{Binding AccessibleName}">
+                    <ItemsControl ItemsSource="{Binding Cells}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:HeatCell">
+                          <Border Width="44" Height="22" CornerRadius="3" Margin="0,0,0,2"
+                                  Background="{Binding HexColor, Converter={x:Static conv:AppConverters.HexToBrush}}"
+                                  AutomationProperties.Name="{Binding AccessibleName}">
+                            <TextBlock FontSize="9" Foreground="#1E293B"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       Text="{Binding ValueText}" />
+                          </Border>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <TextBlock Classes="muted" FontSize="9" TextAlignment="Center"
+                               Text="{Binding DateLabel}" />
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </StackPanel>
+      </Border>
+
+      <!-- ⑨ 合规说明卡 -->
+      <Border Classes="panel">
+        <StackPanel Spacing="6">
+          <TextBlock Classes="h2" Text="合规说明" />
+          <TextBlock Classes="body" Text="{Binding Compliance}" />
+          <TextBlock Classes="muted"
+                     Text="画像不参与任何评价性结论；opt-out 后行为数据不再进入画像计算。" />
+          <Button Classes="ghost" Content="去今日练习" HorizontalAlignment="Left"
+                  Command="{Binding OpenTodayCommand}" AutomationProperties.Name="去今日练习" />
+        </StackPanel>
+      </Border>
+
+      <TextBlock Classes="disclaimer" Text="{Binding FooterDisclaimer}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

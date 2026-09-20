@@ -1,0 +1,80 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AstralPath.Shared.ViewModels"
+             xmlns:svc="using:AstralPath.Shared.Services"
+             xmlns:conv="using:AstralPath.Shared.Converters"
+             x:Class="AstralPath.Mobile.Views.MobileShell"
+             x:DataType="vm:ShellViewModel">
+
+  <!--
+    移动端外壳（方案 §13）
+    - 单栏内容 + 底部 5 Tab（今日 / 练习 / 债边 / 进度 / 我的）
+    - 今日为启动页；顶部保留学生切换与数据源模式标签
+    - 触达 ≥48px 由 App.axaml 的样式覆盖保证
+  -->
+  <Grid RowDefinitions="Auto,*,Auto" Background="{StaticResource AppBackgroundBrush}">
+
+    <!-- ① 顶栏 -->
+    <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,0,0,1" Padding="12,8">
+      <StackPanel Spacing="6">
+        <Grid ColumnDefinitions="*,Auto">
+          <TextBlock Grid.Column="0" Classes="h2" Text="{Binding Title}" VerticalAlignment="Center" />
+          <Border Grid.Column="1" Classes="badge">
+            <TextBlock Classes="badge-text" Foreground="#1E293B" Text="{Binding ModeLabel}" />
+          </Border>
+        </Grid>
+
+        <Grid ColumnDefinitions="*,Auto">
+          <ComboBox Grid.Column="0" ItemsSource="{Binding Students}" SelectedItem="{Binding SelectedStudent}"
+                    HorizontalAlignment="Stretch" AutomationProperties.Name="切换演示学生">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="svc:StudentSummary">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                  <TextBlock Classes="body" Text="{Binding DisplayName}" />
+                  <TextBlock Classes="muted" VerticalAlignment="Center"
+                             Text="{Binding OpenDebtCount, StringFormat='债 {0}'}" />
+                </StackPanel>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <Button Grid.Column="1" Classes="ghost" Margin="8,0,0,0" Content="切换"
+                  Command="{Binding ToggleStudentCommand}" AutomationProperties.Name="切换到另一个演示学生" />
+        </Grid>
+
+        <TextBlock Classes="body" Foreground="#065F46" Text="{Binding StatusMessage}"
+                   IsVisible="{Binding StatusMessage, Converter={x:Static conv:AppConverters.TextToVisible}}"
+                   AutomationProperties.LiveSetting="Polite" />
+      </StackPanel>
+    </Border>
+
+    <!-- ② 内容区 -->
+    <ContentControl Grid.Row="1" Content="{Binding Current}" />
+
+    <!-- ③ 底部 5 Tab -->
+    <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}"
+            BorderBrush="{StaticResource BorderBrush}" BorderThickness="0,1,0,0">
+      <ItemsControl ItemsSource="{Binding MobileTabs}" AutomationProperties.Name="底部导航">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <UniformGrid Rows="1" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:NavItem">
+            <Button Classes="nav" Classes.active="{Binding IsActive}"
+                    MinHeight="56" Padding="4,6"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                    Command="{Binding Navigate}" CommandParameter="{Binding Page}"
+                    AutomationProperties.Name="{Binding Label}">
+              <StackPanel Spacing="2" HorizontalAlignment="Center">
+                <TextBlock Text="{Binding Glyph}" FontSize="18" HorizontalAlignment="Center" />
+                <TextBlock Text="{Binding Label}" FontSize="11" HorizontalAlignment="Center" />
+              </StackPanel>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </Border>
+  </Grid>
+</UserControl>

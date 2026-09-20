@@ -1,17 +1,32 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>AstralPath.Desktop</RootNamespace>
     <AssemblyName>AstralPath.Desktop</AssemblyName>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <!--
+      WinExe：GUI 启动不弹控制台窗口。
+      传 demo 参数运行时 stdout 仍可见（dotnet run 会转发子进程输出），
+      用于 §12 的客户端复算自检。
+    -->
   </PropertyGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\AstralPath.Core\AstralPath.Core.csproj" />
-    <ProjectReference Include="..\AstralPath.Graph\AstralPath.Graph.csproj" />
+    <PackageReference Include="Avalonia" Version="11.3.20" />
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.20" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.20" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.20" />
+    <PackageReference Include="Avalonia.Diagnostics" Version="11.3.20" Condition="'$(Configuration)' == 'Debug'" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="..\..\graph-packs\accounting-v1\**\*" Link="graph-packs\accounting-v1\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <ProjectReference Include="..\AstralPath.Shared\AstralPath.Shared.csproj" />
   </ItemGroup>
+
 </Project>

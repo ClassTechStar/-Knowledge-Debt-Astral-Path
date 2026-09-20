@@ -1,13 +1,67 @@
 <Project Sdk="Microsoft.NET.Sdk">
+
   <PropertyGroup>
+    <!--
+      移动端 TFM 说明（诚实标注）：
+      方案 §13 要求 net10.0-android。当前环境已装 android 工作负载，但
+      Avalonia.Android 会触发 wasm-tools 工作负载需求，而
+      `dotnet workload install wasm-tools` 需要管理员提权（本机安装被取消）。
+
+      因此默认以 net10.0 构建「手机形态」的同一套 Avalonia UI：
+        - 全部移动端视图 / ViewModel / 响应式布局 100% 可用且可 Headless 测试
+        - Android 头文件（Android/ 目录）默认排除，不影响构建
+
+      启用 Android 打包（需先以管理员身份执行 dotnet workload install wasm-tools）：
+        dotnet build -p:EnableAndroidHead=true
+      详见 README「移动端构建」。
+    -->
+    <TargetFramework Condition="'$(EnableAndroidHead)' != 'true'">net10.0</TargetFramework>
+    <TargetFramework Condition="'$(EnableAndroidHead)' == 'true'">net10.0-android</TargetFramework>
+
+    <SupportedOSPlatformVersion Condition="'$(EnableAndroidHead)' == 'true'">24.0</SupportedOSPlatformVersion>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <RootNamespace>AstralPath.Mobile</RootNamespace>
+    <AssemblyName>AstralPath.Mobile</AssemblyName>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(EnableAndroidHead)' == 'true'">
+    <AndroidPackageFormat>aab</AndroidPackageFormat>
+    <ApplicationId>local.astralpath.mobile</ApplicationId>
+    <ApplicationVersion>1</ApplicationVersion>
+    <ApplicationDisplayVersion>1.3.0</ApplicationDisplayVersion>
+    <AndroidManifest>Android\AndroidManifest.xml</AndroidManifest>
+  </PropertyGroup>
+
   <ItemGroup>
-    <ProjectReference Include="..\AstralPath.Core\AstralPath.Core.csproj" />
+    <PackageReference Include="Avalonia" Version="11.3.20" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.20" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.20" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.0" />
+  </ItemGroup>
+
+  <!--
+    手机形态预览（默认 TFM=net10.0）：需要桌面后端才能开窗口，
+    用于本机验证与截图。Android 打包时改用 Avalonia.Android（下方条件项）。
+  -->
+  <ItemGroup Condition="'$(EnableAndroidHead)' != 'true'">
+    <PackageReference Include="Avalonia.Desktop" Version="11.3.20" />
+  </ItemGroup>
+
+  <!-- Android 头：仅在 EnableAndroidHead=true 时引入 -->
+  <ItemGroup Condition="'$(EnableAndroidHead)' == 'true'">
+    <PackageReference Include="Avalonia.Android" Version="11.3.20" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(EnableAndroidHead)' != 'true'">
+    <Compile Remove="Android\**\*.cs" />
+    <None Remove="Android\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AstralPath.Shared\AstralPath.Shared.csproj" />
   </ItemGroup>
+
 </Project>

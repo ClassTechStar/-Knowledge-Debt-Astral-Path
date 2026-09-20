@@ -1,0 +1,127 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AstralPath.Shared.ViewModels"
+             xmlns:conv="using:AstralPath.Shared.Converters"
+             x:Class="AstralPath.Shared.Views.DebtListView"
+             x:DataType="vm:DebtListViewModel">
+
+  <!--
+    债边清单页（方案 §12.2 / §6）
+    · 顶栏：状态筛选 + 筛选后条数
+    · 状态条：销账检查结论（已销账 / 还差 N 次连续达标）
+    · 列表：From → To、impact、score From → To、Freq、状态徽章（颜色 + 中文标签双编码）
+    · 状态说明卡：销账由确定性状态机判定，不依赖模型输出
+  -->
+  <ScrollViewer>
+    <StackPanel Margin="20" Spacing="14">
+
+      <!-- ① 顶栏与筛选 -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto">
+          <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+            <TextBlock Classes="h1" Text="{Binding Title}" />
+            <TextBlock Classes="muted" Text="{Binding StudentLine}" />
+          </StackPanel>
+
+          <StackPanel Grid.Row="0" Grid.Column="1" Orientation="Horizontal" Spacing="8"
+                      VerticalAlignment="Top">
+            <TextBlock Classes="muted" Text="状态筛选" VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding FilterOptions}" SelectedItem="{Binding SelectedFilter}"
+                      MinWidth="110" AutomationProperties.Name="按状态筛选债边" />
+            <Button Classes="ghost" Content="刷新"
+                    Command="{Binding RefreshCommand}"
+                    AutomationProperties.Name="刷新债边清单" />
+            <Button Classes="ghost" Content="查看图谱"
+                    Command="{Binding OpenGraphCommand}"
+                    AutomationProperties.Name="查看知识债图谱" />
+          </StackPanel>
+
+          <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Classes="muted"
+                     Margin="0,12,0,0" Text="{Binding CountText}" />
+        </Grid>
+      </Border>
+
+      <!-- ② 销账检查状态条（销账结论） -->
+      <Border Classes="panel" Background="#DCFCE7" IsVisible="{Binding StatusCleared}">
+        <StackPanel Spacing="4">
+          <TextBlock Classes="body" Foreground="#166534" Text="{Binding StatusMessage}"
+                     AutomationProperties.Name="销账检查结果" />
+          <TextBlock Classes="muted" Text="{Binding StatusDetail}" />
+        </StackPanel>
+      </Border>
+
+      <!-- ③ 销账检查状态条（尚未达标） -->
+      <Border Classes="panel" Background="#FEF3C7" IsVisible="{Binding StatusNotCleared}">
+        <StackPanel Spacing="4">
+          <TextBlock Classes="body" Foreground="#92400E" Text="{Binding StatusMessage}"
+                     AutomationProperties.Name="销账检查结果" />
+          <TextBlock Classes="muted" Text="{Binding StatusDetail}" />
+        </StackPanel>
+      </Border>
+
+      <!-- ④ 错误条（数据源异常时可见，不静默失败） -->
+      <Border Classes="panel" Background="#FEE2E2"
+              IsVisible="{Binding ErrorMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Foreground="#991B1B" Text="{Binding ErrorMessage}" />
+      </Border>
+
+      <!-- ⑤ 债边列表 -->
+      <ItemsControl ItemsSource="{Binding Edges}" IsVisible="{Binding HasEdges}"
+                    AutomationProperties.Name="债边清单">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:DebtEdgeItem">
+            <Border Classes="card" Margin="0,0,0,8"
+                    AutomationProperties.Name="{Binding AccessibleName}">
+              <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Spacing="6">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Classes="h2" Text="{Binding Route}" />
+                    <Border Classes="badge" VerticalAlignment="Center"
+                            Background="{Binding Status, Converter={x:Static conv:AppConverters.StatusToBrush}}">
+                      <TextBlock Classes="badge-text" Text="{Binding StatusLabel}" />
+                    </Border>
+                  </StackPanel>
+                  <TextBlock Classes="muted" Text="{Binding Meta}" />
+                </StackPanel>
+
+                <Button Grid.Column="1" Classes="primary" Content="检查销账" VerticalAlignment="Center"
+                        Command="{Binding $parent[ItemsControl].((vm:DebtListViewModel)DataContext).CheckSaleCommand}"
+                        CommandParameter="{Binding}"
+                        AutomationProperties.Name="{Binding Route, StringFormat='检查销账 {0}'}" />
+              </Grid>
+            </Border>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <!-- ⑥ 空态 -->
+      <Border Classes="card" IsVisible="{Binding IsEmpty}">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="当前筛选下没有债边" />
+          <TextBlock Classes="body"
+                     Text="可以切换到「全部」查看其它状态的债边，或回到图谱页重新做一次诊断。" />
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Button Classes="primary" Content="查看图谱" Command="{Binding OpenGraphCommand}"
+                    AutomationProperties.Name="查看知识债图谱" />
+            <Button Classes="ghost" Content="刷新" Command="{Binding RefreshCommand}"
+                    AutomationProperties.Name="刷新债边清单" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- ⑦ 状态机说明卡 -->
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="销账状态机说明" />
+          <TextBlock Classes="body"
+                     Text="债边被排入计划后，状态由「开放」转为「修复中」；需要连续 2 次达标探测（小测正确率不低于 0.7 且自评信心不低于 3）才会判定为「已销账」。" />
+          <TextBlock Classes="body" Text="销账由确定性状态机判定，不依赖模型输出。" />
+          <TextBlock Classes="muted"
+                     Text="「检查销账」会依据既有作答记录重算连续达标次数；一旦满足条件，该债边转为「已销账」并不再出现在图谱与清单中。" />
+        </StackPanel>
+      </Border>
+
+      <TextBlock Classes="disclaimer" Text="{Binding FooterDisclaimer}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

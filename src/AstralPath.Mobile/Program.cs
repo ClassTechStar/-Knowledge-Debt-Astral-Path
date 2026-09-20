@@ -1,29 +1,28 @@
-using AstralPath.Shared;
+using Avalonia;
 
-// 移动端共享逻辑演示：今日任务 35 分钟胶囊 + 信心滑条必填校验
-Console.WriteLine("=== 知债：星穹学途 · Mobile 共享逻辑 ===");
-Console.WriteLine(DemoMeta.FooterDisclaimer);
-Console.WriteLine($"学生 A={DemoMeta.StudentAId} · B={DemoMeta.StudentBId} · Teacher={DemoMeta.TeacherId}");
-Console.WriteLine($"图版本={DemoMeta.GraphVersion}");
-Console.WriteLine();
+namespace AstralPath.Mobile;
 
-var tasks = new[]
+/// <summary>
+/// 移动端入口（方案 §13）。
+///
+/// Android 打包时由 <c>Android/MainActivity</c>（<c>AvaloniaMainActivity</c>）承载，
+/// 本文件不提供 <c>Main</c>；默认 TFM（net10.0）下提供 <c>Main</c>，
+/// 以手机尺寸窗口预览同一套 UI，便于本机验证与截图。
+/// </summary>
+internal static class Program
 {
-    (Kp: "K03", Name: "借贷记账法", Type: "concept", Min: 8, Why: "为还 会计等式 → 借贷记账法 的债"),
-    (Kp: "K03", Name: "借贷记账法", Type: "drill", Min: 6, Why: "为还 会计等式 → 借贷记账法 的债"),
-    (Kp: "K05", Name: "会计分录", Type: "quiz", Min: 6, Why: "为还 借贷记账法 → 会计分录 的债"),
-};
+    public static AppBuilder BuildAvaloniaApp()
+        => AppBuilder.Configure<App>()
+            .UsePlatformDetect()
+            .WithInterFont()
+            .LogToTrace();
 
-var total = 0;
-foreach (var t in tasks)
-{
-    total += t.Min;
-    Console.WriteLine($"[{t.Type}] {t.Name} · {t.Min}min · {t.Why}");
+#if !ANDROID
+    [STAThread]
+    public static int Main(string[] args)
+    {
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        return 0;
+    }
+#endif
 }
-
-Console.WriteLine();
-Console.WriteLine($"今日合计 {total} 分钟（预算 35）· {"K1 绿灯"}");
-Console.WriteLine("信心滑条 1–5 必填：演示默认 conf=4");
-Console.WriteLine("band 标签：red=" + DemoMeta.BandLabel("red") + " yellow=" + DemoMeta.BandLabel("yellow") + " green=" + DemoMeta.BandLabel("green"));
-Console.WriteLine("Mobile 逻辑演示完成。");
-return total <= 35 ? 0 : 1;

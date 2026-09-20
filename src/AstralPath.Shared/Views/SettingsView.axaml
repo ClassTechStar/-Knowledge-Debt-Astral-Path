@@ -1,0 +1,137 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:AstralPath.Shared.ViewModels"
+             xmlns:conv="using:AstralPath.Shared.Converters"
+             x:Class="AstralPath.Shared.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+  <!--
+    设置页（方案 §12.6 / 附录 X）
+    - 可访问性偏好绑定进程级单例 AppSettings.Current（ObservableObject，双向绑定即时生效）
+    - 触达尺寸：桌面 44px / 移动 48px，滑块步长 4
+    - 数据与合规：只读展示数据源模式、当前学生、图版本、权重版本与免责声明
+  -->
+  <ScrollViewer>
+    <StackPanel Margin="20" Spacing="14">
+
+      <!-- ① 顶栏 -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="*,Auto">
+          <StackPanel Grid.Column="0" Spacing="6">
+            <TextBlock Classes="h1" Text="{Binding Title}" />
+            <TextBlock Classes="muted" Text="{Binding ModeLabel, StringFormat='数据源模式：{0}'}" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Top">
+            <Button Classes="ghost" Content="刷新" Command="{Binding RefreshCommand}"
+                    AutomationProperties.Name="刷新设置信息" />
+            <Button Classes="primary" Content="恢复默认设置" Command="{Binding ResetSettingsCommand}"
+                    AutomationProperties.Name="恢复默认设置" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <!-- ② 操作反馈状态条 -->
+      <Border Classes="panel" IsVisible="{Binding StatusMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Text="{Binding StatusMessage}" />
+      </Border>
+
+      <!-- ③ 数据源异常条 -->
+      <Border Classes="panel" Background="#FEE2E2"
+              IsVisible="{Binding ErrorMessage, Converter={x:Static conv:AppConverters.TextToVisible}}">
+        <TextBlock Classes="body" Foreground="#991B1B" Text="{Binding ErrorMessage}" />
+      </Border>
+
+      <!-- ④ 可访问性 -->
+      <Border Classes="card">
+        <StackPanel Spacing="14">
+          <TextBlock Classes="h2" Text="可访问性" />
+
+          <StackPanel Spacing="4">
+            <CheckBox Content="色盲安全配色"
+                      IsChecked="{Binding Settings.ColorBlindSafe, Mode=TwoWay}"
+                      AutomationProperties.Name="色盲安全配色" />
+            <TextBlock Classes="muted" Margin="28,0,0,0"
+                       Text="债边与掌握度改用 Okabe-Ito 三色，并保留线型与文字标签作为第二重编码。" />
+          </StackPanel>
+
+          <StackPanel Spacing="4">
+            <CheckBox Content="高对比模式"
+                      IsChecked="{Binding Settings.HighContrast, Mode=TwoWay}"
+                      AutomationProperties.Name="高对比模式" />
+            <TextBlock Classes="muted" Margin="28,0,0,0"
+                       Text="提升边框与文本对比度至 7:1 以上，弱视与强光环境下更易辨认。" />
+          </StackPanel>
+
+          <StackPanel Spacing="4">
+            <CheckBox Content="减少动画"
+                      IsChecked="{Binding Settings.ReduceMotion, Mode=TwoWay}"
+                      AutomationProperties.Name="减少动画" />
+            <TextBlock Classes="muted" Margin="28,0,0,0"
+                       Text="关闭图谱平移缩放动画与页面过渡，尊重系统「减少动态效果」偏好。" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+
+      <!-- ⑤ 触达尺寸 -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="触达尺寸" />
+          <Slider Minimum="44" Maximum="56" TickFrequency="4" IsSnapToTickEnabled="True"
+                  Value="{Binding Settings.TouchTarget, Mode=TwoWay}"
+                  AutomationProperties.Name="最小触达尺寸（像素）" />
+          <TextBlock Classes="body"
+                     Text="{Binding Settings.TouchTarget, StringFormat='当前触达尺寸：{0} px'}" />
+          <TextBlock Classes="muted"
+                     Text="桌面最小 44px，移动最小 48px；所有按钮的最小高度由主题统一下限保证。" />
+        </StackPanel>
+      </Border>
+
+      <!-- ⑥ 数据与合规（只读） -->
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="数据与合规" />
+
+          <Grid ColumnDefinitions="110,*">
+            <TextBlock Grid.Column="0" Classes="muted" Text="数据源模式" />
+            <TextBlock Grid.Column="1" Classes="body" Text="{Binding ModeLabel}" />
+          </Grid>
+
+          <Grid ColumnDefinitions="110,*">
+            <TextBlock Grid.Column="0" Classes="muted" Text="当前学生" />
+            <TextBlock Grid.Column="1" Classes="body" Text="{Binding StudentId}" />
+          </Grid>
+
+          <Grid ColumnDefinitions="110,*">
+            <TextBlock Grid.Column="0" Classes="muted" Text="图版本" />
+            <TextBlock Grid.Column="1" Classes="body"
+                       Text="{Binding GraphVer, StringFormat='v{0}'}" />
+          </Grid>
+
+          <Grid ColumnDefinitions="110,*">
+            <TextBlock Grid.Column="0" Classes="muted" Text="权重版本" />
+            <TextBlock Grid.Column="1" Classes="body" Text="{Binding WeightVer}" />
+          </Grid>
+
+          <Grid ColumnDefinitions="110,*">
+            <TextBlock Grid.Column="0" Classes="muted" Text="免责声明" />
+            <TextBlock Grid.Column="1" Classes="body" Text="{Binding Disclaimer}" />
+          </Grid>
+        </StackPanel>
+      </Border>
+
+      <!-- ⑦ 关于 -->
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="关于" />
+          <TextBlock Classes="body" Text="{Binding AppVersion, StringFormat='版本号：{0}'}" />
+          <TextBlock Classes="muted" Text="{Binding AboutFormula}" />
+          <TextBlock Classes="muted" Text="{Binding AboutParity}" />
+          <Button Classes="ghost" Content="查看图谱" HorizontalAlignment="Left"
+                  Command="{Binding OpenGraphCommand}" AutomationProperties.Name="查看图谱" />
+        </StackPanel>
+      </Border>
+
+      <TextBlock Classes="disclaimer" Text="{Binding FooterDisclaimer}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>
