@@ -286,15 +286,17 @@ public class AgentKbProfileTests : IClassFixture<WebApplicationFactory<Program>>
     // ═══════════════════════ 延后项与模块自检 ═══════════════════════
 
     [Fact]
-    public async Task Deferred_Kb_Capabilities_Return_501_Explicitly()
+    public async Task Kb_Capabilities_Are_Implemented_And_Validate_Input()
     {
+        // 原为 501 延后项；现已实现分片直传与片段读取（见 ExtensionServicesTests）
         var client = Client();
-        var uploads = await client.PostAsync("/v1/kb/uploads", null);
-        Assert.Equal(HttpStatusCode.NotImplemented, uploads.StatusCode);
-        Assert.Equal("NOT_IMPLEMENTED", await ErrorCode(uploads));
+        var uploads = await client.PostAsJsonAsync("/v1/kb/uploads", new { ownerUserId = "demo-student-a" });
+        Assert.Equal(HttpStatusCode.BadRequest, uploads.StatusCode);       // title 缺失 → 400，而非 501
+        Assert.Equal("VALIDATION_ERROR", await ErrorCode(uploads));
 
-        var chunks = await client.GetAsync("/v1/kb/chunks/c-1");
-        Assert.Equal(HttpStatusCode.NotImplemented, chunks.StatusCode);
+        var chunks = await client.GetAsync("/v1/kb/chunks/ck-1");
+        Assert.Equal(HttpStatusCode.BadRequest, chunks.StatusCode);        // docId 缺失 → 400
+        Assert.Equal("VALIDATION_ERROR", await ErrorCode(chunks));
     }
 
     [Fact]

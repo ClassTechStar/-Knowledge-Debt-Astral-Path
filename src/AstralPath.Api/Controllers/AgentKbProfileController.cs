@@ -235,22 +235,71 @@ public sealed class AgentKbProfileController : ControllerBase
         return HttpResults.Success(_modules.SearchKb(_store, u, r, body.Query ?? ""));
     }
 
-    // ── 延后实现：显式 501，避免"静默缺能力"被误认为已完成 ────────────────
+    // ── 分片直传 / 证据片段 / 内部导入（原 501 延后项，已补齐）─────────────
+
+    /// <summary>申请知识库分片直传票据。body：{"title":"…","ownerUserId":"…","visibility":"private","courseCode":"LINALG","partCount":3}</summary>
     [HttpPost("/v1/kb/uploads")]
-    public IResult UploadTicket() =>
-        HttpResults.Fail(501, ErrorCodes.NotImplemented, "分片直传票据未实现", new { reason = DeferredReason });
+    public IResult UploadTicket([FromBody] KbUploadTicketRequest? body)
+    {
+        if (body is null || string.IsNullOrWhiteSpace(body.Title) || string.IsNullOrWhiteSpace(body.OwnerUserId))
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "title 与 ownerUserId 必填");
+        try
+        {
+            var ticket = _modules.CreateUploadTicket(body.Title, body.OwnerUserId,
+                body.Visibility ?? "private", body.CourseCode ?? "", body.PartCount);
+            return HttpResults.Created(ticket);
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            return HttpResults.Fail(413, ErrorCodes.ValidationError, ex.Message);
+        }
+    }
 
+    /// <summary>分片合并提交。body：{"ownerUserId":"…","parts":["第一段","第二段"]}</summary>
     [HttpPost("/v1/kb/uploads/{uploadId}/commit")]
-    public IResult UploadCommit(string uploadId) =>
-        HttpResults.Fail(501, ErrorCodes.NotImplemented, "分片合并提交未实现", new { uploadId, reason = DeferredReason });
+    public IResult UploadCommit(string uploadId, [FromBody] KbUploadCommitRequest? body)
+    {
+        if (body?.Parts is null || body.Parts.Count == 0)
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "parts 不能为空");
+        var result = _modules.CommitUpload(uploadId, body.OwnerUserId ?? "demo-student-a",
+            body.Role ?? AgentRoles.Student, body.Parts);
+        return result switch
+        {
+            null => HttpResults.Fail(404, ErrorCodes.ResourceNotFound, "上传票据不存在或已过期"),
+            "forbidden" => HttpResults.Fail(403, ErrorCodes.Forbidden, "仅所有者可提交分片"),
+            "part_count_mismatch" => HttpResults.Fail(409, ErrorCodes.StateConflict, "分片数与票据登记不符"),
+            _ => HttpResults.Success(result)
+        };
+    }
 
+    /// <summary>读取证据片段（含上下文）。Query：context（0–3，默认 1）</summary>
     [HttpGet("/v1/kb/chunks/{chunkId}")]
-    public IResult Chunk(string chunkId) =>
-        HttpResults.Fail(501, ErrorCodes.NotImplemented, "证据片段读取未实现", new { chunkId, reason = DeferredReason });
+    public IResult Chunk(string chunkId, [FromQuery] string? docId, [FromQuery] string? userId,
+        [FromQuery] string? role, [FromQuery] int context = 1)
+    {
+        if (string.IsNullOrWhiteSpace(docId))
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "docId 必填（片段需归属文档）");
+        var (u, r) = Actor(userId, role);
+        var result = _modules.GetChunk(docId, chunkId, u, r, context);
+        return result switch
+        {
+            null => HttpResults.Fail(404, ErrorCodes.ResourceNotFound, "文档不存在"),
+            // 与文档读取保持一致：越权一律 404，避免泄漏文档是否存在（§45.9）
+            "forbidden" => HttpResults.Fail(404, ErrorCodes.ResourceNotFound, "文档不存在或无可见性"),
+            "chunk_not_found" => HttpResults.Fail(404, ErrorCodes.ResourceNotFound, "片段不存在"),
+            _ => HttpResults.Success(result)
+        };
+    }
 
+    /// <summary>知识库系统导入（INTERNAL）。body：{"ownerUserId":"…","items":[{"title":"…","visibility":"public","courseCode":"LINALG","text":"…"}]}</summary>
     [HttpPost("/internal/v1/kb/import")]
-    public IResult InternalImport() =>
-        HttpResults.Fail(501, ErrorCodes.NotImplemented, "知识库系统导入未实现", new { reason = DeferredReason });
+    public IResult InternalImport([FromBody] KbImportRequest? body)
+    {
+        if (body is null || body.Items is null || body.Items.Count == 0)
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "items 不能为空");
+        var items = body.Items.Select(i => (i.Title ?? "", i.Visibility ?? "private", i.CourseCode ?? "", i.Text ?? "")).ToList();
+        return _store.Lock(() => HttpResults.Created(_modules.InternalImport(body.OwnerUserId ?? "demo-student-a", items)));
+    }
 
     // ═══════════════════════════ §46 用户画像 ═════════════════════════════
 

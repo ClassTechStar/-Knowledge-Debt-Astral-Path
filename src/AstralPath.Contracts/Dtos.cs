@@ -213,3 +213,12 @@ public sealed record KbSearchRequest(string Query, string? UserId = null, string
 
 // ── §46 用户画像（profile-svc）───────────────────────────────────────────
 public sealed record ProfileTagUpsert(string Tag, string Domain, double Weight = 1.0, bool OptOut = false, string? ActorId = null);
+
+// ── §45 知识库：分片直传 / 片段 / 内部导入 ─────────────────────────────────
+public sealed record KbUploadTicketRequest(
+    string Title, string OwnerUserId, string? Visibility = null, string? CourseCode = null, int PartCount = 1);
+public sealed record KbUploadCommitRequest(
+    IReadOnlyList<string> Parts, string? OwnerUserId = null, string? Role = null);
+public sealed record KbImportItem(
+    string? Title = null, string? Visibility = null, string? CourseCode = null, string? Text = null);
+public sealed record KbImportRequest(string? OwnerUserId = null, IReadOnlyList<KbImportItem>? Items = null);

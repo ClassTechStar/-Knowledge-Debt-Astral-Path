@@ -515,6 +515,100 @@ public sealed class AstralPathModules
     private static bool CanEdit(KbDocument doc, string userId, string role) =>
         role == "admin" || doc.OwnerUserId == userId;
 
+    // ── 分片直传与证据片段（原为 501 延后项，现补齐）────────────────────
+    private readonly Dictionary<string, KbUploadTicket> _kbUploads = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, List<string>> _kbUploadParts = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, List<KbChunk>> _kbChunks = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>申请分片直传票据（演示版：分片正文随 commit 提交，票据仅登记元数据）。</summary>
+    public object CreateUploadTicket(string title, string ownerUserId, string visibility, string courseCode, int partCount)
+    {
+        lock (_gate)
+        {
+            if (partCount is < 1 or > 512)
+                throw new ArgumentOutOfRangeException(nameof(partCount), "分片数须在 1–512 之间");
+            var ticket = new KbUploadTicket($"up-{Guid.NewGuid():N}"[..14], title, ownerUserId,
+                visibility is "private" or "consented" or "course" or "public" ? visibility : "private",
+                courseCode, partCount, DateTime.UtcNow.AddHours(1), DateTime.UtcNow);
+            _kbUploads[ticket.UploadId] = ticket;
+            _kbUploadParts[ticket.UploadId] = new List<string>();
+            return ticket;
+        }
+    }
+
+    /// <summary>分片合并提交：按序拼接正文 → 建文档 → 切分证据片段。</summary>
+    public object? CommitUpload(string uploadId, string ownerUserId, string role, IReadOnlyList<string> parts)
+    {
+        lock (_gate)
+        {
+            if (!_kbUploads.TryGetValue(uploadId, out var ticket)) return null;
+            if (!string.Equals(ticket.OwnerUserId, ownerUserId, StringComparison.OrdinalIgnoreCase) && role != "admin")
+                return "forbidden";
+            if (parts.Count != ticket.PartCount) return "part_count_mismatch";
+
+            var text = string.Concat(parts);
+            var doc = IngestKb(ticket.Title, ticket.OwnerUserId, ticket.Visibility, ticket.CourseCode, text);
+            _kbChunks[doc.Id] = BuildChunks(text);
+            _kbUploads.Remove(uploadId);
+            _kbUploadParts.Remove(uploadId);
+            return new { doc, chunkCount = _kbChunks[doc.Id].Count, mergedChars = text.Length };
+        }
+    }
+
+    /// <summary>读取证据片段（含上下文）。越权文档不可读。</summary>
+    public object? GetChunk(string docId, string chunkId, string userId, string role, int context)
+    {
+        lock (_gate)
+        {
+            if (!_kbDocs.TryGetValue(docId, out var doc)) return null;
+            if (!Visible(doc, userId, role, null)) return "forbidden";
+            if (!_kbChunks.TryGetValue(docId, out var chunks)) chunks = _kbChunks[docId] = BuildChunks(_kbTexts.GetValueOrDefault(docId) ?? "");
+
+            var idx = chunks.FindIndex(c => string.Equals(c.ChunkId, chunkId, StringComparison.OrdinalIgnoreCase));
+            if (idx < 0) return "chunk_not_found";
+
+            var span = Math.Clamp(context, 0, 3);
+            var from = Math.Max(0, idx - span);
+            var to = Math.Min(chunks.Count - 1, idx + span);
+            var window = new List<object>();
+            for (var i = from; i <= to; i++)
+                window.Add(new { chunks[i].ChunkId, chunks[i].Index, chunks[i].Text, isTarget = i == idx });
+            return new { docId, chunkId, chunk = chunks[idx], context = window };
+        }
+    }
+
+    /// <summary>知识库系统导入（INTERNAL）：批量建文档并切分片段。</summary>
+    public object InternalImport(string ownerUserId, IReadOnlyList<(string Title, string Visibility, string CourseCode, string Text)> items)
+    {
+        lock (_gate)
+        {
+            var created = new List<object>();
+            foreach (var it in items)
+            {
+                var doc = IngestKb(it.Title, ownerUserId, it.Visibility, it.CourseCode, it.Text ?? "");
+                _kbChunks[doc.Id] = BuildChunks(it.Text ?? "");
+                created.Add(new { doc.Id, doc.Title, chunkCount = _kbChunks[doc.Id].Count });
+            }
+            return new { imported = created.Count, items = created };
+        }
+    }
+
+    /// <summary>按句号/换行切分，固定长度上限，保证片段可引用（§45.6 证据可溯源）。</summary>
+    private static List<KbChunk> BuildChunks(string text)
+    {
+        var chunks = new List<KbChunk>();
+        if (string.IsNullOrWhiteSpace(text)) return chunks;
+        const int size = 200;
+        var idx = 0;
+        for (var pos = 0; pos < text.Length; pos += size)
+        {
+            var len = Math.Min(size, text.Length - pos);
+            chunks.Add(new KbChunk($"ck-{idx + 1}", idx, text.Substring(pos, len)));
+            idx++;
+        }
+        return chunks;
+    }
+
     // ══════════════════════════════════════════════════════════════════════
     //  §46 用户画像：特征 / 六维雷达 / 快照时间线
     //  说明：本演示版特征由**已落库的事实**（attempts / mastery / debt_edges）直接派生，
@@ -652,3 +746,11 @@ public sealed record KbVersion(
     string? Note,
     string CreatedBy,
     DateTime CreatedAt);
+
+/// <summary>知识库分片直传票据（§45.2）。</summary>
+public sealed record KbUploadTicket(
+    string UploadId, string Title, string OwnerUserId, string Visibility,
+    string CourseCode, int PartCount, DateTime ExpiresAt, DateTime CreatedAt);
+
+/// <summary>知识库证据片段（§45.6 可溯源引用）。</summary>
+public sealed record KbChunk(string ChunkId, int Index, string Text);

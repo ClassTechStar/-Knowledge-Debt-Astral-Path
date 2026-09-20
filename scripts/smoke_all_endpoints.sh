@@ -136,10 +136,11 @@ if [ -n "$DOC_ID" ]; then
 fi
 probe GET  "/v1/kb/tags?userId=demo-student-a&role=student"
 probe POST "/v1/kb/search" '{"query":"冒烟","userId":"demo-student-a","role":"student"}'
-probe POST "/v1/kb/uploads" "" 501
-probe POST "/v1/kb/uploads/u-1/commit" "" 501
-probe GET  "/v1/kb/chunks/c-1" "" 501
-probe POST "/internal/v1/kb/import" "" 501
+# 以下 4 项原为显式 501 延后项，现已实现；此处校验入参缺失时的 400（完整流程见第 11 节）
+probe POST "/v1/kb/uploads" "" 400
+probe POST "/v1/kb/uploads/u-1/commit" "" 400
+probe GET  "/v1/kb/chunks/c-1" "" 400
+probe POST "/internal/v1/kb/import" "" 400
 
 echo "=== 9) §46 用户画像 ==="
 probe GET  "/v1/profile/demo-student-a"
@@ -157,7 +158,35 @@ probe GET  "/v1/modules/status"
 probe GET  "/v1/knowledge-graphs/accounting-v1/csr"
 probe GET  "/v1/knowledge-graphs/no-such-pack/csr" "" 404
 
-echo "=== 11) 前端页面与静态资源 ==="
+echo "=== 11) §19 扩展服务 ==="
+probe POST "/v1/diffusion/simulate" '{"studentId":"demo-student-a","intervention":{"K02":20},"alpha":0.55,"depth":6}'
+probe POST "/v1/exams/midterm-1/impact" '{"studentId":"demo-student-a","daysToExam":7,"dayBudgetMin":30}'
+probe POST "/v1/exams/midterm-1/preexam-plan" '{"studentId":"demo-student-a","daysToExam":7,"dayBudgetMin":30}'
+probe POST "/v1/cohorts/stats" '{"k":5,"scores":[60,70,55,82,66,71]}'
+probe POST "/v1/cohorts/stats" '{"k":5,"scores":[60,70]}'
+probe POST "/v1/study-groups/match" '{"size":3,"members":[{"studentId":"s1","tags":["线代","矩阵"]},{"studentId":"s2","tags":["概率","统计"]},{"studentId":"s3","tags":["线代","概率"]},{"studentId":"s4","tags":["编程","算法"]}]}'
+probe POST "/v1/micro-lessons/assemble" '{"kpId":"K02","minutes":10,"resources":["教材 P32 例题 3"]}'
+probe POST "/v1/velocity/fit" '{"series":[{"at":"2026-09-01","score":50},{"at":"2026-09-05","score":62},{"at":"2026-09-09","score":71}]}'
+probe POST "/v1/spaced-review/schedule" '{"items":[{"kpId":"K02","lapses":0,"lastScore":90},{"kpId":"K03","lapses":2,"lastScore":45}]}'
+probe POST "/v1/prereq-simulator/simulate" '{"studentId":"demo-student-a","targetKp":"K02","targetScore":75}'
+probe POST "/v1/forecast/student" '{"studentId":"demo-student-a","daysAhead":14}'
+probe POST "/v1/forecast/student" '{"studentId":"demo-student-a","daysAhead":60}'
+probe POST "/internal/v1/lab/experiments" '{"name":"score 候选回归","candidateVersion":"score-v2"}'
+probe POST "/internal/v1/lab/experiments/lab-1/run" '{"cases":[{"expected":1.0,"actual":1.0000001}]}'
+probe GET  "/internal/v1/lab/experiments/lab-1/report"
+probe POST "/internal/v1/lab/formula-versions" '{"version":"score-v2","proposer":"P2"}'
+probe POST "/internal/v1/lab/formula-versions/score-v2/promote" '{"proposer":"P2","approver":"P1"}'
+probe POST "/internal/v1/lab/formula-versions/score-v2/promote" '{"proposer":"P2","approver":"P2"}' 422
+probe POST "/v1/kb/uploads" '{"title":"冒烟分片文档","ownerUserId":"demo-student-a","visibility":"private","courseCode":"LINALG","partCount":2}'
+UPL=$(data_get "uploadId")
+if [ -n "$UPL" ]; then
+  probe POST "/v1/kb/uploads/$UPL/commit" '{"ownerUserId":"demo-student-a","parts":["第一部分正文。","第二部分正文。"]}'
+  DOC2=$(data_get "doc.id")
+  if [ -n "$DOC2" ]; then probe GET "/v1/kb/chunks/ck-1?docId=$DOC2&userId=demo-student-a&role=student&context=1"; fi
+fi
+probe POST "/internal/v1/kb/import" '{"ownerUserId":"demo-student-a","items":[{"title":"导入 A","visibility":"public","courseCode":"LINALG","text":"导入正文 A"}]}'
+
+echo "=== 12) 前端页面与静态资源 ==="
 _ui=$(curl -s -w "\n%{http_code}" "$BASE/" --max-time 25)
 UI_CODE="${_ui##*$'\n'}"
 printf '%s' "${_ui%$'\n'*}" > "$WORK/ui.html"
