@@ -114,17 +114,3 @@ public sealed class AppServices
 
     public AppServices(AstralPathStore store) => Store = store;
 }
-
-public static class HttpResults
-{
-    private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
-
-    public static IResult Success<T>(T data, object? meta = null)
-        => Results.Json(new ApiSuccess<T>(data, meta ?? new { }, Guid.NewGuid().ToString("N")), Json);
-
-    public static IResult Fail(int status, string code, string message, object? details = null)
-        => Results.Json(new ApiFailure(null, new ApiError(code, message, details ?? new { }), Guid.NewGuid().ToString("N")), Json, statusCode: status);
-
-    public static IResult Created<T>(T data, object? meta = null)
-        => Results.Json(new ApiSuccess<T>(data, meta ?? new { }, Guid.NewGuid().ToString("N")), Json, statusCode: 201);
-}

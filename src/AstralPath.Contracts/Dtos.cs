@@ -222,3 +222,22 @@ public sealed record KbUploadCommitRequest(
 public sealed record KbImportItem(
     string? Title = null, string? Visibility = null, string? CourseCode = null, string? Text = null);
 public sealed record KbImportRequest(string? OwnerUserId = null, IReadOnlyList<KbImportItem>? Items = null);
+/// <summary>统一响应封装（原位于 Api/Program.cs 全局命名空间）。下沉到 Contracts，
+/// 供单体与各独立扩展服务共用，避免服务间循环引用。</summary>
+public static class HttpResults
+{
+    private static readonly System.Text.Json.JsonSerializerOptions Json = new(System.Text.Json.JsonSerializerDefaults.Web);
+
+    public static Microsoft.AspNetCore.Http.IResult Success<T>(T data, object? meta = null)
+        => Microsoft.AspNetCore.Http.Results.Json(
+            new ApiSuccess<T>(data, meta ?? new { }, Guid.NewGuid().ToString("N")), Json);
+
+    public static Microsoft.AspNetCore.Http.IResult Fail(int status, string code, string message, object? details = null)
+        => Microsoft.AspNetCore.Http.Results.Json(
+            new ApiFailure(null, new ApiError(code, message, details ?? new { }), Guid.NewGuid().ToString("N")),
+            Json, statusCode: status);
+
+    public static Microsoft.AspNetCore.Http.IResult Created<T>(T data, object? meta = null)
+        => Microsoft.AspNetCore.Http.Results.Json(
+            new ApiSuccess<T>(data, meta ?? new { }, Guid.NewGuid().ToString("N")), Json, statusCode: 201);
+}
