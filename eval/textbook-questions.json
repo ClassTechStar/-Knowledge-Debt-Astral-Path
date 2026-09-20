@@ -1,0 +1,150 @@
+{
+  "version": "textbook-bank-v2-rotate",
+  "note": "扩展题库 + 轮换；题目依据示例教材正文/目录知识点",
+  "banks": {
+    "kotlin": {
+      "match": ["Kotlin"],
+      "book": "Kotlin编程实践：Kotlin从入门到实战",
+      "questions": [
+        { "kp": "Kotlin 语言定位", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "《Kotlin编程实践》前言强调，本书重点不仅是语法，更在于：", "options": ["何时以及为何使用某个特定的语言特性", "背诵全部标准库 API", "只讲 Android UI 控件", "只对比 Java 性能数字"], "correctIndex": 0, "why": "教材定位：特性的使用时机与原因" },
+        { "kp": "Kotlin 多平台", "type": "drill", "difficulty": 2, "estMin": 6, "stem": "JetBrains 鼓励 Kotlin 社区拥抱的发展方向包括：", "options": ["Multiplatform、Native 与 JavaScript", "仅限 Windows 桌面", "仅限嵌入式汇编", "仅限数据库存储过程"], "correctIndex": 0, "why": "Multiplatform / Native / JavaScript" },
+        { "kp": "Kotlin 工具链", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "在 Windows 上安装 Kotlin 相关工具时，书中举例提到的包管理器是：", "options": ["Scoop", "Homebrew（macOS）", "MacPorts", "apt（Debian）"], "correctIndex": 0, "why": "Windows 示例为 Scoop" },
+        { "kp": "Kotlin IDE", "type": "drill", "difficulty": 1, "estMin": 4, "stem": "书中提到的 Kotlin 开发 IDE 包括：", "options": ["IntelliJ IDEA 或 Android Studio", "仅记事本", "仅 Excel", "仅数据库客户端"], "correctIndex": 0, "why": "正文列出 IntelliJ IDEA / Android Studio" },
+        { "kp": "Kotlin 可空类型", "type": "quiz", "difficulty": 3, "estMin": 6, "stem": "书中列举的 Kotlin 基本特性示例包含：", "options": ["可空类型、操作符重载与类型转换", "仅 SQL 语法", "仅 CSS 布局", "仅打印机驱动"], "correctIndex": 0, "why": "目录/前言提到可空类型等特性" },
+        { "kp": "Kotlin REPL", "type": "drill", "difficulty": 2, "estMin": 5, "stem": "安装并运行 Kotlin 的基本过程书中会涉及：", "options": ["REPL、编译器与运行脚本", "仅画图", "仅做动画", "仅调相机"], "correctIndex": 0, "why": "第1章安装与 REPL/脚本运行" },
+        { "kp": "Kotlin 与 JVM", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "Kotlin 在行业语境中常被描述为综合了许多最佳编程思想，并可用于：", "options": ["JVM / Android / 服务端等场景", "只能写 UI 动画", "只能做表格", "只能调 API 打印日志"], "correctIndex": 0, "why": "书中强调 Kotlin 与 JVM/生态" },
+        { "kp": "Kotlin 脚本与 Gradle", "type": "quiz", "difficulty": 3, "estMin": 6, "stem": "执行 Kotlin 脚本 / Gradle 添加 Kotlin 相关配置属于书中哪类内容？", "options": ["安装运行与构建工具链", "排版设计", "摄影后期", "营销文案"], "correctIndex": 0, "why": "章节含执行脚本、Gradle 配置" },
+        { "kp": "Kotlin 面向对象", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "Kotlin 面向对象特性章节通常会讲：", "options": ["类、对象与相关语言特性", "如何做菜", "如何修车", "如何办护照"], "correctIndex": 0, "why": "第3章面向对象" },
+        { "kp": "Kotlin 测试", "type": "drill", "difficulty": 2, "estMin": 5, "stem": "书中后续章节会覆盖测试相关实践，其目的是：", "options": ["验证代码行为符合预期", "让代码跑得更慢", "增加无意义注释", "删除所有函数"], "correctIndex": 0, "why": "目录含测试章节" },
+        { "kp": "Kotlin 社区与学习", "type": "concept", "difficulty": 1, "estMin": 4, "stem": "作者强调学习 Kotlin 时更有效的方式是：", "options": ["理解何时/为何用该特性，而不是死记语法", "只抄片段不理解", "只看标题", "只背页码"], "correctIndex": 0, "why": "前言学习主张" },
+        { "kp": "Kotlin 包管理", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "除 Windows Scoop 外，书中还提到的包管理器有：", "options": ["Homebrew、MacPorts、Snapcraft", "仅 npm", "仅 pip", "仅 cargo"], "correctIndex": 0, "why": "正文列举多平台包管理器" }
+      ]
+    },
+    "python": {
+      "match": ["Python编程", "从入门到实践"],
+      "book": "Python编程：从入门到实践（第3版）",
+      "questions": [
+        { "kp": "多重赋值", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "书中示例：x, y, z = 0, 0, 0。关于这种写法正确的是：", "options": ["用逗号分隔变量名和值，按顺序一一对应赋值", "只会给第一个变量赋值", "语法错误，Python 不支持", "三个变量会变成同一个列表"], "correctIndex": 0, "why": "变量数与值个数相同即可按顺序关联" },
+        { "kp": "常量约定", "type": "concept", "difficulty": 2, "estMin": 5, "stem": "Python 没有内置常量类型，程序员通常如何表示常量？", "options": ["使用全大写字母命名", "必须用 final 关键字", "必须用 const 声明器", "用小写下划线即可"], "correctIndex": 0, "why": "2.4.6：惯例全大写" },
+        { "kp": "学习笔记项目", "type": "concept", "difficulty": 2, "estMin": 8, "stem": "第 3 版项目「学习笔记」部署与样式章节涉及：", "options": ["Bootstrap 设置样式 + Platform.sh 部署", "只用 C 语言重写", "只用 Excel 宏", "只用 Word 排版"], "correctIndex": 0, "why": "Bootstrap + Platform.sh" },
+        { "kp": "练习方法", "type": "drill", "difficulty": 1, "estMin": 4, "stem": "书中建议对待「动手试一试」的正确做法是：", "options": ["先独立完成，卡壳再查补充材料/答案", "直接抄答案", "全部跳过", "只看视频不做题"], "correctIndex": 0, "why": "应大量独立完成练习" },
+        { "kp": "变量与简单类型", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "《Python编程：从入门到实践》第2章主题是：", "options": ["变量和简单的数据类型", "网络攻防", "建筑施工", "医学诊断"], "correctIndex": 0, "why": "第2章：变量和简单的数据类型" },
+        { "kp": "列表", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "书中第3章介绍的列表（list）主要用于：", "options": ["存储有序的元素序列并支持增删改查", "只存一个整数", "只画图", "只发邮件"], "correctIndex": 0, "why": "第3章：列表简介" },
+        { "kp": "起步与安装", "type": "drill", "difficulty": 1, "estMin": 4, "stem": "本书第1章「起步」通常包含：", "options": ["搭建 Python 环境与运行第一个程序", "写操作系统内核", "编译 Linux 内核", "设计芯片"], "correctIndex": 0, "why": "第1章起步" },
+        { "kp": "动手试一试", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "「动手试一试」在本书中的角色是：", "options": ["章末练习，用于巩固当章技能", "可忽略的装饰", "广告页", "作者自传"], "correctIndex": 0, "why": "书中体例" },
+        { "kp": "在线资源", "type": "concept", "difficulty": 2, "estMin": 4, "stem": "书中在线资源/补充材料通常用于：", "options": ["安装说明、更新记录与练习参考", "购买彩票", "预约体检", "订机票"], "correctIndex": 0, "why": "在线资源说明" },
+        { "kp": "字符串基础", "type": "quiz", "difficulty": 2, "estMin": 6, "stem": "在入门章节中，字符串处理通常紧随哪一主题之后深化？", "options": ["变量与简单数据类型", "量子隧穿", "天体力学", "地层取芯"], "correctIndex": 0, "why": "教材结构：变量/类型→字符串等" },
+        { "kp": "项目导向学习", "type": "concept", "difficulty": 2, "estMin": 5, "stem": "本书常见学习路径是：", "options": ["基础语法 → 项目实战（如学习笔记）", "只背公式不做项目", "只看视频", "只抄别人的仓库"], "correctIndex": 0, "why": "入门到实践的项目路径" },
+        { "kp": "命名风格", "type": "drill", "difficulty": 2, "estMin": 4, "stem": "Python 社区常见命名约定中，常量使用全大写的主要目的是：", "options": ["提示读者该值程序内不应随意改动", "让编译更快", "减少内存", "加密代码"], "correctIndex": 0, "why": "全大写表常量的意图" }
+      ]
+    },
+    "deeplearning": {
+      "match": ["深度学习入门", "基于Python的理论与实现", "Deep Learning", "花书", "自制框架"],
+      "book": "深度学习入门 / 花书 / 自制框架",
+      "questions": [
+        { "kp": "Python 动态类型", "type": "concept", "difficulty": 2, "estMin": 5, "stem": "书中指出 Python 是动态类型语言，其含义是：", "options": ["变量类型根据初始化情况自动决定", "所有变量永远是字符串", "必须显式声明每个变量类型为 int", "类型在编译期由 IDE 锁定后不可变"], "correctIndex": 0, "why": "x=10 被推断为 int" },
+        { "kp": "感知机与偏置", "type": "quiz", "difficulty": 3, "estMin": 8, "stem": "在感知机实现中，把公式里的 θ 换成 −b 后，b 称为：", "options": ["偏置（bias）", "学习率", "损失函数", "激活函数的斜率"], "correctIndex": 0, "why": "b 称为偏置，w1/w2 为权重" },
+        { "kp": "感知机逻辑门", "type": "drill", "difficulty": 2, "estMin": 6, "stem": "书中通过修改实现可以展示，感知机能够实现：", "options": ["与门和或门", "任意操作系统调度器", "完整的编译器优化", "数据库事务隔离级别"], "correctIndex": 0, "why": "与门/或门等逻辑门" },
+        { "kp": "矩阵点积", "type": "quiz", "difficulty": 3, "estMin": 7, "stem": "神经网络一章用 np.dot 做多维数组点积，其好处是：", "options": ["可一次性计算输出向量，无需手写 for 逐元素循环", "只能算两个标量相加", "会自动把所有数变成字符串", "必须配合 GPU 才能运行"], "correctIndex": 0, "why": "np.dot 一次运算矩阵乘积" },
+        { "kp": "神经网络复习", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "将层实现为类时，便于后续学习的做法是：", "options": ["把要学习的参数汇总到统一结构（如 model.params）", "把参数散落在全局变量里", "从不保存参数", "用文本文件手算"], "correctIndex": 0, "why": "参数汇总便于学习" },
+        { "kp": "自制框架", "type": "concept", "difficulty": 3, "estMin": 8, "stem": "「自制框架」类深度学习入门书强调：", "options": ["不依赖重量级外部库，从零实现网络与反向传播", "只调用一个 API 就结束", "不做任何数学", "只画流程图"], "correctIndex": 0, "why": "从零实现网络的思想" },
+        { "kp": "误差反向传播", "type": "quiz", "difficulty": 3, "estMin": 8, "stem": "误差反向传播法在深度学习入门书中主要用于：", "options": ["高效计算参数梯度以更新网络", "加密数据", "压缩图片", "生成报告"], "correctIndex": 0, "why": "反向传播求梯度" },
+        { "kp": "卷积神经网络", "type": "drill", "difficulty": 3, "estMin": 7, "stem": "卷积神经网络（CNN）常用于：", "options": ["具有空间结构的数据（如图像）建模", "只处理文字页码", "只做数据库索引", "只做文件压缩"], "correctIndex": 0, "why": "CNN 与图像等空间数据" },
+        { "kp": "强化学习基础", "type": "concept", "difficulty": 3, "estMin": 7, "stem": "强化学习入门中，智能体通过什么改进策略？", "options": ["与环境交互获得奖励信号", "只读说明书", "只抄别人策略且不评估", "随机扔骰子并永不更新"], "correctIndex": 0, "why": "奖励信号与交互" },
+        { "kp": "权重与偏置", "type": "quiz", "difficulty": 2, "estMin": 6, "stem": "感知机式模型中，w1、w2 通常称为：", "options": ["权重（weights）", "偏置（bias）", "学习率", "轮次"], "correctIndex": 0, "why": "w1/w2 称为权重" },
+        { "kp": "Python 科学计算", "type": "drill", "difficulty": 2, "estMin": 5, "stem": "深度学习入门实现中常用的 Python 科学计算基础是：", "options": ["NumPy 数组与点积运算", "仅 Word 宏", "仅 Photoshop", "仅打印机驱动"], "correctIndex": 0, "why": "np.dot / 多维数组" },
+        { "kp": "从零实现", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "「从零创建经典深度学习网络」的目的是：", "options": ["逐步理解深度学习原理，而不是只会调包", "避免理解任何原理", "只背 API 名", "只抄作业"], "correctIndex": 0, "why": "入门书主张" }
+      ]
+    },
+    "nlp": {
+      "match": ["自然语言处理", "深度学习进阶", "word2vec", "强化学习"],
+      "book": "深度学习进阶：自然语言处理",
+      "questions": [
+        { "kp": "神经网络学习流程", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "书中强调的常规流程是：先进行神经网络的____，再用学好的参数做推理。", "options": ["学习（训练）", "卸载", "格式化磁盘", "只做界面美化"], "correctIndex": 0, "why": "先学习再推理" },
+        { "kp": "层与参数组织", "type": "drill", "difficulty": 3, "estMin": 6, "stem": "将神经网络层实现为类时，要学习的参数通常汇总在：", "options": ["model.params", "random.jpg", "ui.layout", "readme.md"], "correctIndex": 0, "why": "参数在 model.params" },
+        { "kp": "自然语言特性", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "与编程语言相比，自然语言被称为「软语言」，因为：", "options": ["含义与形式会灵活变化，可有不同表述或歧义", "语法永远唯一且无歧义", "只能由编译器唯一解释", "不存在同义表达"], "correctIndex": 0, "why": "软/灵活 vs 硬语言" },
+        { "kp": "word2vec 与全连接层", "type": "quiz", "difficulty": 3, "estMin": 8, "stem": "在 word2vec 相关章节，one-hot 表示的单词可经哪类层变换？", "options": ["全连接层（权重连接所有节点）", "仅文件压缩层", "仅打印输出层", "仅磁盘缓存层"], "correctIndex": 0, "why": "全连接层变换" },
+        { "kp": "进阶技术范围", "type": "drill", "difficulty": 2, "estMin": 5, "stem": "《深度学习进阶：自然语言处理》介绍的技术包括：", "options": ["word2vec、RNN、LSTM、GRU、seq2seq、Attention", "仅 Excel 透视表", "仅关系数据库范式", "仅 CSS 布局"], "correctIndex": 0, "why": "内容提要技术清单" },
+        { "kp": "分布式表示", "type": "concept", "difficulty": 3, "estMin": 7, "stem": "单词的分布式表示（distributed representation）主要解决：", "options": ["用稠密向量表达语义相似与关系", "用页码索引图书", "用文件名排序", "用颜色区分章节"], "correctIndex": 0, "why": "分布式表示语义" },
+        { "kp": "RNN/LSTM", "type": "quiz", "difficulty": 3, "estMin": 7, "stem": "RNN/LSTM 在 NLP 中更适合处理：", "options": ["时序/序列数据", "仅静态图片 EXIF", "仅磁盘扇区", "仅打印队列"], "correctIndex": 0, "why": "时序数据处理" },
+        { "kp": "seq2seq 与 Attention", "type": "concept", "difficulty": 3, "estMin": 8, "stem": "seq2seq + Attention 常用于：", "options": ["序列到序列生成并关注关键位置", "只做文件复制", "只做磁盘碎片整理", "只做屏幕截图"], "correctIndex": 0, "why": "生成与注意力" },
+        { "kp": "神经网络推理", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "书中所说「推理」是指：", "options": ["用已学参数对输入给出预测/回答", "法律论证", "哲学思辨", "手算开方"], "correctIndex": 0, "why": "推理=用学好参数预测" },
+        { "kp": "编程语言 vs 自然语言", "type": "drill", "difficulty": 2, "estMin": 5, "stem": "编程语言相对自然语言的特点是：", "options": ["语法定义更可唯一解释，偏「硬」", "永远存在大量歧义且不可解析", "没有语法规则", "只能用于诗歌"], "correctIndex": 0, "why": "硬语言 vs 软语言" },
+        { "kp": "强化学习奖励", "type": "quiz", "difficulty": 3, "estMin": 7, "stem": "强化学习中策略改进依赖的关键信号是：", "options": ["奖励（reward）", "页边距", "字体大小", "打印浓度"], "correctIndex": 0, "why": "RL 奖励信号" },
+        { "kp": "续作定位", "type": "concept", "difficulty": 2, "estMin": 4, "stem": "《深度学习进阶：自然语言处理》与《深度学习入门》的关系是：", "options": ["续作，围绕 NLP 与时序数据深化", "完全无关的菜谱", "地理教材", "会计教材"], "correctIndex": 0, "why": "内容提要：入门书续作" }
+      ]
+    },
+    "csharp": {
+      "match": ["C#从入门到精通", "C#"],
+      "book": "C#从入门到精通（第7版）",
+      "questions": [
+        { "kp": "类的概念", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "书中对「类」的描述是：", "options": ["可封装数据成员、函数成员的数据结构，是创建对象的模板", "一种只能存字符串的变量", "数据库中的外键", "仅用于打印日志的宏"], "correctIndex": 0, "why": "类是创建对象的模板" },
+        { "kp": "表达式", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "C# 中表达式由什么组成？", "options": ["运算符和操作数", "只有注释", "只有 using 别名", "只有命名空间"], "correctIndex": 0, "why": "表达式=运算符+操作数" },
+        { "kp": "字符串 Remove", "type": "quiz", "difficulty": 3, "estMin": 7, "stem": "关于 string.Remove()，书中说明正确的是：", "options": ["可删除从指定位置到末尾的字符，或从指定位置删除指定数目字符", "只能把字符串反转", "会把字符串变成整数", "永远不抛异常"], "correctIndex": 0, "why": "Remove 两种语法" },
+        { "kp": "实战项目", "type": "drill", "difficulty": 2, "estMin": 5, "stem": "《C#从入门到精通（第7版）》提到的实战项目示例包括：", "options": ["贪吃蛇、五子棋、ERP 管理系统等", "只能做计算器皮肤", "只能做屏保", "只能做文件加密器"], "correctIndex": 0, "why": "内容简介项目清单" },
+        { "kp": "C# 程序结构", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "书中强调 C# 中语句与类的关系是：", "options": ["所有语句都必须位于类内", "语句必须在 SQL 里", "语句只能在 HTML 中", "语句不能定义方法"], "correctIndex": 0, "why": "C# 语句位于类内" },
+        { "kp": "变量与常量", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "C# 入门章节「变量与常量」主要讲：", "options": ["数据存储与不可变值的表示", "如何重装系统", "如何剪辑视频", "如何发快递"], "correctIndex": 0, "why": "章节主题" },
+        { "kp": "流程控制", "type": "drill", "difficulty": 2, "estMin": 5, "stem": "流程控制语句用于：", "options": ["按条件/循环组织程序执行路径", "美化窗体颜色", "压缩安装包", "注册账号"], "correctIndex": 0, "why": "if/循环等" },
+        { "kp": "数组和集合", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "数组和集合章节解决的核心问题是：", "options": ["批量组织与操作一组数据", "打印纸质报表", "扫描二维码", "调节屏幕亮度"], "correctIndex": 0, "why": "数组/集合" },
+        { "kp": "面向对象编程", "type": "quiz", "difficulty": 3, "estMin": 7, "stem": "C# 面向对象编程强调：", "options": ["用类与对象封装数据与行为", "只写全局变量和 goto", "不用方法", "不用类型"], "correctIndex": 0, "why": "OOP 类与对象" },
+        { "kp": "异常处理", "type": "quiz", "difficulty": 3, "estMin": 6, "stem": "字符串方法参数非法时可能抛出的异常示例是：", "options": ["ArgumentOutOfRangeException", "PrintQueueFullException", "WifiDisconnectedException", "PageMarginException"], "correctIndex": 0, "why": "Remove 参数非法异常" },
+        { "kp": "Windows 窗体", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "Windows 窗体应用程序设计章节主要涉及：", "options": ["桌面 UI 控件与交互", "航天轨道计算", "地质勘探", "分子对接"], "correctIndex": 0, "why": "WinForms 控件" },
+        { "kp": "数据访问与 LINQ", "type": "drill", "difficulty": 3, "estMin": 7, "stem": "书中数据访问与 LINQ 章节强调：", "options": ["连接数据源并用查询语法处理数据", "手写 SQL 注入", "不用类型查询", "只用记事本存数据"], "correctIndex": 0, "why": "数据访问 + LINQ" }
+      ]
+    },
+    "go": {
+      "match": ["Go语言", "Go语"],
+      "book": "Go语言从入门到精通",
+      "questions": [
+        { "kp": "变量声明初始化", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "Go 中 var days int = 365 的写法说明：", "options": ["声明 int 变量 days 并初始化为 365", "声明字符串 days", "定义接口 days", "创建包 days"], "correctIndex": 0, "why": "变量初始化语法" },
+        { "kp": "类型推断", "type": "concept", "difficulty": 2, "estMin": 5, "stem": "Go 初始化变量时，若省略类型，则：", "options": ["变量类型由表达式决定", "语法错误", "自动变成 interface{}", "必须重新声明"], "correctIndex": 0, "why": "省略类型由表达式决定" },
+        { "kp": "流程控制", "type": "drill", "difficulty": 2, "estMin": 6, "stem": "if…else if…else 在空气质量 API 示例中用于：", "options": ["按污染指数区间分支判断空气质量", "只能打印 Hello", "只能排序数组", "只能读写文件"], "correctIndex": 0, "why": "例4.3 API 判断" },
+        { "kp": "教材范围", "type": "concept", "difficulty": 1, "estMin": 4, "stem": "《Go语言从入门到精通》内容范围包括：", "options": ["流程控制、函数、结构体、接口、并发、网络与爬虫等", "仅前端 CSS", "仅美术设计", "仅硬件电路"], "correctIndex": 0, "why": "内容简介章节范围" },
+        { "kp": "Go 基本数据类型", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "Go 基础章节会介绍基本数据类型与：", "options": ["运算符", "油画技法", "烘焙曲线", "宪法条文"], "correctIndex": 0, "why": "基本类型与运算符" },
+        { "kp": "复合数据类型", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "Go 的复合数据类型通常包括数组/切片/映射等，其作用是：", "options": ["组织更复杂的数据结构", "只能存一个整数", "只能画图", "只能发短信"], "correctIndex": 0, "why": "复合类型" },
+        { "kp": "函数", "type": "drill", "difficulty": 2, "estMin": 5, "stem": "Go 函数章节强调的是：", "options": ["封装可复用逻辑并可返回结果", "只能内联所有代码", "不能有参数", "不能有返回值"], "correctIndex": 0, "why": "函数封装逻辑" },
+        { "kp": "指针", "type": "quiz", "difficulty": 3, "estMin": 6, "stem": "Go 支持指针，其常见用途是：", "options": ["直接操作内存地址/共享数据引用", "只能做界面动画", "只能做数据库备份", "只能做日志美化"], "correctIndex": 0, "why": "指针与地址" },
+        { "kp": "结构体与接口", "type": "concept", "difficulty": 3, "estMin": 7, "stem": "Go 中结构体与接口常用于：", "options": ["组合数据与抽象行为契约", "只做字符串拼接", "只做文件改名", "只做壁纸切换"], "correctIndex": 0, "why": "结构体+接口" },
+        { "kp": "并发编程", "type": "quiz", "difficulty": 3, "estMin": 7, "stem": "Go 并发编程的特色机制常包括：", "options": ["goroutine 与 channel 等", "仅全局锁死", "仅单线程强制", "禁用任何通信"], "correctIndex": 0, "why": "Go 并发" },
+        { "kp": "错误处理", "type": "concept", "difficulty": 2, "estMin": 5, "stem": "Go 惯用错误处理风格通常是：", "options": ["显式返回 error 并检查", "完全忽略错误", "永远 panic", "用注释代替处理"], "correctIndex": 0, "why": "error 返回值" },
+        { "kp": "接口定义", "type": "drill", "difficulty": 2, "estMin": 5, "stem": "Go 的接口（interface）更强调：", "options": ["行为方法集合，实现时隐式满足", "必须继承具体类", "必须用注解注册", "只能有一个方法且必须显式声明 implements"], "correctIndex": 0, "why": "Go 隐式接口" }
+      ]
+    },
+    "java": {
+      "match": ["Java从入门到精通", "Java"],
+      "book": "Java从入门到精通（第6版）",
+      "questions": [
+        { "kp": "Java 可移植性", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "Java 程序具有与体系结构无关的特性，主要得益于：", "options": ["字节码与可移植的类库/解释执行", "必须绑定某一种 CPU 指令", "只能在单机运行", "源码不编译"], "correctIndex": 0, "why": "字节码独立平台" },
+        { "kp": "成员变量与局部变量", "type": "quiz", "difficulty": 2, "estMin": 6, "stem": "类的属性（全局变量）与方法内的变量分别称为：", "options": ["成员变量与局部变量", "文件变量与磁盘变量", "网络变量与缓存变量", "表变量与图变量"], "correctIndex": 0, "why": "成员 vs 局部" },
+        { "kp": "main 方法", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "Java 程序主方法常见修饰是：", "options": ["public static void main()", "private instance void run()", "static final sql main()", "public int main(void)"], "correctIndex": 0, "why": "public static void main" },
+        { "kp": "Java 安全性", "type": "concept", "difficulty": 2, "estMin": 5, "stem": "书中提到 Java 安全性时，取消了类 C 语言中的：", "options": ["指针和相关内存释放风险用法", "全部循环语句", "全部类", "全部注释"], "correctIndex": 0, "why": "取消类 C 指针等" },
+        { "kp": "解释执行", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "运行 Java 程序需要解释器，其作用是：", "options": ["解释执行与平台无关的字节码", "只做磁盘格式化", "只做网络加速", "只做图片压缩"], "correctIndex": 0, "why": "解释器与字节码" },
+        { "kp": "类库可移植", "type": "drill", "difficulty": 2, "estMin": 5, "stem": "Java 类库实现针对不同平台的接口，其意义是：", "options": ["便于程序在不同计算机上移植", "只方便单机调试", "禁用所有网络", "禁用所有文件"], "correctIndex": 0, "why": "类库平台接口" },
+        { "kp": "if 条件语句", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "Java if 语句后是：", "options": ["布尔表达式，true 则执行后续语句", "只能是字符串", "只能是文件名", "只能是颜色"], "correctIndex": 0, "why": "if + boolean" },
+        { "kp": "if…else 分支", "type": "concept", "difficulty": 2, "estMin": 5, "stem": "if…else / if…else if 用于：", "options": ["条件成立与否走不同分支", "只能循环", "只能定义类", "只能导入包"], "correctIndex": 0, "why": "分支结构" },
+        { "kp": "Java 语言特点", "type": "drill", "difficulty": 2, "estMin": 4, "stem": "书中列举的 Java 特点包括与体系结构无关、解释型和：", "options": ["安全性", "无编译无运行", "无类库", "无网络"], "correctIndex": 0, "why": "特点列表" },
+        { "kp": "程序基本结构", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "Java 程序基本结构通常从哪个组织单元展开？", "options": ["类与方法", "网页 div", "Excel 单元格", "PDF 书签"], "correctIndex": 0, "why": "类/方法结构" },
+        { "kp": "开发与移植", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "「字节码独立于平台」意味着：", "options": ["同一字节码可在装有解释器的不同平台执行", "只能在同一台电脑运行", "必须重写源码", "不能使用类库"], "correctIndex": 0, "why": "write once 思想" },
+        { "kp": "变量作用域", "type": "drill", "difficulty": 2, "estMin": 5, "stem": "局部变量声明在方法体中，其作用域通常：", "options": ["限于该方法内部", "整个操作系统", "整个互联网", "所有类文件"], "correctIndex": 0, "why": "局部变量作用域" }
+      ]
+    },
+    "agent": {
+      "match": ["AI Agent", "大模型应用开发", "智能体", "动手做 AI"],
+      "book": "大模型应用开发：动手做 AI Agent",
+      "questions": [
+        { "kp": "Agent 定义", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "书中对 Agent（智能体）的定义强调：", "options": ["具有一定自主性，能感知环境、做出决策并采取行动的 AI 系统", "只能被动等待按钮点击的脚本", "仅用于压缩图片的工具", "仅数据库备份任务"], "correctIndex": 0, "why": "感知-决策-行动" },
+        { "kp": "工具调用", "type": "quiz", "difficulty": 3, "estMin": 7, "stem": "使用工具的 Agent 相比不使用工具时，主要优势是：", "options": ["能执行更复杂任务、更好适应环境并提升解决问题效率", "一定不需要模型", "一定离线且无接口", "只能输出固定口号"], "correctIndex": 0, "why": "工具提升能力" },
+        { "kp": "API 调用示例", "type": "drill", "difficulty": 3, "estMin": 6, "stem": "书中调用 API 引导大模型生成图片的示例使用了：", "options": ["OpenAI 库与 client 初始化（配合环境变量）", "仅 Word 宏", "仅 Photoshop 动作", "仅打印机驱动"], "correctIndex": 0, "why": "OpenAI client" },
+        { "kp": "应用场例", "type": "drill", "difficulty": 2, "estMin": 5, "stem": "书中举例的 Agent 应用场景包括：", "options": ["数据分析 Agent、客户服务 Agent 等", "只能发呆", "只能改壁纸", "只能算 1+1"], "correctIndex": 0, "why": "数据/客服 Agent" },
+        { "kp": "自主性", "type": "concept", "difficulty": 2, "estMin": 6, "stem": "Agent 概念的出发点是推动 AI 从静态被动走向：", "options": ["动态、主动的实体", "更被动的展示页", "离线字典", "屏幕保护"], "correctIndex": 0, "why": "从被动到主动" },
+        { "kp": "感知与行动", "type": "quiz", "difficulty": 2, "estMin": 6, "stem": "完整 Agent 环节通常包括感知环境、做出决策和：", "options": ["采取行动", "只拍照", "只关机", "只清缓存"], "correctIndex": 0, "why": "感知-决策-行动" },
+        { "kp": "数据分析 Agent", "type": "drill", "difficulty": 3, "estMin": 6, "stem": "数据分析 Agent 可能调用的能力包括：", "options": ["统计分析软件或机器学习模型", "只能看日出", "只能倒水", "只能关门"], "correctIndex": 0, "why": "调用统计/模型" },
+        { "kp": "客户服务 Agent", "type": "concept", "difficulty": 2, "estMin": 5, "stem": "客户服务 Agent 常需要：", "options": ["访问数据库回应查询或与其他 Agent 协作", "只播放音乐", "只调整字体", "只清空回收站"], "correctIndex": 0, "why": "查库/协作" },
+        { "kp": "环境变量配置", "type": "quiz", "difficulty": 3, "estMin": 5, "stem": "调用 OpenAI 类接口时，书中示例会用环境变量管理：", "options": ["API Key 等敏感配置", "壁纸颜色", "鼠标灵敏度", "屏幕分辨率"], "correctIndex": 0, "why": "load_dotenv / key" },
+        { "kp": "工具调用步骤", "type": "drill", "difficulty": 3, "estMin": 6, "stem": "以购买商品为例，Agent 调用工具前通常先：", "options": ["识别需求", "格式化硬盘", "重装系统", "注销账号"], "correctIndex": 0, "why": "识别需求→调用工具" },
+        { "kp": "Agent 与脚本", "type": "concept", "difficulty": 2, "estMin": 5, "stem": "Agent 相对普通脚本的关键差异更强调：", "options": ["自主感知与决策闭环", "更长的注释", "更花哨的配色", "更多打印语句"], "correctIndex": 0, "why": "自主性闭环" },
+        { "kp": "大模型应用", "type": "quiz", "difficulty": 2, "estMin": 5, "stem": "「大模型应用开发」场景下 Agent 常作为：", "options": ["编排模型、工具与业务步骤的应用层智能体", "只做磁盘分区", "只做网络测速", "只做屏幕录制"], "correctIndex": 0, "why": "应用层智能体" }
+      ]
+    }
+  }
+}

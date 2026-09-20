@@ -1,0 +1,24 @@
+{
+  "cases": [
+    {
+      "id": "G-SALE-1",
+      "history": [{ "acc": 0.8, "conf": 4 }],
+      "expect": { "saleable": false, "streak": 1, "need": "再完成 1 次达标小测（acc≥0.7 且 conf≥3）" }
+    },
+    {
+      "id": "G-SALE-2",
+      "history": [{ "acc": 0.8, "conf": 4 }, { "acc": 0.75, "conf": 3 }],
+      "expect": { "saleable": true, "streak": 2, "need": null }
+    },
+    {
+      "id": "G-SALE-3",
+      "history": [{ "acc": 0.9, "conf": 5 }, { "acc": 0.6, "conf": 4 }, { "acc": 0.9, "conf": 5 }],
+      "expect": { "saleable": false, "streak": 1, "need": "再完成 1 次达标小测（acc≥0.7 且 conf≥3）" }
+    },
+    {
+      "id": "G-SALE-4",
+      "history": [{ "acc": 0.95, "conf": 2 }],
+      "expect": { "saleable": false, "streak": 0, "need": "再完成 2 次达标小测（acc≥0.7 且 conf≥3）" }
+    }
+  ]
+}

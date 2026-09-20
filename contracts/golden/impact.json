@@ -1,0 +1,75 @@
+{
+  "cases": [
+    {
+      "id": "G-DEBT-1",
+      "desc": "演示主债边：p=28,c=41,freq=6,days=0,w=1.6 → impact=86.4",
+      "input": {
+        "score_p": 28.0,
+        "score_c": 41.0,
+        "freq": 6,
+        "days_since_last_error": 0,
+        "weight": 1.6
+      },
+      "hand": {
+        "recency": 1.0,
+        "gate": "28<40 ∧ 41<50 ∧ 6>0",
+        "formula": "6*(50-41)*1.0*1.6"
+      },
+      "expect": { "detected": true, "impact": 86.4, "recency": 1.0 }
+    },
+    {
+      "id": "G-DEBT-2",
+      "desc": "days=7 使 recency=0.5",
+      "input": {
+        "score_p": 28.0,
+        "score_c": 41.0,
+        "freq": 6,
+        "days_since_last_error": 7,
+        "weight": 1.6
+      },
+      "hand": {
+        "recency": 0.5,
+        "formula": "6*(50-41)*0.5*1.6"
+      },
+      "expect": { "detected": true, "impact": 43.2, "recency": 0.5 }
+    },
+    {
+      "id": "G-DEBT-3",
+      "desc": "p=70 不产生债边",
+      "input": {
+        "score_p": 70.0,
+        "score_c": 41.0,
+        "freq": 6,
+        "days_since_last_error": 0,
+        "weight": 1.0
+      },
+      "expect": { "detected": false, "impact": 0, "recency": 1.0 }
+    },
+    {
+      "id": "G-DEBT-4",
+      "desc": "freq=0 不产生债边",
+      "input": {
+        "score_p": 28.0,
+        "score_c": 41.0,
+        "freq": 0,
+        "days_since_last_error": 0,
+        "weight": 1.0
+      },
+      "expect": { "detected": false, "impact": 0, "recency": 1.0 }
+    },
+    {
+      "id": "G-DEBT-5",
+      "desc": "p=28,c=44,freq=6,days=0,w=1.0",
+      "input": {
+        "score_p": 28.0,
+        "score_c": 44.0,
+        "freq": 6,
+        "days_since_last_error": 0,
+        "weight": 1.0
+      },
+      "hand": { "recency": 1.0, "formula": "6*(50-44)*1.0*1.0" },
+      "expect": { "detected": true, "impact": 36.0, "recency": 1.0 }
+    }
+  ],
+  "tolerance": 1e-6
+}

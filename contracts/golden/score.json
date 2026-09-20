@@ -1,0 +1,55 @@
+{
+  "cases": [
+    {
+      "id": "G-SCORE-1",
+      "input": { "recent_acc": 0.30, "sev": 0.80, "self_conf": 2 },
+      "hand": {
+        "sev_norm": 0.20,
+        "terms": [0.180, 0.060, 0.040],
+        "formula": "100*(0.6*0.30+0.3*0.20+0.1*(2/5))"
+      },
+      "expect": 28.0
+    },
+    {
+      "id": "G-SCORE-2",
+      "input": { "recent_acc": 0.40, "sev": 0.60, "self_conf": 4 },
+      "hand": {
+        "sev_norm": 0.40,
+        "terms": [0.240, 0.120, 0.080],
+        "formula": "100*(0.6*0.40+0.3*0.40+0.1*(4/5))"
+      },
+      "expect": 44.0
+    },
+    {
+      "id": "G-SCORE-3",
+      "input": { "recent_acc": 0.80, "sev": 0.30, "self_conf": 4 },
+      "hand": {
+        "sev_norm": 0.70,
+        "terms": [0.480, 0.210, 0.080],
+        "formula": "100*(0.6*0.80+0.3*0.70+0.1*(4/5))"
+      },
+      "expect": 77.0
+    },
+    {
+      "id": "G-SCORE-4",
+      "input": { "recent_acc": 1.0, "sev": 0.0, "self_conf": 5 },
+      "hand": {
+        "sev_norm": 1.0,
+        "terms": [0.600, 0.300, 0.100],
+        "formula": "100*(0.6*1+0.3*1+0.1*1)"
+      },
+      "expect": 100.0
+    },
+    {
+      "id": "G-SCORE-5",
+      "input": { "recent_acc": 0.0, "sev": 1.0, "self_conf": 1 },
+      "hand": {
+        "sev_norm": 0.0,
+        "terms": [0.0, 0.0, 0.020],
+        "formula": "100*(0+0+0.1*(1/5))"
+      },
+      "expect": 2.0
+    }
+  ],
+  "tolerance": 1e-6
+}

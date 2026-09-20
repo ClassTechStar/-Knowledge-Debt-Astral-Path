@@ -1,0 +1,200 @@
+openapi: 3.1.0
+info:
+  title: 知债：星穹学途（Knowledge Debt: Astral Path） API
+  version: contract-v1.2.0
+  description: 跨课程知识债诊断与修复智能体 · BASELINE 契约
+servers:
+  - url: http://127.0.0.1:5190
+paths:
+  /health/ready:
+    get:
+      summary: 就绪探针
+      responses:
+        '200':
+          description: ready
+  /v1/students/{id}/ingest/scores:
+    post:
+      summary: 成绩导入体检
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [graphVersion, rows, source]
+              properties:
+                graphVersion: { type: integer }
+                source: { type: string, enum: [csv, demo, self_report] }
+                rows:
+                  type: array
+                  items:
+                    type: object
+                    required: [kpId, recentAcc, sev, selfConf]
+                    properties:
+                      kpId: { type: string }
+                      recentAcc: { type: number, minimum: 0, maximum: 1 }
+                      sev: { type: number, minimum: 0, maximum: 1 }
+                      selfConf: { type: integer, minimum: 1, maximum: 5 }
+      responses:
+        '200': { description: 体检完成 }
+        '422': { description: INGEST_HEALTHCHECK_FAILED }
+  /v1/students/{id}/diagnose:
+    post:
+      summary: 债边诊断
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: graph_ver
+          in: query
+          required: true
+          schema: { type: integer }
+        - name: top_n
+          in: query
+          schema: { type: integer, default: 5, minimum: 1, maximum: 20 }
+      responses:
+        '200': { description: DiagnoseResponse }
+        '404': { description: GRAPH_VERSION_NOT_FOUND }
+  /v1/students/{id}/graph-view:
+    get:
+      summary: 边列表图谱视图
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+        - name: graph_ver
+          in: query
+          required: true
+          schema: { type: integer }
+      responses:
+        '200': { description: GraphViewDto }
+  /v1/students/{id}/plans:
+    post:
+      summary: 生成 14 天修复计划
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                graphVersion: { type: integer }
+                dayBudgetMin: { type: integer, default: 35 }
+                horizonDays: { type: integer, default: 14 }
+      responses:
+        '201': { description: Plan（constraints_checked=true） }
+        '422': { description: CONSTRAINT_CHECK_FAILED }
+  /v1/students/{id}/today:
+    post:
+      summary: 今日教练任务
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                day: { type: integer, minimum: 1, maximum: 14 }
+      responses:
+        '200': { description: TodayResponse }
+  /v1/attempts:
+    post:
+      summary: 提交作答
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [studentId, kpId, questionId, correct, selfConf]
+              properties:
+                studentId: { type: string }
+                planItemId: { type: string, nullable: true }
+                kpId: { type: string }
+                questionId: { type: string }
+                correct: { type: boolean }
+                selfConf: { type: integer, minimum: 1, maximum: 5 }
+      responses:
+        '201': { description: AttemptDto }
+  /v1/debt-edges/sale-check:
+    post:
+      summary: 销账检查（progress 唯一 cleared 入口）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [studentId, fromKp, toKp]
+              properties:
+                studentId: { type: string }
+                fromKp: { type: string }
+                toKp: { type: string }
+      responses:
+        '200': { description: SaleCheckResponse }
+  /v1/teachers/{id}/hotspots:
+    get:
+      summary: 班级热点（consent fail-closed）
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: HotspotsResponse }
+  /v1/consents/{studentId}/grant:
+    post:
+      summary: 授权教师可见
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '201': { description: Consent }
+  /v1/consents/{studentId}/revoke:
+    post:
+      summary: 撤销授权并 purge 教师缓存
+      parameters:
+        - name: studentId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Consent revoked }
+  /v1/graphs/{packId}/validate:
+    post:
+      summary: 图包无环与质量校验
+      parameters:
+        - name: packId
+          in: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: GraphValidateResult }
+        '422': { description: GRAPH_WOULD_CYCLE }
+  /v1/what-if:
+    post:
+      summary: What-if impact 模拟
+      responses:
+        '200': { description: WhatIfResponse }
+  /v1/demo/advance:
+    post:
+      summary: 演示推进天数
+      responses:
+        '200': { description: demo state }

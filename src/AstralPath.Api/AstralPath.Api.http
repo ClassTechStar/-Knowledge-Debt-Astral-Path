@@ -1,0 +1,29 @@
+@AstralPath.Api_HostAddress = http://127.0.0.1:5190
+
+### 就绪探针
+GET {{AstralPath.Api_HostAddress}}/health/ready
+Accept: application/json
+
+### 接口元信息
+GET {{AstralPath.Api_HostAddress}}/api/meta
+Accept: application/json
+
+### 演示学生列表
+GET {{AstralPath.Api_HostAddress}}/api/demo/students
+Accept: application/json
+
+### 知识债诊断（王小明 · 预埋红边）
+POST {{AstralPath.Api_HostAddress}}/v1/students/demo-student-a/diagnose?graph_ver=1
+Accept: application/json
+
+### 图谱视图
+GET {{AstralPath.Api_HostAddress}}/v1/students/demo-student-a/graph-view?graph_ver=1
+Accept: application/json
+
+### 今日任务
+POST {{AstralPath.Api_HostAddress}}/v1/students/demo-student-a/today
+Accept: application/json
+
+### 教师端热点（默认仅可见已授权学生）
+GET {{AstralPath.Api_HostAddress}}/v1/teachers/demo-teacher/hotspots
+Accept: application/json

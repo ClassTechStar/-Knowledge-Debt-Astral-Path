@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AstralPath.Desktop</RootNamespace>
+    <AssemblyName>AstralPath.Desktop</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AstralPath.Core\AstralPath.Core.csproj" />
+    <ProjectReference Include="..\AstralPath.Graph\AstralPath.Graph.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\graph-packs\accounting-v1\**\*" Link="graph-packs\accounting-v1\%(RecursiveDir)%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

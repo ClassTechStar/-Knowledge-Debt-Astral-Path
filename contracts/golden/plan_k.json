@@ -1,0 +1,57 @@
+{
+  "cases": [
+    {
+      "id": "G-PLAN-1",
+      "desc": "day1=8min ≤35 通过",
+      "input": {
+        "day_budget_min": 35,
+        "days": [{
+          "day": 1,
+          "items": [
+            { "est_min": 8, "type": "concept", "why": "为还 高数·特征向量 → 线代·特征值 的债", "from_kp_name": "高数·特征向量", "difficulty": 2 }
+          ]
+        }],
+        "top_debts": [{ "from_kp": "K12", "to_kp": "K88" }]
+      },
+      "expect": { "constraints_checked": true, "violations": [] }
+    },
+    {
+      "id": "G-PLAN-2",
+      "desc": "day3=36min 违反 K1",
+      "input": {
+        "day_budget_min": 35,
+        "days": [{
+          "day": 3,
+          "items": [
+            { "est_min": 12, "type": "concept", "why": "…特征向量…", "from_kp_name": "高数·特征向量", "difficulty": 3 },
+            { "est_min": 12, "type": "drill", "why": "…特征向量…", "from_kp_name": "高数·特征向量", "difficulty": 3 },
+            { "est_min": 12, "type": "quiz", "why": "…特征向量…", "from_kp_name": "高数·特征向量", "difficulty": 3 }
+          ]
+        }],
+        "top_debts": [{ "from_kp": "K12", "to_kp": "K88" }]
+      },
+      "expect": {
+        "constraints_checked": false,
+        "violations": [{ "code": "K1", "day": 3, "message": "day=3 minutes=36 > budget=35" }]
+      }
+    },
+    {
+      "id": "G-PLAN-3",
+      "desc": "why 缺 from_kp 违反 K3",
+      "input": {
+        "day_budget_min": 35,
+        "days": [{
+          "day": 1,
+          "items": [
+            { "est_min": 8, "type": "concept", "why": "多练练", "from_kp_name": "高数·特征向量", "difficulty": 2 }
+          ]
+        }],
+        "top_debts": [{ "from_kp": "K12", "to_kp": "K88" }]
+      },
+      "expect": {
+        "constraints_checked": false,
+        "violations": [{ "code": "K3", "day": 1, "message": "why 未包含 from_kp 名" }]
+      }
+    }
+  ]
+}
