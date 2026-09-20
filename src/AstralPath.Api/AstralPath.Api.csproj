@@ -13,6 +13,10 @@
     <ProjectReference Include="..\AstralPath.Contracts\AstralPath.Contracts.csproj" />
     <ProjectReference Include="..\AstralPath.Infrastructure\AstralPath.Infrastructure.csproj" />
     <ProjectReference Include="..\AstralPath.Shared\AstralPath.Shared.csproj" />
+    <!-- §19 扩展服务控制器（单一路由来源：单体与独立服务宿主共用） -->
+    <ProjectReference Include="..\AstralPath.Services\AstralPath.Services.csproj" />
+    <!-- 生产级持久化（可切换 memory / postgres） -->
+    <ProjectReference Include="..\AstralPath.Persistence\AstralPath.Persistence.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\graph-packs\accounting-v1\**\*">

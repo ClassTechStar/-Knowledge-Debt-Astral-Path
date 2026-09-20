@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AstralPath.Services.lab_bench_svc</RootNamespace>
+    <AssemblyName>lab-bench-svc</AssemblyName>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\AstralPath.Services\AstralPath.Services.csproj" />
+    <ProjectReference Include="..\..\src\AstralPath.Infrastructure\AstralPath.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\AstralPath.Persistence\AstralPath.Persistence.csproj" />
+  </ItemGroup>
+
+</Project>

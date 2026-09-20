@@ -8,11 +8,26 @@
     <Project Path="src/AstralPath.Infrastructure/AstralPath.Infrastructure.csproj" />
     <Project Path="src/AstralPath.Mobile/AstralPath.Mobile.csproj" />
     <Project Path="src/AstralPath.Shared/AstralPath.Shared.csproj" />
+    <Project Path="src/AstralPath.Persistence/AstralPath.Persistence.csproj" />
+    <Project Path="src/AstralPath.Services/AstralPath.Services.csproj" />
+  </Folder>
+  <Folder Name="/services/">
+    <Project Path="services/concept-diffusion-svc/concept-diffusion-svc.csproj" />
+    <Project Path="services/exam-impact-svc/exam-impact-svc.csproj" />
+    <Project Path="services/knowledge-forecast-svc/knowledge-forecast-svc.csproj" />
+    <Project Path="services/lab-bench-svc/lab-bench-svc.csproj" />
+    <Project Path="services/learning-velocity-svc/learning-velocity-svc.csproj" />
+    <Project Path="services/micro-lesson-svc/micro-lesson-svc.csproj" />
+    <Project Path="services/peer-cohort-svc/peer-cohort-svc.csproj" />
+    <Project Path="services/prerequisite-simulator-svc/prerequisite-simulator-svc.csproj" />
+    <Project Path="services/spaced-review-svc/spaced-review-svc.csproj" />
+    <Project Path="services/study-group-svc/study-group-svc.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/AstralPath.Api.Tests/AstralPath.Api.Tests.csproj" />
     <Project Path="tests/AstralPath.Core.Tests/AstralPath.Core.Tests.csproj" />
     <Project Path="tests/AstralPath.Desktop.Tests/AstralPath.Desktop.Tests.csproj" />
     <Project Path="tests/AstralPath.Eval.Tests/AstralPath.Eval.Tests.csproj" />
+    <Project Path="tests/AstralPath.Persistence.Tests/AstralPath.Persistence.Tests.csproj" />
   </Folder>
 </Solution>
