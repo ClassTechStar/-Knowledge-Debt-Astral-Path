@@ -33,6 +33,9 @@ tools/tessdata/
 _smoke_tmp/
 astralpath_smoke/
 
+**/__pycache__/
+*.py[cod]
+
 # 运行时/临时
 *.log
 *.tmp

@@ -258,22 +258,29 @@ Api.Tests       53  端到端：诊断/计划/今日/consent 撤销 purge/销账
 Desktop.Tests   47  Headless UI（Avalonia.Headless.XUnit）：全页面导航与视图解析、宽/窄屏响应式、
                        触达尺寸、页脚与伦理措辞扫描、11 个页面 VM 的行为硬约束（信心必填、
                        fail-closed、opt-out 隐藏可视化、销账校验…）、图谱布局确定性与 400 节点 <50ms
-合计           113  全部通过（dotnet test AstralPath.slnx -c Release）
+Persistence.Tests  8  持久化：内存仓储、嵌入确定性、RRF 公式、切分、SchemaSql 断言
+                           + 真实 PostgreSQL 集成（pgvector/HNSW/全文/RRF，需 ASTRALPATH_PG_CONN）
+合计           121  全部通过（dotnet test AstralPath.slnx -c Release）
 ```
+
+Postgres 集成用例在无数据库环境下会**显式跳过**（打印 SKIPPED），不会误判为失败。
 
 另：`scripts/smoke_all_endpoints.sh` 覆盖 100+ 路由与前端页面的端到端自检（真实动态 ID 与真实凭据，不使用假数据）。
 
+## 已完成（本轮交付）
+
+- **独立微服务拆分**（§19.11）：十个扩展服务拆为独立进程/容器，各自独立配置与数据库；路由按服务隔离（实测自身 200、他服务 404），单体行为等价由 53 项端到端测试验证。
+- **生产级持久化**：PostgreSQL + pgvector（HNSW）+ GIN 全文 + RRF 混合检索；`memory` / `postgres` 双模式可切换；真实容器集成测试通过。
+- **K8s / 混沌 / 可观测性**（§23–§25）：部署清单、混沌演练脚本、OTel 与 Prometheus 告警规则已产出并通过语法校验。
+
 ## 未完成范围（诚实标注）
 
-方案描述的以下部分尚未实现，属**数月级**工作量，非单次交付可覆盖：
-
 1. **`ApiAppDataSource`（客户端 HTTP 数据源）**（§11.2 / §16）：客户端已完整实现 UI 与数据源抽象，默认走进程内 `OfflineDemoDataSource`；连接真实 API 的 HTTP 实现尚未编写。
-2. **独立微服务拆分**（§19.11）：十个扩展服务当前以**单进程内的纯函数服务**实现，契约与拥有边界与独立部署形态一致，但未拆分为独立进程/容器与独立数据库。
-3. **生产级持久化**：DDL 已提供，默认仍为内存演示仓库，未接入真实 PostgreSQL / HNSW 向量索引与 RRF 混合检索。
-4. **K8s / 混沌 / 可观测性落地**（§23–§25）：仅有 Runbook，未产出部署清单与演练脚本。
-5. **Android 打包**：移动端 UI 与响应式布局已实现并通过 Headless 测试，但 `net10.0-android` 目标需要管理员安装 `wasm-tools` 工作负载后以 `-p:EnableAndroidHead=true` 构建。
+2. **Android 打包**：移动端 UI 与响应式布局已实现并通过 Headless 测试，但 `net10.0-android` 目标需要管理员安装 `wasm-tools` 工作负载后以 `-p:EnableAndroidHead=true` 构建。
+3. **K8s 清单未经集群验证**：`deploy/k8s/` 已完成 YAML 语法校验（17/17），但本机无集群，未做服务端 schema 校验与实际部署；首次上集群前请执行 `kubectl apply --dry-run=server`。
+4. **混沌与可观测性为"配置就绪"**：脚本与采集配置已产出并通过 `bash -n` 检查，但未在真实集群执行过演练。
 
-以上均不影响当前演示链路的完整性与可验证性（构建 0 错误 0 警告 · 113 测试通过 · 端到端自检全绿 · 双端客户端可启动）。
+以上均不影响当前演示链路的完整性与可验证性（构建 0 错误 0 警告 · **121 测试通过** · 端到端自检 93 项全绿 · 双端客户端可启动）。
 
 ## 页脚合规声明
 
