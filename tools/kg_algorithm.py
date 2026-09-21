@@ -31,6 +31,12 @@ STOP_TERMS = {
     "the", "and", "for", "you", "with", "this", "that", "from", "are", "was",
     "www", "http", "https", "com", "pdf", "isbn", "copyright", "page", "chapter",
     "function", "class", "public", "static", "void", "import", "return",
+    "ptpress", "com.cn", "net", "org",
+    # OCR / 版权噪声
+    "posts", "telecom", "press", "rights", "reserved",
+    "isbn", "cip", "books", "edition", "preface", "contents",
+    "figure", "table", "section", "example", "note", "see", "also",
+    "post", "tele", "mail", "phone",
 }
 
 
@@ -63,16 +69,88 @@ def strip_noise_title(t: str) -> str:
     return t[:40]
 
 
-def extract_outline(text: str) -> tuple[list[dict], list[dict]]:
-    """返回 (chapters, sections)，带层级与序号。"""
+NOISE_TITLE = re.compile(
+    r"(版权|出版社|印刷|开本|书号|ISBN|CIP|备案|定价|字数|版次|印次|www\.|http|@|邮电|新华书店|责任编辑|封面设计|校对|经销|发行|版权所有)",
+    re.I,
+)
+
+
+def clean_chapter_title(t: str) -> str:
+    t = re.sub(r"\s+", " ", (t or "").strip())
+    t = re.sub(r"^[第]*\s*([0-9一二三四五六七八九十百零]+)\s*章\s*", r"第\1章 ", t)
+    # 目录后接说明文字：截到句号/逗号/空白说明
+    t = re.split(r"[。；;：:，,—\-—]|另外|包括|其中|介绍|讲解了|重点介绍|本书", t)[0]
+    t = re.sub(r"\s+\d{1,4}$", "", t)  # 去掉页码
+    t = re.sub(r"\s+", " ", t).strip()
+    return t[:36]
+
+
+def is_noise_title(title: str) -> bool:
+    t = (title or "").strip()
+    if len(t) < 2:
+        return True
+    # OCR 垃圾：大量符号、拉丁字母与数字混杂且无中文
+    import re as _re
+    if "出版社" in t or "印刷" in t or "开本" in t or "字数" in t or "版次" in t:
+        return True
+    if "www." in t or ".com" in t or ".cn" in t:
+        return True
+    if "ISBN" in t or "CIP" in t or "责任编辑" in t or "封面设计" in t:
+        return True
+    # 连续点号 / 省略号垃圾（强化学习扫描版目录）
+    if _re.search(r"[\.\…·]{3,}", t):
+        return True
+    han = len(_re.findall(r"[一-鿿]", t))
+    latin = len(_re.findall(r"[A-Za-z]", t))
+    digits = len(_re.findall(r"\d", t))
+    if han == 0 and (latin + digits) >= 1:
+        # 允许 Go / Java / C# / RNN 等有意义英文术语
+        if not _re.search(r"(Go|Java|Kotlin|Python|RNN|LSTM|GRU|Transformer|Agent|SQL|API|NLP|CNN|RL)\b", t):
+            return True
+    # 「4 时预约」「9 著 黄 佳」「9 著」OCR 残片
+    if _re.match(r"^\d+\s+\S{0,6}(著|时|页|印|版|次|预约)", t):
+        return True
+    if _re.search(r"\b(著|校对|经销|发行|印次|版次)\b", t) and han < 8:
+        return True
+    if t.count("…") >= 2:
+        return True
+    if _re.match(r"^\d+\s*[，,。]", t):
+        return True
+    if NOISE_TITLE.search(t):
+        return True
+    # 目录/CIP 噪声：如「1 . ①深」「1 数据核字」
+    if re.match(r"^\d+\s*[\.\s]*[①②③④⑤ⅠⅡⅢ]", t):
+        return True
+    if re.match(r"^[\d\s\.、，,。①②③ⅠⅡⅢ]+$", t):
+        return True
+    if re.match(r"^[\W_]{1,8}$", t):
+        return True
+    # 小节残片：数字编号 + 极短无意义中文（OCR 目录）
+    m = _re.match(r"^(\d{1,2}(?:\.\d{1,2}){0,2})\s*(.*)$", t)
+    if m:
+        rest = (m.group(2) or "").strip()
+        rest_han = len(_re.findall(r"[一-鿿]", rest))
+        if len(rest) < 2 or rest_han == 0:
+            return True
+        # 「须程」「老虎」「数据核字」「尔曼方」等碎片
+        if rest_han <= 2 and len(rest) <= 4 and not _re.search(r"(变量|函数|类|数组|循环|线程|对象|接口|继承|网络|梯度|损失)", rest):
+            return True
+        if _re.search(r"(数据核字|须程|尔曼|间的随|示的|法平均|掌握|以及)", rest) and rest_han <= 4:
+            return True
+    return False
+
+
+def extract_outline(text: str, max_chapters: int = 80, max_sections: int = 200) -> tuple[list[dict], list[dict]]:
+    """返回 (chapters, sections)，带层级与序号；过滤版权/CIP 噪声。目录尽量全量。"""
     chapters: list[dict[str, Any]] = []
     sections: list[dict[str, Any]] = []
     seen_c: set[str] = set()
     seen_s: set[str] = set()
 
-    # 章
     for m in re.finditer(r"(第\s*[0-9一二三四五六七八九十百零]+\s*章[^\n]{0,40})", text):
-        raw = strip_noise_title(m.group(1))
+        raw = clean_chapter_title(strip_noise_title(m.group(1)))
+        if is_noise_title(raw):
+            continue
         num = parse_chapter_num(raw)
         key = f"ch:{num if num is not None else raw}"
         if key in seen_c or len(raw) < 3:
@@ -86,10 +164,11 @@ def extract_outline(text: str) -> tuple[list[dict], list[dict]]:
             "offset": m.start(),
         })
 
-    # 节/小节
     for m in re.finditer(r"(?m)^\s*(\d{1,2}(?:\.\d{1,2}){0,2})\s+([^\n]{2,40})$", text):
         code = m.group(1)
         name = strip_noise_title(m.group(2))
+        if is_noise_title(name) or is_noise_title(f"{code} {name}"):
+            continue
         title = f"{code} {name}"[:36]
         key = f"sec:{code}"
         if key in seen_s or len(name) < 2:
@@ -108,7 +187,7 @@ def extract_outline(text: str) -> tuple[list[dict], list[dict]]:
 
     chapters.sort(key=lambda x: (x["chapter_num"] if x["chapter_num"] is not None else 999, x["offset"]))
     sections.sort(key=lambda x: (x.get("chapter_num") or 999, x["offset"]))
-    return chapters[:24], sections[:80]
+    return chapters[:max_chapters], sections[:max_sections]
 
 
 def extract_terms_weighted(text: str, chapter_offsets: list[tuple[int, str]], limit: int = 28) -> list[dict]:
@@ -141,6 +220,20 @@ def extract_terms_weighted(text: str, chapter_offsets: list[tuple[int, str]], li
                 continue
             # 过滤页码式、全小写虚词
             if re.fullmatch(r"[a-z]{1,3}", term):
+                continue
+            # OCR 噪声词：全大写新闻页脚 / 连续点号 / 过长垃圾
+            if re.search(r"[\.\…·]{3,}", term):
+                continue
+            if term.isupper() and len(term) >= 4 and term not in {"API", "SQL", "NLP", "CNN", "RNN", "LSTM", "GRU", "RL", "HTTP"}:
+                if term not in domain and term.lower() not in {d.lower() for d in domain}:
+                    continue
+            if low in {"posts", "telecom", "press", "copyright", "isbn", "preface", "contents", "reilly", "o'reilly"}:
+                continue
+            if term in {"Reilly", "O'Reilly", "Media", "Inc", "Ltd", "图灵", "社区", "投稿", "邮箱"}:
+                continue
+            # 中英混杂且中文 < 2 的碎片
+            han_n = len(re.findall(r"[一-鿿]", term))
+            if han_n == 0 and len(term) >= 10 and term.lower() not in {d.lower() for d in domain}:
                 continue
             counts[term] += 1
             if term not in first_pos:
@@ -300,17 +393,19 @@ def remove_cycles(nodes: list[dict], edges: list[dict]) -> tuple[list[dict], lis
 def build_knowledge_graph(
     text: str,
     material_title: str,
-    max_chapters: int = 20,
-    max_sections: int = 36,
-    max_terms: int = 24,
+    max_chapters: int = 80,
+    max_sections: int = 200,
+    max_terms: int = 28,
 ) -> dict[str, Any]:
-    """完整构图算法。"""
-    chapters, sections = extract_outline(text)
+    """完整构图算法。目录尽量全量入图（章+节+小节）。"""
+    chapters, sections = extract_outline(text, max_chapters=max_chapters, max_sections=max_sections)
 
     # 若章过少，从文件名/正则兜底
     if len(chapters) < 2:
         for m in re.finditer(r"(第\s*\d+\s*章[^\n]{0,24})", text):
-            t = strip_noise_title(m.group(1))
+            t = clean_chapter_title(strip_noise_title(m.group(1)))
+            if is_noise_title(t):
+                continue
             chapters.append({"title": t, "kind": "chapter", "level": 0,
                              "chapter_num": parse_chapter_num(t), "offset": m.start()})
         # 去重
@@ -332,6 +427,22 @@ def build_knowledge_graph(
     course = material_title[:24] or "MATERIAL"
     nodes: list[dict] = []
     edges: list[dict] = []
+
+    # 无章节时兜底：合成书名主干节点，保证小节/术语有挂点，图不至于 0 边
+    if len(chapters) == 0:
+        fallback_title = (material_title or "教材")[:24]
+        chapters = [{
+            "title": fallback_title,
+            "kind": "chapter",
+            "level": 0,
+            "chapter_num": 1,
+            "offset": 0,
+        }]
+        for si, sec in enumerate(sections[:12], start=1):
+            if sec.get("chapter_num") is None:
+                sec["chapter_num"] = 1
+        if not terms:
+            terms = [{"term": fallback_title[:12], "freq": 3, "score": 3.0, "first_offset": 0, "host_chapter": fallback_title}]
 
     # 分配 ID：章 → 小节 → 关键词（ID 顺序即层级顺序，利于布局）
     def alloc(prefix: str, i: int) -> str:
@@ -385,21 +496,12 @@ def build_knowledge_graph(
                 "from": parent, "to": nid, "edgeType": "prerequisite", "weight": 1.1,
                 "source": "kg:section-parent",
             })
-        else:
-            # 回退：挂到最近的前一章
-            if ch_ids:
-                # 用 offset 就近
-                nearest = None
-                best = -1
-                for c in chapters:
-                    if c["offset"] <= sec.get("offset", 0) and c["offset"] >= best:
-                        best = c["offset"]
-                        nearest = ch_id[c["title"]]
-                if nearest:
-                    edges.append({
-                        "from": nearest, "to": nid, "edgeType": "prerequisite", "weight": 0.9,
-                        "source": "kg:section-near",
-                    })
+        elif ch_ids:
+            # 兜底：挂到第一章，避免小节孤立导致 0 边
+            edges.append({
+                "from": ch_ids[0], "to": nid, "edgeType": "prerequisite", "weight": 0.9,
+                "source": "kg:section-fallback",
+            })
 
     term_id: dict[str, str] = {}
     term_pos: dict[str, int] = {}
@@ -462,9 +564,14 @@ def build_knowledge_graph(
         },
     }
     triples = to_triples(nodes, edges)
-    mindmap = to_mindmap_tree(nodes, edges, root_text=material_title)
-    outline = tree_to_markdown(mindmap)
-    layout = logical_structure_layout(mindmap)
+    try:
+        mindmap = to_mindmap_tree(nodes, edges, root_text=material_title)
+        outline = tree_to_markdown(mindmap)
+        layout = logical_structure_layout(mindmap)
+    except Exception:
+        mindmap = {"data": {"text": material_title[:24] or "知识图谱", "id": "__root__", "layer": "root", "expand": True}, "children": []}
+        outline = f"# {material_title}"
+        layout = None
     return {
         "nodes": nodes,
         "edges": edges,
@@ -579,17 +686,43 @@ def to_mindmap_tree(nodes: list[dict], edges: list[dict], root_text: str = "知�
         parent[b] = a
         children[a].append(b)
 
-    # 无父节点 → 作为根的直接子节点（逻辑结构树的“自由分支”）
+    # 无父节点 → 作为根的直接子节点
     roots = [nid for nid in by_id if nid not in parent]
-    root_id = "__root__"
-    # 章节优先做一级
-    chapters = [nid for nid in roots if by_id[nid].get("layer") == "chapter" or str(by_id[nid].get("name", "")).startswith("第")]
+    # 思维导图：章节并列挂在书根下（不要被 chapter-sequence 拉成单链）
+    chapters = [
+        nid for nid in by_id
+        if by_id[nid].get("layer") == "chapter"
+        or str(by_id[nid].get("name", "")).startswith("第")
+        or str(by_id[nid].get("description", "")) in ("chapter", "title")
+    ]
+    chapter_set = set(chapters)
+    # 章节彼此不作为父子（sequence 边只表示阅读顺序）
+    for ch in chapters:
+        parent.pop(ch, None)
+    children = {nid: [c for c in lst if c not in chapter_set or lst is None] for nid, lst in children.items()}
+    # rebuild children excluding chapter→chapter sequence edges
+    children = {nid: [] for nid in by_id}
+    for e in tree_edges:
+        a, b = e["from"], e["to"]
+        if a not in by_id or b not in by_id or a == b:
+            continue
+        if b in chapter_set and a in chapter_set:
+            continue  # 章节并列，不互为父
+        if b in parent:
+            continue
+        parent[b] = a
+        children[a].append(b)
+
+    roots = [nid for nid in by_id if nid not in parent]
     if chapters:
-        # 最小 chapter_num 或 topo 最前的作锚点，其余挂在根下
-        chapters = sorted(chapters, key=lambda i: by_id[i].get("topo_rank", 999))
-        root_children = chapters + [nid for nid in roots if nid not in chapters]
+        chapter_ids = [c for c in chapters]
+        others = [nid for nid in roots if nid not in chapter_ids]
+        # 章节按 topo/序号并列
+        chapter_ids = sorted(chapter_ids, key=lambda i: by_id[i].get("topo_rank", 999))
+        root_children = chapter_ids + others
+        # 章节下的 section/term 保持原父子
     else:
-        root_children = roots
+        root_children = sorted(roots, key=lambda i: by_id[i].get("topo_rank", 999))
 
     def build(nid: str) -> dict:
         n = by_id[nid]
@@ -611,7 +744,7 @@ def to_mindmap_tree(nodes: list[dict], edges: list[dict], root_text: str = "知�
     return {
         "data": {
             "text": root_text[:24] or "知识图谱",
-            "id": root_id,
+            "id": "__root__",
             "layer": "root",
             "expand": True,
         },

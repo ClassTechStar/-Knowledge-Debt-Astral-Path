@@ -72,7 +72,26 @@ app.Use(async (context, next) =>
     }
     await next();
 });
-app.UseStaticFiles();
+// wwwroot 可能在 bin 输出目录；若 ContentRoot 不对则显式指定
+var webRootCandidates = new[]
+{
+    Path.Combine(builder.Environment.ContentRootPath, "wwwroot"),
+    Path.Combine(AppContext.BaseDirectory, "wwwroot"),
+    Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "wwwroot")),
+};
+var webRoot = webRootCandidates.FirstOrDefault(Directory.Exists);
+if (webRoot != null)
+{
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(webRoot),
+        RequestPath = ""
+    });
+}
+else
+{
+    app.UseStaticFiles();
+}
 app.MapControllers();
 app.MapGet("/health/ready", () => Results.Json(new
 {

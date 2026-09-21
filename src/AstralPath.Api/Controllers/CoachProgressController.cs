@@ -138,16 +138,19 @@ public sealed class CoachProgressController : ControllerBase
                 return HttpResults.Fail(400, ErrorCodes.ValidationError, "selfConf 必须为 1..5");
 
             var student = _store.EnsureStudent(request.StudentId);
-            var question = _store.Questions.GetValueOrDefault(request.QuestionId);
-            var stem = question?.Stem ?? request.QuestionId;
+            var qid = string.IsNullOrWhiteSpace(request.QuestionId) ? $"q-auto-{Guid.NewGuid():N}"[..20] : request.QuestionId;
+            var question = _store.Questions.GetValueOrDefault(qid);
+            var stem = question?.Stem
+                ?? (string.IsNullOrWhiteSpace(request.KpId) ? "教材练习" : $"知识点「{request.KpId}」相关练习");
             var stemHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(stem))).ToLowerInvariant();
 
+            var kpId = string.IsNullOrWhiteSpace(request.KpId) ? "K03" : request.KpId;
             var attempt = new Attempt(
                 Guid.NewGuid().ToString("N"),
                 request.StudentId,
                 request.PlanItemId,
-                request.KpId,
-                request.QuestionId,
+                kpId,
+                qid,
                 stemHash,
                 "choice",
                 request.Correct,
@@ -158,16 +161,29 @@ public sealed class CoachProgressController : ControllerBase
                 DateTime.UtcNow);
             student.Attempts.Add(attempt);
 
-            if (student.MasteryInputs.TryGetValue(request.KpId, out var row))
+            // 教材题库 kpId（bank:xxx）不在会计图里：记入临时掌握，不写会计债边
+            if (!student.MasteryInputs.ContainsKey(kpId))
+            {
+                student.MasteryInputs[kpId] = new Core.Algorithms.IngestRow(
+                    kpId,
+                    request.Correct ? 0.8 : 0.4,
+                    request.Correct ? 0.2 : 0.5,
+                    request.SelfConf);
+            }
+            else if (student.MasteryInputs.TryGetValue(kpId, out var row))
             {
                 var newAcc = (row.RecentAcc * 9 + (request.Correct ? 1.0 : 0.0)) / 10.0;
                 var newSev = Math.Clamp(row.Sev * (request.Correct ? 0.9 : 1.05), 0, 1);
-                student.MasteryInputs[request.KpId] = row with
+                student.MasteryInputs[kpId] = row with
                 {
                     RecentAcc = Math.Round(newAcc, 6),
                     Sev = Math.Round(newSev, 6),
                     SelfConf = request.SelfConf
                 };
+            }
+            // 仅对课程图内 kpId 重算债边；bank:* 只更新掌握度
+            if (!kpId.StartsWith("bank:", StringComparison.Ordinal))
+            {
                 _store.RecomputeMastery(request.StudentId);
             }
 

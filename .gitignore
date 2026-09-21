@@ -46,3 +46,8 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+
+# 安装包产物（数百 MB 自包含 exe，不进仓库）
+deploy/win-install/
+materials/ocr-debug/
+**/ocr-debug/

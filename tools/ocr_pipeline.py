@@ -220,7 +220,7 @@ def render_pdf_page_png(path: Path, page_index: int, scale: float = 2.0, out_png
         return None
 
 
-def tesseract_pdf_pages(path: Path, page_indexes: list[int], scale: float = 2.0, max_pages: int = 12) -> tuple[str, str]:
+def tesseract_pdf_pages(path: Path, page_indexes: list[int], scale: float = 2.0, max_pages: int = 12, time_budget_s: float = 40.0) -> tuple[str, str]:
     """PDF → PNG → tesseract（官方 CLI）逐页识别。"""
     exe = find_tesseract()
     if not exe:
@@ -241,7 +241,12 @@ def tesseract_pdf_pages(path: Path, page_indexes: list[int], scale: float = 2.0,
     except Exception as e:
         return "", f"pdf_open_error:{e}"
 
+    import time as _tesseract_time
+    _t0 = _tesseract_time.time()
     for idx in sorted({i for i in page_indexes if 0 <= i < total})[:max_pages]:
+        if _tesseract_time.time() - _t0 > time_budget_s:
+            chunks.append("[ocr-budget] stopped")
+            break
         png = workdir / f"page_{idx:04d}.png"
         out_base = workdir / f"page_{idx:04d}"
         rendered = render_pdf_page_png(path, idx, scale=scale, out_png=png)
@@ -480,6 +485,66 @@ def build_suggested_tasks(nodes: list, material_title: str, max_tasks: int = 6) 
     return tasks[:max_tasks]
 
 
+def extract_full_text(path: Path, ocr_mode: str = "standard") -> tuple[str, int, str, list[str]]:
+    """尽量抽取 PDF 全部文字：文本层全量 + 扫描页 tesseract 补齐。"""
+    notes: list[str] = []
+    # 文本层：尽可能全量（deep/standard 不截断；quick 仍限制以保速度）
+    if ocr_mode == "quick":
+        max_text_pages = 120
+    else:
+        max_text_pages = 0  # 0 = 全部
+
+    text, pages, mode = try_extract_text_pypdf(path, max_pages=max_text_pages if max_text_pages else 100000)
+    if len(text) < 80:
+        text2, pages2, mode2 = try_extract_text_pdfium(path, max_pages=max_text_pages if max_text_pages else 100000)
+        if len(text2) > len(text):
+            text, pages, mode = text2, pages2, mode2
+            notes.append("fallback_pdfium")
+
+    # 密度：平均每页字符
+    density = (len(text) / pages) if pages else 0
+    info = tesseract_info()
+    ocr_used = False
+
+    if len(text) < 80 or density < 80:
+        notes.append(f"text_layer_sparse:density={density:.1f}")
+        if ocr_mode in ("standard", "quick", "deep") and info.get("available"):
+            total = pages or 30
+            # 扫描版：优先 OCR 目录区 + 全书均匀采样，保证能抽出完整目录
+            toc_idx = list(range(0, min(total, 24)))
+            sample = []
+            if total > 24:
+                step = max(8, total // 20)
+                sample = list(range(24, total, step))[:18]
+            indexes = sorted({i for i in toc_idx + sample if 0 <= i < total})
+            if ocr_mode == "quick":
+                indexes = indexes[:12]
+                max_ocr = 10
+            else:
+                max_ocr = 28
+            ocr_text, ocr_note = tesseract_pdf_pages(
+                path, indexes, scale=2.0, max_pages=max_ocr,
+                time_budget_s=90.0 if ocr_mode != "quick" else 40.0,
+            )
+            notes.append(ocr_note)
+            ocr_text = clean_ocr_text(ocr_text)
+            if len(ocr_text) > len(text) * 0.5:
+                # 合并：保留已有文本层，OCR 结果附在后面供目录抽取
+                if len(ocr_text) > len(text):
+                    text = ocr_text
+                else:
+                    text = text + "\n" + ocr_text
+                ocr_used = True
+                notes.append("ocr_merged")
+        else:
+            notes.append("tesseract_unavailable_or_no_traineddata")
+    else:
+        notes.append("text_layer_full")
+
+    text = clean_ocr_text(text)
+    return text, pages, mode, notes
+
+
 def process_file(path: Path, ocr_mode: str = "standard") -> dict[str, Any]:
     info = tesseract_info()
     result: dict[str, Any] = {
@@ -496,95 +561,166 @@ def process_file(path: Path, ocr_mode: str = "standard") -> dict[str, Any]:
         "tesseract": info,
         "notes": [],
         "textSample": "",
+        "fullText": "",
         "chapters": [],
+        "sections": [],
+        "chapterBodies": [],
+        "sectionBodies": [],
+        "toc": {"chapters": [], "sections": []},
+        "deepStats": {},
         "terms": [],
         "sentences": [],
         "nodes": [],
         "edges": [],
         "suggestedTasks": [],
+        "chapterQuestions": [],
     }
     if not path.exists():
         result["notes"].append("file_missing")
         return result
 
-    max_text_pages = 45 if ocr_mode == "standard" else 25
-    text, pages, mode = try_extract_text_pypdf(path, max_pages=max_text_pages)
-    if len(text) < 80:
-        text2, pages2, mode2 = try_extract_text_pdfium(path, max_pages=max_text_pages)
-        if len(text2) > len(text):
-            text, pages, mode = text2, pages2, mode2
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        import deep_chapters
+    except Exception as e:
+        result["notes"].append(f"deep_chapters_import_error:{e}")
+        deep_chapters = None
 
+    text, pages, mode, notes = extract_full_text(path, ocr_mode)
     result["pageCount"] = pages
     result["mode"] = mode
     result["extractedChars"] = len(text)
-
-    if len(text) < 80:
-        result["needsOcr"] = True
-        result["notes"].append("text_layer_missing_or_sparse")
-        if ocr_mode in ("standard", "quick") and info.get("available"):
-            total = pages or 30
-            if ocr_mode == "quick":
-                indexes = list(range(0, min(total, 8)))
-                max_ocr = 6
-            else:
-                indexes = list(range(0, min(total, 12)))
-                indexes += [min(total - 1, i) for i in (20, 40, 60, 80, 100, 120, 150, 200, 260)]
-                max_ocr = 12
-            indexes = sorted({i for i in indexes if 0 <= i < max(total, 1)})
-            ocr_text, ocr_note = tesseract_pdf_pages(path, indexes, scale=2.0, max_pages=max_ocr)
-            result["notes"].append(ocr_note)
-            ocr_text = clean_ocr_text(ocr_text)
-            if len(ocr_text) > len(text):
-                text = ocr_text
-                result["ocrUsed"] = True
-                result["mode"] = f"{mode}+{ocr_note}"
-        elif ocr_mode in ("standard", "quick"):
-            result["notes"].append("tesseract_unavailable_or_no_traineddata")
-    else:
-        result["notes"].append("text_layer_ok")
-        text = clean_ocr_text(text)
-
+    result["notes"].extend(notes)
+    result["ocrUsed"] = any("tesseract" in n or "ocr" in n for n in notes)
+    result["fullText"] = text  # 供 API 存章节全文
     result["textSample"] = text[:4000]
-    result["extractedChars"] = len(text)
-    chapters = extract_chapters(text)
-    terms = extract_terms(text)
-    sentences = extract_sentences(text)
 
-    if len(chapters) < 2:
-        stem = path.stem
-        title = re.sub(r"[_\-]+", " ", stem)
-        chapters = [{"title": title[:40], "kind": "title", "offset": 0}]
-        result["notes"].append("chapter_fallback_from_filename")
-        if not terms:
-            tokens = re.findall(r"[一-鿿]{2,10}|[A-Za-z]{3,20}", title)
-            terms = [{"term": t, "freq": 1} for t in tokens[:12]] or [{"term": title[:16], "freq": 1}]
+    material_title = Path(path).stem
+    # 上传落盘名形如 {32hex}_{书名}：去掉 id 前缀，避免题干出现 hash
+    material_title = re.sub(r"^[0-9a-fA-F]{24,}_", "", material_title).strip() or Path(path).stem
+    material_title = material_title[:48]
 
+    # 深度章节解析：完整目录 + 章节正文 + 按章出题
+    if deep_chapters is not None and text:
+        try:
+            deep = deep_chapters.build_deep_chapter_payload(text, material_title, questions_per_chapter=3)
+            result["toc"] = deep.get("toc", {"chapters": [], "sections": []})
+            result["chapterBodies"] = deep.get("chapterBodies", [])
+            result["sectionBodies"] = deep.get("sectionBodies", [])
+            result["deepStats"] = deep.get("stats", {})
+            result["chapters"] = [
+                {"title": c["title"], "kind": "chapter", "offset": c.get("offset", 0), "id": c.get("id")}
+                for c in deep.get("chapterBodies", [])
+            ]
+            result["sections"] = deep.get("toc", {}).get("sections", [])
+            # 今日任务候选：前几章的题
+            cq = []
+            for ch in deep.get("chapterBodies", [])[:8]:
+                for q in ch.get("questions", [])[:2]:
+                    cq.append({
+                        "chapterId": ch.get("id"),
+                        "chapterTitle": ch.get("title"),
+                        **q,
+                    })
+            result["chapterQuestions"] = cq
+            result["notes"].append(
+                f"deep_parse:ch={result['deepStats'].get('chapterCount', 0)}"
+                f",sec={result['deepStats'].get('sectionCount', 0)}"
+                f",q={result['deepStats'].get('questionCount', 0)}"
+            )
+        except Exception as e:
+            result["notes"].append(f"deep_parse_error:{e}")
+
+    result["terms"] = [{"term": t, "freq": 1} for t in (result.get("terms") or [])][:30]
+    result["sentences"] = extract_sentences(text)
+
+    # 知识图谱：完整目录入图
     try:
         sys.path.insert(0, str(Path(__file__).resolve().parent))
         import kg_algorithm
-        # 直接用优化算法构图（完整文本）
-        kg = kg_algorithm.build_knowledge_graph(text, Path(path).stem)
-        chapters = [{"title": c, "kind": "chapter", "offset": 0} for c in kg.get("chapters", [])]
-        terms = kg.get("terms", [])
+        kg_text = text
+        kg = kg_algorithm.build_knowledge_graph(kg_text, material_title, max_chapters=80, max_sections=200, max_terms=28)
         result["nodes"] = kg.get("nodes", [])
         result["edges"] = kg.get("edges", [])
         result["graphAlgorithm"] = kg.get("stats", {}).get("algorithm", "kg-v2")
         result["graphStats"] = kg.get("stats", {})
-        result["chapters"] = chapters[:40]
-        result["terms"] = [{"term": t.get("term"), "freq": t.get("freq"), "score": t.get("score")} for t in terms[:30]]
-        result["sentences"] = sentences
-        result["suggestedTasks"] = build_suggested_tasks(result["nodes"], path.stem)
-        return result
+        result["terms"] = [
+            {"term": t.get("term"), "freq": t.get("freq"), "score": t.get("score")}
+            for t in kg.get("terms", [])[:30]
+        ]
+        # 若 kg 章节数明显少于 deep TOC，用 deep TOC 补全图节点（目录完整性）
+        deep_chs = result.get("toc", {}).get("chapters") or []
+        deep_secs = result.get("toc", {}).get("sections") or []
+        existing_names = {n.get("name") for n in result["nodes"]}
+        if deep_chs and len(deep_chs) > len([n for n in result["nodes"] if n.get("description") == "chapter"]):
+            course = material_title[:24] or "MATERIAL"
+            added_ch = 0
+            for c in deep_chs:
+                if c["title"] in existing_names:
+                    continue
+                result["nodes"].append({
+                    "id": f"TOC_{c['id']}",
+                    "name": c["title"][:40],
+                    "course": course,
+                    "description": "chapter",
+                    "source": "deep:toc-chapter",
+                    "level": 0,
+                    "layer": "chapter",
+                    "weight": 1.0,
+                })
+                existing_names.add(c["title"])
+                added_ch += 1
+            # 时序边
+            toc_ids = [n["id"] for n in result["nodes"] if str(n["id"]).startswith("TOC_CH")]
+            for a, b in zip(toc_ids, toc_ids[1:]):
+                result["edges"].append({
+                    "from": a, "to": b, "edgeType": "prerequisite", "weight": 1.2,
+                    "source": "deep:toc-sequence",
+                })
+            # 目录小节 → 章
+            ch_id_by_title = {n["name"]: n["id"] for n in result["nodes"] if n.get("description") == "chapter"}
+            ch_id_by_num = {}
+            for c in deep_chs:
+                if c.get("chapterNum") is not None:
+                    ch_id_by_num[c["chapterNum"]] = f"TOC_{c['id']}" if f"TOC_{c['id']}" in {n["id"] for n in result["nodes"]} else None
+            for s in deep_secs[:120]:
+                if s["title"] in existing_names:
+                    continue
+                sid = f"TOC_{s['id']}"
+                result["nodes"].append({
+                    "id": sid,
+                    "name": s["title"][:40],
+                    "course": course,
+                    "description": "section",
+                    "source": "deep:toc-section",
+                    "level": s.get("level", 1),
+                    "layer": "section",
+                    "weight": 0.8,
+                })
+                existing_names.add(s["title"])
+                parent_id = None
+                if s.get("parentId"):
+                    parent_id = f"TOC_{s['parentId']}"
+                    if parent_id not in {n["id"] for n in result["nodes"]}:
+                        parent_id = None
+                if parent_id is None and toc_ids:
+                    parent_id = toc_ids[0]
+                if parent_id:
+                    result["edges"].append({
+                        "from": parent_id, "to": sid, "edgeType": "prerequisite", "weight": 1.0,
+                        "source": "deep:toc-section-parent",
+                    })
+            result["notes"].append(f"toc_graph_enrich:+{added_ch}ch")
     except Exception as e:
         result["notes"].append(f"kg_algorithm_fallback:{e}")
-        nodes, edges = build_nodes_edges(chapters, terms, path.stem)
-        result["chapters"] = chapters[:40]
-        result["terms"] = terms
-        result["sentences"] = sentences
+        chapters = result.get("chapters") or [{"title": material_title[:40], "kind": "chapter", "offset": 0}]
+        nodes, edges = build_nodes_edges(chapters, [], material_title)
         result["nodes"] = nodes
         result["edges"] = edges
-        result["suggestedTasks"] = build_suggested_tasks(nodes, path.stem)
-        return result
+
+    if not result["suggestedTasks"]:
+        result["suggestedTasks"] = build_suggested_tasks(result["nodes"], material_title)
+    return result
 
 
 def main() -> int:

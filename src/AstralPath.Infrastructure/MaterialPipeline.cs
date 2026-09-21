@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AstralPath.Contracts;
 using AstralPath.Graph;
 
 namespace AstralPath.Infrastructure;
@@ -139,12 +140,26 @@ public static class MaterialPipeline
             }
 
             using var proc = System.Diagnostics.Process.Start(psi) ?? throw new InvalidOperationException("failed to start OCR process");
-            var stdout = await proc.StandardOutput.ReadToEndAsync(ct);
-            var stderr = await proc.StandardError.ReadToEndAsync(ct);
-            await proc.WaitForExitAsync(ct);
+            // 经典死锁：stderr 缓冲被 fontTools 等警告写满时，进程会卡在写 stderr，
+            // 而顺序 ReadToEnd(stdout) 永远等不到 EOF。必须并行读 + 超时杀进程。
+            var stdoutTask = proc.StandardOutput.ReadToEndAsync(ct);
+            var stderrTask = proc.StandardError.ReadToEndAsync(ct);
+            using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
+            timeoutCts.CancelAfter(TimeSpan.FromMinutes(3));
+            try
+            {
+                await proc.WaitForExitAsync(timeoutCts.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                try { proc.Kill(entireProcessTree: true); } catch { /* ignore */ }
+                throw new TimeoutException($"OCR 超时(180s)：{Path.GetFileName(filePath)} mode={ocrMode}");
+            }
+            var stdout = await stdoutTask;
+            var stderr = await stderrTask;
 
             if (!File.Exists(outFile))
-                throw new InvalidOperationException($"OCR output missing. stdout={stdout} stderr={stderr}");
+                throw new InvalidOperationException($"OCR output missing. exit={proc.ExitCode} stdout={Truncate(stdout, 400)} stderr={Truncate(stderr, 400)}");
 
             var text = await File.ReadAllTextAsync(outFile, ct);
             using var doc = JsonDocument.Parse(text);
@@ -154,6 +169,12 @@ public static class MaterialPipeline
         {
             try { if (File.Exists(outFile)) File.Delete(outFile); } catch { /* ignore */ }
         }
+    }
+
+    private static string Truncate(string? s, int n)
+    {
+        s = s ?? "";
+        return s.Length <= n ? s : s[..n] + "…";
     }
 
     public static AutoKnowledgeGraph ToGraph(MaterialDoc material, JsonElement payload)
@@ -208,15 +229,53 @@ public static class MaterialPipeline
 
     public static GraphValidateResult ValidateGenerated(AutoKnowledgeGraph graph)
     {
-        var pack = new GraphPack(
-            graph.GraphId,
-            graph.MaterialName,
-            "AUTO",
-            graph.GraphVersion,
-            graph.GeneratedAt.ToString("O"),
-            graph.Nodes,
-            graph.Edges);
-        return new KnowledgeGraph(pack).Validate();
+        var nodes = graph.Nodes;
+        var edges = graph.Edges;
+        var issues = new List<string>();
+        var ids = nodes.Select(n => n.Id).ToHashSet(StringComparer.Ordinal);
+        var cycles = new List<string>();
+
+        // 自动教材图谱：只要求无环 + 节点/边合法，不套用会计课程包「≥40 边」口径
+        if (nodes.Count < 1)
+            issues.Add("节点数为 0");
+        foreach (var e in edges)
+        {
+            if (!ids.Contains(e.From)) issues.Add($"边起点不存在: {e.From}");
+            if (!ids.Contains(e.To)) issues.Add($"边终点不存在: {e.To}");
+            if (e.Weight <= 0 || e.Weight > 2)
+                issues.Add($"边权重非法: {e.From}->{e.To} weight={e.Weight}");
+        }
+
+        // 无环检测（Kahn）
+        var adj = nodes.ToDictionary(n => n.Id, _ => new List<string>(), StringComparer.Ordinal);
+        var indeg = ids.ToDictionary(i => i, _ => 0);
+        foreach (var e in edges)
+        {
+            if (!adj.ContainsKey(e.From) || !indeg.ContainsKey(e.To)) continue;
+            adj[e.From].Add(e.To);
+            indeg[e.To]++;
+        }
+        var q = new Queue<string>(indeg.Where(kv => kv.Value == 0).Select(kv => kv.Key));
+        var seen = 0;
+        var remain = new Dictionary<string, int>(indeg);
+        while (q.Count > 0)
+        {
+            var u = q.Dequeue();
+            seen++;
+            foreach (var v in adj[u])
+            {
+                remain[v]--;
+                if (remain[v] == 0) q.Enqueue(v);
+            }
+        }
+        if (seen != ids.Count)
+        {
+            cycles.Add($"存在环：拓扑排序仅覆盖 {seen}/{ids.Count} 节点");
+            issues.Add(cycles[0]);
+        }
+
+        var ok = issues.Count == 0;
+        return new GraphValidateResult(ok, nodes.Count, edges.Count, cycles, issues);
     }
 
     /// <summary>导出三元组/属性图/思维导图树（对齐 KnowledgeGraph 与 mind-map）。</summary>
@@ -361,5 +420,87 @@ public static class MaterialPipeline
         var now = DateTime.UtcNow;
         return new MaterialDoc(id, name, path, size, "ready", ocrMode, ocrUsed, pageCount, chars, nodes, edges,
             $"auto-{id}", notes, now, now, null);
+    }
+
+    public static MaterialChapterBundle? ParseChapterBundle(string materialId, string materialName, JsonElement payload)
+    {
+        if (!payload.TryGetProperty("chapterBodies", out var chArr) || chArr.ValueKind != JsonValueKind.Array)
+            return null;
+
+        List<ChapterQuestionItem> ReadQs(JsonElement node)
+        {
+            var list = new List<ChapterQuestionItem>();
+            if (!node.TryGetProperty("questions", out var qs) || qs.ValueKind != JsonValueKind.Array) return list;
+            foreach (var q in qs.EnumerateArray())
+            {
+                var options = new List<string>();
+                if (q.TryGetProperty("options", out var opts) && opts.ValueKind == JsonValueKind.Array)
+                {
+                    foreach (var o in opts.EnumerateArray())
+                        options.Add(o.GetString() ?? "");
+                }
+                list.Add(new ChapterQuestionItem(
+                    q.TryGetProperty("id", out var id) ? id.GetString() ?? Guid.NewGuid().ToString("N") : Guid.NewGuid().ToString("N"),
+                    q.TryGetProperty("stem", out var stem) ? stem.GetString() ?? "" : "",
+                    options,
+                    q.TryGetProperty("correctIndex", out var ci) ? ci.GetInt32() : 0,
+                    q.TryGetProperty("why", out var why) ? why.GetString() ?? "" : "",
+                    q.TryGetProperty("type", out var t) ? t.GetString() ?? "quiz" : "quiz",
+                    q.TryGetProperty("difficulty", out var d) ? d.GetInt32() : 2,
+                    q.TryGetProperty("estMin", out var m) ? m.GetInt32() : 6,
+                    q.TryGetProperty("kp", out var kp) ? kp.GetString() ?? "" : ""));
+            }
+            return list;
+        }
+
+        ChapterBodyItem ReadBody(JsonElement node) => new(
+            node.TryGetProperty("id", out var id) ? id.GetString() ?? Guid.NewGuid().ToString("N") : Guid.NewGuid().ToString("N"),
+            node.TryGetProperty("title", out var title) ? title.GetString() ?? "章节" : "章节",
+            node.TryGetProperty("kind", out var kind) ? kind.GetString() ?? "chapter" : "chapter",
+            node.TryGetProperty("level", out var lv) ? lv.GetInt32() : 0,
+            node.TryGetProperty("parentId", out var pid) && pid.ValueKind != JsonValueKind.Null ? pid.GetString() : null,
+            node.TryGetProperty("chapterNum", out var cn) && cn.ValueKind != JsonValueKind.Null ? cn.GetInt32() : null,
+            node.TryGetProperty("charCount", out var cc) ? cc.GetInt32() : 0,
+            node.TryGetProperty("content", out var content) ? content.GetString() ?? "" : "",
+            ReadQs(node));
+
+        var chapters = new List<ChapterBodyItem>();
+        foreach (var n in chArr.EnumerateArray()) chapters.Add(ReadBody(n));
+
+        var sections = new List<ChapterBodyItem>();
+        if (payload.TryGetProperty("sectionBodies", out var secArr) && secArr.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var n in secArr.EnumerateArray()) sections.Add(ReadBody(n));
+        }
+
+        object toc = payload.TryGetProperty("toc", out var tEl) ? (object)tEl : new { };
+        object stats = payload.TryGetProperty("deepStats", out var sEl) ? (object)sEl : new { };
+        return new MaterialChapterBundle(materialId, materialName, chapters, sections, toc, stats);
+    }
+
+    public static List<TodayTaskDto> ChapterQuestionsToTasks(MaterialChapterBundle bundle, int max = 8)
+    {
+        var tasks = new List<TodayTaskDto>();
+        foreach (var ch in bundle.Chapters)
+        {
+            foreach (var q in ch.Questions)
+            {
+                tasks.Add(new TodayTaskDto(
+                    Guid.NewGuid().ToString("N"),
+                    $"chapter:{ch.Id}",
+                    string.IsNullOrWhiteSpace(q.Kp) ? ch.Title : q.Kp,
+                    q.Type,
+                    q.Difficulty,
+                    q.EstMin,
+                    $"来自《{bundle.MaterialName}》「{ch.Title}」：{q.Why}",
+                    q.Id,
+                    q.Stem,
+                    q.Options,
+                    q.CorrectIndex,
+                    null));
+                if (tasks.Count >= max) return tasks;
+            }
+        }
+        return tasks;
     }
 }

@@ -110,7 +110,7 @@ public static class TextbookQuestionBank
             if (ContainsAny(n, "Python编程", "从入门到实践")) return Has("python");
             if (ContainsAny(n, "自然语言处理", "Natural Language Processing")) return Has("nlp");
             if (ContainsAny(n, "大模型应用", "AI Agent", "动手做 AI")) return Has("agent");
-            if (ContainsAny(n, "C#从入门", "C#", "csharp")) return Has("csharp");
+            if (ContainsAny(n, "C#从入门", "C#", "csharp", "C_从入门", "C#从")) return Has("csharp");
             if (ContainsAny(n, "Go语言", "Go语", "Go语")) return Has("go");
             if (ContainsAny(n, "Java从入门", "Java从入门到精通")) return Has("java");
             if (ContainsAny(n, "深度学习入门", "基于Python的理论与实现", "花书", "Goodfellow", "自制框架", "强化学习")) return Has("deeplearning");

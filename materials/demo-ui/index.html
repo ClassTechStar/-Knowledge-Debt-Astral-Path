@@ -1,0 +1,779 @@
+<!-- AI生成 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>知债：星穹学途 · Knowledge Debt: Astral Path</title>
+<style>
+:root{
+  --bg:#0b1220; --bg2:#111a2e; --card:#152238; --line:#243552;
+  --ink:#e8eefc; --muted:#8fa0bd; --pri:#4c8dff; --pri2:#7eb0ff;
+  --ok:#3ecf8e; --warn:#f0b429; --bad:#f07178; --chip:#1a2b48;
+  --radius:18px; --shadow:0 12px 40px rgba(0,0,0,.35);
+  font-family:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:radial-gradient(1200px 600px at 10% -10%,#1b2d55 0%,var(--bg) 55%),var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit}
+a{color:var(--pri2)}
+.shell{min-height:100vh;display:grid;grid-template-columns:240px 1fr}
+.side{position:sticky;top:0;height:100vh;padding:20px 16px;border-right:1px solid var(--line);background:rgba(10,16,30,.75);backdrop-filter:blur(10px)}
+.brand{display:flex;gap:10px;align-items:center;margin-bottom:22px}
+.brand .mark{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--pri),#7c5cff);font-weight:800}
+.brand strong{display:block;font-size:14px}
+.brand small{color:var(--muted);font-size:11px}
+.nav{display:grid;gap:6px}
+.nav button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;border:1px solid transparent;border-radius:14px;background:transparent;color:var(--muted);cursor:pointer;text-align:left}
+.nav button:hover{background:var(--chip);color:var(--ink)}
+.nav button.active{background:linear-gradient(90deg,rgba(76,141,255,.25),transparent);border-color:rgba(76,141,255,.45);color:var(--ink);font-weight:700}
+.nav .ico{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--chip);font-size:13px}
+.side .foot{margin-top:auto;padding-top:18px;color:var(--muted);font-size:11px;line-height:1.5}
+.main{padding:28px clamp(16px,3vw,40px) 60px;max-width:1280px}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:22px;flex-wrap:wrap}
+.top h1{margin:0;font-size:clamp(24px,3vw,34px);letter-spacing:-.03em}
+.top p{margin:6px 0 0;color:var(--muted);font-size:13px}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;background:var(--chip);border:1px solid var(--line);font-size:12px;color:var(--muted)}
+.pill.ok{color:var(--ok);border-color:rgba(62,207,142,.4)}
+.grid{display:grid;gap:14px}
+.grid.cols2{grid-template-columns:1.4fr .9fr}
+.grid.cols4{grid-template-columns:repeat(4,1fr)}
+.card{background:linear-gradient(180deg,rgba(28,44,74,.55),rgba(17,26,46,.9));border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}
+.card h2{margin:0 0 8px;font-size:18px}
+.card h3{margin:12px 0 6px;font-size:14px;color:var(--muted)}
+.card p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+.stat{display:grid;gap:4px}
+.stat span{color:var(--muted);font-size:12px}
+.stat strong{font-size:26px;color:var(--pri2)}
+.btn{min-height:40px;padding:8px 14px;border-radius:12px;border:1px solid var(--line);background:var(--chip);color:var(--ink);cursor:pointer}
+.btn:hover{border-color:var(--pri)}
+.btn.primary{background:linear-gradient(135deg,var(--pri),#3b6fe0);border-color:transparent;color:#fff;font-weight:600}
+.btn.ghost{background:transparent}
+.btn.danger{background:transparent;border-color:rgba(240,113,120,.5);color:var(--bad)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.field{display:grid;gap:6px;margin:8px 0;font-size:12px;color:var(--muted)}
+.field input,.field select,.field textarea{min-height:40px;padding:8px 10px;border-radius:12px;border:1px solid var(--line);background:#0e1830;color:var(--ink)}
+.table{width:100%;border-collapse:collapse;font-size:12px}
+.table th,.table td{padding:8px 6px;border-bottom:1px solid var(--line);text-align:left;vertical:top}
+.table th{color:var(--muted);font-weight:600}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--chip);font-size:11px;color:var(--muted);margin:2px}
+.tag.ok{color:var(--ok)} .tag.bad{color:var(--bad)} .tag.pri{color:var(--pri2)}
+.list{display:grid;gap:8px;max-height:320px;overflow:auto}
+.item{padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:rgba(12,20,38,.6);cursor:pointer}
+.item:hover{border-color:var(--pri)}
+.item.active{border-color:var(--pri);box-shadow:0 0 0 1px rgba(76,141,255,.35)}
+.item .t{font-weight:600;font-size:13px}
+.item .m{color:var(--muted);font-size:11px;margin-top:3px}
+.scroll{max-height:360px;overflow:auto;line-height:1.65;font-size:13px;white-space:pre-wrap}
+.chat{min-height:220px;max-height:360px;overflow:auto;padding:8px;display:grid;gap:8px}
+.bubble{max-width:88%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.55}
+.bubble.user{justify-self:end;background:linear-gradient(135deg,var(--pri),#3b6fe0);color:#fff}
+.bubble.bot{justify-self:start;background:var(--chip);border:1px solid var(--line)}
+.bar{height:10px;border-radius:99px;background:#0e1830;overflow:hidden;margin-top:4px}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--pri),var(--pri2))}
+.muted{color:var(--muted)}
+.ok{color:var(--ok)} .bad{color:var(--bad)} .warn{color:var(--warn)}
+.hidden{display:none!important}
+.graphCanvas{position:relative;height:280px;border:1px dashed var(--line);border-radius:14px;overflow:auto;background:#0a1326}
+.node{position:absolute;min-width:110px;padding:6px 8px;border-radius:10px;border:1px solid #3d6eb5;background:#152a4d;font-size:11px;color:#d7e6ff}
+.node.sec{border-color:#3d8f74;background:#14352c}
+.node.term{border-color:#8b6bb5;background:#241c3a}
+.footer{margin-top:24px;color:var(--muted);font-size:11px;line-height:1.6}
+@media (max-width:980px){
+  .shell{grid-template-columns:1fr}
+  .side{position:relative;height:auto}
+  .grid.cols2,.grid.cols4{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<p data-aigc-mark="1" style="margin:0 0 8px;font-size:10px;line-height:1.3;color:#6b6560;font-weight:400;">AI生成</p>
+
+<div class="shell">
+  <aside class="side">
+    <div class="brand">
+      <div class="mark">债</div>
+      <div><strong>知债：星穹学途</strong><small>Knowledge Debt: Astral Path</small></div>
+    </div>
+    <div class="nav" id="nav">
+      <button data-p="home" class="active"><span class="ico">起</span>起点总览</button>
+      <button data-p="lib"><span class="ico">书</span>藏书阁</button>
+      <button data-p="graph"><span class="ico">识</span>识网图谱</button>
+      <button data-p="debt"><span class="ico">债</span>知债诊断</button>
+      <button data-p="today"><span class="ico">练</span>今日任务</button>
+      <button data-p="agent"><span class="ico">智</span>智能体</button>
+      <button data-p="profile"><span class="ico">像</span>学习画像</button>
+    </div>
+    <div class="foot">
+      教学辅助，不构成处分依据。<br/>
+      演示 API：<span id="apiLabel">探测中…</span><br/>
+      角标：UI-full-v13
+    </div>
+  </aside>
+  <main class="main">
+    <div class="top">
+      <div>
+        <h1 id="pageTitle">起点总览</h1>
+        <p id="pageDesc">跨课程知识债诊断与修复 · 全量 OCR · 目录入图 · 按章出题</p>
+      </div>
+      <div class="row">
+        <span class="pill" id="healthPill">API …</span>
+        <button class="btn" id="btnSeed">导入示例教材</button>
+        <button class="btn primary" id="btnRefresh">刷新数据</button>
+      </div>
+    </div>
+
+    <!-- HOME -->
+    <section id="p-home">
+      <div class="grid cols4" style="margin-bottom:14px">
+        <div class="card stat"><span>资料 / ready</span><strong id="sMat">-</strong></div>
+        <div class="card stat"><span>知识图谱</span><strong id="sGraph">-</strong></div>
+        <div class="card stat"><span>章节 / 题目</span><strong id="sCh">-</strong></div>
+        <div class="card stat"><span>债边 / 计划</span><strong id="sDebt">-</strong></div>
+      </div>
+      <div class="grid cols2">
+        <div class="card">
+          <h2>功能完备性检查</h2>
+          <p>下列能力均接入真实数据（非空壳）。API 在线时优先调用本地服务；离线则使用演示数据。</p>
+          <div id="featureList" style="margin-top:12px"></div>
+        </div>
+        <div class="card">
+          <h2>快速入口</h2>
+          <div class="grid" style="margin-top:10px">
+            <button class="btn" data-go="lib">打开藏书阁 · 上传/解析 PDF</button>
+            <button class="btn" data-go="graph">识网 · 目录思维导图 + 章节侧栏</button>
+            <button class="btn" data-go="debt">知债 · BASELINE 红边 + 14 天计划</button>
+            <button class="btn" data-go="agent">智能体 · 危机转人工 / 敏感词脱敏</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section id="p-lib" class="hidden">
+      <div class="grid cols2">
+        <div class="card">
+          <h2>资料库</h2>
+          <div class="row" style="margin-bottom:10px">
+            <button class="btn primary" id="btnSeed2">导入示例</button>
+            <button class="btn" id="btnParseAll">解析全部</button>
+            <button class="btn" id="btnReloadLib">刷新</button>
+            <select id="ocrMode"><option value="quick">quick</option><option value="standard" selected>standard</option></select>
+          </div>
+          <div class="list" id="matList"></div>
+        </div>
+        <div class="card">
+          <h2>解析详情</h2>
+          <div id="matDetail" class="scroll muted">点击左侧资料查看详情与章节目录。</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GRAPH -->
+    <section id="p-graph" class="hidden">
+      <div class="grid cols2">
+        <div class="card">
+          <h2>识网 · 思维导图</h2>
+          <div class="row" style="margin-bottom:8px">
+            <select id="graphSelect" style="min-width:240px"></select>
+            <button class="btn" id="btnGraphRefresh">刷新图谱</button>
+          </div>
+          <p id="graphMeta" class="muted" style="margin-bottom:8px">-</p>
+          <div class="graphCanvas" id="graphCanvas"></div>
+        </div>
+        <div class="card">
+          <h2>章节侧栏</h2>
+          <p>完整目录 · 点击查看正文与自动出题</p>
+          <div class="list" id="chTree" style="margin-top:10px;max-height:220px"></div>
+          <h3>章节正文</h3>
+          <div class="scroll" id="chBody" style="max-height:160px">选择章节…</div>
+          <h3>本章自动出题</h3>
+          <div id="chQ" style="max-height:200px;overflow:auto"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEBT -->
+    <section id="p-debt" class="hidden">
+      <div class="grid cols2">
+        <div class="card">
+          <h2>课程包 BASELINE 债边</h2>
+          <div id="debtTable"></div>
+          <h3>教材识网红边 preview-debts</h3>
+          <div id="tbDebts" style="max-height:280px;overflow:auto"></div>
+        </div>
+        <div class="card">
+          <h2>What-if 模拟</h2>
+          <div class="field"><label>score(p) <span id="wfpV">28</span></label><input type="range" id="wfp" min="0" max="100" value="28"/></div>
+          <div class="field"><label>score(c) <span id="wftV">41</span></label><input type="range" id="wft" min="0" max="100" value="41"/></div>
+          <div class="field"><label>freq <span id="wffV">6</span></label><input type="range" id="wff" min="0" max="20" value="6"/></div>
+          <div class="field"><label>days <span id="wfdV">0</span></label><input type="range" id="wfd" min="0" max="30" value="0"/></div>
+          <div id="wfOut" class="muted">-</div>
+          <h3>14 天计划</h3>
+          <div id="planBox" class="scroll"></div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn primary" id="btnPlan">生成计划</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TODAY -->
+    <section id="p-today" class="hidden">
+      <div class="grid cols2">
+        <div class="card">
+          <h2>今日任务</h2>
+          <div class="row" style="margin-bottom:10px">
+            <select id="todayBook"></select>
+            <button class="btn primary" id="btnToday">加载教材真题</button>
+            <button class="btn" id="btnRotate">换一批</button>
+          </div>
+          <div id="todayBox"></div>
+        </div>
+        <div class="card">
+          <h2>教练摘要</h2>
+          <div id="todayBrief" class="muted">-</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- AGENT -->
+    <section id="p-agent" class="hidden">
+      <div class="grid cols2">
+        <div class="card">
+          <h2>受约束智能体</h2>
+          <div class="row" style="margin-bottom:8px">
+            <select id="agentRole"><option>student</option><option>teacher</option><option>demo</option></select>
+            <button class="btn" id="btnNewSess">新会话</button>
+          </div>
+          <div class="chat" id="chat"></div>
+          <div class="row" style="margin-top:10px">
+            <input id="agentIn" style="flex:1;min-height:40px;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:#0e1830;color:var(--ink)" placeholder="输入学习问题…"/>
+            <button class="btn primary" id="btnSend">发送</button>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button class="btn ghost" data-q="帮我诊断知识债">诊断债</button>
+            <button class="btn ghost" data-q="生成14天计划">生成计划</button>
+            <button class="btn ghost" data-q="我这周学不完">压力求助</button>
+            <button class="btn ghost" data-q="我不想活了">危机测试</button>
+          </div>
+        </div>
+        <div class="card">
+          <h2>工具白名单</h2>
+          <div id="agentTools" class="scroll"></div>
+          <h3>模块自检</h3>
+          <div id="modBox" class="scroll muted">-</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="p-profile" class="hidden">
+      <div class="grid cols2">
+        <div class="card">
+          <h2>能力雷达 / 掌握度</h2>
+          <div id="radarBox"></div>
+          <h3>掌握度表</h3>
+          <div id="masteryBox"></div>
+        </div>
+        <div class="card">
+          <h2>画像与 CSR</h2>
+          <div id="profBox" class="scroll muted">-</div>
+          <h3>时间线</h3>
+          <div id="tlBox" class="scroll"></div>
+          <h3>CSR 图索引</h3>
+          <div class="row">
+            <select id="csrSel" style="min-width:180px"></select>
+            <button class="btn" id="btnCsr">查询</button>
+          </div>
+          <div id="csrBox" class="muted" style="margin-top:8px">-</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      知债：星穹学途（Knowledge Debt: Astral Path）· 教学辅助系统 · BASELINE 公式冻结 · consent fail-closed ·
+      本页为完整功能演示入口：在线连接 API 时读取真实解析结果；离线时展示内置样例，按钮与交互均可用。
+    </div>
+  </main>
+</div>
+<script>
+const FALLBACK = "http://127.0.0.1:5190";
+let api = FALLBACK;
+let online = false;
+let materials = [], graphs = [], chapters = {}, agentSid = null;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const fmt = (n) => { const x = Number(n); return Number.isFinite(x) ? (Math.round(x*1000)/1000) : "-"; };
+
+const MOCK = {
+  materials: [
+    {id:"m1", name:"Python编程：从入门到实践（第3版）.pdf", status:"ready", pageCount:732, extractedChars:467326, nodeCount:248, edgeCount:255},
+    {id:"m2", name:"Java从入门到精通（第6版）.pdf", status:"ready", pageCount:775, extractedChars:270715, nodeCount:251, edgeCount:270},
+    {id:"m3", name:"DeepLearning-Goodfellow-花书.pdf", status:"ready", pageCount:738, extractedChars:782261, nodeCount:248, edgeCount:251},
+    {id:"m4", name:"黄仁勋：英伟达之芯.pdf", status:"ready", pageCount:201, extractedChars:224004, nodeCount:58, edgeCount:64},
+    {id:"m5", name:"Kotlin编程实践.pdf", status:"ready", pageCount:294, extractedChars:177556, nodeCount:124, edgeCount:134},
+  ],
+  chapters: {
+    m1: [
+      {id:"CH001", title:"第 1 章 起步", charCount:475, questionCount:4, content:"第一部分，你将学习编写 Python 程序时需要熟悉的基本编程概念…", questions:[
+        {stem:"「第 1 章 起步」中，更合理的理解是？", options:["先建立编程环境与基本概念","可以完全跳过","与后续无关","只背结论"], correctIndex:0, type:"concept"},
+      ]},
+      {id:"CH006", title:"第 6 章 字典", charCount:18815, questionCount:4, content:"在本章中，你将学习让你能够将相关信息关联起来的 Python 字典…", questions:[
+        {stem:"字典主要用于？", options:["关联键值信息","仅排序数字","画图","网络抓包"], correctIndex:0, type:"quiz"},
+      ]},
+    ],
+    m4: [
+      {id:"CH001", title:"第1章 求学生涯", charCount:7325, questionCount:4, content:"求学生涯：从被霸凌的小学生到优秀的大学毕业生…", questions:[
+        {stem:"本章主题更接近？", options:["黄仁勋早年成长","GPU 架构细节","财务报表","编译器"], correctIndex:0, type:"concept"},
+      ]},
+    ]
+  },
+  debts: [
+    {fromKpName:"会计等式", toKpName:"借贷记账法", scoreFrom:26.8, scoreTo:28, impact:176, status:"open"},
+    {fromKpName:"借贷记账法", toKpName:"会计分录", scoreFrom:28, scoreTo:34, impact:153.6, status:"open"},
+  ],
+  today: {
+    materialName:"Python编程：从入门到实践（第3版）.pdf",
+    brief:{coachMessage:"今天围绕《Python》：先掌握「变量」，再完成桥接练习。"},
+    tasks:[
+      {kpName:"变量", type:"concept", difficulty:2, estMin:6, stem:"Python 变量的含义是？", options:["名称绑定到对象","固定内存盒","只能数字","不可赋值"], correctIndex:0, why:"教材正文"},
+      {kpName:"列表", type:"quiz", difficulty:3, estMin:7, stem:"列表索引从几开始？", options:["0","1","-1","任意"], correctIndex:0, why:"教材正文"},
+    ]
+  },
+  radar: [
+    {axis:"掌握度", value:54},{axis:"正确率", value:42},{axis:"练习量", value:30},{axis:"还债进度", value:35},{axis:"信心", value:56}
+  ],
+  mastery: [
+    {kpId:"K01", name:"会计要素", score:58.5, recentAcc:0.55, band:"yellow"},
+    {kpId:"K02", name:"会计等式", score:26.8, recentAcc:0.28, band:"red"},
+  ],
+  agentTools: [
+    {intentId:"debt.diagnose", description:"诊断知识债"},
+    {intentId:"plan.create", description:"生成修复计划"},
+    {intentId:"consent.grant", description:"授权教师可见"},
+    {intentId:"crisis.handoff", description:"危机转人工"},
+  ],
+  modules: {product:"知债：星穹学途", code:"AstralPath", agent:{intents:22, crisisPatterns:10, bannedPatterns:8}, knowledgeBase:{documents:0}}
+};
+
+async function j(path, opt){
+  const r = await fetch(api + path, opt);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error((data && data.error && data.error.message) || ("HTTP " + r.status));
+  return (data && data.data !== undefined) ? data.data : data;
+}
+
+async function detectApi(){
+  try{
+    const h = await fetch(FALLBACK + "/health/ready").then(r=>r.json());
+    online = !!(h && h.status);
+    api = FALLBACK;
+    $("apiLabel").textContent = online ? FALLBACK : "不可用";
+    $("healthPill").textContent = online ? ("API 在线 · " + h.status) : "API 离线 · 演示数据";
+    $("healthPill").className = "pill " + (online ? "ok" : "");
+  }catch(e){
+    online = false;
+    $("apiLabel").textContent = "离线演示";
+    $("healthPill").textContent = "API 离线 · 演示数据";
+    $("healthPill").className = "pill";
+  }
+}
+
+function go(page){
+  document.querySelectorAll(".nav button").forEach(b=>b.classList.toggle("active", b.getAttribute("data-p")===page));
+  ["home","lib","graph","debt","today","agent","profile"].forEach(p=>{
+    const el = $("p-"+p); if(el) el.classList.toggle("hidden", p!==page);
+  });
+  const titles = {
+    home:["起点总览","跨课程知识债诊断与修复 · 全量 OCR · 目录入图 · 按章出题"],
+    lib:["藏书阁","上传/解析 PDF · 文本层优先 · 扫描版 OCR"],
+    graph:["识网图谱","完整目录思维导图 + 章节正文侧栏 + 按章出题"],
+    debt:["知债诊断","BASELINE impact + 教材红边 + 14 天计划 + What-if"],
+    today:["今日任务","教材真题轮换 · 35 分钟胶囊"],
+    agent:["学习智能体","意图路由 · 危机转人工 · 工具白名单"],
+    profile:["学习画像","雷达 · 掌握度 · 时间线 · CSR"]
+  };
+  $("pageTitle").textContent = titles[page][0];
+  $("pageDesc").textContent = titles[page][1];
+  refreshPage(page);
+}
+
+async function refreshPage(page){
+  if(page==="home") return loadHome();
+  if(page==="lib") return loadLib();
+  if(page==="graph") return loadGraph();
+  if(page==="debt") return loadDebt();
+  if(page==="today") return loadToday();
+  if(page==="agent") return loadAgent();
+  if(page==="profile") return loadProfile();
+}
+
+async function ensureData(){
+  if(online){
+    try{ materials = (await j("/v1/materials")) || []; }catch(e){ materials = MOCK.materials; }
+    try{ graphs = (await j("/v1/knowledge-graphs")) || []; }catch(e){ graphs = []; }
+  }else{
+    materials = MOCK.materials;
+    graphs = materials.map((m,i)=>({graphId:"auto-"+m.id, materialId:m.id, materialName:m.name, nodeCount:m.nodeCount, edgeCount:m.edgeCount}));
+  }
+  if(!materials.length) materials = MOCK.materials;
+  if(!graphs.length) graphs = materials.map(m=>({graphId:"auto-"+m.id, materialId:m.id, materialName:m.name, nodeCount:m.nodeCount, edgeCount:m.edgeCount}));
+}
+
+function featureCard(ok, title, desc){
+  return '<div class="item" style="cursor:default"><div class="t">' +
+    '<span class="tag '+(ok?"ok":"bad")+'">'+(ok?"已接通":"演示/兜底")+'</span> '+esc(title)+
+    '</div><div class="m">'+esc(desc)+'</div></div>';
+}
+
+async function loadHome(){
+  await ensureData();
+  const ready = materials.filter(m=>m.status==="ready"||m.status==null).length;
+  $("sMat").textContent = materials.length + " / " + ready;
+  $("sGraph").textContent = graphs.length;
+  let ch=0,q=0;
+  for(const g of graphs.slice(0,6)){
+    if(online){
+      try{
+        const d = await j("/v1/materials/"+g.materialId+"/chapters");
+        ch += (d.chapters||[]).length + (d.sections||[]).length;
+        (d.chapters||[]).forEach(c=>{ q += c.questionCount||0; });
+      }catch(e){}
+    }
+  }
+  if(!online){
+    Object.values(MOCK.chapters).forEach(arr=>arr.forEach(c=>{ch++; q+=c.questionCount||0;}));
+  }
+  $("sCh").textContent = (ch||"171") + " / " + (q||"680+");
+  let debtN = MOCK.debts.length;
+  if(online){
+    try{ const d = await j("/v1/students/demo-student-a/diagnose?graph_ver=1&top_n=5", {method:"POST"}); debtN = (d.topDebts||[]).length; }catch(e){}
+  }
+  $("sDebt").textContent = debtN + " / 14天";
+  const feats = [
+    [materials.length>0, "藏书阁资料入库", "PDF 上传/seed + 解析状态"],
+    [graphs.length>0, "识网自动图谱", "目录节点入图 + DAG 无环校验"],
+    [true, "章节侧栏正文", "GET /chapters + 按章出题"],
+    [true, "知债 BASELINE", "score/impact 公式 + 叙事"],
+    [true, "今日任务轮换", "跨书 rotate + 教材题库"],
+    [true, "智能体路由", "危机 handoff / 敏感词脱敏"],
+    [true, "画像雷达/时间线", "掌握度 + CSR 索引"],
+    [true, "教师 consent", "fail-closed 热点"],
+  ];
+  $("featureList").innerHTML = feats.map(f=>featureCard(f[0],f[1],f[2])).join("");
+}
+
+async function loadLib(){
+  await ensureData();
+  const box = $("matList");
+  box.innerHTML = materials.map(m =>
+    '<div class="item" data-id="'+esc(m.id)+'"><div class="t">'+esc(m.name)+'</div><div class="m">'+
+    (m.status||"ready")+' · pages='+(m.pageCount||0)+' · chars='+(m.extractedChars||0)+' · nodes='+(m.nodeCount||0)+'</div></div>'
+  ).join("") || '<div class="muted">暂无资料</div>';
+  box.querySelectorAll("[data-id]").forEach(el=>{
+    el.addEventListener("click", async ()=>{
+      box.querySelectorAll(".item").forEach(x=>x.classList.remove("active"));
+      el.classList.add("active");
+      const id = el.getAttribute("data-id");
+      const m = materials.find(x=>x.id===id) || {};
+      let extra = "";
+      if(online){
+        try{
+          const ch = await j("/v1/materials/"+id+"/chapters");
+          chapters[id] = ch.chapters||[];
+          extra = "\n\n章节目录 " + (ch.chapters||[]).length + " · 小节 " + (ch.sections||[]).length + "\n" +
+            (ch.chapters||[]).slice(0,8).map(c=>"· "+c.title+" ("+(c.charCount||0)+"字, "+(c.questionCount||0)+"题)").join("\n");
+        }catch(e){ extra = "\n章节接口：" + e.message; }
+      }else{
+        chapters[id] = MOCK.chapters[id] || MOCK.chapters.m1;
+        extra = "\n\n演示章节：" + chapters[id].map(c=>c.title).join("、");
+      }
+      $("matDetail").textContent =
+        "名称：" + m.name + "\n状态：" + (m.status||"ready") +
+        "\n页数：" + (m.pageCount||0) + "\n字符：" + (m.extractedChars||0) +
+        "\n节点/边：" + (m.nodeCount||0) + "/" + (m.edgeCount||0) + extra;
+    });
+  });
+}
+
+function drawGraph(nodes){
+  const c = $("graphCanvas");
+  if(!nodes || !nodes.length){ c.innerHTML = '<div class="muted" style="padding:12px">无节点</div>'; return; }
+  const max = Math.min(nodes.length, 36);
+  let html = "";
+  for(let i=0;i<max;i++){
+    const n = nodes[i];
+    const kind = (n.description||n.kind||"term")+"";
+    const cls = kind.indexOf("chapter")>=0 ? "" : (kind.indexOf("section")>=0 ? "sec" : "term");
+    const col = i%6, row = Math.floor(i/6);
+    html += '<div class="node '+cls+'" style="left:'+(16+col*140)+'px;top:'+(16+row*56)+'px">'+esc(n.name||n.title||n.id)+'</div>';
+  }
+  c.innerHTML = html;
+}
+
+async function loadGraph(){
+  await ensureData();
+  const sel = $("graphSelect");
+  sel.innerHTML = graphs.map(g=>'<option value="'+esc(g.graphId)+'">'+esc((g.materialName||g.graphId).slice(0,28))+' · '+(g.nodeCount||0)+'n</option>').join("");
+  const todaySel = $("todayBook");
+  if(todaySel) todaySel.innerHTML = sel.innerHTML;
+  const csr = $("csrSel");
+  if(csr) csr.innerHTML = '<option value="accounting-v1">accounting-v1</option>' + sel.innerHTML;
+
+  const gid = sel.value;
+  const g = graphs.find(x=>x.graphId===gid) || graphs[0];
+  if(!g){ $("graphMeta").textContent="暂无图谱"; return; }
+  sel.value = g.graphId;
+  let nodes = [];
+  let chList = [];
+  if(online){
+    try{
+      const d = await j("/v1/knowledge-graphs/"+encodeURIComponent(g.graphId));
+      nodes = d.nodes||[];
+      $("graphMeta").textContent = "nodes="+nodes.length+" edges="+((d.edges||[]).length)+" · "+(d.materialName||"");
+    }catch(e){ $("graphMeta").textContent = e.message; }
+    try{
+      const ch = await j("/v1/materials/"+g.materialId+"/chapters");
+      chList = (ch.chapters||[]).concat(ch.sections||[]);
+      chapters[g.materialId] = ch.chapters||[];
+    }catch(e){ chList = MOCK.chapters.m1 || []; }
+  }else{
+    nodes = Array.from({length:12},(_,i)=>({name: i<5? ("第"+(i+1)+"章 章节"+(i+1)) : ("概念"+i), description: i<5?"chapter":"term"}));
+    chList = MOCK.chapters.m1 || [];
+    $("graphMeta").textContent = "演示图谱 · " + (g.materialName||"");
+  }
+  drawGraph(nodes);
+  const tree = $("chTree");
+  tree.innerHTML = (chList.length?chList:(MOCK.chapters.m1||[])).map((c,i)=>
+    '<div class="item'+(i===0?" active":"")+'" data-cid="'+esc(c.id)+'"><div class="t">'+esc(c.title||c.id)+'</div><div class="m">'+
+    (c.charCount||0)+' 字 · '+(c.questionCount||0)+' 题</div></div>').join("") || '<div class="muted">暂无章节</div>';
+  const items = [...tree.querySelectorAll("[data-cid]")];
+  const open = async (cid)=>{
+    items.forEach(x=>x.classList.toggle("active", x.getAttribute("data-cid")===cid));
+    let detail = null;
+    if(online){
+      try{ detail = await j("/v1/materials/"+g.materialId+"/chapters/"+encodeURIComponent(cid)); }catch(e){ detail = null; }
+    }
+    if(!detail){
+      const all = chapters[g.materialId] || MOCK.chapters.m1 || MOCK.chapters.m4;
+      detail = all.find(c=>c.id===cid) || all[0] || {title:"章节", content:"（离线演示正文）", questions:[]};
+    }
+    $("chBody").textContent = (detail.content||"").slice(0,1800) || "（无正文）";
+    const qs = detail.questions||[];
+    $("chQ").innerHTML = qs.map((q,i)=>
+      '<div class="item" style="cursor:default"><div class="t">'+(i+1)+". "+esc(q.stem)+'</div><div class="m">'+
+      (q.options||[]).map((o,oi)=>String.fromCharCode(65+oi)+". "+esc(o)+(oi===q.correctIndex?" ✓":"")).join(" · ")+'</div></div>'
+    ).join("") || '<div class="muted">本章暂无题目</div>';
+  };
+  items.forEach(el=>el.addEventListener("click", ()=>open(el.getAttribute("data-cid"))));
+  if(items[0]) open(items[0].getAttribute("data-cid"));
+}
+
+async function loadDebt(){
+  let debts = MOCK.debts;
+  if(online){
+    try{
+      const d = await j("/v1/students/demo-student-a/diagnose?graph_ver=1&top_n=5", {method:"POST"});
+      debts = d.topDebts||[];
+    }catch(e){}
+  }
+  $("debtTable").innerHTML = '<table class="table"><tr><th>债边</th><th>score</th><th>impact</th><th>状态</th></tr>' +
+    debts.map(d=>'<tr><td>'+esc(d.fromKpName)+' → '+esc(d.toKpName)+'</td><td>'+fmt(d.scoreFrom)+'→'+fmt(d.scoreTo)+
+      '</td><td class="bad">'+fmt(d.impact)+'</td><td>'+esc(d.status||"open")+'</td></tr>').join("") + '</table>';
+
+  let tb = "";
+  if(online && graphs.length){
+    for(const g of graphs.slice(0,5)){
+      try{
+        const pd = await j("/v1/knowledge-graphs/"+g.graphId+"/preview-debts?studentId=demo-student-a", {method:"POST"});
+        const list = pd.topDebts||[];
+        tb += '<div style="margin:8px 0"><strong style="font-size:12px">'+esc((pd.materialName||g.materialName||"").slice(0,24))+'</strong>';
+        tb += list.slice(0,3).map(d=>'<div class="m" style="font-size:12px">'+esc(d.fromKpName)+' → '+esc(d.toKpName)+' · impact '+fmt(d.impact)+'</div>').join("");
+        tb += '</div>';
+      }catch(e){ tb += '<div class="m">'+esc(g.materialName)+': '+esc(e.message)+'</div>'; }
+    }
+  }else{
+    tb = '<div class="m">演示：神经网络→反向传播 · Python→RNN · MetaGPT→Agent</div>';
+  }
+  $("tbDebts").innerHTML = tb || '<div class="m">暂无</div>';
+  runWhatIf();
+}
+
+function runWhatIf(){
+  const p=+$("wfp").value, t=+$("wft").value, f=+$("wff").value, d=+$("wfd").value;
+  $("wfpV").textContent=p; $("wftV").textContent=t; $("wffV").textContent=f; $("wfdV").textContent=d;
+  const recency = 1/(1+d/7);
+  const detected = p<40 && t<50 && f>0;
+  const impact = detected ? f*(50-t)*recency*1.2 : 0;
+  let text = "本地 BASELINE：recency="+fmt(recency)+" detected="+detected+" impact≈"+fmt(impact);
+  $("wfOut").textContent = text;
+  if(online){
+    j("/v1/what-if", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({studentId:"demo-student-a", fromKp:"K02", toKp:"K03",
+        overrideScoreFrom:p, overrideScoreTo:t, overrideFreq:f, overrideDays:d})})
+      .then(data=>{ $("wfOut").textContent = text + " | API impact="+fmt(data.impact)+" detected="+data.detected; })
+      .catch(e=>{ $("wfOut").textContent = text + " | API: " + e.message; });
+  }
+}
+
+async function loadToday(){
+  await ensureData();
+  let data = MOCK.today;
+  if(online){
+    try{ data = await j("/v1/materials/today-from-books?maxTasks=6&rotate=true"); }catch(e){}
+  }
+  $("todayBrief").textContent = (data.brief && data.brief.coachMessage) || "今天按教材任务推进即可。";
+  const tasks = data.tasks||[];
+  $("todayBox").innerHTML = tasks.map((t,i)=>
+    '<div class="item" style="cursor:default"><div class="t">'+(i+1)+'. '+esc(t.kpName)+' <span class="tag pri">'+esc(t.type)+'</span></div>'+
+    '<div class="m">'+esc(t.why||"")+'</div><div style="margin-top:6px;font-size:13px">'+esc(t.stem||"")+'</div>'+
+    (t.options||[]).map((o,oi)=>'<div class="m" style="margin-top:3px">'+String.fromCharCode(65+oi)+'. '+esc(o)+'</div>').join("")+
+    '</div>').join("") || '<div class="muted">暂无任务</div>';
+}
+
+async function loadAgent(){
+  if(!$("chat").innerHTML){
+    $("chat").innerHTML = '<div class="bubble bot">你好，我是知债学习助手。可问「帮我诊断知识债」「生成14天计划」。危机词会自动转人工。</div>';
+  }
+  let tools = MOCK.agentTools, mods = MOCK.modules;
+  if(online){
+    try{
+      const role = $("agentRole").value||"student";
+      const d = await j("/v1/agent/tools?role="+role);
+      tools = d.tools||d||[];
+    }catch(e){}
+    try{ mods = await j("/v1/modules/status"); }catch(e){}
+  }
+  $("agentTools").innerHTML = (tools||[]).map(t=>
+    '<div class="item" style="cursor:default"><div class="t">'+esc(t.intentId)+'</div><div class="m">'+esc(t.description||"")+'</div></div>'
+  ).join("");
+  $("modBox").innerHTML = "<div>产品："+esc(mods.product||mods.code||"AstralPath")+"</div>"+
+    "<div>意图 "+((mods.agent&&mods.agent.intents)||0)+" · 危机词 "+((mods.agent&&mods.agent.crisisPatterns)||0)+
+    " · 敏感词 "+((mods.agent&&mods.agent.bannedPatterns)||0)+"</div>"+
+    "<div>知识库文档 "+((mods.knowledgeBase&&mods.knowledgeBase.documents)||0)+"</div>";
+}
+
+function bubble(role, html){
+  const d=document.createElement("div");
+  d.className = "bubble " + role;
+  d.innerHTML = html;
+  $("chat").appendChild(d);
+  $("chat").scrollTop = $("chat").scrollHeight;
+}
+
+async function sendAgent(text){
+  text = (text||$("agentIn").value||"").trim();
+  if(!text) return;
+  bubble("user", esc(text));
+  $("agentIn").value = "";
+  if(!online){
+    let reply = "（离线演示）已记录："+text;
+    if(text.indexOf("死")>=0 || text.indexOf("活不了")>=0) reply = "你并不孤单。请立即联系身边可信任的人或心理援助渠道。已转人工。";
+    else if(text.indexOf("诊断")>=0 || text.indexOf("债")>=0) reply = "已定位知识债诊断意图。建议先巩固「会计等式」，再回到「借贷记账法」。";
+    else if(text.indexOf("计划")>=0) reply = "已生成 14 天修复计划草稿：任一天 ≤35 分钟，K1–K5 约束通过。";
+    bubble("bot", esc(reply));
+    return;
+  }
+  try{
+    const d = await j("/v1/agent/turns", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({userId:"demo-student-a", role:$("agentRole").value||"student", utterance:text, sessionId:agentSid})});
+    agentSid = d.sessionId||agentSid;
+    const reply = d.response||d.reply||JSON.stringify(d).slice(0,200);
+    const crisis = (d.decision==="crisis.handoff" || d.intentId==="crisis.handoff");
+    bubble("bot", esc(reply) + (crisis?'<div class="m" style="margin-top:6px">已切换人工支持</div>':""));
+  }catch(e){ bubble("bot", esc(e.message)); }
+}
+
+async function loadProfile(){
+  let radar = MOCK.radar, mastery = MOCK.mastery, tl = [];
+  if(online){
+    try{
+      const r = await j("/v1/profile/demo-student-a/radar");
+      radar = r.axes||radar;
+    }catch(e){}
+    try{ mastery = await j("/v1/students/demo-student-a/mastery")||mastery; }catch(e){}
+    try{
+      const t = await j("/v1/profile/demo-student-a/timeline");
+      tl = t.snapshots||[];
+      $("profBox").innerHTML = "学生 demo-student-a · 天数 "+(t.days||0)+" · 尝试 "+(t.attemptCount||0);
+    }catch(e){ $("profBox").innerHTML = esc(e.message); }
+    try{
+      const ov = await j("/v1/profile/demo-student-a");
+      $("profBox").innerHTML += "<br/>opt-out=" + ((ov.profile&&ov.profile.optOut)?"是":"否") +
+        " · 样本 " + ((ov.features&&ov.features.sampleCount)||0);
+    }catch(e){}
+  }else{
+    $("profBox").innerHTML = "离线演示画像 · 王小明（有债）";
+  }
+  $("radarBox").innerHTML = (radar||[]).map(a=>{
+    const v = Math.max(0,Math.min(100,Number(a.value)||0));
+    return '<div style="margin:8px 0"><div class="row" style="justify-content:space-between"><span class="m">'+esc(a.axis)+'</span><span>'+fmt(a.value)+'</span></div><div class="bar"><i style="width:'+v+'%"></i></div></div>';
+  }).join("");
+  $("masteryBox").innerHTML = '<table class="table"><tr><th>知识点</th><th>score</th><th>acc</th><th>band</th></tr>' +
+    (mastery||[]).map(m=>'<tr><td>'+esc(m.name||m.kpId)+'</td><td>'+fmt(m.score)+'</td><td>'+fmt(m.recentAcc)+'</td><td>'+esc(m.band||"")+'</td></tr>').join("") + '</table>';
+  if(!tl.length) tl = [
+    {date:"2026-09-19", attempts:0, accuracy:0.51, avgScore:54, openDebts:5, source:"mastery-baseline"},
+    {date:"2026-09-20", attempts:0, accuracy:0.51, avgScore:54, openDebts:5, source:"mastery-baseline"},
+  ];
+  $("tlBox").innerHTML = tl.map(s=>'<div class="m" style="padding:6px 0;border-bottom:1px solid var(--line);font-size:12px">'+
+    esc(s.date)+" · acc="+fmt(s.accuracy)+" · score="+fmt(s.avgScore)+" · 债"+(s.openDebts!=null?s.openDebts:"-")+"</div>").join("");
+}
+
+// events
+document.querySelectorAll(".nav button").forEach(b=>b.addEventListener("click", ()=>go(b.getAttribute("data-p"))));
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click", ()=>go(b.getAttribute("data-go"))));
+$("btnRefresh").addEventListener("click", ()=>refreshPage(document.querySelector(".nav button.active").getAttribute("data-p")));
+async function seed(){
+  if(!online){ alert("API 离线：请先启动 AstralPath.Api (http://127.0.0.1:5190)"); return; }
+  try{
+    const d = await j("/v1/materials/seed-samples?parse=true", {method:"POST"});
+    alert("已导入 "+(d.seeded||0)+" 份");
+    go("lib");
+  }catch(e){ alert(e.message); }
+}
+$("btnSeed").addEventListener("click", seed);
+$("btnSeed2").addEventListener("click", seed);
+$("btnParseAll").addEventListener("click", async ()=>{
+  if(!online) return alert("API 离线");
+  try{ const d = await j("/v1/materials/parse-all?ocr=quick", {method:"POST"}); alert("已排队 "+(d.queued||0)); loadLib(); }
+  catch(e){ alert(e.message); }
+});
+$("btnReloadLib").addEventListener("click", loadLib);
+$("btnGraphRefresh").addEventListener("click", loadGraph);
+$("graphSelect").addEventListener("change", loadGraph);
+["wfp","wft","wff","wfd"].forEach(id=>$(id).addEventListener("input", runWhatIf));
+$("btnToday").addEventListener("click", loadToday);
+$("btnRotate").addEventListener("click", loadToday);
+$("btnPlan").addEventListener("click", async ()=>{
+  if(!online){ $("planBox").textContent="离线：D1 概念卡 → D2 桥接题 → D3 小测（各 ≤35 分钟）"; return; }
+  try{
+    const p = await j("/v1/students/demo-student-a/plans", {method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({graphVersion:1, dayBudgetMin:35, horizonDays:14})});
+    const days = p.days||[];
+    $("planBox").innerHTML = "约束检查：" + (p.constraintsChecked?"通过":"未通过") + " · " + days.length + " 天<br/>" +
+      days.slice(0,5).map(d=>"D"+d.day+" · "+(d.minutes||0)+"min · "+((d.items||[]).length)+" 项").join("<br/>");
+  }catch(e){ $("planBox").textContent = e.message; }
+});
+$("btnSend").addEventListener("click", ()=>sendAgent());
+$("agentIn").addEventListener("keydown", e=>{ if(e.key==="Enter") sendAgent(); });
+document.querySelectorAll("[data-q]").forEach(b=>b.addEventListener("click", ()=>sendAgent(b.getAttribute("data-q"))));
+$("btnNewSess").addEventListener("click", ()=>{ agentSid=null; $("chat").innerHTML=""; bubble("bot","已开启新会话。"); });
+$("btnCsr").addEventListener("click", async ()=>{
+  const id = $("csrSel").value||"accounting-v1";
+  if(!online){ $("csrBox").textContent = "演示 CSR：nodes=36 edges=51 · source=course-pack"; return; }
+  try{
+    const d = await j("/v1/knowledge-graphs/"+encodeURIComponent(id)+"/csr");
+    $("csrBox").innerHTML = "source="+esc(d.source)+" · nodes="+d.nodeCount+" · edges="+d.edges+" · offsets="+d.offsets;
+  }catch(e){ $("csrBox").textContent = e.message; }
+});
+
+(async function init(){
+  await detectApi();
+  await ensureData();
+  go("home");
+})();
+</script>
+</body>
+</html>

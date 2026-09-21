@@ -34,6 +34,16 @@ button,input,select { font:inherit; font-family:inherit; }
 .rail-nav button { padding:8px 12px; border:0; border-radius:999px; color:var(--muted); background:transparent; cursor:pointer; }
 .rail-nav button:hover { color:var(--ink); }
 .rail-nav button.active { color:var(--ink); background:var(--surface); font-weight:700; }
+.radar-bar { height:10px; border-radius:99px; background:var(--surface-soft); overflow:hidden; }
+.radar-bar > i { display:block; height:100%; background:linear-gradient(90deg,var(--primary),#6aa8f0); }
+.task-card { margin:10px 0; padding:14px 16px; border:1px solid var(--rule); border-radius:var(--radius-group); background:var(--surface); }
+.task-card .options button { display:block; width:100%; margin:6px 0; padding:10px 12px; border:1px solid var(--rule); border-radius:14px; background:var(--field); text-align:left; cursor:pointer; }
+.task-card .options button:hover { border-color:var(--primary); }
+.kv { display:grid; gap:8px; font-size:13px; }
+.kv > div { display:flex; justify-content:space-between; gap:12px; padding:6px 0; border-bottom:1px dashed var(--rule); }
+.kv span:first-child { color:var(--muted); }
+.inspector-empty { color:var(--muted); font-size:13px; padding:10px 0; }
+.home-summary article strong { color:var(--primary); }
 .rail-account { display:flex; align-items:center; gap:8px; }
 .rail-avatar { width:34px; height:34px; border-radius:50%; display:grid; place-items:center; background:var(--surface-strong); color:#fff; font-weight:700; }
 .rail-profile strong { font-size:13px; display:block; max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
@@ -152,6 +162,8 @@ button,input,select { font:inherit; font-family:inherit; }
       <button type="button" data-page="graph">识网</button>
       <button type="button" data-page="debt">知债</button>
       <button type="button" data-page="today">今日</button>
+      <button type="button" data-page="agent">智能体</button>
+      <button type="button" data-page="profile">画像</button>
       <button type="button" data-page="auth">账户</button>
     </nav>
     <div class="rail-account">
@@ -159,7 +171,7 @@ button,input,select { font:inherit; font-family:inherit; }
         <div class="rail-avatar" id="avatar">访</div>
         <span><strong id="railStudent">未登录</strong><small id="apiHint">API 检测中…</small></span>
       </div>
-      <span class="badge" id="uiVersion">UI-pan-v10</span>
+      <span class="badge" id="uiVersion">UI-full-v13</span>
       <select id="studentSelect">
         <option value="demo-student-a">王小明（有债）</option>
         <option value="demo-student-b">李华（无债）</option>
@@ -180,7 +192,7 @@ button,input,select { font:inherit; font-family:inherit; }
       </div>
     </header>
     <section class="home-welcome">
-      <span>ZHIZHAITU WORKSPACE</span>
+      <span>ASTRALPATH WORKSPACE</span>
       <h2>把讲义变成识网，再把欠债算清楚</h2>
       <p>示例教材（Kotlin/C#/Go/深度学习/大模型等）可解析生成今日任务；账户体系参考千知万理 GalReview。</p>
       <div class="quick-actions">
@@ -260,7 +272,7 @@ button,input,select { font:inherit; font-family:inherit; }
         <header style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
           <div>
             <h2>知识图谱 <span id="activeBookBadge" class="badge">-</span></h2>
-            <p id="graphSubtitle">选择教材</p>
+            <p id="graphSubtitle">选择教材 · 思维导图展示完整目录</p>
           </div>
           <select id="graphSelect" style="max-width:320px"></select>
         </header>
@@ -311,7 +323,11 @@ button,input,select { font:inherit; font-family:inherit; }
         </div>
       </section>
       <aside class="panel graph-inspector">
-        <header><h2>节点检视</h2></header>
+        <header><h2>章节侧栏</h2><p>完整目录 · 点击查看正文与自动出题</p></header>
+        <div id="chapterTree" style="max-height:280px;overflow:auto;margin-bottom:12px;border:1px solid var(--rule);border-radius:8px;padding:8px">尚未加载章节</div>
+        <div id="chapterContent" style="max-height:220px;overflow:auto;margin-bottom:12px;padding:8px;background:var(--surface-soft);border-radius:8px;font-size:13px;line-height:1.6">选择左侧章节后显示正文</div>
+        <div id="chapterQuestions"></div>
+        <header style="margin-top:12px"><h2>节点检视</h2></header>
         <div id="graphInspector" class="inspector-empty">点击 DAG 节点。</div>
         <div id="debtPreview" style="margin-top:16px"></div>
         <div id="bookQuestions" style="margin-top:16px"></div>
@@ -348,6 +364,14 @@ button,input,select { font:inherit; font-family:inherit; }
         <div id="debts">-</div>
       </section>
     </div>
+
+    <section class="panel" style="margin-top:16px">
+      <header>
+        <h2>教材识网红边（preview-debts）</h2>
+        <p>来自藏书阁解析出的知识图谱边；与课程包 BASELINE 债边并列展示</p>
+      </header>
+      <div id="textbookDebts" class="status-line">加载中…</div>
+    </section>
 
     <section class="panel" style="margin-top:16px">
       <header>
@@ -412,8 +436,86 @@ button,input,select { font:inherit; font-family:inherit; }
         <div class="form-field"><label>score(c) <span id="wfToV">41</span></label><input type="range" id="wfTo" min="0" max="100" value="41" /></div>
         <div class="form-field"><label>freq <span id="wfFreqV">6</span></label><input type="range" id="wfFreq" min="0" max="20" value="6" /></div>
         <div class="form-field"><label>days <span id="wfDaysV">0</span></label><input type="range" id="wfDays" min="0" max="30" value="0" /></div>
-        <div id="wfResult" class="status-line">-</div>
+        <div id="wfResult" class="status-line">拖动滑块即时计算 BASELINE impact；将调用 /v1/what-if</div>
       </section>
+    </div>
+  </main>
+
+  <main id="page-agent" class="page hidden">
+    <header class="page-header">
+      <div>
+        <h1>受约束智能体</h1>
+        <p>意图路由 · 危机转人工 · 敏感词脱敏 · 工具白名单（§44）。演示账户 demo-student-a / role=student</p>
+      </div>
+      <div class="page-header__actions">
+        <select id="agentRole" style="min-height:40px">
+          <option value="student">student</option>
+          <option value="teacher">teacher</option>
+          <option value="demo">demo</option>
+        </select>
+        <button type="button" class="button" id="btnAgentTools">刷新工具清单</button>
+        <button type="button" class="button" id="btnAgentReset">新会话</button>
+      </div>
+    </header>
+    <div class="workspace-grid">
+      <section class="panel">
+        <header><h2>对话</h2><p id="agentSessionMeta">sessionId: -</p></header>
+        <div id="agentChat" style="min-height:220px;max-height:420px;overflow:auto;padding:8px;border:1px solid var(--rule);border-radius:12px;background:var(--surface)"></div>
+        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+          <input id="agentInput" style="flex:1;min-width:200px;min-height:42px;padding:8px 12px;border:1px solid var(--rule);border-radius:18px;background:var(--field)" placeholder="例如：我的会计等式总是搞不清，怎么办？" />
+          <button type="button" class="button primary" id="btnAgentSend">发送</button>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px">
+          <button type="button" class="button quiet" data-agent-q="我这周学不完计划了">压力求助</button>
+          <button type="button" class="button quiet" data-agent-q="我不想活了">危机词测试</button>
+          <button type="button" class="button quiet" data-agent-q="帮我诊断知识债">诊断债</button>
+          <button type="button" class="button quiet" data-agent-q="生成14天计划">生成计划</button>
+        </div>
+        <div id="agentStatus" class="status-line">就绪</div>
+      </section>
+      <aside class="panel graph-inspector">
+        <header><h2>工具白名单</h2></header>
+        <div id="agentTools" class="inspector-empty">点击「刷新工具清单」</div>
+        <header style="margin-top:16px"><h2>模块自检</h2></header>
+        <div id="moduleStatusBox" class="inspector-empty">加载中…</div>
+      </aside>
+    </div>
+  </main>
+
+  <main id="page-profile" class="page hidden">
+    <header class="page-header">
+      <div>
+        <h1>学习画像</h1>
+        <p>雷达 · 掌握度 · 时间线 · CSR 图索引（§46 / §48）</p>
+      </div>
+      <div class="page-header__actions">
+        <select id="profileStudentSel" style="min-height:40px">
+          <option value="demo-student-a">王小明（有债）</option>
+          <option value="demo-student-b">李华（对照）</option>
+        </select>
+        <button type="button" class="button primary" id="btnLoadProfile">刷新画像</button>
+        <button type="button" class="button danger" id="btnProfileOptOut">画像 Opt-out</button>
+      </div>
+    </header>
+    <div class="workspace-grid">
+      <section class="panel">
+        <header><h2>能力雷达</h2><p>掌握度 / 正确率 / 练习量 / 还债进度 / 信心</p></header>
+        <div id="profileRadar">-</div>
+        <header style="margin-top:18px"><h2>掌握度表</h2></header>
+        <div id="profileMastery">-</div>
+      </section>
+      <aside class="panel graph-inspector">
+        <header><h2>画像概览</h2></header>
+        <div id="profileOverview" class="inspector-empty">-</div>
+        <header style="margin-top:14px"><h2>时间线</h2></header>
+        <div id="profileTimeline">-</div>
+        <header style="margin-top:14px"><h2>CSR 索引</h2></header>
+        <div id="csrBox" class="inspector-empty">选择图谱后显示</div>
+        <div class="form-field"><label>图 ID</label>
+          <select id="csrGraphSelect"><option value="accounting-v1">accounting-v1 课程包</option></select>
+        </div>
+        <button type="button" class="button" id="btnLoadCsr">查询 CSR</button>
+      </aside>
     </div>
   </main>
 
@@ -600,9 +702,11 @@ function go(page) {
     const hint = $("apiHint");
     if (hint) hint.textContent = "API " + base;
     const uv = $("uiVersion");
-    if (uv) uv.textContent = "UI-pan-v10";
+    if (uv) uv.textContent = "UI-full-v13";
     if (page === "home") loadHome();
     if (page === "materials") loadMaterials();
+    if (page === "agent") loadAgentPage();
+    if (page === "profile") loadProfilePage();
     if (page === "graph") {
       let keep = null;
       try { keep = sessionStorage.getItem("astralpath_graph_id"); } catch (e) {}
@@ -897,6 +1001,207 @@ function renderTasks(pack) {
       }
     });
   });
+}
+
+async function loadAgentPage() {
+  await resolveApiBase();
+  await refreshModuleStatus();
+  await refreshAgentTools();
+  if (!$("agentChat").innerHTML || $("agentChat").innerHTML.indexOf("inspector-empty") >= 0) {
+    $("agentChat").innerHTML = '<div style="color:var(--muted);font-size:13px;padding:12px">你好，我是知债学习助手。可问「我的知识债」「生成计划」「这周学不完」等。危机词会自动转人工。</div>';
+  }
+}
+
+async function refreshModuleStatus() {
+  const box = $("moduleStatusBox");
+  if (!box) return;
+  try {
+    const d = await j("/v1/modules/status");
+    box.innerHTML = '<div class="kv">' +
+      "<div><span>产品</span><span>" + escapeHtml(d.product || d.code || "") + "</span></div>" +
+      "<div><span>智能体意图</span><span>" + ((d.agent && d.agent.intents) || 0) + "</span></div>" +
+      "<div><span>危机/敏感词</span><span>" + ((d.agent && d.agent.crisisPatterns) || 0) + " / " + ((d.agent && d.agent.bannedPatterns) || 0) + "</span></div>" +
+      "<div><span>知识库文档</span><span>" + ((d.knowledgeBase && d.knowledgeBase.documents) || 0) + "</span></div>" +
+      "<div><span>画像/图模块</span><span>" + escapeHtml(JSON.stringify(d.profile || d.graph || {}).slice(0, 60)) + "</span></div>" +
+      "</div>";
+  } catch (e) {
+    box.innerHTML = '<div class="status-line error">' + escapeHtml(e.message) + "</div>";
+  }
+}
+
+async function refreshAgentTools() {
+  const box = $("agentTools");
+  if (!box) return;
+  const role = ($("agentRole") && $("agentRole").value) || "student";
+  try {
+    const d = await j("/v1/agent/tools?role=" + encodeURIComponent(role));
+    const tools = Array.isArray(d) ? d : (d.tools || d.data || []);
+    if (!tools.length) {
+      box.innerHTML = '<div class="inspector-empty">该角色暂无可见工具</div>';
+      return;
+    }
+    box.innerHTML = tools.map(function (t) {
+      return "<div style='padding:6px 0;border-bottom:1px solid var(--rule);font-size:12px'>" +
+        "<strong>" + escapeHtml(t.intentId || t.IntentId || "") + "</strong> " +
+        escapeHtml(t.description || t.Description || "") +
+        "</div>";
+    }).join("");
+  } catch (e) {
+    box.innerHTML = '<div class="status-line error">' + escapeHtml(e.message) + "</div>";
+  }
+}
+
+function agentBubble(role, html) {
+  const box = $("agentChat");
+  const align = role === "user" ? "flex-end" : "flex-start";
+  const bg = role === "user" ? "var(--primary)" : "var(--surface-soft)";
+  const color = role === "user" ? "#fff" : "var(--ink)";
+  box.insertAdjacentHTML("beforeend",
+    '<div style="display:flex;justify-content:' + align + ';margin:8px 0"><div style="max-width:88%;padding:10px 12px;border-radius:14px;background:' + bg + ';color:' + color + ';font-size:13px;line-height:1.55">' + html + "</div></div>");
+  box.scrollTop = box.scrollHeight;
+}
+
+let agentSessionId = null;
+async function sendAgent() {
+  const input = $("agentInput");
+  const text = (input && input.value || "").trim();
+  if (!text) return;
+  const role = ($("agentRole") && $("agentRole").value) || "student";
+  agentBubble("user", escapeHtml(text));
+  if (input) input.value = "";
+  $("agentStatus").textContent = "路由中…";
+  try {
+    const body = {
+      userId: studentId() || "demo-student-a",
+      role: role,
+      utterance: text,
+      sessionId: agentSessionId || null
+    };
+    const d = await j("/v1/agent/turns", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+    agentSessionId = d.sessionId || agentSessionId;
+    $("agentSessionMeta").textContent = "sessionId: " + (agentSessionId || "-") +
+      " · phase=" + (d.phase || "-") + " · intent=" + (d.intentId || "-") +
+      " · decision=" + (d.decision || "-");
+    const reply = d.response || d.reply || d.message || d.text || d.speak || JSON.stringify(d).slice(0, 240);
+    const flags = d.safetyFlags || {};
+    agentBubble("bot", escapeHtml(String(reply)) +
+      (flags.bannedHit ? '<div style="margin-top:6px;font-size:11px;opacity:.85">已脱敏敏感词</div>' : "") +
+      (d.decision === "crisis.handoff" || d.intentId === "crisis.handoff"
+        ? '<div style="margin-top:6px;font-size:11px">已切换人工/教师支持流程</div>' : ""));
+    $("agentStatus").textContent = "ok · " + (d.decision || "");
+    $("agentStatus").className = "status-line ok";
+  } catch (e) {
+    agentBubble("bot", escapeHtml(e.message));
+    $("agentStatus").textContent = "失败：" + e.message;
+    $("agentStatus").className = "status-line error";
+  }
+}
+
+async function loadProfilePage() {
+  await resolveApiBase();
+  const sid = ($("profileStudentSel") && $("profileStudentSel").value) || studentId() || "demo-student-a";
+  // CSR options
+  try {
+    const gs = await j("/v1/knowledge-graphs") || [];
+    const sel = $("csrGraphSelect");
+    if (sel) {
+      let opts = '<option value="accounting-v1">accounting-v1 课程包</option>';
+      gs.forEach(function (g) {
+        opts += '<option value="' + escapeHtml(g.graphId) + '">' + escapeHtml(shortBookName(g.materialName)) + "</option>";
+      });
+      sel.innerHTML = opts;
+    }
+  } catch (e) {}
+
+  try {
+    const ov = await j("/v1/profile/" + sid);
+    const p = ov.profile || ov;
+    const f = ov.features || {};
+    $("profileOverview").innerHTML = '<div class="kv">' +
+      "<div><span>学生</span><span>" + escapeHtml(sid) + "</span></div>" +
+      "<div><span>opt-out</span><span>" + (p.optOut ? "是" : "否") + "</span></div>" +
+      "<div><span>标签</span><span>" + escapeHtml(((p.tags || []).map(function (t) { return t.tag || t; }).join(", ") || "无")) + "</span></div>" +
+      "<div><span>样本/尝试</span><span>" + (f.sampleCount || 0) + " / " + (f.attemptCount || 0) + "</span></div>" +
+      "<div><span>正确率</span><span>" + (f.accuracy != null ? fmt(f.accuracy) : "-") + "</span></div>" +
+      "</div>";
+  } catch (e) {
+    $("profileOverview").innerHTML = '<div class="status-line error">' + escapeHtml(e.message) + "</div>";
+  }
+
+  try {
+    const radar = await j("/v1/profile/" + sid + "/radar");
+    const axes = radar.axes || [];
+    if (!axes.length) {
+      $("profileRadar").innerHTML = '<div class="inspector-empty">暂无雷达数据</div>';
+    } else {
+      let html = "";
+      axes.forEach(function (a) {
+        const v = Math.max(0, Math.min(100, Number(a.value) || 0));
+        html += '<div style="margin:8px 0"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)"><span>' +
+          escapeHtml(a.axis) + "</span><span>" + fmt(a.value) + '</span></div><div style="height:10px;border-radius:99px;background:var(--surface-soft);overflow:hidden"><div style="height:100%;width:' +
+          v + '%;background:linear-gradient(90deg,var(--primary),#6aa8f0)"></div></div></div>';
+      });
+      $("profileRadar").innerHTML = html;
+    }
+  } catch (e) {
+    $("profileRadar").innerHTML = '<div class="status-line error">' + escapeHtml(e.message) + "</div>";
+  }
+
+  try {
+    const mastery = await j("/v1/students/" + sid + "/mastery") || [];
+    if (!mastery.length) {
+      $("profileMastery").innerHTML = '<div class="inspector-empty">暂无掌握度</div>';
+    } else {
+      let rows = '<table class="debt-table"><tr><th>知识点</th><th>score</th><th>acc</th><th>band</th></tr>';
+      mastery.forEach(function (m) {
+        rows += "<tr><td>" + escapeHtml(m.name || m.kpId) + "</td><td>" + fmt(m.score) +
+          "</td><td>" + fmt(m.recentAcc) + "</td><td>" + escapeHtml(m.band || "") + "</td></tr>";
+      });
+      $("profileMastery").innerHTML = rows + "</table>";
+    }
+  } catch (e) {
+    $("profileMastery").innerHTML = '<div class="status-line error">' + escapeHtml(e.message) + "</div>";
+  }
+
+  try {
+    const tl = await j("/v1/profile/" + sid + "/timeline");
+    const snaps = tl.snapshots || [];
+    if (!snaps.length) {
+      $("profileTimeline").innerHTML = '<div class="inspector-empty">暂无时间线</div>';
+    } else {
+      $("profileTimeline").innerHTML = snaps.map(function (s) {
+        return "<div style='font-size:12px;padding:6px 0;border-bottom:1px solid var(--rule)'>" +
+          escapeHtml(s.date) + " · 尝试" + (s.attempts || 0) + " · acc=" + fmt(s.accuracy) +
+          " · score=" + fmt(s.avgScore) + " · 债" + (s.openDebts != null ? s.openDebts : "-") +
+          " <span style='color:var(--muted)'>" + escapeHtml(s.source || "") + "</span></div>";
+      }).join("");
+    }
+  } catch (e) {
+    $("profileTimeline").innerHTML = '<div class="status-line error">' + escapeHtml(e.message) + "</div>";
+  }
+}
+
+async function loadCsr() {
+  const id = ($("csrGraphSelect") && $("csrGraphSelect").value) || "accounting-v1";
+  const box = $("csrBox");
+  if (!box) return;
+  box.textContent = "查询中…";
+  try {
+    const d = await j("/v1/knowledge-graphs/" + encodeURIComponent(id) + "/csr");
+    box.innerHTML = '<div class="kv">' +
+      "<div><span>graphId</span><span>" + escapeHtml(String(d.graphId || id).slice(-20)) + "</span></div>" +
+      "<div><span>source</span><span>" + escapeHtml(d.source || "-") + "</span></div>" +
+      "<div><span>节点/边</span><span>" + (d.nodeCount || 0) + " / " + (d.edges || 0) + "</span></div>" +
+      "<div><span>offsets</span><span>" + (d.offsets || 0) + "</span></div>" +
+      "<div><span>类型</span><span>" + escapeHtml((d.edgeTypes || []).join(", ") || "-") + "</span></div>" +
+      "</div>";
+  } catch (e) {
+    box.innerHTML = '<div class="status-line error">' + escapeHtml(e.message) + "</div>";
+  }
 }
 
 async function loadHome() {
@@ -1344,6 +1649,122 @@ async function loadGraphs(preferGraphId) {
   await loadSelectedGraph(nextId);
 }
 
+function renderChapterSidebar(list, materialName, materialId) {
+  const tree = $("chapterTree");
+  const content = $("chapterContent");
+  const qbox = $("chapterQuestions");
+  if (!tree) return;
+  window.__zzChapters = { materialId: materialId, materialName: materialName, items: list || [] };
+  if (!list || !list.length) {
+    tree.innerHTML = '<div class="inspector-empty">暂无章节数据，请重新「解析」该教材（深度解析）</div>';
+    return;
+  }
+  let html = '<div style="font-size:12px;color:var(--muted);margin-bottom:6px">' +
+    escapeHtml(materialName || "") + " · " + list.length + " 章</div>";
+  list.forEach(function (c) {
+    const pad = (c.level || 0) * 12;
+    const isSec = (c.kind || "") !== "chapter";
+    html += '<button type="button" data-ch-id="' + escapeHtml(c.id) + '" style="display:block;width:100%;text-align:left;border:0;background:transparent;padding:5px 4px;margin-left:' +
+      pad + 'px;cursor:pointer;border-radius:6px;font-size:12px;line-height:1.4">' +
+      '<span class="badge" style="margin-right:6px">' + (isSec ? "节" : "章") + "</span>" +
+      escapeHtml(c.title || c.id) +
+      ' <span style="color:var(--muted)">' + (c.charCount || 0) + "字 · " + (c.questionCount || 0) + "题</span></button>";
+  });
+  tree.innerHTML = html;
+  tree.querySelectorAll("[data-ch-id]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      const cid = btn.getAttribute("data-ch-id");
+      tree.querySelectorAll("[data-ch-id]").forEach(function (b) { b.style.background = "transparent"; });
+      btn.style.background = "var(--surface-soft)";
+      openChapter(materialId, cid);
+    });
+  });
+  if (content) content.textContent = "点击上方章节查看正文与自动出题。";
+  if (qbox) qbox.innerHTML = "";
+}
+
+async function loadChapterSidebar(materialId, materialName) {
+  const tree = $("chapterTree");
+  if (!tree) return;
+  if (!materialId) {
+    tree.innerHTML = '<div class="inspector-empty">图谱未关联资料 ID</div>';
+    return;
+  }
+  tree.innerHTML = '<div class="status-line">加载章节目录…</div>';
+  try {
+    const data = await j("/v1/materials/" + materialId + "/chapters");
+    const chapters = data.chapters || [];
+    const sections = data.sections || [];
+    // 侧边栏：章 + 节（完整目录）
+    const merged = chapters.concat(sections);
+    renderChapterSidebar(merged, data.materialName || materialName, materialId);
+    // 同步章节下拉框（思维导图过滤）
+    const sel = $("chapterSelect");
+    if (sel) {
+      const keep = sel.value;
+      sel.innerHTML = '<option value="">全部章节（' + chapters.length + "）</option>" +
+        chapters.map(function (c) {
+          return '<option value="' + escapeHtml(c.id) + '">' + escapeHtml(c.title) + "</option>";
+        }).join("");
+      if (keep && chapters.some(function (c) { return c.id === keep; })) sel.value = keep;
+    }
+    if ($("chapterChips") && chapters.length) {
+      let chips = '<button type="button" class="button primary" data-chap="">全图</button>';
+      chapters.forEach(function (c) {
+        chips += '<button type="button" class="button" data-chap="' + escapeHtml(c.id) + '">' + escapeHtml((c.title || "").slice(0, 14)) + "</button>";
+      });
+      $("chapterChips").innerHTML = chips;
+      $("chapterChips").querySelectorAll("[data-chap]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          const v = b.getAttribute("data-chap") || "";
+          const sel2 = $("chapterSelect");
+          if (sel2) { sel2.value = v; applyChapterFilter(v); }
+          if (v) openChapter(materialId, v);
+        });
+      });
+    }
+  } catch (e) {
+    tree.innerHTML = '<div class="status-line error">' + escapeHtml(e.message) + "</div>";
+  }
+}
+
+async function openChapter(materialId, chapterId) {
+  const content = $("chapterContent");
+  const qbox = $("chapterQuestions");
+  if (content) content.textContent = "加载章节正文…";
+  if (qbox) qbox.innerHTML = "";
+  try {
+    const d = await j("/v1/materials/" + materialId + "/chapters/" + encodeURIComponent(chapterId));
+    if (content) {
+      content.innerHTML = "<div style='font-weight:600;margin-bottom:6px'>" + escapeHtml(d.title || "") +
+        " <span style='color:var(--muted);font-weight:400'>" + (d.charCount || 0) + " 字</span></div>" +
+        "<div style='white-space:pre-wrap'>" + escapeHtml(d.content || "（本章暂无正文抽取结果）") + "</div>";
+    }
+    const qs = d.questions || [];
+    if (qbox) {
+      if (!qs.length) {
+        qbox.innerHTML = '<div class="inspector-empty">本章暂无自动题目</div>';
+        return;
+      }
+      let html = '<h3 style="font-size:14px;margin:8px 0">本章自动出题 · ' + qs.length + " 题</h3>";
+      qs.forEach(function (q, i) {
+        html += '<div class="task-card" style="margin:8px 0"><div><strong>' + (i + 1) + ". " +
+          escapeHtml(q.stem || "") + '</strong> <span class="badge">' + escapeHtml(q.type || "quiz") +
+          " · d" + (q.difficulty || 2) + "</span></div>";
+        (q.options || []).forEach(function (opt, oi) {
+          const mark = oi === q.correctIndex ? " ✓" : "";
+          html += "<div style='margin:2px 0;font-size:12px'>" + String.fromCharCode(65 + oi) + ". " + escapeHtml(opt) + mark + "</div>";
+        });
+        if (q.why) html += "<div style='color:var(--muted);font-size:12px;margin-top:4px'>" + escapeHtml(q.why) + "</div>";
+        html += "</div>";
+      });
+      qbox.innerHTML = html;
+    }
+  } catch (e) {
+    if (content) content.innerHTML = '<div class="status-line error">' + escapeHtml(e.message) + "</div>";
+  }
+}
+
 async function loadSelectedGraph(graphId) {
   window.__zzSwitchLog = (window.__zzSwitchLog || []);
   const id0 = graphId || ($("graphSelect") && $("graphSelect").value);
@@ -1394,6 +1815,8 @@ async function loadSelectedGraph(graphId) {
       " edges=" + (g.edges || []).length +
       " cycles=" + ((g.cycles || []).length) +
       " · 已切换";
+    // 章节侧栏：完整目录 + 正文 + 按章出题
+    try { await loadChapterSidebar(g.materialId || (g.graphId || "").replace(/^auto-/, ""), g.materialName); } catch (e) {}
     dagState.zoom = 1; dagState.x = 20; dagState.y = 20;
     window.__zzDebtPairs = [];
     window.__zzGraphExtras = {
@@ -1404,6 +1827,8 @@ async function loadSelectedGraph(graphId) {
     };
     renderDag(g.nodes || [], g.edges || [], []);
     fillChapterSelect(g.nodes || [], g.edges || [], "");
+    // 章节侧栏在 fillChapterSelect 之后加载，避免目录被覆盖
+    try { await loadChapterSidebar(g.materialId || (g.graphId || "").replace(/^auto-/, ""), g.materialName); } catch (e) {}
     const sample = (g.nodes || []).slice(0, 3).map(function (n) { return n.name; }).join(" / ");
     $("graphInspector").innerHTML =
       '<div class="kv">' +
@@ -2096,6 +2521,43 @@ function bindDagZoom() {
 }
 bindDagZoom();
 
+async function refreshTextbookDebts() {
+  const box = $("textbookDebts");
+  if (!box) return;
+  try {
+    const graphs = await j("/v1/knowledge-graphs") || [];
+    if (!graphs.length) {
+      box.innerHTML = '<div class="inspector-empty">暂无教材图谱，请先在藏书阁解析</div>';
+      return;
+    }
+    let html = "";
+    for (let gi = 0; gi < Math.min(graphs.length, 8); gi++) {
+      const g = graphs[gi];
+      try {
+        const data = await j("/v1/knowledge-graphs/" + g.graphId + "/preview-debts?studentId=" + studentId(), { method: "POST" });
+        const debts = data.topDebts || [];
+        html += '<div style="margin:10px 0"><strong>' + escapeHtml(data.materialName || g.materialName || "") +
+          '</strong> <span style="color:var(--muted);font-size:12px">nodes=' + g.nodeCount + " edges=" + g.edgeCount + " · 红边 " + debts.length + "</span>";
+        if (!debts.length) {
+          html += '<div style="color:var(--muted);font-size:12px">未检出有效债边</div></div>';
+          continue;
+        }
+        html += '<table class="debt-table"><tr><th>#</th><th>债边</th><th>score</th><th>impact</th></tr>';
+        debts.slice(0, 4).forEach(function (d, i) {
+          html += "<tr><td>" + (i + 1) + "</td><td>" + escapeHtml(d.fromKpName) + " → " + escapeHtml(d.toKpName) +
+            "</td><td>" + fmt(d.scoreFrom) + " → " + fmt(d.scoreTo) + '</td><td class="edge-red">' + fmt(d.impact) + "</td></tr>";
+        });
+        html += "</table></div>";
+      } catch (e) {
+        html += '<div class="status-line error">' + escapeHtml((g.materialName || g.graphId) + "：" + e.message) + "</div>";
+      }
+    }
+    box.innerHTML = html || '<div class="inspector-empty">无数据</div>';
+  } catch (e) {
+    box.innerHTML = '<div class="status-line error">' + escapeHtml(e.message) + "</div>";
+  }
+}
+
 async function refreshDebt() {
   const id = studentId();
   try {
@@ -2127,6 +2589,7 @@ async function refreshDebt() {
     $("graphView").innerHTML = '<div class="status-line error">边列表加载失败：' + escapeHtml(e.message) + "</div>";
     $("debts").innerHTML = '<div class="status-line error">' + escapeHtml(e.message) + "</div>";
   }
+  try { await refreshTextbookDebts(); } catch (e) { /* non-fatal */ }
 }
 
 let currentPlan = null;
@@ -2420,7 +2883,7 @@ $("todayBookSelect").addEventListener("change", function () { resetTodayRotate()
 $("btnRefreshDebt").addEventListener("click", refreshDebt);
 $("btnCreatePlan").addEventListener("click", createPlan);
 $("btnPlanToToday").addEventListener("click", planToToday);
-$("btnTeacher").addEventListener("click", loadTeacherDashboard);
+$("btnTeacher") && $("btnTeacher").addEventListener("click", loadTeacherDashboard);
 $("btnGrantB").addEventListener("click", function () { grantConsent("demo-student-b"); });
 $("btnRevokeB").addEventListener("click", function () { revokeConsent("demo-student-b"); });
 $("btnGrantA").addEventListener("click", function () { grantConsent("demo-student-a"); });
@@ -2446,6 +2909,39 @@ $("btnLogout").addEventListener("click", logoutAuth);
 $("btnUpdateProfile").addEventListener("click", updateProfile);
 $("btnSeedParse").addEventListener("click", seedAndParseBooks);
 $("btnMaterialToday").addEventListener("click", loadMaterialToday);
+$("btnAgentSend") && $("btnAgentSend").addEventListener("click", sendAgent);
+$("btnAgentTools") && $("btnAgentTools").addEventListener("click", refreshAgentTools);
+$("btnAgentReset") && $("btnAgentReset").addEventListener("click", function () {
+  agentSessionId = null;
+  $("agentChat").innerHTML = "";
+  $("agentSessionMeta").textContent = "sessionId: -";
+  agentBubble("bot", "已开启新会话。");
+});
+$("agentInput") && $("agentInput").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") sendAgent();
+});
+document.querySelectorAll("[data-agent-q]").forEach(function (btn) {
+  btn.addEventListener("click", function () {
+    const q = btn.getAttribute("data-agent-q");
+    const input = $("agentInput");
+    if (input) input.value = q;
+    sendAgent();
+  });
+});
+$("btnLoadProfile") && $("btnLoadProfile").addEventListener("click", loadProfilePage);
+$("btnLoadCsr") && $("btnLoadCsr").addEventListener("click", loadCsr);
+$("btnProfileOptOut") && $("btnProfileOptOut").addEventListener("click", async function () {
+  const sid = ($("profileStudentSel") && $("profileStudentSel").value) || studentId();
+  try {
+    await j("/v1/profile/" + sid + "/opt-out", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+    await loadProfilePage();
+  } catch (e) { alert(e.message); }
+});
+["wfFrom", "wfTo", "wfFreq", "wfDays"].forEach(function (id) {
+  const el = $(id);
+  if (el) el.addEventListener("input", runWhatIf);
+});
+setTimeout(function () { try { runWhatIf(); } catch (e) {} }, 800);
 $("studentSelect").addEventListener("change", function () {
   const id = studentId();
   if (id.indexOf("-b") >= 0) {
@@ -2591,7 +3087,7 @@ $("studentSelect").addEventListener("change", function () {
   // capture on viewport so newly rendered nodes work
   vp.addEventListener("pointerdown", onNodePointerDown, true);
 
-  dbg("pan: ready (UI-pan-v10)");
+  dbg("pan: ready (UI-full-v13)");
 })();
 
 applyAuthUi();

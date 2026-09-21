@@ -388,25 +388,50 @@ public sealed class AgentKbProfileController : ControllerBase
     [HttpGet("/v1/modules/status")]
     public IResult ModuleStatus() => _store.Lock(() => HttpResults.Success(_modules.ModuleStatus(_store)));
 
-    /// <summary>知识图谱 CSR 索引统计（§48.1：紧凑邻接 + 类型位图）。</summary>
+    /// <summary>知识图谱 CSR 索引统计（§48.1：紧凑邻接 + 类型位图）。支持课程包与教材自动图。</summary>
     [HttpGet("/v1/knowledge-graphs/{id}/csr")]
     public IResult Csr(string id)
     {
         return _store.Lock(() =>
         {
-            if (!string.Equals(id, _store.PackId, StringComparison.OrdinalIgnoreCase))
-                return HttpResults.Fail(404, ErrorCodes.ResourceNotFound, $"图包不存在：{id}");
-            var csr = CsrGraph.Build(
-                _store.Graph.Edges.Select(e => (e.From, e.To, e.EdgeType)),
-                _store.Graph.Nodes.Select(n => n.Id));
-            return HttpResults.Success(new
+            // 1) 课程包
+            if (string.Equals(id, _store.PackId, StringComparison.OrdinalIgnoreCase))
             {
-                graphId = id,
-                nodeCount = csr.NodeCount,
-                offsets = csr.Offsets.Count,
-                edges = csr.AdjDst.Count,
-                edgeTypes = csr.TypeNames
-            });
+                var csrPack = CsrGraph.Build(
+                    _store.Graph.Edges.Select(e => (e.From, e.To, e.EdgeType)),
+                    _store.Graph.Nodes.Select(n => n.Id));
+                return HttpResults.Success(new
+                {
+                    graphId = id,
+                    source = "course-pack",
+                    nodeCount = csrPack.NodeCount,
+                    offsets = csrPack.Offsets.Count,
+                    edges = csrPack.AdjDst.Count,
+                    edgeTypes = csrPack.TypeNames
+                });
+            }
+
+            // 2) 教材自动图（识网）
+            var auto = MaterialRegistry.GetGraph(id);
+            if (auto != null)
+            {
+                var csrAuto = CsrGraph.Build(
+                    auto.Edges.Select(e => (e.From, e.To, e.EdgeType ?? "prerequisite")),
+                    auto.Nodes.Select(n => n.Id));
+                return HttpResults.Success(new
+                {
+                    graphId = id,
+                    source = "material-auto",
+                    materialName = auto.MaterialName,
+                    nodeCount = csrAuto.NodeCount,
+                    offsets = csrAuto.Offsets.Count,
+                    edges = csrAuto.AdjDst.Count,
+                    edgeTypes = csrAuto.TypeNames,
+                    ok = MaterialPipeline.ValidateGenerated(auto).Ok
+                });
+            }
+
+            return HttpResults.Fail(404, ErrorCodes.ResourceNotFound, $"图包不存在：{id}");
         });
     }
 

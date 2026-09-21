@@ -19,6 +19,9 @@
     <ProjectReference Include="..\AstralPath.Persistence\AstralPath.Persistence.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Content Update="wwwroot\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="..\..\graph-packs\accounting-v1\**\*">
       <Link>graph-packs\accounting-v1\%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

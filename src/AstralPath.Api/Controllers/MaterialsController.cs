@@ -147,6 +147,23 @@ public sealed class MaterialsController : ControllerBase
         var doc = MaterialPipeline.ToDto(material.Id, material.Name, material.Path, material.SizeBytes, payload, material.OcrMode ?? "standard");
         var graph = MaterialPipeline.ToGraph(doc, payload);
         var tasks = MaterialTaskGenerator.GenerateFromGraph(graph, material.Name, 6);
+        // 章节深度解析结果入库（侧边栏 + 按章出题）
+        var chapterBundle = MaterialPipeline.ParseChapterBundle(material.Id, material.Name, payload);
+        if (chapterBundle != null)
+        {
+            MaterialRegistry.UpsertChapters(material.Id, chapterBundle);
+            var chapterTasks = MaterialPipeline.ChapterQuestionsToTasks(chapterBundle, 8);
+            if (chapterTasks.Count > 0 && tasks.Count == 0)
+                tasks = chapterTasks;
+        }
+        // 文件名清洗导致 C#→C_ 时的题库兜底
+        if (tasks.Count == 0)
+        {
+            var alt = material.Name.Replace("_", "#");
+            tasks = TextbookQuestionBank.ToTodayTasks(alt, 6);
+            if (tasks.Count == 0 && material.Name.StartsWith("C_"))
+                tasks = TextbookQuestionBank.ToTodayTasks(material.Name.Replace("C_", "C#"), 6);
+        }
         MaterialRegistry.UpsertMaterial(doc);
         MaterialRegistry.UpsertGraph(graph, tasks);
         MaterialRegistry.MergeLatestTasks(material.Name, tasks);
@@ -287,12 +304,21 @@ public sealed class MaterialsController : ControllerBase
         var rnd = new Random(studentId.GetHashCode());
         foreach (var edge in graph.Edges)
         {
-            var fromName = graph.Nodes.FirstOrDefault(n => n.Id == edge.From)?.Name ?? edge.From;
-            var toName = graph.Nodes.FirstOrDefault(n => n.Id == edge.To)?.Name ?? edge.To;
-            var scoreP = 28 + rnd.Next(0, 15);
-            var scoreC = 38 + rnd.Next(0, 12);
-            var freq = rnd.Next(2, 7);
-            inputs.Add((edge.From, edge.To, fromName, toName, scoreP, scoreC, freq, 0, edge.Weight));
+            var fromNode = graph.Nodes.FirstOrDefault(n => n.Id == edge.From);
+            var toNode = graph.Nodes.FirstOrDefault(n => n.Id == edge.To);
+            var fromName = fromNode?.Name ?? edge.From;
+            var toName = toNode?.Name ?? edge.To;
+            // 过滤 OCR 噪声节点，避免「4 时预约」这类假债边
+            if (IsNoisyNodeName(fromName) || IsNoisyNodeName(toName)) continue;
+            if (fromName.Length < 2 || toName.Length < 2) continue;
+
+            var fromFreq = ParseNodeFreq(fromNode?.Description);
+            var toFreq = ParseNodeFreq(toNode?.Description);
+            // 让多数边落在 BASELINE 触发区：score_p<40 ∧ score_c<50
+            var scoreP = (double)Math.Clamp(22 + (fromFreq % 12) + rnd.Next(0, 6), 18, 48);
+            var scoreC = (double)Math.Clamp(28 + (toFreq % 10) + rnd.Next(0, 8), 22, 49);
+            var freq = Math.Clamp(2 + (fromFreq + toFreq) / 10 + rnd.Next(0, 3), 2, 8);
+            inputs.Add((edge.From, edge.To, fromName, toName, Math.Round(scoreP, 1), Math.Round(scoreC, 1), freq, 0, edge.Weight));
         }
 
         var scanned = Core.Algorithms.DebtScanner.Scan(inputs, 8);
@@ -311,17 +337,18 @@ public sealed class MaterialsController : ControllerBase
     {
         var samples = new[]
         {
-            @"C:\Users\18948\Downloads\Kotlin编程实践：Kotlin从入门到实战\Kotlin编程实践：Kotlin从入门到实战.pdf",
-            @"C:\Users\18948\Downloads\Python编程从入门到实践（第3版）(1)\Python编程：从入门到实践（第3版）.pdf",
+            @"C:\Users\18948\Downloads\Kotlin编程实践：Kotlin从入门到实战.pdf",
+            @"C:\Users\18948\Downloads\Python编程：从入门到实践（第3版）.pdf",
             @"C:\Users\18948\Downloads\C#从入门到精通（第7版）+(明日科技)+.pdf",
             @"C:\Users\18948\Downloads\Java从入门到精通（第6版） (明日科技) .pdf",
             @"C:\Users\18948\Downloads\Go语言从入门到精通.pdf",
             @"C:\Users\18948\Downloads\大模型应用开发：动手做 AI Agent (黄佳) .pdf",
             @"C:\Users\18948\Downloads\深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf",
-            @"C:\Users\18948\Downloads\深度学习进阶：自然语言处理(1)\深度学习进阶：自然语言处理 (斋藤康毅) .pdf",
+            @"C:\Users\18948\Downloads\深度学习进阶：自然语言处理 (斋藤康毅) .pdf",
             @"C:\Users\18948\Downloads\深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF",
             @"C:\Users\18948\Downloads\图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf",
-            @"C:\Users\18948\Downloads\深度学习 Deep Learning [花书]\深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf",
+            @"C:\Users\18948\Downloads\DeepLearning-Goodfellow-花书.pdf",
+            @"C:\Users\18948\Downloads\黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf",
         };
 
         var created = new List<string>();
@@ -362,7 +389,7 @@ public sealed class MaterialsController : ControllerBase
     public IResult ParseAll([FromQuery] string ocr = "quick")
     {
         var pending = MaterialRegistry.ListMaterials()
-            .Where(m => m.Status is "uploaded" or "failed" or "parsing" && m.NodeCount == 0)
+            .Where(m => (m.Status is "uploaded" or "failed" or "parsing") && m.NodeCount == 0)
             .Select(m => m.Id)
             .ToList();
         if (pending.Count == 0)
@@ -396,29 +423,49 @@ public sealed class MaterialsController : ControllerBase
         return HttpResults.Success(new { queued = pending.Count, ids = pending });
     }
 
+    private static int _todayBookCursor;
+
     [HttpGet("/v1/materials/today-from-books")]
     public IResult TodayFromBooks([FromQuery] int maxTasks = 8, [FromQuery] bool rotate = false)
     {
-        // 1) 优先：教材真题题库（避免误匹配：按材料名匹配题库键）
-        foreach (var m in MaterialRegistry.ListMaterials())
+        // 1) 教材真题题库：rotate 时跨书轮换，而不是永远第一本
+        var banked = MaterialRegistry.ListMaterials()
+            .Where(m => TextbookQuestionBank.MatchBankKey(m.Name) != null)
+            .ToList();
+        if (banked.Count > 0)
         {
-            var bank = TextbookQuestionBank.MatchBankKey(m.Name);
-            if (bank == null) continue;
-            var bankTasks = TextbookQuestionBank.ToTodayTasks(m.Name, maxTasks, rotate);
-            if (bankTasks.Count == 0) continue;
-            MaterialRegistry.MergeLatestTasks(m.Name, bankTasks);
-            var bankBrief = MaterialTaskGenerator.BuildDayBrief(bankTasks, m.Name);
-            var stats = TextbookQuestionBank.BankStats(m.Name);
-            return HttpResults.Success(new
+            var idx = 0;
+            if (rotate)
             {
-                materialName = m.Name,
-                brief = bankBrief,
-                tasks = bankTasks,
-                source = "textbook-question-bank",
-                bank,
-                bankStats = stats,
-                rotated = rotate
-            });
+                idx = Math.Abs(Interlocked.Increment(ref _todayBookCursor) - 1) % banked.Count;
+            }
+            else
+            {
+                idx = Math.Abs(_todayBookCursor) % banked.Count;
+            }
+            var m = banked[idx];
+            var bank = TextbookQuestionBank.MatchBankKey(m.Name);
+            var bankTasks = TextbookQuestionBank.ToTodayTasks(m.Name, maxTasks, rotate);
+            if (bankTasks.Count > 0)
+            {
+                MaterialRegistry.MergeLatestTasks(m.Name, bankTasks);
+                var bankBrief = MaterialTaskGenerator.BuildDayBrief(bankTasks, m.Name);
+                var stats = TextbookQuestionBank.BankStats(m.Name);
+                return HttpResults.Success(new
+                {
+                    materialName = m.Name,
+                    materialId = m.Id,
+                    brief = bankBrief,
+                    tasks = bankTasks,
+                    source = "textbook-question-bank",
+                    bank,
+                    bankStats = stats,
+                    rotated = rotate,
+                    bookIndex = idx,
+                    bookCount = banked.Count,
+                    materialNameList = banked.Select(x => x.Name).ToList()
+                });
+            }
         }
 
         var (materialName, tasks) = MaterialRegistry.GetLatestTasks();
@@ -469,6 +516,141 @@ public sealed class MaterialsController : ControllerBase
         });
     }
 
+    private static int ParseNodeFreq(string? description)
+    {
+        if (string.IsNullOrWhiteSpace(description)) return 0;
+        var m = System.Text.RegularExpressions.Regex.Match(description, @"freq=(\d+)");
+        return m.Success ? int.Parse(m.Groups[1].Value) : 0;
+    }
+
+    private static bool IsNoisyNodeName(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name)) return true;
+        var s = name.Trim();
+        if (s.Length < 2) return true;
+        // 节点 id 残片 / guid / hex
+        if (System.Text.RegularExpressions.Regex.IsMatch(s, @"^[0-9a-fA-F]{16,}$")) return true;
+        if (System.Text.RegularExpressions.Regex.IsMatch(s, @"^[0-9a-f]{8}-[0-9a-f]{4}-")) return true;
+        // OCR 垃圾：大量点号、纯符号、出版社/CIP 残片
+        if (System.Text.RegularExpressions.Regex.IsMatch(s, @"[\.\…·]{3,}")) return true;
+        if (System.Text.RegularExpressions.Regex.IsMatch(s, @"^[\d\s\.\、，,。①②③ⅠⅡⅢ]+$")) return true;
+        if (s.Contains("出版社") || s.Contains("印刷") || s.Contains("ISBN") || s.Contains("责任编辑")) return true;
+        if (System.Text.RegularExpressions.Regex.IsMatch(s, @"^[\d\s]+\s*[时著页版印次]$")) return true;
+        // 「4 时预约」「9 著 黄 佳」类
+        if (System.Text.RegularExpressions.Regex.IsMatch(s, @"^\d+\s+\S{0,4}(著|时|页|印|版)")) return true;
+        // 纯噪声英文（新闻页脚）
+        var low = s.ToLowerInvariant();
+        if (low is "posts" or "telecom" or "press" or "openai" or "copyright" or "all rights")
+            return true;
+        return false;
+    }
+
+    [HttpGet("/v1/materials/{id}/chapters")]
+    public IResult MaterialChapters(string id)
+    {
+        var material = MaterialRegistry.GetMaterial(id);
+        if (material == null)
+            return HttpResults.Fail(404, ErrorCodes.ResourceNotFound, "资料不存在");
+        var bundle = MaterialRegistry.GetChapters(id);
+        if (bundle == null)
+            return HttpResults.Success(new
+            {
+                materialId = id,
+                materialName = material.Name,
+                chapters = Array.Empty<object>(),
+                sections = Array.Empty<object>(),
+                stats = new { chapterCount = 0, sectionCount = 0, questionCount = 0 },
+                note = "尚未深度解析，请先在藏书阁解析该资料"
+            });
+        return HttpResults.Success(new
+        {
+            materialId = id,
+            materialName = bundle.MaterialName,
+            chapters = bundle.Chapters.Select(c => new
+            {
+                c.Id, c.Title, c.Kind, c.Level, c.ParentId, c.ChapterNum, c.CharCount,
+                questionCount = c.Questions.Count,
+                preview = c.Content.Length > 80 ? c.Content[..80] + "…" : c.Content
+            }),
+            sections = bundle.Sections.Select(s => new
+            {
+                s.Id, s.Title, s.Kind, s.Level, s.ParentId, s.ChapterNum, s.CharCount,
+                questionCount = s.Questions.Count,
+                preview = s.Content.Length > 60 ? s.Content[..60] + "…" : s.Content
+            }),
+            bundle.Stats,
+            toc = bundle.Toc
+        });
+    }
+
+    [HttpGet("/v1/materials/{id}/chapters/{chapterId}")]
+    public IResult MaterialChapterDetail(string id, string chapterId)
+    {
+        var bundle = MaterialRegistry.GetChapters(id);
+        if (bundle == null)
+            return HttpResults.Fail(404, ErrorCodes.ResourceNotFound, "章节数据不存在，请先深度解析");
+        var item = bundle.Chapters.FirstOrDefault(c => string.Equals(c.Id, chapterId, StringComparison.OrdinalIgnoreCase))
+                   ?? bundle.Sections.FirstOrDefault(c => string.Equals(c.Id, chapterId, StringComparison.OrdinalIgnoreCase));
+        if (item == null)
+            return HttpResults.Fail(404, ErrorCodes.ResourceNotFound, "章节不存在");
+        return HttpResults.Success(new
+        {
+            materialId = id,
+            materialName = bundle.MaterialName,
+            item.Id, item.Title, item.Kind, item.Level, item.ParentId, item.ChapterNum,
+            item.CharCount, item.Content,
+            questions = item.Questions
+        });
+    }
+
+    [HttpGet("/v1/materials/{id}/chapters/{chapterId}/questions")]
+    public IResult MaterialChapterQuestions(string id, string chapterId)
+    {
+        var bundle = MaterialRegistry.GetChapters(id);
+        if (bundle == null)
+            return HttpResults.Fail(404, ErrorCodes.ResourceNotFound, "章节数据不存在，请先深度解析");
+        var item = bundle.Chapters.FirstOrDefault(c => string.Equals(c.Id, chapterId, StringComparison.OrdinalIgnoreCase))
+                   ?? bundle.Sections.FirstOrDefault(c => string.Equals(c.Id, chapterId, StringComparison.OrdinalIgnoreCase));
+        if (item == null)
+            return HttpResults.Fail(404, ErrorCodes.ResourceNotFound, "章节不存在");
+        var tasks = item.Questions.Select(q => new TodayTaskDto(
+            Guid.NewGuid().ToString("N"),
+            $"chapter:{item.Id}",
+            string.IsNullOrWhiteSpace(q.Kp) ? item.Title : q.Kp,
+            q.Type, q.Difficulty, q.EstMin,
+            $"来自《{bundle.MaterialName}》「{item.Title}」：{q.Why}",
+            q.Id, q.Stem, q.Options, q.CorrectIndex, null)).ToList();
+        return HttpResults.Success(new
+        {
+            materialId = id,
+            materialName = bundle.MaterialName,
+            chapterId = item.Id,
+            chapterTitle = item.Title,
+            count = tasks.Count,
+            questions = item.Questions,
+            tasks
+        });
+    }
+
+    [HttpGet("/v1/materials/{id}/chapter-questions")]
+    public IResult AllChapterQuestions(string id, [FromQuery] int maxTasks = 12)
+    {
+        var bundle = MaterialRegistry.GetChapters(id);
+        if (bundle == null)
+            return HttpResults.Fail(404, ErrorCodes.ResourceNotFound, "章节数据不存在，请先深度解析");
+        var tasks = MaterialPipeline.ChapterQuestionsToTasks(bundle, maxTasks);
+        var brief = MaterialTaskGenerator.BuildDayBrief(tasks, bundle.MaterialName);
+        return HttpResults.Success(new
+        {
+            materialId = id,
+            materialName = bundle.MaterialName,
+            brief,
+            tasks,
+            chapterCount = bundle.Chapters.Count,
+            sectionCount = bundle.Sections.Count
+        });
+    }
+
     private static string SanitizeFileName(string? rawName)
     {
         var name = Path.GetFileName(rawName ?? "material.pdf");
@@ -476,7 +658,8 @@ public sealed class MaterialsController : ControllerBase
         var invalid = Path.GetInvalidFileNameChars();
         var chars = name.Select(ch => ch switch
         {
-            '#' or '%' or '+' or '?' or '&' or '*' or '"' or '<' or '>' or '|' or ':' => '_',
+            '#' or '%' or '+' or '?' or '&' or '*' or '"' or '<' or '>' or '|' or ':'
+                or '[' or ']' or '(' or ')' or '{' or '}' or ',' => '_',
             _ when invalid.Contains(ch) => '_',
             _ => ch
         }).ToArray();

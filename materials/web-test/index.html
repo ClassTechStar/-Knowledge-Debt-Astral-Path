@@ -1,0 +1,675 @@
+<!-- AI生成 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>知债：星穹学途（Knowledge Debt: Astral Path） · 测试台</title>
+<meta http-equiv="Cache-Control" content="no-store" />
+<style>
+:root {
+  font-family: "Microsoft YaHei","Microsoft YaHei UI",sans-serif;
+  --canvas:#f3f4f5; --surface:#fbfbfc; --soft:#e8eaec; --ink:#303236; --muted:#70757a;
+  --rule:#c7cacf; --field:#eff0f2; --primary:#0D72D9; --danger:#b64a58; --ok:#3ecf8e;
+  --warn:#d9aa3e; --radius:18px; --group:28px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--canvas);color:var(--ink)}
+header{position:sticky;top:0;z-index:9;display:flex;gap:16px;align-items:center;padding:14px 22px;border-bottom:1px solid var(--rule);background:rgba(243,244,245,.94);backdrop-filter:blur(10px)}
+.brand{display:flex;align-items:center;gap:10px}
+.mark{width:40px;height:30px;display:grid;place-items:center;border-radius:10px;background:var(--soft);color:#858a90;font-weight:800}
+.brand strong{font-size:15px;letter-spacing:.06em}
+.brand small{display:block;color:var(--muted);font-size:11px}
+nav{display:flex;gap:4px;margin-left:auto;padding:4px;border-radius:999px;background:var(--soft);flex-wrap:wrap}
+nav button{border:0;background:transparent;padding:8px 12px;border-radius:999px;color:var(--muted);cursor:pointer}
+nav button.active{background:var(--surface);color:var(--ink);font-weight:700}
+.status{font-size:12px;color:var(--muted);min-width:140px}
+main{width:min(1200px,100%);margin:0 auto;padding:24px 18px 60px}
+.panel{padding:20px;border:1px solid var(--rule);border-radius:var(--group);background:var(--surface);margin-bottom:14px}
+.panel h2{margin:0 0 8px;font-size:20px}
+.panel p{margin:0 0 10px;color:var(--muted);font-size:13px;line-height:1.55}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:900px){.cards{grid-template-columns:1fr 1fr}}
+.card{padding:14px;border:1px solid var(--rule);border-radius:var(--group);background:var(--surface)}
+.card span{color:var(--muted);font-size:12px}
+.card strong{display:block;margin-top:6px;font-size:22px}
+.btn{min-height:38px;padding:8px 14px;border:1px solid var(--rule);border-radius:var(--radius);background:var(--primary);color:#fff;cursor:pointer}
+.btn.ghost{background:var(--surface);color:var(--ink)}
+.btn.danger{background:var(--danger)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:8px 6px;border-bottom:1px solid var(--rule);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:500}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;background:var(--soft);color:var(--muted)}
+.tag.red{background:#ffe1e5;color:#792e38}
+.tag.green{background:#dcf4e7;color:#1e5d43}
+.tag.blue{background:#e8f1fb;color:#1d3d5f}
+.ok{color:#2f6b50}
+.err{color:var(--danger)}
+.bar{height:12px;border-radius:6px;background:var(--soft);overflow:hidden;margin:4px 0}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),#6aa8f0)}
+.log{font-family:Consolas,monospace;font-size:12px;white-space:pre-wrap;background:var(--field);border-radius:12px;padding:10px;max-height:220px;overflow:auto;color:var(--muted)}
+input,select{min-height:38px;border:1px solid var(--rule);border-radius:12px;padding:6px 10px;background:var(--field)}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+.hidden{display:none!important}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:16px;border-top:1px solid var(--rule)}
+</style>
+</head>
+<body>
+<p data-aigc-mark="1" style="margin:0 0 8px;font-size:10px;line-height:1.3;color:#6b6560;font-weight:400;">AI生成</p>
+
+<header>
+  <div class="brand">
+    <div class="mark">途</div>
+    <div>
+      <strong>知债：星穹学途</strong>
+      <small>Knowledge Debt: Astral Path · 测试台</small>
+    </div>
+  </div>
+  <nav id="nav">
+    <button data-p="home" class="active">起点</button>
+    <button data-p="formula">公式自检</button>
+    <button data-p="debt">知识债</button>
+    <button data-p="plan">14天计划</button>
+    <button data-p="today">今日任务</button>
+    <button data-p="graph">识网</button>
+    <button data-p="teacher">教师端</button>
+    <button data-p="agent">智能体</button>
+  </nav>
+  <div class="status" id="apiStatus">API 检测中…</div>
+</header>
+
+<main>
+  <section id="page-home" class="panel">
+    <h2>测试入口</h2>
+    <p>本页可<strong>离线自检</strong>（BASELINE 公式 / 双学生 / 计划 / 教师端逻辑），也可连接本机 API（<code>http://127.0.0.1:5190</code>）做联调。</p>
+    <div class="cards">
+      <div class="card"><span>公式金样</span><strong id="statFormula">-</strong></div>
+      <div class="card"><span>A 债边</span><strong id="statA">-</strong></div>
+      <div class="card"><span>B 债边</span><strong id="statB">-</strong></div>
+      <div class="card"><span>今日题量</span><strong id="statToday">-</strong></div>
+    </div>
+    <div class="row">
+      <button class="btn" id="btnRunAll">一键跑全部自检</button>
+      <button class="btn ghost" id="btnProbeApi">探测 API</button>
+      <button class="btn ghost" id="btnSeed" title="需要 API">导入示例教材（API）</button>
+      <select id="studentSel">
+        <option value="demo-student-a">王小明（有债）</option>
+        <option value="demo-student-b">李华（无债）</option>
+      </select>
+    </div>
+    <div id="homeLog" class="log">等待自检…</div>
+  </section>
+
+  <section id="page-formula" class="panel hidden">
+    <h2>BASELINE 公式自检（金样 1e-6）</h2>
+    <p>score = 100×(0.6·acc + 0.3·sev_norm + 0.1·conf/5)；impact = freq×(50−score_c)×recency×weight</p>
+    <div class="row">
+      <button class="btn" id="btnFormula">运行公式金样</button>
+    </div>
+    <div id="formulaTable"></div>
+  </section>
+
+  <section id="page-debt" class="panel hidden">
+    <h2>知识债诊断（离线演示 + API）</h2>
+    <div class="row">
+      <button class="btn" id="btnDebtOffline">离线演示数据</button>
+      <button class="btn ghost" id="btnDebtApi">从 API 诊断</button>
+    </div>
+    <div class="cards">
+      <div class="card"><span>红边数</span><strong id="debtCount">-</strong></div>
+      <div class="card"><span>最高 impact</span><strong id="debtTop">-</strong></div>
+      <div class="card"><span>图版本</span><strong>1</strong></div>
+      <div class="card"><span>公式</span><strong style="font-size:14px">score-v1 / impact-v1</strong></div>
+    </div>
+    <div id="debtTable"></div>
+  </section>
+
+  <section id="page-plan" class="panel hidden">
+    <h2>14 天修复计划</h2>
+    <div class="row">
+      <button class="btn" id="btnPlan">生成/显示计划</button>
+    </div>
+    <div id="planSummary" class="log">-</div>
+    <div id="planGantt"></div>
+    <div id="planDays"></div>
+  </section>
+
+  <section id="page-today" class="panel hidden">
+    <h2>今日任务（教材真题 · 可轮换）</h2>
+    <div class="row">
+      <button class="btn" id="btnToday">加载第 1 批</button>
+      <button class="btn ghost" id="btnTodayRotate">换一批题</button>
+    </div>
+    <div id="todayCoach" class="log">-</div>
+    <div id="todayTasks"></div>
+  </section>
+
+  <section id="page-graph" class="panel hidden">
+    <h2>识网 · 知识图谱 / 思维导图</h2>
+    <div class="row">
+      <select id="graphBook">
+        <option value="kotlin">Kotlin编程实践</option>
+        <option value="python">Python从入门到实践</option>
+        <option value="go">Go语言从入门到精通</option>
+        <option value="csharp">C#从入门到精通</option>
+        <option value="java">Java从入门到精通</option>
+        <option value="deeplearning">深度学习入门/花书</option>
+        <option value="nlp">深度学习进阶NLP</option>
+        <option value="agent">大模型应用 AI Agent</option>
+      </select>
+      <select id="graphLayout">
+        <option value="layer">分层图谱</option>
+        <option value="mindmap">逻辑结构图</option>
+      </select>
+      <button class="btn ghost" id="btnOutline">大纲</button>
+      <button class="btn ghost" id="btnTriples">三元组</button>
+    </div>
+    <div id="graphMeta" class="log">-</div>
+    <div id="graphCanvas" style="position:relative;height:360px;border:1px solid var(--rule);border-radius:var(--group);background:radial-gradient(circle,#d0d4da 1px,transparent 1px) 0 0/18px 18px #f5f6f7;overflow:hidden"></div>
+    <div id="graphSide" style="margin-top:10px"></div>
+  </section>
+
+  <section id="page-teacher" class="panel hidden">
+    <h2>教师端 · consent fail-closed</h2>
+    <div class="row">
+      <button class="btn" id="btnGrantA">授权 A</button>
+      <button class="btn ghost" id="btnGrantB">授权 B</button>
+      <button class="btn danger" id="btnRevokeA">撤销 A</button>
+      <button class="btn danger" id="btnRevokeB">撤销 B</button>
+    </div>
+    <div id="teacherStudents"></div>
+    <div id="teacherHotspots"></div>
+    <div id="teacherBrief" class="log" style="margin-top:10px">-</div>
+  </section>
+
+  <section id="page-agent" class="panel hidden">
+    <h2>受约束智能体（§44/§47）</h2>
+    <div class="row">
+      <input id="agentInput" style="flex:1;min-width:200px" placeholder="例如：帮我诊断知识债 / 生成14天计划 / 我不想活了" />
+      <button class="btn" id="btnAgent">发送</button>
+    </div>
+    <div id="agentOut" class="log">-</div>
+  </section>
+</main>
+
+<footer>
+  知债：星穹学途（Knowledge Debt: Astral Path）· 教学辅助，不构成处分依据 · 数据为合成演示数据
+</footer>
+
+<script>
+const FALLBACK_API = "http://127.0.0.1:5190";
+let api = "";
+let apiOnline = false;
+let todayBatch = 1;
+let teacherVisible = { a: true, b: false };
+
+/* ---------- utils ---------- */
+const $ = id => document.getElementById(id);
+function fmt(n){return Number(n).toFixed(4).replace(/\.?0+$/,'')}
+function show(page){
+  document.querySelectorAll('main > section').forEach(s=>s.classList.add('hidden'));
+  const el = $('page-'+page); if(el) el.classList.remove('hidden');
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('active', b.dataset.p===page));
+}
+document.querySelectorAll('#nav button').forEach(b=>{
+  b.addEventListener('click',()=>show(b.dataset.p));
+});
+
+async function probeApi(){
+  const bases=[location.origin, FALLBACK_API, 'http://localhost:5190'].filter(Boolean);
+  for (const b of bases){
+    try{
+      const r=await fetch(b+'/health/ready',{signal:AbortSignal.timeout(2500)});
+      if(r.ok){ api=b; apiOnline=true; $('apiStatus').textContent='API '+b+' · online'; $('apiStatus').className='status ok'; return true; }
+    }catch(e){}
+  }
+  apiOnline=false; $('apiStatus').textContent='API 离线 · 离线自检可用'; $('apiStatus').className='status err';
+  return false;
+}
+
+/* ---------- BASELINE formulas ---------- */
+function computeScore(acc, sev, conf){
+  const sevNorm = 1 - Math.min(sev,1);
+  return Math.round(100*(0.6*acc + 0.3*sevNorm + 0.1*(conf/5))*1e6)/1e6;
+}
+function computeImpact(sp, sc, freq, days, weight){
+  const recency = 1/(1+days/7);
+  const detected = sp<40 && sc<50 && freq>0;
+  const impact = detected ? freq*(50-sc)*recency*weight : 0;
+  return {detected, impact: Math.round(impact*1e6)/1e6, recency: Math.round(recency*1e6)/1e6};
+}
+function isSaleable(hist){
+  let streak=0;
+  for(let i=hist.length-1;i>=0;i--){
+    if(hist[i].acc>=0.7 && hist[i].conf>=3) streak++;
+    else break;
+  }
+  return {saleable: streak>=2, streak, need: streak>=2?null:`再完成 ${2-streak} 次达标小测（acc≥0.7 且 conf≥3）`};
+}
+
+const GOLDEN = {
+  score:[
+    {id:'G-SCORE-1',input:{acc:0.30,sev:0.80,conf:2},expect:28.0},
+    {id:'G-SCORE-2',input:{acc:0.40,sev:0.60,conf:4},expect:44.0},
+    {id:'G-SCORE-3',input:{acc:0.80,sev:0.30,conf:4},expect:77.0},
+    {id:'G-SCORE-4',input:{acc:1.0,sev:0.0,conf:5},expect:100.0},
+    {id:'G-SCORE-5',input:{acc:0.0,sev:1.0,conf:1},expect:2.0}
+  ],
+  impact:[
+    {id:'G-DEBT-1',input:{sp:28,sc:41,freq:6,days:0,w:1.6},expect:86.4},
+    {id:'G-DEBT-2',input:{sp:28,sc:41,freq:6,days:7,w:1.6},expect:43.2},
+    {id:'G-DEBT-3',input:{sp:70,sc:41,freq:6,days:0,w:1.0},expect:0},
+    {id:'G-DEBT-4',input:{sp:28,sc:41,freq:0,days:0,w:1.0},expect:0},
+    {id:'G-DEBT-5',input:{sp:28,sc:44,freq:6,days:0,w:1.0},expect:36.0}
+  ],
+  sale:[
+    {id:'G-SALE-1',hist:[{acc:0.8,conf:4}],expect:{saleable:false,streak:1}},
+    {id:'G-SALE-2',hist:[{acc:0.8,conf:4},{acc:0.75,conf:3}],expect:{saleable:true,streak:2}},
+    {id:'G-SALE-3',hist:[{acc:0.9,conf:5},{acc:0.6,conf:4},{acc:0.9,conf:5}],expect:{saleable:false,streak:1}},
+    {id:'G-SALE-4',hist:[{acc:0.95,conf:2}],expect:{saleable:false,streak:0}}
+  ]
+};
+
+function runFormulaSelfTest(){
+  const rows=[];
+  let pass=0,total=0;
+  GOLDEN.score.forEach(c=>{
+    total++;
+    const got=computeScore(c.input.acc,c.input.sev,c.input.conf);
+    const ok=Math.abs(got-c.expect)<1e-6; if(ok)pass++;
+    rows.push([c.id,`acc=${c.input.acc},sev=${c.input.sev},conf=${c.input.conf}`,fmt(c.expect),fmt(got),ok]);
+  });
+  GOLDEN.impact.forEach(c=>{
+    total++;
+    const got=computeImpact(c.input.sp,c.input.sc,c.input.freq,c.input.days,c.input.w).impact;
+    const ok=Math.abs(got-c.expect)<1e-6; if(ok)pass++;
+    rows.push([c.id,`sp=${c.input.sp},sc=${c.input.sc},f=${c.input.freq}`,fmt(c.expect),fmt(got),ok]);
+  });
+  GOLDEN.sale.forEach(c=>{
+    total++;
+    const got=isSaleable(c.hist);
+    const ok=got.saleable===c.expect.saleable && got.streak===c.expect.streak; if(ok)pass++;
+    rows.push([c.id,`hist=${JSON.stringify(c.hist)}`,`${c.expect.saleable}/${c.expect.streak}`,`${got.saleable}/${got.streak}`,ok]);
+  });
+  const html='<table><tr><th>金样</th><th>输入</th><th>期望</th><th>实算</th><th>结果</th></tr>'+
+    rows.map(r=>`<tr><td>${r[0]}</td><td>${escapeHtml(r[1])}</td><td>${r[2]}</td><td>${r[3]}</td><td class="${r[4]?'ok':'err'}">${r[4]?'PASS':'FAIL'}</td></tr>`).join('')+
+    `</table><p class="${pass===total?'ok':'err'}">公式金样：${pass}/${total} 通过（容差 1e-6）</p>`;
+  $('formulaTable').innerHTML=html;
+  $('statFormula').textContent=`${pass}/${total}`;
+  return pass===total;
+}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+/* ---------- offline debt demo ---------- */
+const KP={
+  K02:'会计等式',K03:'借贷记账法',K05:'会计分录',K06:'试算平衡',K12:'财产清查',K17:'存货计价',K33:'权责发生制',K30:'资产负债表'
+};
+const EDGES_A=[
+  {from:'K02',to:'K03',sp:26.8,sc:28,freq:6,w:1.6,scoreFrom:26.8,scoreTo:28},
+  {from:'K03',to:'K05',sp:28,sc:34,freq:6,w:1.4,scoreFrom:28,scoreTo:34},
+  {from:'K02',to:'K05',sp:26.8,sc:34,freq:5,w:1.2,scoreFrom:26.8,scoreTo:34},
+  {from:'K05',to:'K06',sp:34,sc:42,freq:5,w:1.3,scoreFrom:34,scoreTo:42},
+  {from:'K03',to:'K06',sp:28,sc:42,freq:4,w:1.1,scoreFrom:28,scoreTo:42},
+  {from:'K33',to:'K30',sp:38,sc:44,freq:3,w:1.2,scoreFrom:38,scoreTo:44},
+  {from:'K12',to:'K06',sp:40,sc:42,freq:3,w:1.0,scoreFrom:40,scoreTo:42},
+  {from:'K17',to:'K06',sp:45,sc:42,freq:2,w:1.0,scoreFrom:45,scoreTo:42}
+];
+function scanDebts(edges){
+  return edges.map(e=>{
+    const imp=computeImpact(e.sp,e.sc,e.freq,0,e.w);
+    return {
+      fromKp:e.from,toKp:e.to,
+      fromKpName:KP[e.from]||e.from,toKpName:KP[e.to]||e.to,
+      scoreFrom:e.scoreFrom,scoreTo:e.scoreTo,freq:e.freq,
+      impact:imp.impact,detected:imp.detected,recency:imp.recency,weight:e.w,
+      status:'open'
+    };
+  }).filter(d=>d.detected).sort((a,b)=>b.impact-a.impact);
+}
+function renderDebts(list){
+  $('debtCount').textContent=list.length;
+  $('debtTop').textContent=list[0]?fmt(list[0].impact):'0';
+  $('statA').textContent=list.length;
+  const story=d=>`你在${d.toKpName}相关练习上多次出错，回溯显示${d.fromKpName}掌握度为 ${fmt(d.scoreFrom)}，当前知识点掌握度为 ${fmt(d.scoreTo)}，影响分 ${fmt(d.impact)}。建议先巩固${d.fromKpName}，再回到${d.toKpName}。`;
+  $('debtTable').innerHTML=`<table><tr><th>#</th><th>债边</th><th>score</th><th>impact</th><th>叙事</th></tr>`+
+    list.map((d,i)=>`<tr><td>${i+1}</td><td class="tag red">${escapeHtml(d.fromKpName)} → ${escapeHtml(d.toKpName)}</td><td>${fmt(d.scoreFrom)} → ${fmt(d.scoreTo)}</td><td class="err">${fmt(d.impact)}</td><td>${escapeHtml(story(d))}</td></tr>`).join('')+
+    '</table>';
+  window.__debts=list;
+}
+
+/* ---------- plan ---------- */
+function buildPlan(debts){
+  const budget=35;
+  const days=[];
+  for(let i=0;i<14;i++) days.push({day:i+1,items:[],minutes:0});
+  let di=0,used=0;
+  debts.slice(0,5).forEach(d=>{
+    const plan=[
+      {kp:d.fromKpName,type:'concept',diff:2,min:8,why:`为还 ${d.fromKpName} → ${d.toKpName} 的债`},
+      {kp:d.fromKpName,type:'drill',diff:3,min:6,why:`为还 ${d.fromKpName} → ${d.toKpName} 的债`},
+      {kp:d.toKpName,type:'quiz',diff:4,min:6,why:`为还 ${d.fromKpName} → ${d.toKpName} 的债`}
+    ];
+    plan.forEach(it=>{
+      while(di<14 && used+it.min>budget){di++;used=0;}
+      if(di>=14)return;
+      days[di].items.push(it);
+      used+=it.min;
+      days[di].minutes+=it.min;
+    });
+  });
+  return {dayBudgetMin:budget,constraintsChecked:days.every(d=>d.minutes<=budget),days,plannerVersion:'planner-v1'};
+}
+function renderPlan(plan){
+  $('planSummary').textContent=`constraintsChecked=${plan.constraintsChecked} · budget=${plan.dayBudgetMin} · 合计 ${plan.days.reduce((s,d)=>s+d.minutes,0)} 分钟`;
+  const max=plan.dayBudgetMin||35;
+  $('planGantt').innerHTML=plan.days.map(d=>{
+    const pct=Math.min(100,(d.minutes/max)*100);
+    return `<div style="display:flex;gap:8px;align-items:center;margin:4px 0"><div style="width:40px;color:var(--muted);font-size:12px">D${d.day}</div><div class="bar" style="flex:1"><i style="width:${pct}%"></i></div><div style="width:70px;color:var(--muted);font-size:12px">${d.minutes}/${max}</div></div>`;
+  }).join('');
+  $('planDays').innerHTML=plan.days.filter(d=>d.items.length).map(d=>
+    `<div class="panel" style="padding:10px;margin-top:8px"><strong>第 ${d.day} 天</strong> <span class="tag">${d.minutes} min</span> `+
+    d.items.map(it=>`<div style="margin-top:6px;font-size:13px"><span class="tag blue">${it.type}</span> ${escapeHtml(it.kp)} · ${it.min}min · ${escapeHtml(it.why)}</div>`).join('')+
+    '</div>'
+  ).join('');
+}
+
+/* ---------- today questions from sample books ---------- */
+const BANK={
+  kotlin:[
+    {kp:'Kotlin 语言定位',type:'concept',min:6,stem:'《Kotlin编程实践》前言强调，本书重点不仅是语法，更在于：',opts:['何时以及为何使用某个特定的语言特性','背诵全部标准库API','只讲Android UI','只对比Java性能'],ci:0},
+    {kp:'Kotlin 工具链',type:'quiz',min:5,stem:'Windows 上安装 Kotlin 工具时，书中举例的包管理器是：',opts:['Scoop','Homebrew','MacPorts','apt'],ci:0},
+    {kp:'Kotlin 多平台',type:'drill',min:6,stem:'JetBrains 鼓励 Kotlin 社区拥抱的方向包括：',opts:['Multiplatform、Native 与 JavaScript','仅Windows桌面','仅嵌入式汇编','仅存储过程'],ci:0},
+    {kp:'Kotlin IDE',type:'drill',min:4,stem:'书中提到的 Kotlin IDE 包括：',opts:['IntelliJ IDEA 或 Android Studio','仅记事本','仅Excel','仅数据库客户端'],ci:0},
+    {kp:'Kotlin 可空类型',type:'quiz',min:6,stem:'书中列举的 Kotlin 基本特性示例包含：',opts:['可空类型、操作符重载与类型转换','仅SQL语法','仅CSS布局','仅打印机驱动'],ci:0},
+    {kp:'Kotlin REPL',type:'drill',min:5,stem:'安装并运行 Kotlin 的基本过程书中会涉及：',opts:['REPL、编译器与运行脚本','仅画图','仅做动画','仅调相机'],ci:0},
+    {kp:'Kotlin 面向对象',type:'concept',min:6,stem:'Kotlin 面向对象特性章节通常会讲：',opts:['类、对象与相关语言特性','如何做菜','如何修车','如何办护照'],ci:0},
+    {kp:'Kotlin 包管理',type:'quiz',min:5,stem:'除 Scoop 外书中还提到的包管理器有：',opts:['Homebrew、MacPorts、Snapcraft','仅npm','仅pip','仅cargo'],ci:0},
+    {kp:'Kotlin 测试',type:'drill',min:5,stem:'书中测试章节的目的是：',opts:['验证代码行为符合预期','让代码更慢','增加无意义注释','删除所有函数'],ci:0},
+    {kp:'Kotlin 与 JVM',type:'concept',min:6,stem:'Kotlin 可用于：',opts:['JVM / Android / 服务端等场景','只能写UI动画','只能做表格','只能打印日志'],ci:0},
+    {kp:'Kotlin 社区学习',type:'concept',min:4,stem:'作者强调学习 Kotlin 更有效的方式是：',opts:['理解何时/为何用该特性，而不是死记语法','只抄片段','只看标题','只背页码'],ci:0},
+    {kp:'Kotlin 脚本与Gradle',type:'quiz',min:6,stem:'执行Kotlin脚本/配置Gradle属于：',opts:['安装运行与构建工具链','排版设计','摄影后期','营销文案'],ci:0}
+  ],
+  go:[
+    {kp:'Go 变量初始化',type:'quiz',min:5,stem:'Go 中 var days int = 365 的写法说明：',opts:['声明 int 变量 days 并初始化为 365','声明字符串days','定义接口days','创建包days'],ci:0},
+    {kp:'Go 类型推断',type:'concept',min:5,stem:'Go 初始化变量时若省略类型，则：',opts:['变量类型由表达式决定','语法错误','自动变成interface{}','必须重新声明'],ci:0},
+    {kp:'Go 流程控制',type:'drill',min:6,stem:'if…else if…else 在空气质量 API 示例中用于：',opts:['按污染指数区间分支判断空气质量','只能打印Hello','只能排序数组','只能读写文件'],ci:0},
+    {kp:'Go 教材范围',type:'concept',min:4,stem:'《Go语言从入门到精通》内容范围包括：',opts:['流程控制、函数、结构体、接口、并发、网络与爬虫等','仅前端CSS','仅美术设计','仅硬件电路'],ci:0},
+    {kp:'Go 指针',type:'quiz',min:6,stem:'Go 支持指针，其常见用途是：',opts:['直接操作内存地址/共享数据引用','只能做界面动画','只能做备份','只能做日志美化'],ci:0},
+    {kp:'Go 结构体与接口',type:'concept',min:7,stem:'Go 中结构体与接口常用于：',opts:['组合数据与抽象行为契约','只做字符串拼接','只做文件改名','只做壁纸切换'],ci:0},
+    {kp:'Go 并发',type:'quiz',min:7,stem:'Go 并发编程的特色机制常包括：',opts:['goroutine 与 channel 等','仅全局锁死','仅单线程强制','禁用任何通信'],ci:0},
+    {kp:'Go 错误处理',type:'concept',min:5,stem:'Go 惯用错误处理风格通常是：',opts:['显式返回 error 并检查','完全忽略错误','永远panic','用注释代替处理'],ci:0},
+    {kp:'Go 复合类型',type:'concept',min:6,stem:'Go 的复合数据类型通常包括数组/切片/映射等，其作用是：',opts:['组织更复杂的数据结构','只能存一个整数','只能画图','只能发短信'],ci:0},
+    {kp:'Go 函数',type:'drill',min:5,stem:'Go 函数章节强调的是：',opts:['封装可复用逻辑并可返回结果','只能内联所有代码','不能有参数','不能有返回值'],ci:0},
+    {kp:'Go 接口定义',type:'drill',min:5,stem:'Go 的接口（interface）更强调：',opts:['行为方法集合，实现时隐式满足','必须继承具体类','必须用注解注册','只能有一个方法'],ci:0},
+    {kp:'Go 基本类型',type:'quiz',min:5,stem:'Go 基础章节会介绍基本数据类型与：',opts:['运算符','油画技法','烘焙曲线','宪法条文'],ci:0}
+  ],
+  csharp:[
+    {kp:'类的概念',type:'concept',min:6,stem:'书中对「类」的描述是：',opts:['可封装数据成员、函数成员的数据结构，是创建对象的模板','只能存字符串的变量','数据库外键','仅用于打印日志的宏'],ci:0},
+    {kp:'表达式',type:'quiz',min:5,stem:'C# 中表达式由什么组成？',opts:['运算符和操作数','只有注释','只有using别名','只有命名空间'],ci:0},
+    {kp:'字符串Remove',type:'quiz',min:7,stem:'关于 string.Remove()，书中说明正确的是：',opts:['可删除从指定位置到末尾的字符，或从指定位置删除指定数目字符','只能把字符串反转','会把字符串变成整数','永远不抛异常'],ci:0},
+    {kp:'实战项目',type:'drill',min:5,stem:'《C#从入门到精通（第7版）》提到的实战项目示例包括：',opts:['贪吃蛇、五子棋、ERP管理系统等','只能做计算器皮肤','只能做屏保','只能做文件加密器'],ci:0},
+    {kp:'异常处理',type:'quiz',min:6,stem:'字符串方法参数非法时可能抛出的异常示例是：',opts:['ArgumentOutOfRangeException','PrintQueueFullException','WifiDisconnectedException','PageMarginException'],ci:0},
+    {kp:'C# 程序结构',type:'concept',min:6,stem:'书中强调 C# 中语句与类的关系是：',opts:['所有语句都必须位于类内','语句必须在SQL里','语句只能在HTML中','语句不能定义方法'],ci:0},
+    {kp:'OOP',type:'quiz',min:7,stem:'C# 面向对象编程强调：',opts:['用类与对象封装数据与行为','只写全局变量和goto','不用方法','不用类型'],ci:0},
+    {kp:'数组和集合',type:'concept',min:6,stem:'数组和集合章节解决的核心问题是：',opts:['批量组织与操作一组数据','打印纸质报表','扫描二维码','调节屏幕亮度'],ci:0},
+    {kp:'数据访问与LINQ',type:'drill',min:7,stem:'数据访问与 LINQ 章节强调：',opts:['连接数据源并用查询语法处理数据','手写SQL注入','不用类型查询','只用记事本存数据'],ci:0},
+    {kp:'Windows窗体',type:'concept',min:6,stem:'Windows 窗体应用程序设计章节主要涉及：',opts:['桌面UI控件与交互','航天轨道计算','地质勘探','分子对接'],ci:0},
+    {kp:'变量与常量',type:'quiz',min:5,stem:'「变量与常量」章节主要讲：',opts:['数据存储与不可变值的表示','如何重装系统','如何剪辑视频','如何发快递'],ci:0},
+    {kp:'流程控制',type:'drill',min:5,stem:'流程控制语句用于：',opts:['按条件/循环组织程序执行路径','美化窗体颜色','压缩安装包','注册账号'],ci:0}
+  ]
+};
+// 默认教材任务池
+function pickBank(key){ return BANK[key]||BANK.kotlin; }
+
+function renderToday(key, batch){
+  const bank=pickBank(key);
+  const per=4;
+  const start=((batch-1)*per)%bank.length;
+  const tasks=[];
+  for(let i=0;i<per;i++){
+    tasks.push(bank[(start+i)%bank.length]);
+  }
+  const total=tasks.reduce((s,t)=>s+t.min,0);
+  $('statToday').textContent=tasks.length;
+  $('todayCoach').textContent=`第 ${batch} 批 · 题库 ${bank.length} 题 · 合计约 ${total} 分钟 · 教材=${key}`;
+  $('todayTasks').innerHTML=tasks.map((t,i)=>`
+    <div class="panel" style="padding:12px">
+      <div><strong>${escapeHtml(t.kp)}</strong> <span class="tag blue">${t.type}</span> <span class="tag">${t.min}min</span></div>
+      <div style="margin:6px 0;font-size:14px">${escapeHtml(t.stem)}</div>
+      <div>${t.opts.map((o,j)=>`<div style="margin:4px 0"><label style="display:inline"><input type="radio" name="q${batch}_${i}" value="${j}" /> ${String.fromCharCode(65+j)}. ${escapeHtml(o)}</label></div>`).join('')}</div>
+      <div class="row">
+        <label style="margin:0">信心 <input type="range" min="1" max="5" value="3" id="conf${batch}_${i}" /></label>
+        <button class="btn ghost" onclick="gradeQ(${batch},${i},${t.ci})">提交</button>
+        <span id="fb${batch}_${i}" style="align-self:center"></span>
+      </div>
+    </div>`).join('');
+}
+
+function gradeQ(batch,i,ci){
+  const sel=document.querySelector(`input[name="q${batch}_${i}"]:checked`);
+  const fb=$(`fb${batch}_${i}`);
+  if(!sel){fb.textContent='请选择一项';fb.className='err';return;}
+  const ok=Number(sel.value)===ci;
+  const conf=$(`conf${batch}_${i}`).value;
+  fb.textContent=ok?`正确 · 信心 ${conf}`:`未对 · 信心 ${conf} · 正确答案 ${String.fromCharCode(65+ci)}`;
+  fb.className=ok?'ok':'err';
+}
+
+/* ---------- graph offline ---------- */
+const GRAPHS={
+  kotlin:{name:'Kotlin编程实践',chapters:['第1章 安装与运行','第2章 基本特性','第3章 面向对象'],terms:['Kotlin','REPL','Gradle','协程','空安全','JVM']},
+  python:{name:'Python从入门到实践',chapters:['第1章 起步','第2章 变量与数据类型','第3章 列表简介'],terms:['变量','常量','列表','字符串','函数','类']},
+  go:{name:'Go语言从入门到精通',chapters:['第1章 初识Go','第2章 数据类型','第3章 流程控制'],terms:['Go','goroutine','并发','接口','结构体','channel']},
+  csharp:{name:'C#从入门到精通',chapters:['第1章 初识C#','第2章 程序基本结构','第3章 变量与常量'],terms:['C#','类','对象','LINQ','异常','集合']},
+  java:{name:'Java从入门到精通',chapters:['第1章 初识Java','第2章 语言基础','第3章 流程控制'],terms:['Java','字节码','main','继承','多态','异常']},
+  deeplearning:{name:'深度学习入门/花书',chapters:['第1章 Python入门','第2章 感知机','第3章 神经网络'],terms:['感知机','偏置','权重','CNN','反向传播','NumPy']},
+  nlp:{name:'深度学习进阶NLP',chapters:['第1章 神经网络复习','第2章 分布式表示','第3章 word2vec'],terms:['word2vec','RNN','LSTM','Attention','seq2seq','model.params']},
+  agent:{name:'大模型应用 AI Agent',chapters:['第1章 何谓Agent','第2章 技术框架','第3章 工具调用'],terms:['Agent','工具调用','OpenAI','智能体','RAG','决策']}
+};
+function renderGraph(key, layout){
+  const g=GRAPHS[key]||GRAPHS.kotlin;
+  const chapters=g.chapters, terms=g.terms;
+  const nodes=[];
+  chapters.forEach((c,i)=>nodes.push({id:'C'+i,name:c,layer:'chapter',x:30+(i%3)*180,y:24}));
+  terms.forEach((t,i)=>nodes.push({id:'T'+i,name:t,layer:'term',x:30+(i%3)*180,y:120+Math.floor(i/3)*70}));
+  if(layout==='mindmap'){
+    // 逻辑结构：根左，章向右，词再右
+    nodes.forEach((n,i)=>{
+      if(n.layer==='chapter'){n.x=40+i*28;n.y=40+i*70;}
+      else{n.x=280+(i%2)*20;n.y=40+Math.floor(i/2)*55;}
+    });
+  }
+  const edges=[];
+  chapters.forEach((c,i)=>{if(i>0) edges.push({from:'C'+(i-1),to:'C'+i});});
+  terms.forEach((t,i)=>edges.push({from:'C0',to:'T'+i}));
+  const map={};nodes.forEach(n=>map[n.id]=n);
+  const w=layout==='mindmap'?500:600;
+  let html='';
+  // edges as svg
+  html+=`<svg style="position:absolute;inset:0;width:100%;height:100%">`;
+  edges.forEach(e=>{
+    const a=map[e.from],b=map[e.to]; if(!a||!b)return;
+    html+=`<path d="M ${a.x+70} ${a.y+22} C ${(a.x+b.x)/2+70} ${a.y+22}, ${(a.x+b.x)/2} ${b.y+22}, ${b.x} ${b.y+22}" fill="none" stroke="#9aa6b5" stroke-width="1.5" marker-end="url(#arr)"/>`;
+  });
+  html+=`<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#9aa6b5"/></marker></defs></svg>`;
+  nodes.forEach(n=>{
+    const cls=n.layer==='chapter'?'chapter':'term';
+    const bg=n.layer==='chapter'?'#d9e9f8':'#d4f0e2';
+    const bc=n.layer==='chapter'?'#4f86c6':'#55a77b';
+    html+=`<div style="position:absolute;left:${n.x}px;top:${n.y}px;min-width:120px;padding:8px 10px;border:2px solid ${bc};border-radius:14px;background:${bg};font-size:12px;font-weight:700;cursor:move" data-id="${n.id}">${escapeHtml(n.name)}</div>`;
+  });
+  $('graphCanvas').innerHTML=html;
+  $('graphMeta').textContent=`教材=${g.name} · 布局=${layout==='mindmap'?'逻辑结构图':'分层图谱'} · 章节${chapters.length} · 知识点${terms.length} · 可拖拽节点`;
+  window.__graphData={g,nodes,edges,layout};
+  // node drag
+  $('graphCanvas').querySelectorAll('[data-id]').forEach(el=>{
+    el.onmousedown=ev=>{
+      ev.stopPropagation();
+      const id=el.getAttribute('data-id');
+      const n=window.__graphData.nodes.find(x=>x.id===id);
+      const sx=ev.clientX,sy=ev.clientY,ox=n.x,oy=n.y;
+      const mv=e2=>{n.x=ox+(e2.clientX-sx);n.y=oy+(e2.clientY-sy);el.style.left=n.x+'px';el.style.top=n.y+'px';};
+      const up=()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up);};
+      window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);
+    };
+  });
+  $('graphSide').innerHTML=`<div class="log">三元组示例：〈${escapeHtml(chapters[0])}〉 --后继章节--> 〈${escapeHtml(chapters[1])}〉\n〈${escapeHtml(chapters[0])}〉 --涉及关键词--> 〈${escapeHtml(terms[0])}〉\nMarkdown大纲：\n${chapters.map((c,i)=>'# '.repeat(i+1)+' '+c).join('\n')}</div>`;
+}
+
+/* ---------- teacher ---------- */
+function renderTeacher(){
+  const students=[
+    {id:'demo-student-a',name:'王小明（有债）',key:'a'},
+    {id:'demo-student-b',name:'李华（对照）',key:'b'}
+  ];
+  $('teacherStudents').innerHTML='<table><tr><th>学生</th><th>ID</th><th>consent</th><th>教师可见</th></tr>'+
+    students.map(s=>{const vis=teacherVisible[s.key];return `<tr><td>${s.name}</td><td>${s.id}</td><td><span class="tag ${vis?'green':''}">${vis?'granted':'revoked'}</span></td><td>${vis?'可见':'不可见（fail-closed）'}</td></tr>`}).join('')+
+    '</table>';
+  const debts=window.__debts||scanDebts(EDGES_A);
+  const visible=teacherVisible.a?debts:[];
+  if(!visible.length){
+    $('teacherHotspots').innerHTML='<div class="log">无有效授权，教师端不可见任何班级热点（默认不可见 / fail-closed）</div>';
+    $('teacherBrief').textContent='教师简报：当前无可见数据。';
+    return;
+  }
+  $('teacherHotspots').innerHTML='<table><tr><th>热点债边</th><th>人数</th><th>均 impact</th><th>建议</th></tr>'+
+    visible.slice(0,5).map(d=>`<tr><td class="tag red">${escapeHtml(d.fromKpName)} → ${escapeHtml(d.toKpName)}</td><td>1</td><td class="err">${fmt(d.impact)}</td><td>课上补充：${escapeHtml(d.fromKpName)}→${escapeHtml(d.toKpName)} 桥接练习</td></tr>`).join('')+
+    '</table>';
+  const top=visible[0];
+  $('teacherBrief').textContent=`教师简报：本班最集中债边为「${top.fromKpName} → ${top.toKpName}」，均 impact ${fmt(top.impact)}。建议先巩固先修概念，再布置桥接练习（非处分依据）。`;
+}
+
+/* ---------- agent offline ---------- */
+const CRISIS=['自杀','不想活','轻生','结束生命','自残','伤害自己','跳楼','suicide','kill myself'];
+const BANNED=['不适合','太笨','比别人差','没救','别学了','处分','废物','无可救药','智商'];
+function agentReply(text){
+  const norm=(text||'').toLowerCase().replace(/\s+/g,'');
+  if(CRISIS.some(w=>norm.includes(w.toLowerCase())))
+    return {intentId:'crisis.handoff',decision:'crisis.handoff',response:'你并不孤单。请立即联系身边信任的人或当地心理援助热线。系统不会把这里当作处分依据。',trace:'R0:crisis'};
+  if(BANNED.some(w=>(text||'').includes(w)))
+    return {intentId:'meta.help',decision:'fallback',response:'这段内容暂时无法展示，请查看教材原文或联系老师。',trace:'L3:sanitize'};
+  const rules=[
+    [/债|诊断|红边|薄弱/,'debt.diagnose','已定位知识债诊断意图。请在「知识债」页查看红边与 impact。'],
+    [/计划|14天|安排/,'plan.create','可生成 14 天修复计划（任一天 ≤35 分钟）。'],
+    [/今日|今天/,'today.tasks','今日任务来自教材真题与课程债边计划。'],
+    [/图谱|识网|思维导图/,'graph.view','请打开「识网」查看教材知识图谱。'],
+    [/授权|consent/,'consent.grant','将授权教师可见性（可随时撤销）。'],
+    [/撤销/,'consent.revoke','将撤销授权并即时清除教师端缓存。'],
+    [/热点|班级/,'teacher.hotspots','班级热点仅展示已授权学生。'],
+    [/帮助|怎么用/,'meta.help','我可以帮你：知识债诊断、14天计划、今日任务、图谱、智能体对话。']
+  ];
+  for(const [re,id,resp] of rules){
+    if(re.test(text||'')) return {intentId:id,decision:'execute',response:resp,trace:'R3:anchor'};
+  }
+  return {intentId:'meta.help',decision:'fallback',response:'我可以帮你：知识债诊断、14 天计划、今日任务、图谱查看。请描述你的目标。',trace:'R6:fallback'};
+}
+
+/* ---------- events ---------- */
+$('btnRunAll').onclick=async()=>{
+  const log=[];
+  const okF=runFormulaSelfTest();
+  log.push(`公式金样 ${okF?'PASS':'FAIL'}`);
+  const debtsA=scanDebts(EDGES_A);
+  renderDebts(debtsA);
+  log.push(`离线债边 A=${debtsA.length} B=0`);
+  const plan=buildPlan(debtsA);
+  renderPlan(plan);
+  log.push(`计划 ${plan.days.length} 天 constraintsChecked=${plan.constraintsChecked}`);
+  renderToday('kotlin',1);
+  log.push(`今日任务 批1=${$('todayTasks').children.length} 题`);
+  renderGraph('kotlin','layer');
+  log.push('识网 Kotlin 分层图谱已渲染');
+  renderTeacher();
+  log.push(`教师端 authorized=${teacherVisible.a?1:0}`);
+  const online=await probeApi();
+  log.push(online?`API ${api} online`:'API offline · 已用离线数据完成自检');
+  $('homeLog').textContent=log.join('\n');
+};
+$('btnFormula').onclick=()=>{runFormulaSelfTest();show('formula')};
+$('btnDebtOffline').onclick=()=>renderDebts(scanDebts(EDGES_A));
+$('btnDebtApi').onclick=async()=>{
+  const st=$('studentSel').value;
+  if(!apiOnline) await probeApi();
+  if(!apiOnline){$('debtTable').innerHTML='<div class="log err">API 离线，请点「离线演示数据」</div>';return;}
+  try{
+    const r=await fetch(`${api}/v1/students/${st}/diagnose?graph_ver=1&top_n=5`,{method:'POST'});
+    const j=await r.json();
+    const list=(j.data&&j.data.topDebts)||[];
+    if(!list.length){$('debtTable').innerHTML='<div class="log">未检出债边（可能为对照组 B）</div>';$('debtCount').textContent=0;return;}
+    renderDebts(list);
+  }catch(e){$('debtTable').innerHTML=`<div class="log err">API 失败：${escapeHtml(e.message)}</div>`}
+};
+$('btnPlan').onclick=()=>{
+  const debts=window.__debts||scanDebts(EDGES_A);
+  renderPlan(buildPlan(debts));
+};
+$('btnToday').onclick=()=>{todayBatch=1;renderToday($('graphBook').value,todayBatch)};
+$('btnTodayRotate').onclick=()=>{todayBatch++;renderToday($('graphBook').value,todayBatch)};
+$('graphBook').onchange=()=>renderGraph($('graphBook').value,$('graphLayout').value);
+$('graphLayout').onchange=()=>renderGraph($('graphBook').value,$('graphLayout').value);
+$('btnOutline').onclick=()=>{
+  const g=window.__graphData&&window.__graphData.g;
+  if(!g)return;
+  $('graphSide').innerHTML=`<div class="log">Markdown 大纲（mind-map 兼容）：\n`+
+    g.chapters.map((c,i)=>'# '.repeat(i+1)+' '+c).join('\n')+`\n## 关键词\n- ${g.terms.join('\n- ')}</div>`;
+};
+$('btnTriples').onclick=()=>{
+  const g=window.__graphData&&window.__graphData.g;
+  if(!g)return;
+  const lines=[];
+  g.chapters.forEach((c,i)=>{if(i>0)lines.push(`〈${g.chapters[i-1]}〉 --后继章节--> 〈${c}〉`)});
+  g.terms.forEach(t=>lines.push(`〈${g.chapters[0]}〉 --涉及关键词--> 〈${t}〉`));
+  $('graphSide').innerHTML=`<div class="log">知识三元组（对齐 KnowledgeGraph/RDF）：\n${lines.slice(0,12).join('\n')}</div>`;
+};
+$('btnGrantA').onclick=()=>{teacherVisible.a=true;renderTeacher()};
+$('btnGrantB').onclick=()=>{teacherVisible.b=true;renderTeacher()};
+$('btnRevokeA').onclick=()=>{teacherVisible.a=false;renderTeacher()};
+$('btnRevokeB').onclick=()=>{teacherVisible.b=false;renderTeacher()};
+$('btnAgent').onclick=()=>{
+  const text=$('agentInput').value;
+  const r=agentReply(text);
+  $('agentOut').textContent=`intent=${r.intentId}\ndecision=${r.decision}\ntrace=${r.trace}\nresponse=${r.response}`;
+};
+$('btnProbeApi').onclick=probeApi;
+$('btnSeed').onclick=async()=>{
+  if(!apiOnline) await probeApi();
+  if(!apiOnline){$('homeLog').textContent='API 离线，无法导入示例';return;}
+  try{
+    const r=await fetch(api+'/v1/materials/seed-samples?parse=true',{method:'POST'});
+    const j=await r.json();
+    $('homeLog').textContent=`已请求 API 导入示例教材：seeded=${j.data&&j.data.seeded}`;
+  }catch(e){$('homeLog').textContent='导入失败：'+e.message}
+};
+
+// canvas pan for graph
+$('graphCanvas').addEventListener('mousedown',e=>{
+  if(e.target.closest('[data-id]'))return;
+  const box=$('graphCanvas');
+  const sx=e.clientX,sy=e.clientY;
+  const kids=[...box.children].filter(el=>el.tagName!=='svg');
+  const svg=box.querySelector('svg');
+  const orig=kids.map(el=>({el,left:parseInt(el.style.left)||0,top:parseInt(el.style.top)||0}));
+  const mv=e2=>{
+    const dx=e2.clientX-sx,dy=e2.clientY-sy;
+    orig.forEach(o=>{o.el.style.left=(o.left+dx)+'px';o.el.style.top=(o.top+dy)+'px';});
+  };
+  const up=()=>{window.removeEventListener('mousemove',mv);window.removeEventListener('mouseup',up)};
+  window.addEventListener('mousemove',mv);window.addEventListener('mouseup',up);
+});
+
+// init
+probeApi().then(()=>{
+  runFormulaSelfTest();
+  renderDebts(scanDebts(EDGES_A));
+  renderPlan(buildPlan(scanDebts(EDGES_A)));
+  renderToday('kotlin',1);
+  renderGraph('kotlin','layer');
+  renderTeacher();
+  $('homeLog').textContent='初始化完成。可点「一键跑全部自检」。\nAPI: '+(apiOnline?api:'offline（离线数据可用）');
+});
+</script>
+</body>
+</html>

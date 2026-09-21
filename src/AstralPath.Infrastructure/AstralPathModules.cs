@@ -701,7 +701,7 @@ public sealed class AstralPathModules
         return new { studentId, suppressed = teacherSide && attempts.Count < 10, axes };
     }
 
-    /// <summary>快照时间线：按日聚合尝试记录（演示版以事实流代替独立快照表）。</summary>
+    /// <summary>快照时间线：按日聚合尝试记录；无尝试时用掌握度/债边生成基线快照。</summary>
     public object? ProfileTimeline(AstralPathStore store, string studentId, bool teacherSide)
     {
         if (!store.Students.TryGetValue(studentId, out var student)) return null;
@@ -713,10 +713,50 @@ public sealed class AstralPathModules
                 date = g.Key.ToString("yyyy-MM-dd"),
                 attempts = g.Count(),
                 accuracy = Math.Round(g.Average(a => a.Correct ? 1.0 : 0.0), 6),
-                avgSelfConf = Math.Round(g.Average(a => (double)a.SelfConf), 3)
+                avgSelfConf = Math.Round(g.Average(a => (double)a.SelfConf), 3),
+                openDebts = student.DebtEdges.Count(d => d.Status != "cleared"),
+                avgScore = student.Mastery.Count == 0
+                    ? 0.0
+                    : Math.Round(student.Mastery.Values.Average(m => m.Score), 2),
+                source = "attempts"
             })
-            .ToList();
-        return new { studentId, suppressed = teacherSide && student.Attempts.Count < 10, days = byDay.Count, snapshots = byDay };
+            .ToList<object>();
+
+        if (byDay.Count == 0)
+        {
+            // 无尝试时：用当前掌握度生成 3 日基线，避免画像时间线空壳
+            var avgScore = student.Mastery.Count == 0
+                ? 0.0
+                : Math.Round(student.Mastery.Values.Average(m => m.Score), 2);
+            var open = student.DebtEdges.Count(d => d.Status != "cleared");
+            var acc = student.Mastery.Count == 0
+                ? 0.0
+                : Math.Round(student.Mastery.Values.Average(m => m.RecentAcc), 4);
+            var conf = student.Mastery.Count == 0
+                ? 3.0
+                : Math.Round(student.Mastery.Values.Average(m => (double)m.SelfConf), 2);
+            for (var i = 2; i >= 0; i--)
+            {
+                byDay.Add(new
+                {
+                    date = DateTime.UtcNow.Date.AddDays(-i).ToString("yyyy-MM-dd"),
+                    attempts = 0,
+                    accuracy = acc,
+                    avgSelfConf = conf,
+                    openDebts = open,
+                    avgScore,
+                    source = "mastery-baseline"
+                });
+            }
+        }
+        return new
+        {
+            studentId,
+            suppressed = teacherSide && student.Attempts.Count < 10 && student.Mastery.Count < 3,
+            days = byDay.Count,
+            attemptCount = student.Attempts.Count,
+            snapshots = byDay
+        };
     }
 
     public object ModuleStatus(AstralPathStore store)
