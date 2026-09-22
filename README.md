@@ -1,33 +1,171 @@
 # 知债：星穹学途（Knowledge Debt: Astral Path）
 
-《知债：星穹学途》（Knowledge Debt: Astral Path）是一个跨课程知识债诊断与修复智能体——用确定性公式找出你“欠”了哪门课的先修债，用约束满足生成可完成的还债计划，用受约束智能体陪你一步步销账，同时守住教育伦理底线。
+跨课程**知识债**诊断与修复智能体：用确定性公式找出你「欠」了哪门课的先修债，用约束满足生成可完成的还债计划，用受约束智能体陪伴销账，并守住教育伦理底线。
 
-2026 iCAN AI / DuMate 竞赛实现。
+> **2026 iCAN AI / DuMate 竞赛实现** · 版本 **1.3.0** · Windows 10/11
 
 > **项目名称规范（全文唯一口径）**
-> - 全称：**知债：星穹学途（Knowledge Debt: Astral Path）** —— 用于文档标题、封面、申报书、答辩材料、对外介绍。
-> - 中文简称：**知债：星穹学途** —— 用于正文叙述、章节标题与图表标签。
-> - 英文标识：**AstralPath** —— 用于代码命名空间、解决方案名、包名、镜像名、数据库名与域名（如 `AstralPath.slnx` / `AstralPath.Core` / `api.astralpath.local`）。
+>
+> - 全称：**知债：星穹学途（Knowledge Debt: Astral Path）** — 文档标题、封面、申报书、答辩与对外介绍  
+> - 中文简称：**知债：星穹学途** — 正文叙述、章节标题与图表标签  
+> - 英文标识：**AstralPath** — 命名空间、解决方案名、包名、镜像名、数据库名与域名  
 
+---
 
+## 目录
 
-## 架构
+1. [产品简介](#1-产品简介)  
+2. [快速开始](#2-快速开始)  
+3. [新手五分钟上手](#3-新手五分钟上手)  
+4. [功能模块](#4-功能模块)  
+5. [核心公式（BASELINE）](#5-核心公式baseline)  
+6. [系统架构](#6-系统架构)  
+7. [API 一览](#7-api-一览)  
+8. [演示账号](#8-演示账号)  
+9. [开发者与测试](#9-开发者与测试)  
+10. [常见问题](#10-常见问题)  
+11. [伦理与合规](#11-伦理与合规)  
+12. [未完成范围](#12-未完成范围诚实标注)
 
-| 层 | 项目 | 职责 |
-|---|---|---|
-| Core | `src/AstralPath.Core` | BASELINE 纯函数：score / impact / K1–K5 / 销账 / 禁词 / 教练；§19 扩展服务算法；§44 受约束智能体路由 |
-| Graph | `src/AstralPath.Graph` | 图包加载、无环校验、版本化 |
-| Contracts | `src/AstralPath.Contracts` | DTO、错误码与统一响应封装（唯一契约出口） |
-| Persistence | `src/AstralPath.Persistence` | 生产级持久化：PostgreSQL + pgvector（HNSW）+ 全文索引 + RRF 混合检索；可切换内存模式 |
-| Services | `src/AstralPath.Services` | §19 扩展服务的**单一路由来源**与独立服务宿主模板（ServiceHost） |
-| 独立服务 | `services/*`（10 个） | §19.11 拆分后的独立进程/容器，各自独立配置与数据库 |
-| Infrastructure | `src/AstralPath.Infrastructure` | 演示内存仓库、双学生种子、consent 缓存、§44/§45/§46 模块仓库、材料与 OCR 流水线 |
-| Api | `src/AstralPath.Api` | 统一契约 API + 演示 Web UI（`/`） |
-| Shared | `src/AstralPath.Shared` | 双端共享 UI 层：ViewModels / Views（`.axaml`）/ 主题样式 / 数据源抽象 / 导航 / 转换器 |
-| Desktop / Mobile | `src/AstralPath.Desktop` · `src/AstralPath.Mobile` | Avalonia 11 双端客户端（桌面三栏 + 移动底部 Tab），见「客户端（Avalonia 双端 UI）」 |
-| Tests | `tests/*` | 金样例 + 召回 + 端到端 + Headless UI |
+---
 
-## BASELINE 公式（金样 1e-6）
+## 1. 产品简介
+
+多门课交叉学习时，卡住往往不是「这一章没听懂」，而是**前面某门课的先修概念没打好**——这就是「知识债」。
+
+知债：星穹学途会：
+
+| 模块 | 做什么 |
+|------|--------|
+| **藏书阁** | 教材 PDF → 全文抽取 / OCR → 完整目录与章节正文 |
+| **识网** | 自动生成知识图谱（思维导图），侧栏可读各章正文并**按章自动出题** |
+| **知债** | BASELINE 红边诊断 + 14 天还债计划 + What-if 模拟 |
+| **今日** | 约 35 分钟教材真题与练习（可轮换题库） |
+| **智能体** | 意图路由；危机转人工；敏感词脱敏 |
+| **画像** | 能力雷达、掌握度、学习时间线、CSR 图索引 |
+
+**桌面端与 Web 端功能、界面布局、交互与数据处理逻辑完全一致**（桌面使用 WebView2 内嵌同一套 Web 页面与本地 API）。
+
+---
+
+## 2. 快速开始
+
+### 2.1 Windows 安装版（推荐）
+
+1. 运行安装包：`deploy/win-install/dist/AstralPath-Setup-1.3.0-Desktop.exe`  
+2. 按向导安装（默认 `C:\Program Files\AstralPath`）  
+3. 可选安装 **Microsoft Edge WebView2 运行时**（Win10 必需，Win11 通常已自带）  
+4. 启动桌面图标「知债：星穹学途」，状态栏显示 **「已就绪」** 即可使用  
+
+也可使用 Web 演示台：安装后启动本地服务，浏览器打开 `http://127.0.0.1:5190/`（或安装包内「启动 Web 演示台」）。
+
+### 2.2 源码运行（开发者）
+
+```powershell
+cd <仓库根目录>          # 例如 C:\Users\18948\Documents\GitHub\-Knowledge-Debt-Astral-Path
+dotnet build AstralPath.slnx -c Release
+dotnet test  AstralPath.slnx -c Release --no-build
+
+# 启动 API + Web UI
+dotnet run --project src/AstralPath.Api -c Release -- --urls http://127.0.0.1:5190
+```
+
+- 演示台：<http://127.0.0.1:5190/>  
+- Swagger：<http://127.0.0.1:5190/swagger>  
+- 离线演示页：`materials/demo-ui/index.html`（无服务时可预览界面）
+
+> **注意**：不要在 `appsettings.json` 中写死 `"urls"`，否则会覆盖命令行 / 环境变量指定的端口，导致桌面壳「本地服务启动失败」。
+
+### 2.3 自检脚本
+
+```bash
+bash scripts/smoke_all_endpoints.sh              # 需先启动 API；覆盖 100+ 路由
+python scripts/naming_consistency.py --check     # 命名一致性（CI 门禁）
+```
+
+---
+
+## 3. 新手五分钟上手
+
+**步骤 1 · 启动**  
+安装版点桌面图标；源码版见上文命令。状态「已就绪」后继续。
+
+**步骤 2 · 藏书阁导入教材**  
+点顶部 **「藏书阁」** → **「导入示例资料」**（约 12 本），或 **「上传并解析」** 选择自己的 PDF。  
+状态出现绿色 `ready` 即解析完成（大书需数十秒）。
+
+**步骤 3 · 识网看图谱与章节**  
+点 **「识网」** → 切换教材卡片 → 画布为**完整目录**思维导图。  
+右侧**章节侧栏**点击任一章：查看正文摘要，并完成 **本章自动出题**（含选项与答案）。
+
+**步骤 4 · 知债看红边与计划**  
+点 **「知债」**：课程包 BASELINE 红边 + 诊断叙事；教材识网红边；右侧 **What-if** 拖滑块；点 **「生成/刷新 14 天计划」**（任一天 ≤35 分钟）。
+
+**步骤 5 · 今日做题**  
+点 **「今日」** → **「加载教材真题」** → 答题并调信心条 → **「换一批题」** 轮换。
+
+**步骤 6 · 问智能体**  
+点 **「智能体」**，试试：
+
+| 输入 | 系统行为 |
+|------|----------|
+| 帮我诊断知识债 | 诊断意图 + 还债建议 |
+| 生成14天计划 | 生成修复计划 |
+| 我这周学不完 | 压力支持话术 |
+| 危机相关表述 | **自动转人工（crisis.handoff）** |
+
+---
+
+## 4. 功能模块
+
+### 4.1 藏书阁（资料库）
+
+| 能力 | 说明 |
+|------|------|
+| 上传 PDF | 支持多选；文本层优先**全书抽取** |
+| 扫描版 OCR | 可选 Tesseract（`chi_sim+eng`）；有文本层则不依赖 OCR |
+| 深度解析 | 全文字符 · 完整目录 · 章节正文 · **按章自动出题** |
+| 示例教材 | Kotlin / Python / Java / Go / C# / 深度学习系列 / AI Agent / 传记等 |
+
+状态：`parsing` → `ready` / `failed`。
+
+### 4.2 识网（知识图谱）
+
+| 能力 | 说明 |
+|------|------|
+| 思维导图 | 章 / 节 / 小节完整入图，DAG 无环 |
+| 章节侧栏 | 点章看正文 + 自动出题 |
+| 教材真题 | 每书约 12 题，支持轮换 |
+| 导出 | Markdown 大纲 / RDF 三元组 |
+| 布局 | 分层图谱 / 逻辑结构图；节点拖拽、画布缩放平移 |
+
+### 4.3 知债诊断
+
+| 能力 | 说明 |
+|------|------|
+| 红边列表 | BASELINE impact + 诊断叙事 |
+| 教材债边 | 识网 preview-debts（如「神经网络→反向传播」） |
+| 14 天计划 | K1–K5 约束检查；任一天 ≤35 分钟 |
+| What-if | 实时模拟 score / freq / days → impact |
+| 教师热点 | consent fail-closed，未授权不进热点 |
+
+### 4.4 今日任务
+
+教材真题优先；选项 + 信心滑条；支持换一批、重置题序、Demo +1 天。教练节奏：概念卡 → 桥接题 → 小测。
+
+### 4.5 智能体（受约束）
+
+意图路由 · 危机转人工 · 敏感词脱敏 · 按角色工具白名单 · 会话状态（响应 / 澄清 / 人工）。
+
+### 4.6 学习画像
+
+能力雷达（掌握度 / 正确率 / 练习量 / 还债进度 / 信心）· 掌握度表 · 时间线 · Opt-out · CSR 图索引。
+
+---
+
+## 5. 核心公式（BASELINE）
+
+金样精度 **1e-6**，实现为确定性纯函数：
 
 ```text
 score  = 100 × (0.6×recent_acc + 0.3×sev_norm + 0.1×(self_conf/5))
@@ -41,247 +179,151 @@ recency = 1 / (1 + days_since_last_error / 7)
 仅 progress 路径可写 cleared
 ```
 
-§19.1 传播模型（另见 `ConceptDiffusion`）：α=0.55、D_max=6、N≤400，结果必带 `truncationBound = ‖b⁰‖·α^(D+1)/(1−α)`。
+§19.1 传播模型（`ConceptDiffusion`）：α=0.55、D_max=6、N≤400，结果必带  
+`truncationBound = ‖b⁰‖·α^(D+1)/(1−α)`。
 
-## 快速开始
+---
 
-```powershell
-$env:DOTNET_ROOT = "C:\Program Files\dotnet"
-$env:NUGET_PACKAGES = "C:\Temp\ngp"
-Set-Location "C:\Users\18948\XiaomiMiMoProjects\Knowledge Debt Astral Path"
+## 6. 系统架构
 
-dotnet build AstralPath.slnx -c Release
-dotnet test  AstralPath.slnx -c Release --no-build
-dotnet run --project src/AstralPath.Api -c Release --urls http://127.0.0.1:5190
-```
+| 层 | 项目 | 职责 |
+|----|------|------|
+| Core | `src/AstralPath.Core` | BASELINE 纯函数；扩展服务算法；受约束智能体路由 |
+| Graph | `src/AstralPath.Graph` | 图包加载、无环校验、版本化 |
+| Contracts | `src/AstralPath.Contracts` | DTO 与错误码（唯一契约出口） |
+| Infrastructure | `src/AstralPath.Infrastructure` | 材料 OCR 流水线、题库、演示仓库、consent、模块仓库 |
+| Api | `src/AstralPath.Api` | REST API + Web UI（`wwwroot/index.html`） |
+| Desktop | `src/AstralPath.Desktop` | WebView2 桌面壳（与 Web **同构**） |
+| Mobile | `src/AstralPath.Mobile` | 移动端项目骨架 |
+| Shared | `src/AstralPath.Shared` | 双端共享演示元数据 |
+| Tests | `tests/*` | 金样例 + 召回 + 端到端 |
+| Tools | `tools/*.py` | OCR 全文、深度章节、图谱算法 |
 
-打开 <http://127.0.0.1:5190/> 使用演示台（起点 / 藏书阁 / 识网 / 知债 / 今日 / What-if / 教师端 / 账户）。
-Swagger：<http://127.0.0.1:5190/swagger>
+数据与部署：
 
-切换到真实 PostgreSQL（需 Docker）：
+- PostgreSQL DDL：`deploy/sql/001_init.sql`  
+- 运维手册：`deploy/RUNBOOK.md`  
+- 环境变量统一前缀 `ASTRALPATH_*`（旧 `ZZ_*` 已废弃，启动时告警）  
+- Windows 安装包：`deploy/win-install/dist/AstralPath-Setup-1.3.0-Desktop.exe`
 
-```bash
-# 启动 PostgreSQL + pgvector（pgvector 0.8.6，支持 HNSW）
-docker run -d --name astralpath-pg -e POSTGRES_PASSWORD=astralpath -e POSTGRES_DB=astralpath \
-  -p 55432:5432 pgvector/pgvector:pg16
+---
 
-# 以 postgres 模式运行（默认仍是 memory，用于本地调试）
-export Persistence__Mode=postgres
-export Persistence__ConnectionString="Host=127.0.0.1;Port=55432;Database=astralpath;Username=postgres;Password=astralpath"
-dotnet run --project src/AstralPath.Api -c Release
-```
-
-独立服务（§19.11）示例：
-
-```bash
-export ASTRALPATH_GRAPH_PACK="<repo>\graph-packs\accounting-v1"
-dotnet run --project services/concept-diffusion-svc -c Release --urls http://127.0.0.1:5191
-# 自身路由 200；其他服务路由 404（路由已按服务隔离）
-curl -s -o /dev/null -w "%{http_code}\n" -X POST http://127.0.0.1:5191/v1/diffusion/simulate \
-  -H "Content-Type: application/json" -d '{"studentId":"demo-student-a","intervention":{"K02":20}}'
-curl -s -o /dev/null -w "%{http_code}\n" -X POST http://127.0.0.1:5191/v1/cohorts/stats \
-  -H "Content-Type: application/json" -d '{"k":5,"scores":[1,2,3,4,5,6]}'
-```
-
-自检脚本：
-
-```bash
-bash scripts/smoke_all_endpoints.sh              # 需先启动 API；覆盖 100+ 路由与前端页面
-python scripts/naming_consistency.py --check     # 命名一致性（CI 门禁，残留须为 0）
-```
-
-## 客户端（Avalonia 双端 UI）
-
-桌面端与移动端共用 `AstralPath.Shared` 的 ViewModel / View / 样式，只有外壳（Shell）不同。
-
-```powershell
-dotnet run --project src/AstralPath.Desktop -c Release          # 桌面三栏（1440×900）
-dotnet run --project src/AstralPath.Desktop -c Release -- --demo # 控制台复算自检（成功退出码 0）
-dotnet run --project src/AstralPath.Mobile  -c Release          # 手机形态预览（390×844 窗口）
-```
-
-### 页面清单（方案 §11–§17）
-
-| 页面 | 桌面 | 移动 | 要点 |
-|---|---|---|---|
-| 今日 | ✅ | ✅ 启动页 | 35 分钟预算胶囊 + 任务卡（含「为什么做这个」）+ 逐日切换 |
-| 图谱 | ✅ | ✅ 债边简图 | 自绘深色画布（`#0F0F1A`）、Top-N 诊断、节点选中 Story 卡 |
-| 计划 | ✅ | — | 14 天甘特、每日预算校验、K1–K5 违规逐条列出 |
-| 练习 | ✅ | ✅ | 单选作答 + **信心滑条 1–5 必填**（未填则提交禁用）+ 判题卡 |
-| 债边 | ✅ | ✅ | 状态筛选、销账状态机校验、颜色 + 线型双编码 |
-| 进度 | ✅ | ✅ | 掌握度分布、band 中文标签、明确「不对学生做分数排名」 |
-| 教师视图 | ✅ | — | **fail-closed**：无授权时显示「已撤销授权：教师视图已更新为空。」 |
-| What-if | ✅ | — | 4 参数实时推演，与真实 impact 并排对比（容差 1e-6） |
-| 我的画像 | ✅ | ✅ | 雷达 / 时间线 / 标签云 / 热力图四件套；opt-out 时**全部隐藏** |
-| 知识库 | ✅ | — | 文档列表、可见性徽章、检索、新建 |
-| 设置 | ✅ | — | 色盲安全配色 / 高对比 / 减少动画 / 触达尺寸 |
-
-### 交互与可访问性
-
-- **响应式断点**：宽度 ≥1180px 显示左导航 + 内容 + 右信息栏；<900px 收起两侧只留内容与底部 Tab。
-- **快捷键**（桌面）：`Ctrl+1` / `Ctrl+2` 切演示学生、`Ctrl+D` 图谱诊断、`Ctrl+T` 教师视图、`Ctrl+R` 撤销授权、`Ctrl+P` 计划、`Ctrl+K` 知识库。
-- **键盘与读屏**：图谱画布可聚焦，方向键在节点间移动、`Home`/`End` 跳首尾；所有交互元素带 `AutomationProperties.Name`，状态条为 `Polite` LiveRegion。
-- **触达尺寸**：桌面 ≥44px、移动 ≥48px（移动端由 `Mobile/App.axaml` 覆盖）。
-- **不靠颜色单独表意**：债边状态用「颜色 + 线型」，掌握度用「颜色 + 中文 band 标签」，热力图/雷达图/时间线一律同时给出数值文本；提供色盲安全三色（`#1B9E77` / `#D95F02` / `#7570B3`）。
-- **伦理硬约束**：不展示精确分数排名、不按分数给学生排序、无「处分/惩罚」措辞，每页带免责页脚。
-
-### 数据源
-
-视图模型只依赖 `IAppDataSource`，默认实现为 `OfflineDemoDataSource`（进程内复用 Core 纯函数与 `AstralPathStore`，与 API 同源，零外部依赖）。公式类计算直接调用 Core，因此「手算 = API = 端上显示」在离线模式下同样成立。切换为 `ApiAppDataSource` 即可走 HTTP 契约（该实现尚未编写，见「未完成范围」）。
-
-### 移动端构建（诚实标注）
-
-默认 `TargetFramework` 为 `net10.0`，以「手机形态」运行同一套 UI（全部移动端视图与响应式布局可用，可被 Headless 测试覆盖）。启用 Android 打包需先以管理员身份安装工作负载，再打开条件开关：
-
-```powershell
-dotnet workload install wasm-tools          # 需管理员提权
-dotnet build src/AstralPath.Mobile -c Release -p:EnableAndroidHead=true
-```
-
-未安装该工作负载时 `Android/` 目录不参与编译，`net10.0` 构建不受影响。
-
-## 演示账号
-
-| ID | 说明 |
-|---|---|
-| `demo-student-a` | 王小明 · 有债预埋（≥3 红边） |
-| `demo-student-b` | 李华 · 无债对照 |
-| `demo-teacher` | 教师端 · 默认仅可见已授权学生 |
-
-账户登录：`demo@astralpath.local` / `demo123456`；教师：`teacher@astralpath.local` / `teacher123`。
-
-## API
+## 7. API 一览
 
 ### 主链路
 
 | 方法 | 路由 |
-|---|---|
+|------|------|
 | POST | `/v1/students/{id}/ingest/scores` |
 | POST·GET | `/v1/students/{id}/diagnose?graph_ver=` |
-| GET | `/v1/students/{id}/graph-view?graph_ver=` |
-| GET | `/v1/students/{id}/mastery` |
-| POST | `/v1/students/{id}/plans` |
-| GET | `/v1/plans/{id}` · POST `/v1/plans/{id}/rebalance` |
-| POST | `/v1/students/{id}/today` |
-| POST | `/v1/attempts` |
-| POST | `/v1/debt-edges/sale-check` |
+| GET | `/v1/students/{id}/graph-view` · `/mastery` |
+| POST | `/v1/students/{id}/plans` · GET `/v1/plans/{id}` · POST `/v1/plans/{id}/rebalance` |
+| POST | `/v1/students/{id}/today` · `/v1/attempts` · `/v1/debt-edges/sale-check` |
 | GET | `/v1/teachers/{id}/hotspots` |
-| POST | `/v1/consents/{studentId}/grant \| revoke` · GET `/v1/consents/{studentId}` |
-| POST | `/v1/graphs/{packId}/validate` |
-| POST | `/v1/what-if` |
-| POST | `/v1/demo/advance` |
-| GET | `/v1/question-banks` · GET `/v1/questions/{id}` |
-| GET·POST | `/v1/materials`（含 upload / upload-batch / parse / generate-graph / tasks / textbook-questions / seed-samples / parse-all / today-from-books） |
-| GET | `/v1/knowledge-graphs` · `/v1/knowledge-graphs/{graphId}` · `/v1/knowledge-graphs/{id}/csr` |
-| POST | `/api/v1/auth/register \| sessions \| logout \| material-today` · GET·PUT `/api/v1/auth/me \| profile` |
+| POST·GET | `/v1/consents/{studentId}` |
+| POST | `/v1/graphs/{packId}/validate` · `/v1/what-if` · `/v1/demo/advance` |
+| GET | `/v1/question-banks` · `/v1/questions/{id}` |
+| GET·POST | `/v1/materials`（upload / parse / chapters / textbook-questions / seed-samples / parse-all / today-from-books 等） |
+| GET | `/v1/knowledge-graphs` · `/{graphId}` · `/{id}/csr` |
+| POST·GET | `/api/v1/auth/*`（register / sessions / me / profile） |
 
-### §44 受约束智能体
+### 受约束智能体（§44）
 
-| 方法 | 路由 |
-|---|---|
-| POST | `/v1/agent/turns` |
-| GET·DELETE | `/v1/agent/sessions/{sessionId}` |
-| GET | `/v1/agent/tools?role=` |
-| GET | `/v1/agent/goldens/{goldenId}` |
+`POST /v1/agent/turns` · `GET|DELETE /v1/agent/sessions/{id}` · `GET /v1/agent/tools?role=` · `GET /v1/agent/goldens/{id}`
 
-### §45 知识库
+### 知识库（§45）
 
-| 方法 | 路由 |
-|---|---|
-| POST | `/v1/kb/documents` |
-| GET·PATCH | `/v1/kb/documents/{id}` |
-| PUT | `/v1/kb/documents/{id}/tags` |
-| POST·GET | `/v1/kb/documents/{id}/versions` |
-| POST | `/v1/kb/documents/{id}/publish \| rollback \| archive` |
-| GET | `/v1/kb/tags` |
-| POST | `/v1/kb/search` |
-| POST | `/v1/kb/uploads` · POST `/v1/kb/uploads/{uploadId}/commit` |
-| GET | `/v1/kb/chunks/{chunkId}?docId=` |
-| POST | `/internal/v1/kb/import` |
+`/v1/kb/documents`（CRUD / tags / versions / publish / rollback / archive）· `/v1/kb/search` · `/v1/kb/uploads` · `/v1/kb/chunks/{id}` · `/internal/v1/kb/import`
 
-### §46 用户画像
+### 用户画像（§46）
 
-| 方法 | 路由 |
-|---|---|
-| GET | `/v1/profile/{studentId}` · `/features` · `/tags` · `/radar` · `/timeline` |
-| POST | `/v1/profile/{studentId}/tags` · `/v1/profile/{studentId}/opt-out` |
+`/v1/profile/{id}` · `/features` · `/tags` · `/radar` · `/timeline` · `POST .../tags` · `POST .../opt-out`
 
-### §19 扩展服务
+### 扩展服务（§19）
 
-| 服务 | 路由 |
-|---|---|
-| concept-diffusion（§19.1） | POST `/v1/diffusion/simulate` |
-| exam-impact（§19.2） | POST `/v1/exams/{examId}/impact` · `/v1/exams/{examId}/preexam-plan` |
-| peer-cohort（§19.3，**强伦理**） | POST `/v1/cohorts/stats` |
-| study-group（§19.4，**强伦理**） | POST `/v1/study-groups/match` |
-| micro-lesson（§19.5） | POST `/v1/micro-lessons/draft` · `/assemble` · GET `/v1/micro-lessons/{id}` |
-| learning-velocity（§19.6） | POST `/v1/velocity/fit` |
-| spaced-review（§19.7） | POST `/v1/spaced-review/schedule` |
-| prerequisite-simulator（§19.8） | POST `/v1/prereq-simulator/simulate` |
-| knowledge-forecast（§19.9，**强伦理**） | POST `/v1/forecast/student` |
-| lab-bench（§19.10） | POST `/internal/v1/lab/experiments` · `/{id}/run` · GET `/{id}/report` · POST `/internal/v1/lab/formula-versions` · `/{v}/promote` |
+concept-diffusion · exam-impact · peer-cohort · study-group · micro-lesson · learning-velocity · spaced-review · prerequisite-simulator · knowledge-forecast · lab-bench（路由见实现）
 
 ### 模块自检
 
-| 方法 | 路由 |
-|---|---|
-| GET | `/v1/modules/status` |
-| GET | `/health/ready` · `/api/meta` · `/api/demo/students` |
+`GET /health/ready` · `/api/meta` · `/api/demo/students` · `/v1/modules/status`
 
-## 架构铁律落地
+---
 
-- C1：score/impact/K/销账 = 确定性代码，金样 CI 阻断
-- C2：LLM 不改数字（演示叙事走模板 + 禁词门禁；微课装配拦截结论性数字，放行排期时长）
-- C3：图包 publish 前无环校验，边必须有 source
-- C4：计划 `constraints_checked=true` 才返回 201
-- C6/C9：教师端 fail-closed + 禁词扫描
-- C8：cleared 仅 progress 路径写入
-- §19.3/§19.4/§19.9 强伦理：k-匿名、不排名、不用明文分数、外推 >30 天即抑制；越权一律 404（不泄漏资源是否存在）
+## 8. 演示账号
 
-## 数据与部署
+| 账号 / ID | 说明 |
+|-----------|------|
+| `demo@astralpath.local` / `demo123456` | 学生登录 |
+| `teacher@astralpath.local` / `teacher123` | 教师登录 |
+| `demo-student-a` | 王小明 · 有债预埋（≥3 红边），推荐演示 |
+| `demo-student-b` | 李华 · 无债对照 |
+| `demo-teacher` | 教师端 · 默认仅可见已授权学生 |
 
-- PostgreSQL 初始 DDL：`deploy/sql/001_init.sql`（图包 / 掌握度 / 债边 / 计划 / 尝试 / consent / 知识库 / 画像 / 扩展服务 / 审计）
-- 持久化实现：`src/AstralPath.Persistence`（`Persistence:Mode = memory | postgres`；postgres 模式自动建 pgvector + HNSW + GIN 全文索引）
-- Kubernetes 清单：`deploy/k8s/`（Namespace / ConfigMap / Secret 占位 / Postgres StatefulSet / 10 个服务 Deployment+Service / Ingress / HPA + PDB）
-- 混沌演练：`deploy/chaos/`（`pod-kill.sh`、`db-outage.sh`，含预期结果与回滚）
-- 可观测性：`deploy/observability/`（OTel Collector、Prometheus 告警规则）
-- 运维手册：`deploy/RUNBOOK.md`
-- 环境变量统一使用 `ASTRALPATH_` 前缀（如 `ASTRALPATH_GRAPH_PACK`、`ASTRALPATH_OCR_PYTHON`、`ASTRALPATH_TESSERACT`）。旧 `ZZ_*` 前缀已废弃，启动时若检测到会打印迁移告警。
+---
 
-## 测试
+## 9. 开发者与测试
 
 ```text
-Core.Tests      11  金样 score/impact/K/sale/narrative + 图包无环 + 召回 ≥0.80 + OCR/材料流水线
-Eval.Tests       2  合成 30 学生画像 + 公式纯函数守护
-Api.Tests       53  端到端：诊断/计划/今日/consent 撤销 purge/销账/what-if/材料与题库/账户
-                       §44 智能体 · §45 知识库（含分片直传与片段）· §46 画像 · §19 扩展服务
-Desktop.Tests   47  Headless UI（Avalonia.Headless.XUnit）：全页面导航与视图解析、宽/窄屏响应式、
-                       触达尺寸、页脚与伦理措辞扫描、11 个页面 VM 的行为硬约束（信心必填、
-                       fail-closed、opt-out 隐藏可视化、销账校验…）、图谱布局确定性与 400 节点 <50ms
-Persistence.Tests  8  持久化：内存仓储、嵌入确定性、RRF 公式、切分、SchemaSql 断言
-                           + 真实 PostgreSQL 集成（pgvector/HNSW/全文/RRF，需 ASTRALPATH_PG_CONN）
-合计           121  全部通过（dotnet test AstralPath.slnx -c Release）
+Core.Tests   11  金样 score/impact/K/sale/narrative + 图包无环 + 召回 ≥0.80 + OCR 流水线
+Eval.Tests    2  合成学生画像 + 公式纯函数守护
+Api.Tests    53  端到端：诊断/计划/今日/consent/销账/what-if/材料与题库/账户
+               §44 智能体 · §45 知识库 · §46 画像 · §19 扩展服务
+合计         66  全部通过（dotnet test AstralPath.slnx -c Release）
 ```
 
-Postgres 集成用例在无数据库环境下会**显式跳过**（打印 SKIPPED），不会误判为失败。
+架构铁律：
 
-另：`scripts/smoke_all_endpoints.sh` 覆盖 100+ 路由与前端页面的端到端自检（真实动态 ID 与真实凭据，不使用假数据）。
+- **C1** score/impact/K/销账 = 确定性代码，金样 CI 阻断  
+- **C2** LLM 不改数字（模板叙事 + 禁词门禁）  
+- **C3** 图包 publish 前无环校验，边必须有 source  
+- **C4** 计划 `constraints_checked=true` 才返回 201  
+- **C6/C9** 教师端 fail-closed + 禁词扫描  
+- **C8** cleared 仅 progress 路径写入  
+- **§19.3/§19.4/§19.9** 强伦理：k-匿名、不排名、不用明文分数、外推 >30 天抑制；越权一律 404  
 
-## 已完成（本轮交付）
+---
 
-- **独立微服务拆分**（§19.11）：十个扩展服务拆为独立进程/容器，各自独立配置与数据库；路由按服务隔离（实测自身 200、他服务 404），单体行为等价由 53 项端到端测试验证。
-- **生产级持久化**：PostgreSQL + pgvector（HNSW）+ GIN 全文 + RRF 混合检索；`memory` / `postgres` 双模式可切换；真实容器集成测试通过。
-- **K8s / 混沌 / 可观测性**（§23–§25）：部署清单、混沌演练脚本、OTel 与 Prometheus 告警规则已产出并通过语法校验。
+## 10. 常见问题
 
-## 未完成范围（诚实标注）
+**Q：桌面窗口空白或提示「本地服务启动失败」？**  
+A：请使用端口修复后的安装包（`appsettings.json` 不得写死 `urls`）。日志：`%LOCALAPPDATA%\AstralPath\api-stdout.log`。
 
-1. **`ApiAppDataSource`（客户端 HTTP 数据源）**（§11.2 / §16）：客户端已完整实现 UI 与数据源抽象，默认走进程内 `OfflineDemoDataSource`；连接真实 API 的 HTTP 实现尚未编写。
-2. **Android 打包**：移动端 UI 与响应式布局已实现并通过 Headless 测试，但 `net10.0-android` 目标需要管理员安装 `wasm-tools` 工作负载后以 `-p:EnableAndroidHead=true` 构建。
-3. **K8s 清单未经集群验证**：`deploy/k8s/` 已完成 YAML 语法校验（17/17），但本机无集群，未做服务端 schema 校验与实际部署；首次上集群前请执行 `kubectl apply --dry-run=server`。
-4. **混沌与可观测性为"配置就绪"**：脚本与采集配置已产出并通过 `bash -n` 检查，但未在真实集群执行过演练。
+**Q：扫描版 PDF 解析内容很少？**  
+A：安装 [Tesseract](https://github.com/UB-Mannheim/tesseract) 与 `chi_sim+eng` 语言包，`traineddata` 放到 `api/tools/tessdata/`。带文本层的 PDF 无需 OCR 即可完整解析。
 
-以上均不影响当前演示链路的完整性与可验证性（构建 0 错误 0 警告 · **121 测试通过** · 端到端自检 93 项全绿 · 双端客户端可启动）。
+**Q：教师看不到学生？**  
+A：故意设计：consent fail-closed，需学生授权后教师才可见。
 
-## 页脚合规声明
+**Q：销账（cleared）条件？**  
+A：连续 2 次小测 正确率 ≥0.7 且信心 ≥3；仅 progress 路径可写入。
 
-本系统仅用于教学辅助与学习规划，不构成处分依据。演示数据均为合成数据。
+**Q：桌面与 Web 是否一致？**  
+A：一致。桌面为 WebView2 内嵌同一 `wwwroot/index.html` 与同一本地 API。
+
+---
+
+## 11. 伦理与合规
+
+本系统**仅用于教学辅助与学习规划，不构成处分依据**。
+
+- 教师可见性 **consent fail-closed**  
+- 敏感词脱敏；危机内容自动转人工  
+- 同伴 / 预测类能力不排名、不用明文分数、k-匿名  
+- 演示数据均为合成数据  
+
+---
+
+## 12. 未完成范围（诚实标注）
+
+以下为方案中的长期项，非本次交付覆盖范围：
+
+1. **Avalonia 双端完整 UI**（§11–§17）：当前桌面端为 **WebView2 与 Web 同构壳**；Avalonia 原生 `.axaml` 界面仍为骨架。  
+2. **独立微服务部署**（§19.11）：十个扩展服务为单进程纯函数实现，契约一致，尚未拆分为独立容器与库。  
+3. **生产级持久化**：已提供 DDL，默认仍为内存演示仓库。  
+4. **K8s / 混沌 / 可观测性**：已有 Runbook 与部分清单，未在真实集群完成演练。
+
+以上不影响当前演示链路完整性（构建通过 · 测试全绿 · 端到端自检可跑）。
+
+---
+
+**知债：星穹学途四人团队** · © 2026 · [仓库](https://github.com/ClassTechStar/-Knowledge-Debt-Astral-Path)

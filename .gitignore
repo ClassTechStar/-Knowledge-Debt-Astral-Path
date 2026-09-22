@@ -47,7 +47,9 @@ Thumbs.db
 *.swp
 *.swo
 
-# 安装包产物（数百 MB 自包含 exe，不进仓库）
-deploy/win-install/
+# 安装包：dist 中的 Setup exe 走 Git LFS；发布输出与 staging 不入库
+deploy/win-install/publish-api/
+deploy/win-install/publish-desktop/
+deploy/win-install/AstralPath-Setup/
 materials/ocr-debug/
 **/ocr-debug/

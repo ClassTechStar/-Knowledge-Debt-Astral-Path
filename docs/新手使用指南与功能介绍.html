@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>知债：星穹学途 · 新手使用指南与功能介绍</title>
+<style>
+:root{
+  --bg:#070b14; --bg2:#0d1528; --card:#121c33; --line:#243552;
+  --ink:#e8eefc; --muted:#8fa0bd; --pri:#5b8cff; --pri2:#8bb4ff;
+  --ok:#3ecf8e; --warn:#f0b429; --bad:#f07178; --chip:#182847;
+  font-family:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:
+  radial-gradient(1000px 500px at 15% -10%,#1c3058 0%,transparent 55%),
+  radial-gradient(800px 400px at 90% 10%,#1a2744 0%,transparent 50%),
+  var(--bg); color:var(--ink); line-height:1.65}
+a{color:var(--pri2)}
+.wrap{max-width:1080px;margin:0 auto;padding:36px 20px 80px}
+.hero{padding:36px 0 28px;border-bottom:1px solid var(--line);margin-bottom:28px}
+.hero .tag{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--chip);border:1px solid var(--line);font-size:12px;color:var(--muted)}
+.hero h1{margin:14px 0 8px;font-size:clamp(28px,4vw,40px);letter-spacing:-.03em}
+.hero p{margin:0;color:var(--muted);max-width:720px}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.badge{padding:6px 12px;border-radius:999px;background:var(--chip);border:1px solid var(--line);font-size:12px;color:var(--muted)}
+.badge.ok{color:var(--ok);border-color:rgba(62,207,142,.35)}
+nav.toc{position:sticky;top:0;z-index:10;background:rgba(7,11,20,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:28px}
+nav.toc .inner{max-width:1080px;margin:0 auto;padding:0 20px;display:flex;flex-wrap:wrap;gap:8px}
+nav.toc a{color:var(--muted);text-decoration:none;font-size:13px;padding:6px 10px;border-radius:10px}
+nav.toc a:hover{background:var(--chip);color:var(--ink)}
+section{margin:36px 0}
+h2{font-size:24px;margin:0 0 6px;letter-spacing:-.02em}
+h3{font-size:16px;margin:22px 0 8px;color:var(--pri2)}
+.lead{color:var(--muted);margin:0 0 16px}
+.card{background:linear-gradient(180deg,rgba(24,40,71,.5),rgba(13,21,40,.95));border:1px solid var(--line);border-radius:18px;padding:20px;margin:14px 0}
+.grid{display:grid;gap:14px}
+.grid.c2{grid-template-columns:1fr 1fr}
+.grid.c3{grid-template-columns:repeat(3,1fr)}
+.grid.c4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:860px){.grid.c2,.grid.c3,.grid.c4{grid-template-columns:1fr}}
+.mini{font-size:13px;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:12px}
+code,pre{font-family:ui-monospace,Consolas,monospace;font-size:12.5px}
+pre{background:#0a1326;border:1px solid var(--line);border-radius:12px;padding:14px;overflow:auto;color:#cfe0ff}
+code{background:var(--chip);padding:1px 6px;border-radius:6px;color:#cfe0ff}
+.step{display:grid;grid-template-columns:40px 1fr;gap:12px;align-items:start;margin:12px 0}
+.step .n{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;background:linear-gradient(135deg,var(--pri),#3b6fe0);font-weight:700}
+.kbd{display:inline-block;padding:2px 8px;border:1px solid var(--line);border-bottom-width:2px;border-radius:6px;background:var(--chip);font-size:12px}
+.callout{border-left:3px solid var(--warn);background:rgba(240,180,41,.08);padding:12px 14px;border-radius:0 12px 12px 0;margin:12px 0;font-size:13px}
+.callout.ok{border-left-color:var(--ok);background:rgba(62,207,142,.08)}
+.formula{background:#0a1326;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-family:ui-monospace,Consolas,monospace;font-size:13px;color:#d7e6ff;margin:10px 0}
+.footer{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+.pill{display:inline-block;padding:3px 8px;border-radius:99px;background:var(--chip);font-size:11px;color:var(--muted);margin-left:6px}
+</style>
+</head>
+<body>
+<nav class="toc"><div class="inner">
+  <a href="#intro">是什么</a>
+  <a href="#start">怎么打开</a>
+  <a href="#walk">五分钟上手</a>
+  <a href="#features">功能详解</a>
+  <a href="#agent">智能体</a>
+  <a href="#formula">公式</a>
+  <a href="#faq">常见问题</a>
+  <a href="#dev">开发者</a>
+</div></nav>
+
+<div class="wrap">
+<header class="hero">
+  <span class="tag">新手使用指南与功能介绍 · v1.3.0</span>
+  <h1>知债：星穹学途</h1>
+  <p>Knowledge Debt: Astral Path —— 跨课程知识债诊断与修复智能体。用固定公式找出你「欠」了哪门课的先修债，用可完成的 14 天计划一步步销账。</p>
+  <div class="badges">
+    <span class="badge ok">桌面端 ≡ Web 端</span>
+    <span class="badge">Windows 10 / 11</span>
+    <span class="badge">教学辅助 · 不构成处分依据</span>
+    <span class="badge">consent fail-closed</span>
+  </div>
+</header>
+
+<section id="intro">
+  <h2>它解决什么问题？</h2>
+  <p class="lead">多门课交叉学习时，卡住往往不是「这一章没听懂」，而是<strong>前面某门课的先修概念没打好</strong>——这就是「知识债」。</p>
+  <div class="grid c4">
+    <div class="card"><strong>1 藏书阁</strong><p class="mini">教材 PDF → 全文与目录</p></div>
+    <div class="card"><strong>2 识网</strong><p class="mini">知识图谱 + 章节侧栏出题</p></div>
+    <div class="card"><strong>3 知债</strong><p class="mini">红边诊断 + 14 天计划</p></div>
+    <div class="card"><strong>4 今日</strong><p class="mini">35 分钟真题练习</p></div>
+  </div>
+  <div class="callout">合规：系统仅用于<strong>教学辅助与学习规划</strong>；教师可见需学生授权；敏感词脱敏；危机内容自动转人工。</div>
+</section>
+
+<section id="start">
+  <h2>怎么打开</h2>
+  <div class="grid c3">
+    <div class="card">
+      <strong>A. Windows 安装版</strong>
+      <p class="mini">双击 <code>AstralPath-Setup-1.3.0-Desktop.exe</code> → 装完点桌面图标。<br/>推荐日常使用。</p>
+    </div>
+    <div class="card">
+      <strong>B. 浏览器 Web</strong>
+      <p class="mini">本地服务启动后打开 <code>http://127.0.0.1:5190/</code><br/>演示、对照、调试。</p>
+    </div>
+    <div class="card">
+      <strong>C. 离线演示页</strong>
+      <p class="mini">双击 <code>materials/demo-ui/index.html</code><br/>无服务时快速看界面。</p>
+    </div>
+  </div>
+  <div class="card">
+    <strong>演示账户</strong>
+    <table>
+      <tr><th>邮箱</th><td><code>demo@astralpath.local</code></td></tr>
+      <tr><th>密码</th><td><code>demo123456</code></td></tr>
+      <tr><th>演示学生</th><td>王小明（有债，推荐先用） / 李华（对照，无债）</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="walk">
+  <h2>五分钟上手</h2>
+  <div class="step"><div class="n">1</div><div>
+    <strong>启动应用</strong>
+    <p class="mini">安装版双击桌面图标，状态栏出现「已就绪」。开发者：<code>dotnet run --project src\AstralPath.Api -- --urls http://127.0.0.1:5190</code></p>
+  </div></div>
+  <div class="step"><div class="n">2</div><div>
+    <strong>藏书阁 · 导入教材</strong>
+    <p class="mini">点「导入示例资料」，或「上传并解析」自己的 PDF。等状态变成绿色 <span class="pill">ready</span>。</p>
+  </div></div>
+  <div class="step"><div class="n">3</div><div>
+    <strong>识网 · 看图谱与章节</strong>
+    <p class="mini">切换教材卡片 → 画布是完整目录思维导图 → 右侧<strong>章节侧栏</strong>点一章，看正文与<strong>本章自动出题</strong>。</p>
+  </div></div>
+  <div class="step"><div class="n">4</div><div>
+    <strong>知债 · 看红边与计划</strong>
+    <p class="mini">BASELINE 诊断叙事 + 教材识网红边；拖 What-if 滑块理解 impact；「生成 14 天计划」每天 ≤35 分钟。</p>
+  </div></div>
+  <div class="step"><div class="n">5</div><div>
+    <strong>今日 · 做题</strong>
+    <p class="mini">「加载教材真题」→ 答题并拉信心条 →「换一批题」轮换题库。</p>
+  </div></div>
+  <div class="step"><div class="n">6</div><div>
+    <strong>智能体 · 问一句</strong>
+    <p class="mini">试试「帮我诊断知识债」「生成14天计划」。危机相关表述会<strong>自动转人工</strong>。</p>
+  </div></div>
+</section>
+
+<section id="features">
+  <h2>功能详解</h2>
+  <p class="lead">六大模块：藏书阁 · 识网 · 知债 · 今日 · 智能体 · 画像（另有账户）。</p>
+
+  <h3>1. 藏书阁</h3>
+  <div class="card">
+    <table>
+      <tr><th>能力</th><th>说明</th></tr>
+      <tr><td>上传 PDF</td><td>多选；文本层优先<strong>全书抽取</strong></td></tr>
+      <tr><td>扫描版 OCR</td><td>可选 Tesseract（chi_sim+eng）；有文本层则不依赖 OCR</td></tr>
+      <tr><td>深度解析</td><td>全文字符 · 完整目录 · 章节正文 · <strong>按章自动出题</strong></td></tr>
+      <tr><td>示例教材</td><td>Kotlin / Python / Java / Go / C# / 深度学习系列 / AI Agent / 人物传记等</td></tr>
+    </table>
+  </div>
+
+  <h3>2. 识网（知识图谱）</h3>
+  <div class="card">
+    <table>
+      <tr><th>能力</th><th>说明</th></tr>
+      <tr><td>思维导图</td><td>完整目录入图（章/节/小节），DAG 无环</td></tr>
+      <tr><td>章节侧栏</td><td>点章看正文摘要 + 自动出题（含答案）</td></tr>
+      <tr><td>教材真题</td><td>每书约 12 题，可轮换</td></tr>
+      <tr><td>导出</td><td>Markdown 大纲 / RDF 三元组</td></tr>
+      <tr><td>布局</td><td>分层图谱 / 逻辑结构图；节点拖拽、画布缩放平移</td></tr>
+    </table>
+  </div>
+
+  <h3>3. 知债诊断</h3>
+  <div class="card">
+    <table>
+      <tr><th>能力</th><th>说明</th></tr>
+      <tr><td>红边列表</td><td>BASELINE impact + 可访问性表格 + 诊断叙事</td></tr>
+      <tr><td>教材债边</td><td>识网 preview-debts（如 神经网络→反向传播）</td></tr>
+      <tr><td>14 天计划</td><td>K1–K5 约束；任一天 ≤35 分钟</td></tr>
+      <tr><td>What-if</td><td>实时模拟 score / freq / days → impact</td></tr>
+      <tr><td>教师热点</td><td>consent fail-closed，未授权不进热点</td></tr>
+    </table>
+  </div>
+
+  <h3>4. 今日任务</h3>
+  <div class="card">
+    <p class="mini">教材真题优先 → 选项 + 信心滑条 → 提交。支持换一批、重置题序、Demo +1 天。教练节奏：概念卡 → 桥接题 → 小测。</p>
+  </div>
+
+  <h3>5. 画像</h3>
+  <div class="card">
+    <table>
+      <tr><th>能力</th><th>说明</th></tr>
+      <tr><td>能力雷达</td><td>掌握度 / 正确率 / 练习量 / 还债进度 / 信心</td></tr>
+      <tr><td>掌握度表</td><td>知识点 score / acc / 色带</td></tr>
+      <tr><td>时间线</td><td>按日聚合；无记录时用掌握度基线</td></tr>
+      <tr><td>Opt-out</td><td>关闭个性化标签（不影响学业事实）</td></tr>
+      <tr><td>CSR 索引</td><td>图谱紧凑邻接统计</td></tr>
+    </table>
+  </div>
+</section>
+
+<section id="agent">
+  <h2>智能体（受约束）</h2>
+  <div class="grid c2">
+    <div class="card">
+      <strong>你可以这样问</strong>
+      <table>
+        <tr><th>输入</th><th>行为</th></tr>
+        <tr><td>帮我诊断知识债</td><td>诊断意图 + 还债建议</td></tr>
+        <tr><td>生成14天计划</td><td>生成修复计划</td></tr>
+        <tr><td>我这周学不完</td><td>压力支持话术</td></tr>
+        <tr><td>危机相关表述</td><td><strong>crisis.handoff 转人工</strong></td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <strong>安全机制</strong>
+      <ul class="mini">
+        <li>意图路由（诊断 / 计划 / 叙事 / 工具）</li>
+        <li>敏感词脱敏</li>
+        <li>危机词自动转人工</li>
+        <li>按角色的工具白名单</li>
+        <li>会话状态（响应 / 澄清 / 人工）</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="formula">
+  <h2>核心公式（冻结 BASELINE）</h2>
+  <div class="formula">score  = 100 × (0.6×recent_acc + 0.3×sev_norm + 0.1×self_conf/5)
+sev_norm = 1 − min(sev, 1)
+
+impact = freq × (50 − score_c) × recency × weight
+recency = 1 / (1 + days/7)
+触发：score_p &lt; 40 ∧ score_c &lt; 50 ∧ freq &gt; 0
+
+销账：cleared ⟺ 连续 2 次 quiz acc≥0.7 ∧ conf≥3
+（仅 progress 路径可写 cleared）</div>
+</section>
+
+<section id="faq">
+  <h2>常见问题</h2>
+  <div class="card">
+    <strong>桌面空白 / 本地服务启动失败？</strong>
+    <p class="mini">请安装端口修复版（不得在 appsettings 写死 urls）。日志：<code>%LOCALAPPDATA%\AstralPath\api-stdout.log</code>。</p>
+  </div>
+  <div class="card">
+    <strong>扫描版解析很少？</strong>
+    <p class="mini">安装 Tesseract（chi_sim+eng），traineddata 放到 <code>api\tools\tessdata\</code>。有文本层的 PDF 不装 OCR 也可用。</p>
+  </div>
+  <div class="card">
+    <strong>教师看不到学生？</strong>
+    <p class="mini">故意设计：consent fail-closed，需学生授权。</p>
+  </div>
+  <div class="card">
+    <strong>桌面和 Web 会不会不一致？</strong>
+    <p class="mini">桌面为 WebView2 内嵌同一 <code>index.html</code>，功能、布局、交互、数据逻辑一致。</p>
+  </div>
+</section>
+
+<section id="dev">
+  <h2>开发者速查</h2>
+  <div class="card">
+    <table>
+      <tr><th>路径</th><th>职责</th></tr>
+      <tr><td><code>src/AstralPath.Core</code></td><td>BASELINE、智能体路由、扩展算法</td></tr>
+      <tr><td><code>src/AstralPath.Api</code></td><td>REST + Web UI（wwwroot/index.html）</td></tr>
+      <tr><td><code>src/AstralPath.Desktop</code></td><td>WebView2 桌面壳（与 Web 同构）</td></tr>
+      <tr><td><code>tools/deep_chapters.py</code></td><td>章节正文 + 按章出题</td></tr>
+      <tr><td><code>eval/textbook-questions.json</code></td><td>教材真题题库</td></tr>
+      <tr><td><code>deploy/win-install/dist/</code></td><td>Windows 安装程序</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <strong>常用 API</strong>
+    <pre>GET  /health/ready
+GET  /v1/materials
+POST /v1/materials/upload
+GET  /v1/knowledge-graphs
+GET  /v1/materials/{id}/chapters
+GET  /v1/materials/{id}/chapters/{cid}
+GET  /v1/students/{id}/diagnose?graph_ver=1
+POST /v1/agent/turns
+GET  /v1/profile/{id}/radar</pre>
+  </div>
+</section>
+
+<div class="footer">
+  知债：星穹学途（Knowledge Debt: Astral Path）· AstralPath · 新手使用指南与功能介绍 v1.3.0<br/>
+  教学辅助系统，不构成处分依据 · 仓库：ClassTechStar/-Knowledge-Debt-Astral-Path
+</div>
+</div>
+</body>
+</html>
