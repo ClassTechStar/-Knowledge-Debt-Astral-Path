@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">知债：星穹学途</string>
+    <string name="app_name_en">Knowledge Debt: Astral Path</string>
+    <string name="status_starting">正在启动本地/远程服务…</string>
+</resources>

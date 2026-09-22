@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.AstralPath" parent="@android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#F3F4F5</item>
+        <item name="android:windowBackground">#F3F4F5</item>
+    </style>
+</resources>

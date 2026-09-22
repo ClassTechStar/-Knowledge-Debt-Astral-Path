@@ -53,3 +53,10 @@ deploy/win-install/publish-desktop/
 deploy/win-install/AstralPath-Setup/
 materials/ocr-debug/
 **/ocr-debug/
+
+# Android 构建缓存与中间产物
+src/AstralPath.Android/.gradle/
+src/AstralPath.Android/build-manual/
+src/AstralPath.Android/local.properties
+*.keystore
+src/AstralPath.Android/dist/test-shots/

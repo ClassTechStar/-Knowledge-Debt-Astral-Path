@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>知债：星穹学途</title>
+<style>
+/* 为滑动流畅度服务：少圆角/无阴影/无transform层/文档滚动 */
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{background:#f3f4f5}
+body{
+  font-family:"Microsoft YaHei","PingFang SC",sans-serif;
+  color:#303236;background:#f3f4f5;
+  -webkit-text-size-adjust:100%;
+  overscroll-behavior-y:none;
+  padding-bottom:calc(64px + env(safe-area-inset-bottom));
+}
+header{
+  /* 不用 sticky：Android WebView 滚动时强制重算，易掉帧 */
+  background:#f3f4f5;
+  border-bottom:1px solid #c7cacf;padding:8px 12px;
+}
+.brand{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mk{width:28px;height:28px;line-height:28px;text-align:center;background:#0D72D9;color:#fff;font-weight:700;border-radius:4px;font-size:12px}
+.brand b{font-size:14px}
+.brand small{color:#70757a;font-size:10px;display:block}
+.hrow{display:flex;gap:6px;margin-top:6px}
+.hrow select{flex:1;min-height:36px;border:1px solid #c7cacf;border-radius:6px;background:#fff;padding:4px 8px}
+main{padding:10px 12px}
+section.hidden{display:none}
+.card{background:#fff;border:1px solid #c7cacf;border-radius:8px;padding:10px;margin-bottom:10px}
+.card h2{font-size:15px;margin-bottom:6px}
+.card h3{font-size:12px;color:#70757a;margin:8px 0 4px;font-weight:600}
+.muted{color:#70757a;font-size:12px;line-height:1.45}
+.row{display:flex;flex-wrap:wrap;gap:6px}
+.btn{min-height:36px;padding:6px 10px;border:1px solid #c7cacf;border-radius:6px;background:#fff;color:#303236;font-size:13px}
+.btn.pri{background:#0D72D9;border-color:#0D72D9;color:#fff}
+.btn.sm{min-height:32px;font-size:12px;padding:4px 8px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.stats div{background:#fff;border:1px solid #c7cacf;border-radius:8px;padding:8px}
+.stats span{display:block;color:#70757a;font-size:11px}
+.stats b{font-size:18px;color:#0D72D9}
+.item{border-bottom:1px solid #e8eaec;padding:8px 0}
+.item .t{font-size:13px;font-weight:700}
+.item .m{font-size:11px;color:#70757a;margin-top:2px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
+.chips button{flex:0 0 auto;border:1px solid #c7cacf;background:#fff;border-radius:16px;padding:6px 10px;font-size:12px;min-height:34px;white-space:nowrap}
+.chips button.on{background:#0D72D9;color:#fff;border-color:#0D72D9}
+.toc{max-height:200px;overflow-y:auto;border:1px solid #e8eaec;border-radius:6px;padding:0 8px}
+.body{max-height:140px;overflow-y:auto;font-size:12px;line-height:1.5;white-space:pre-wrap;border:1px solid #e8eaec;border-radius:6px;padding:8px;background:#fafbfc}
+.opt{display:block;width:100%;text-align:left;margin-top:6px;padding:8px;border:1px solid #c7cacf;border-radius:6px;background:#fafbfc;font-size:12px;min-height:40px}
+.opt.ok{border-color:#2f6b50;color:#2f6b50}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th,td{padding:5px 3px;border-bottom:1px solid #e8eaec;text-align:left}
+.bar{height:6px;background:#e8eaec;border-radius:3px;overflow:hidden;margin:2px 0 8px}
+.bar>i{display:block;height:100%;background:#0D72D9}
+.bubble{max-width:92%;padding:8px 10px;border-radius:8px;margin:6px 0;font-size:13px;line-height:1.45}
+.bubble.u{margin-left:auto;background:#0D72D9;color:#fff}
+.bubble.b{background:#e8eaec}
+#chat{min-height:120px}
+input[type=text],input[type=email],input[type=password],textarea{
+  min-height:36px;border:1px solid #c7cacf;border-radius:6px;padding:6px 8px;background:#fff;width:100%}
+nav.tabs{
+  position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;
+  background:#fff;border-top:1px solid #c7cacf;
+  padding-bottom:env(safe-area-inset-bottom);
+}
+nav.tabs button{
+  flex:1;min-height:56px;border:0;background:transparent;color:#70757a;
+  font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+}
+nav.tabs button.on{color:#0D72D9;font-weight:700;background:#eef4fb}
+nav.tabs i{font-style:normal;font-size:15px;line-height:1}
+.more{display:block;width:100%;margin:8px 0;min-height:36px;border:1px dashed #c7cacf;background:#fff;border-radius:6px;font-size:12px;color:#70757a}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <div class="mk">债</div>
+    <div style="flex:1;min-width:120px">
+      <b>知债：星穹学途</b>
+      <small id="apiLine">…</small>
+    </div>
+    <span class="muted" id="uiTag">UI-mob-fast</span>
+  </div>
+  <div class="hrow">
+    <select id="stu">
+      <option value="demo-student-a">王小明（有债）</option>
+      <option value="demo-student-b">李华（对照）</option>
+    </select>
+    <button class="btn sm" id="btnRefresh">刷新</button>
+  </div>
+</header>
+
+<main>
+  <section id="p-home">
+    <div class="stats">
+      <div><span>资料</span><b id="sMat">-</b></div>
+      <div><span>图谱</span><b id="sGr">-</b></div>
+      <div><span>债边</span><b id="sDebt">-</b></div>
+      <div><span>今日题</span><b id="sTask">-</b></div>
+    </div>
+    <div class="card">
+      <h2>状态</h2>
+      <div class="muted" id="health">…</div>
+    </div>
+    <div class="card">
+      <h2>快捷</h2>
+      <div class="row">
+        <button class="btn pri" data-go="lib">藏书阁</button>
+        <button class="btn" data-go="debt">知债</button>
+        <button class="btn" data-go="today">今日</button>
+      </div>
+    </div>
+  </section>
+
+  <section id="p-lib" class="hidden">
+    <div class="card">
+      <h2>藏书阁</h2>
+      <div class="row">
+        <button class="btn pri" id="btnSeed">导入示例</button>
+        <button class="btn" id="btnParseAll">解析全部</button>
+      </div>
+      <div id="matList"></div>
+      <button class="more" id="matMore" hidden>加载更多</button>
+    </div>
+  </section>
+
+  <section id="p-graph" class="hidden">
+    <div class="card">
+      <h2>识网</h2>
+      <div class="chips" id="bookChips"></div>
+      <h3>章节（点开看正文/题）</h3>
+      <div class="toc" id="chList"></div>
+      <button class="more" id="chMore" hidden>加载更多章节</button>
+      <h3>正文</h3>
+      <div class="body" id="chBody">点章节…</div>
+      <h3>题目</h3>
+      <div id="chQ"></div>
+    </div>
+  </section>
+
+  <section id="p-debt" class="hidden">
+    <div class="card">
+      <h2>知债</h2>
+      <div id="debtList"></div>
+    </div>
+    <div class="card">
+      <h2>What-if</h2>
+      <div class="muted">p <span id="wfA">28</span> · c <span id="wfB">41</span> · f <span id="wfC">6</span></div>
+      <input type="range" id="wfp" min="0" max="100" value="28"/>
+      <input type="range" id="wft" min="0" max="100" value="41"/>
+      <input type="range" id="wff" min="0" max="20" value="6"/>
+      <div class="muted" id="wfOut" style="margin-top:6px"></div>
+    </div>
+    <div class="card">
+      <h2>14 天计划</h2>
+      <button class="btn pri" id="btnPlan">生成计划</button>
+      <div id="planBox" class="muted" style="margin-top:6px"></div>
+    </div>
+  </section>
+
+  <section id="p-today" class="hidden">
+    <div class="card">
+      <h2>今日</h2>
+      <div class="row">
+        <button class="btn pri" id="btnToday">加载真题</button>
+        <button class="btn" id="btnRotate">换一批</button>
+      </div>
+      <div id="todayBox"></div>
+      <button class="more" id="todayMore" hidden>加载更多</button>
+    </div>
+  </section>
+
+  <section id="p-agent" class="hidden">
+    <div class="card">
+      <h2>智能体</h2>
+      <div id="chat"></div>
+      <div class="row" style="margin-top:6px">
+        <input id="agentIn" type="text" placeholder="输入…" style="flex:1;min-width:0"/>
+        <button class="btn pri" id="btnSend">发送</button>
+      </div>
+      <div class="row" style="margin-top:6px">
+        <button class="btn sm" data-q="帮我诊断知识债">诊断债</button>
+        <button class="btn sm" data-q="生成14天计划">生成计划</button>
+        <button class="btn sm" data-q="我这周学不完">压力</button>
+        <button class="btn sm" data-q="我不想活了">危机</button>
+      </div>
+      <h3>工具</h3>
+      <div class="muted" id="tools"></div>
+    </div>
+  </section>
+
+  <section id="p-profile" class="hidden">
+    <div class="card">
+      <h2>画像</h2>
+      <div id="radar"></div>
+      <h3>掌握度</h3>
+      <div id="mastery"></div>
+      <h3>时间线</h3>
+      <div class="muted" id="tl"></div>
+    </div>
+  </section>
+
+  <section id="p-auth" class="hidden">
+    <div class="card">
+      <h2>账户</h2>
+      <div class="muted">demo@astralpath.local / demo123456</div>
+      <div style="margin-top:6px"><input id="email" type="email" value="demo@astralpath.local"/></div>
+      <div style="margin-top:6px"><input id="pwd" type="password" value="demo123456"/></div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn pri" id="btnLogin">登录</button>
+        <button class="btn" id="btnLogout">退出</button>
+      </div>
+      <div class="muted" id="authMsg" style="margin-top:6px"></div>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs" id="tabs">
+  <button data-p="home" class="on"><i>起</i>起点</button>
+  <button data-p="lib"><i>书</i>藏书阁</button>
+  <button data-p="graph"><i>识</i>识网</button>
+  <button data-p="debt"><i>债</i>知债</button>
+  <button data-p="today"><i>练</i>今日</button>
+  <button data-p="agent"><i>智</i>智能体</button>
+  <button data-p="profile"><i>像</i>画像</button>
+  <button data-p="auth"><i>户</i>账户</button>
+</nav>
+
+<script>
+const API = (window.__ASTRALPATH_API__ || "http://127.0.0.1:5190").replace(/\/$/, "");
+let token = null, graphId = null, materialId = null, agentSid = null;
+let matPage = 0, chPage = 0, todayCache = [], todayPage = 0;
+const PAGE = 12;
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const fmt = (n) => Number.isFinite(Number(n)) ? Math.round(Number(n)*100)/100 : "-";
+
+async function j(path, opt) {
+  opt = opt || {};
+  opt.headers = Object.assign({ "Content-Type": "application/json" }, opt.headers || {});
+  if (token) opt.headers.Authorization = "Bearer " + token;
+  const r = await fetch(API + path, opt);
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error((data && data.error && data.error.message) || ("HTTP " + r.status));
+  return (data && data.data !== undefined) ? data.data : data;
+}
+
+function go(page) {
+  document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.getAttribute("data-p") === page));
+  ["home","lib","graph","debt","today","agent","profile","auth"].forEach(p => {
+    $("p-" + p).classList.toggle("hidden", p !== page);
+  });
+  window.scrollTo(0, 0);
+  load(page);
+}
+document.querySelectorAll("#tabs button").forEach(b => b.addEventListener("click", () => go(b.getAttribute("data-p"))));
+document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.getAttribute("data-go"))));
+$("btnRefresh").addEventListener("click", () => {
+  const on = document.querySelector("#tabs button.on");
+  load(on ? on.getAttribute("data-p") : "home");
+});
+
+function load(p) {
+  if (p === "home") return loadHome();
+  if (p === "lib") return loadLib(true);
+  if (p === "graph") return loadGraph();
+  if (p === "debt") return loadDebt();
+  if (p === "today") return loadToday(true);
+  if (p === "agent") return loadAgent();
+  if (p === "profile") return loadProfile();
+}
+
+async function loadHome() {
+  try {
+    const h = await fetch(API + "/health/ready").then(r => r.json());
+    $("health").textContent = "API status=" + h.status + " · graph=" + (h.checks && h.checks.graph) +
+      " · students=" + (h.checks && h.checks.students);
+    $("apiLine").textContent = "API " + API;
+  } catch (e) {
+    $("health").textContent = "API 不可用：" + e.message;
+    $("apiLine").textContent = "离线";
+  }
+  try { $("sMat").textContent = ((await j("/v1/materials")) || []).length; } catch (e) { $("sMat").textContent = "0"; }
+  try { $("sGr").textContent = ((await j("/v1/knowledge-graphs")) || []).length; } catch (e) { $("sGr").textContent = "0"; }
+  try {
+    const d = await j("/v1/students/" + $("stu").value + "/diagnose?graph_ver=1&top_n=5", { method: "POST" });
+    $("sDebt").textContent = (d.topDebts || []).length;
+  } catch (e) { $("sDebt").textContent = "-"; }
+  try {
+    const t = await j("/v1/materials/today-from-books?maxTasks=8");
+    $("sTask").textContent = (t.tasks || []).length;
+  } catch (e) { $("sTask").textContent = "0"; }
+}
+
+async function loadLib(reset) {
+  if (reset) matPage = 0;
+  let mats = [];
+  try { mats = (await j("/v1/materials")) || []; } catch (e) { $("matList").innerHTML = esc(e.message); return; }
+  const slice = mats.slice(0, (matPage + 1) * PAGE);
+  $("matList").innerHTML = slice.map(m =>
+    '<div class="item"><div class="t">' + esc(m.name) + '</div><div class="m">' +
+    (m.status || "") + " · " + (m.pageCount || 0) + "页 · n=" + (m.nodeCount || 0) +
+    '</div><div class="row" style="margin-top:4px">' +
+    '<button class="btn sm" data-parse="' + m.id + '">解析</button>' +
+    '<button class="btn sm" data-gid="' + esc(m.graphId || ("auto-" + m.id)) + '" data-mid="' + m.id + '">识网</button></div></div>'
+  ).join("");
+  $("matMore").hidden = slice.length >= mats.length;
+  $("matList").querySelectorAll("[data-parse]").forEach(b => b.addEventListener("click", async () => {
+    b.textContent = "…";
+    try { await j("/v1/materials/" + b.getAttribute("data-parse") + "/parse?ocr=quick", { method: "POST" }); loadLib(true); }
+    catch (e) { b.textContent = e.message.slice(0, 12); }
+  }));
+  $("matList").querySelectorAll("[data-gid]").forEach(b => b.addEventListener("click", () => {
+    graphId = b.getAttribute("data-gid"); materialId = b.getAttribute("data-mid"); go("graph");
+  }));
+}
+$("matMore").addEventListener("click", () => { matPage++; loadLib(false); });
+$("btnSeed").addEventListener("click", async () => {
+  try { await j("/v1/materials/seed-samples?parse=true", { method: "POST" }); loadLib(true); }
+  catch (e) { alert(e.message); }
+});
+$("btnParseAll").addEventListener("click", async () => {
+  try { await j("/v1/materials/parse-all?ocr=quick", { method: "POST" }); alert("已排队"); }
+  catch (e) { alert(e.message); }
+});
+
+let chAll = [];
+async function loadGraph() {
+  let gs = [];
+  try { gs = (await j("/v1/knowledge-graphs")) || []; } catch (e) {}
+  if (!graphId && gs[0]) { graphId = gs[0].graphId; materialId = gs[0].materialId; }
+  $("bookChips").innerHTML = gs.slice(0, 16).map(g =>
+    '<button data-g="' + esc(g.graphId) + '" data-m="' + esc(g.materialId) + '"' +
+    (g.graphId === graphId ? ' class="on"' : '') + '>' +
+    esc((g.materialName || "").slice(0, 10)) + "</button>"
+  ).join("");
+  $("bookChips").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
+    graphId = b.getAttribute("data-g"); materialId = b.getAttribute("data-m"); chPage = 0; loadGraph();
+  }));
+  if (!materialId) return;
+  try {
+    const ch = await j("/v1/materials/" + materialId + "/chapters");
+    chAll = (ch.chapters || []).concat(ch.sections || []);
+  } catch (e) { $("chList").innerHTML = esc(e.message); return; }
+  renderToc();
+}
+function renderToc() {
+  const slice = chAll.slice(0, (chPage + 1) * PAGE);
+  $("chList").innerHTML = slice.map(c =>
+    '<div class="item" data-c="' + esc(c.id) + '"><div class="t">' +
+    (c.kind === "chapter" ? "[章] " : "[节] ") + esc(c.title) + '</div><div class="m">' +
+    (c.charCount || 0) + "字 · " + (c.questionCount || 0) + "题</div></div>"
+  ).join("");
+  $("chMore").hidden = slice.length >= chAll.length;
+  $("chList").querySelectorAll("[data-c]").forEach(el =>
+    el.addEventListener("click", () => openCh(el.getAttribute("data-c"))));
+}
+$("chMore").addEventListener("click", () => { chPage++; renderToc(); });
+
+async function openCh(id) {
+  $("chBody").textContent = "…";
+  try {
+    const d = await j("/v1/materials/" + materialId + "/chapters/" + encodeURIComponent(id));
+    $("chBody").textContent = (d.content || "").slice(0, 2000) || "（无）";
+    const qs = (d.questions || []).slice(0, 4);
+    $("chQ").innerHTML = qs.map((q, i) =>
+      '<div class="item"><div class="t">' + (i + 1) + ". " + esc(q.stem) + "</div>" +
+      (q.options || []).map((o, oi) =>
+        '<button class="opt' + (oi === q.correctIndex ? " ok" : "") + '" data-cq="' + esc(q.id || id) +
+        '" data-ki="' + esc(q.kp || d.title || "ch") + '" data-ok="' + (oi === q.correctIndex ? 1 : 0) +
+        '">' + "ABCD"[oi] + ". " + esc(o) + (oi === q.correctIndex ? " ✓" : "") + "</button>"
+      ).join("") + "</div>"
+    ).join("");
+    $("chQ").querySelectorAll("[data-cq]").forEach(btn => btn.addEventListener("click", () => {
+      const ok = btn.getAttribute("data-ok") === "1";
+      j("/v1/attempts", {
+        method: "POST",
+        body: JSON.stringify({
+          studentId: $("stu").value, planItemId: null,
+          kpId: btn.getAttribute("data-ki"), questionId: btn.getAttribute("data-cq"),
+          correct: ok, selfConf: ok ? 4 : 2, latencyMs: 700
+        })
+      }).then(() => btn.classList.toggle("ok", ok)).catch(e => { btn.textContent = e.message.slice(0, 16); });
+    }));
+  } catch (e) { $("chBody").textContent = e.message; }
+}
+
+async function loadDebt() {
+  try {
+    const d = await j("/v1/students/" + $("stu").value + "/diagnose?graph_ver=1&top_n=6", { method: "POST" });
+    const debts = (d.topDebts || []).slice(0, 6);
+    const narr = d.narrative || [];
+    $("debtList").innerHTML = debts.map((x, i) =>
+      '<div class="item"><div class="t">' + esc(x.fromKpName) + " → " + esc(x.toKpName) +
+      '</div><div class="m">impact ' + fmt(x.impact) + " · " +
+      esc((narr[i] && narr[i].story) || "").slice(0, 60) + "</div></div>"
+    ).join("") || '<div class="muted">无</div>';
+  } catch (e) { $("debtList").innerHTML = esc(e.message); }
+  runWf();
+}
+function runWf() {
+  const p = +$("wfp").value, t = +$("wft").value, f = +$("wff").value;
+  $("wfA").textContent = p; $("wfB").textContent = t; $("wfC").textContent = f;
+  const det = p < 40 && t < 50 && f > 0;
+  const imp = det ? f * (50 - t) * 1.2 : 0;
+  $("wfOut").textContent = "det=" + det + " impact≈" + fmt(imp);
+  j("/v1/what-if", {
+    method: "POST",
+    body: JSON.stringify({ studentId: $("stu").value, fromKp: "K02", toKp: "K03",
+      overrideScoreFrom: p, overrideScoreTo: t, overrideFreq: f, overrideDays: 0 })
+  }).then(d => { $("wfOut").textContent += " | API=" + fmt(d.impact); }).catch(() => {});
+}
+["wfp","wft","wff"].forEach(id => $(id).addEventListener("input", runWf));
+$("btnPlan").addEventListener("click", async () => {
+  try {
+    const p = await j("/v1/students/" + $("stu").value + "/plans", {
+      method: "POST",
+      body: JSON.stringify({ graphVersion: 1, dayBudgetMin: 35, horizonDays: 14 })
+    });
+    $("planBox").innerHTML = "约束：" + (p.constraintsChecked ? "通过" : "未通过") + "<br/>" +
+      (p.days || []).slice(0, 4).map(d => "D" + d.day + " " + (d.minutes || 0) + "min").join(" · ");
+  } catch (e) { $("planBox").textContent = e.message; }
+});
+
+async function loadToday(reset) {
+  if (reset) {
+    todayPage = 0;
+    try {
+      const t = await j("/v1/materials/today-from-books?maxTasks=12&rotate=true");
+      todayCache = t.tasks || [];
+    } catch (e) { $("todayBox").innerHTML = esc(e.message); return; }
+  }
+  const slice = todayCache.slice(0, (todayPage + 1) * PAGE);
+  $("todayBox").innerHTML = slice.map((x, i) =>
+    '<div class="item"><div class="t">' + (i + 1) + ". " + esc(x.kpName) + '</div><div class="m">' +
+    esc(x.stem || "") + "</div>" +
+    (x.options || []).map((o, oi) =>
+      '<button class="opt" data-qid="' + esc(x.questionId) + '" data-ki="' + esc(x.kpId) +
+      '" data-ok="' + (oi === (x.correctIndex || 0) ? 1 : 0) + '">' + "ABCD"[oi] + ". " + esc(o) + "</button>"
+    ).join("") + "</div>"
+  ).join("") || '<div class="muted">无</div>';
+  $("todayMore").hidden = slice.length >= todayCache.length;
+  $("todayBox").querySelectorAll("[data-qid]").forEach(btn => btn.addEventListener("click", () => {
+    const ok = btn.getAttribute("data-ok") === "1";
+    j("/v1/attempts", {
+      method: "POST",
+      body: JSON.stringify({
+        studentId: $("stu").value, planItemId: null,
+        kpId: btn.getAttribute("data-ki"), questionId: btn.getAttribute("data-qid"),
+        correct: ok, selfConf: ok ? 4 : 2, latencyMs: 800
+      })
+    }).then(() => btn.classList.toggle("ok", ok)).catch(() => {});
+  }));
+}
+$("todayMore").addEventListener("click", () => { todayPage++; loadToday(false); });
+$("btnToday").addEventListener("click", () => loadToday(true));
+$("btnRotate").addEventListener("click", () => loadToday(true));
+
+function bubble(role, html) {
+  const d = document.createElement("div");
+  d.className = "bubble " + role;
+  d.textContent = html;
+  $("chat").appendChild(d);
+}
+async function loadAgent() {
+  if (!$("chat").children.length) bubble("b", "可问「诊断债」「生成计划」。危机词转人工。");
+  try {
+    const d = await j("/v1/agent/tools?role=student");
+    const tools = (d.tools || d || []).slice(0, 12);
+    $("tools").textContent = tools.map(t => t.intentId).join(" · ");
+  } catch (e) { $("tools").textContent = e.message; }
+}
+async function sendAgent(text) {
+  text = (text || $("agentIn").value || "").trim();
+  if (!text) return;
+  bubble("u", text);
+  $("agentIn").value = "";
+  try {
+    const d = await j("/v1/agent/turns", {
+      method: "POST",
+      body: JSON.stringify({ userId: $("stu").value, role: "student", utterance: text, sessionId: agentSid })
+    });
+    agentSid = d.sessionId || agentSid;
+    const rep = d.response || d.reply || "ok";
+    const crisis = d.decision === "crisis.handoff" || d.intentId === "crisis.handoff";
+    bubble("b", rep + (crisis ? "【已转人工】" : ""));
+  } catch (e) { bubble("b", e.message); }
+}
+$("btnSend").addEventListener("click", () => sendAgent());
+$("agentIn").addEventListener("keydown", e => { if (e.key === "Enter") sendAgent(); });
+document.querySelectorAll("[data-q]").forEach(b => b.addEventListener("click", () => sendAgent(b.getAttribute("data-q"))));
+
+async function loadProfile() {
+  const sid = $("stu").value;
+  try {
+    const r = await j("/v1/profile/" + sid + "/radar");
+    $("radar").innerHTML = (r.axes || []).slice(0, 6).map(a => {
+      const v = Math.max(0, Math.min(100, +a.value || 0));
+      return '<div class="muted">' + esc(a.axis) + " " + fmt(a.value) +
+        '</div><div class="bar"><i style="width:' + v + '%"></i></div>';
+    }).join("");
+  } catch (e) { $("radar").textContent = e.message; }
+  try {
+    const m = await j("/v1/students/" + sid + "/mastery");
+    $("mastery").innerHTML = "<table><tr><th>点</th><th>score</th><th>acc</th></tr>" +
+      (m || []).slice(0, 10).map(x =>
+        "<tr><td>" + esc(x.name || x.kpId) + "</td><td>" + fmt(x.score) + "</td><td>" + fmt(x.recentAcc) + "</td></tr>"
+      ).join("") + "</table>";
+  } catch (e) { $("mastery").textContent = e.message; }
+  try {
+    const t = await j("/v1/profile/" + sid + "/timeline");
+    $("tl").textContent = (t.snapshots || []).slice(0, 5).map(s =>
+      s.date + " score=" + fmt(s.avgScore)
+    ).join(" · ") || "暂无";
+  } catch (e) { $("tl").textContent = e.message; }
+}
+$("btnLogin").addEventListener("click", async () => {
+  try {
+    const d = await j("/api/v1/auth/sessions", {
+      method: "POST",
+      body: JSON.stringify({ email: $("email").value, password: $("pwd").value, deviceName: "android" })
+    });
+    token = d.accessToken || null;
+    $("authMsg").textContent = "登录成功";
+  } catch (e) { $("authMsg").textContent = e.message; }
+});
+$("btnLogout").addEventListener("click", () => { token = null; $("authMsg").textContent = "已退出"; });
+$("stu").addEventListener("change", () => {
+  const on = document.querySelector("#tabs button.on");
+  load(on ? on.getAttribute("data-p") : "home");
+});
+
+load("home");
+</script>
+</body>
+</html>

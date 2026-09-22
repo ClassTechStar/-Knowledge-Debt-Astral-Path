@@ -616,7 +616,7 @@ body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain;
 <script>
 "use strict";
 
-const FALLBACK_API = "http://127.0.0.1:5190";
+const FALLBACK_API = (window.__ASTRALPATH_API__ || "http://127.0.0.1:5190");
 let api = "";
 let apiResolved = false;
 let currentPage = "home";
@@ -3133,3 +3133,4 @@ go("home");
 </script>
 </body>
 </html>
+
