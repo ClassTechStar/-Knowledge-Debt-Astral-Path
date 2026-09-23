@@ -91,7 +91,12 @@ public sealed class MaterialsController : ControllerBase
         foreach (var file in candidates)
         {
             var id = Guid.NewGuid().ToString("N");
-            var safeName = SanitizeFileName(file.FileName);
+            // 显示标题保留用户原始文件名（仅剥离路径成分）；磁盘文件名另做安全净化。
+            // 修复：原实现把净化后的名字同时用作显示标题，导致教材名中的 [ ] ( ) , + 等
+            // 被替换为 _（如「…(明日科技)…」显示成「…_明日科技_…」），用户看到会误以为是缺陷。
+            var displayName = Path.GetFileName((file.FileName ?? string.Empty).Trim());
+            if (string.IsNullOrWhiteSpace(displayName)) displayName = "material.pdf";
+            var safeName = SanitizeFileName(displayName);
             var dest = Path.Combine(MaterialsDir, $"{id}_{safeName}");
             Directory.CreateDirectory(MaterialsDir);
             await using (var fs = System.IO.File.Create(dest))
@@ -99,7 +104,7 @@ public sealed class MaterialsController : ControllerBase
                 await file.CopyToAsync(fs);
             }
 
-            var doc = new MaterialDoc(id, safeName, dest, file.Length, "parsing", ocr, false, 0, 0, 0, 0,
+            var doc = new MaterialDoc(id, displayName, dest, file.Length, "parsing", ocr, false, 0, 0, 0, 0,
                 null, "batch-upload", DateTime.UtcNow, DateTime.UtcNow, null);
             MaterialRegistry.UpsertMaterial(doc);
             created.Add(doc);

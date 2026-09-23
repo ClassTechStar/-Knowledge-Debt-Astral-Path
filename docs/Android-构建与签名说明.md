@@ -164,7 +164,29 @@ INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package signatures do not match
 
 ---
 
-## 六、故障排查
+## 六、手机连接后端（服务器地址）
+
+App 内「系统状态」卡片提供**服务器地址**设置（Web / Windows / Android 三端共用同一套逻辑）：
+
+| 控件 | 说明 |
+|---|---|
+| 服务器地址 | 如 `http://10.102.22.199:5190`；未写协议自动补 `http://`，未写端口自动补 `:5190` |
+| 保存并测试 | 立即探测并持久化（localStorage）；失败时列出全部候选地址的探测结果 |
+| 自动探测 | 按候选顺序（用户配置 → 宿主注入 → 页面来源 → `10.0.2.2` → `127.0.0.1` → `localhost`）逐个探测 |
+| 恢复默认 | 清除配置，回到自动探测 |
+
+后端以局域网模式启动时会打印可直接填写的地址：
+
+```text
+dotnet run --project src/AstralPath.Api -c Release --urls http://0.0.0.0:5190
+[AstralPath] 手机端请在「服务器地址」填入：http://10.102.22.199:5190
+```
+
+> **为什么必须可配置**：真机上 `127.0.0.1` 指的是手机自身；原实现把地址写死为
+> `http://127.0.0.1:5190`，脱离 USB（未做 `adb reverse`）时所有请求 `Failed to fetch`，
+> 上传、诊断、账户等功能全部不可用。现已改为可配置且持久化，并保留 USB 与其余候选作为回退。
+
+## 七、故障排查
 
 | 现象 | 原因 | 处理 |
 |---|---|---|
@@ -172,7 +194,9 @@ INSTALL_FAILED_UPDATE_INCOMPATIBLE: Existing package signatures do not match
 | `apksigner sign` 报 `Wrong password? / BadPaddingException` | PKCS12 密钥库不支持独立密钥口令 | 令 `keyPassword` = `storePassword`（见 4.1） |
 | 构建脚本报中文乱码语法错误（如「意外的标记"鎷疯礉"」） | 5.1 版脚本宿主在无 BOM 时按 ANSI 解析 UTF-8 脚本 | 脚本已保存为 **UTF-8 with BOM**；修改时请保持 BOM |
 | 应用内上传按钮无反应 | 系统 WebView 默认不处理 `<input type="file">` | 已在 `MainActivity` 实现 `onShowFileChooser` + `onActivityResult` 接入系统文件选择器 |
-| 界面能开但数据为空 | 未做 `adb reverse`，或宿主机后端未启动 | 执行 `adb reverse tcp:5190 tcp:5190` 并确认 `/health/ready` 返回 ready |
+| 界面能开但提示「API 不可用：Failed to fetch」 | 手机上 `127.0.0.1` 指向手机自身；既未做 `adb reverse` 也未配置局域网地址 | 在「系统状态 → 服务器地址」填入电脑局域网 IP（见 §6），或执行 `adb reverse tcp:5190 tcp:5190` |
+| 填了局域网地址仍不通 | 电脑仅监听 127.0.0.1 / 防火墙未放行 / 手机开了 VPN / 不在同一网段 | 以 `--urls http://0.0.0.0:5190` 启动；放行 TCP 5190；关闭手机 VPN；确认同 Wi-Fi |
+| 上传大批文件失败 | 单请求体积超过服务端上限（512 MB） | 分批上传，或调大 `MaxRequestBodySize` |
 
 ---
 

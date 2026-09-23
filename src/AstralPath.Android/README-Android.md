@@ -54,6 +54,46 @@ adb shell am start -n com.astralpath.app/.MainActivity
 > **已装过旧版**：若设备上存在 debug 签名的旧构建，安装发布版会报
 > `INSTALL_FAILED_UPDATE_INCOMPATIBLE`（签名不一致）。先卸载旧版再安装。
 
+## 连接后端（手机端必读）
+
+**手机上的 `127.0.0.1` 指向手机自己**，因此必须让 App 知道电脑的地址。三种方式任选：
+
+### 方式 A：App 内配置局域网地址（推荐，无需数据线）
+
+1. 电脑与手机连**同一个 Wi-Fi**（注意手机关闭 VPN，VPN 会拦截局域网访问）；
+2. 电脑上以局域网模式启动后端：
+
+   ```text
+   dotnet run --project src/AstralPath.Api -c Release --urls http://0.0.0.0:5190
+   ```
+
+   启动横幅会直接打印可用地址，例如：
+   `[AstralPath] 手机端请在「服务器地址」填入：http://10.102.22.199:5190`
+3. 首次放行 Windows 防火墙（管理员执行一次）：
+
+   ```text
+   netsh advfirewall firewall add rule name="AstralPath 5190" dir=in action=allow protocol=TCP localport=5190
+   ```
+4. 打开 App → 首页「系统状态」→ 在**服务器地址**填入上面打印的地址 → 点「保存并测试」。
+   地址会持久化，之后自动连接。也可点「自动探测」；「恢复默认」清除配置。
+
+### 方式 B：USB + adb reverse（无需改网络，最稳）
+
+```text
+adb reverse tcp:5190 tcp:5190     # 把电脑 5190 映射到手机的 127.0.0.1:5190
+```
+
+App 保持默认地址 `http://127.0.0.1:5190` 即可。**每次重新插拔 USB 后需重执行**。
+
+### 方式 C：手机开热点，电脑连热点
+
+手机开启热点 → 电脑连上该热点 → 电脑按方式 A 以局域网模式启动 → App 填电脑在热点网段的 IP。
+
+### 排障
+
+「系统状态」卡片会列出**所有探测过的候选地址及结果**（✅/❌），可直接定位是哪一环不通。
+用手机浏览器打开填入的地址，若同样打不开，则是网络/防火墙问题而非 App 问题。
+
 ## 系统要求
 
 - Android 8.0（API 26）及以上；targetSdk 34

@@ -248,6 +248,22 @@ body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain;
     <section class="panel">
       <header><h2>系统状态</h2><p>健康检查与 API 基址</p></header>
       <div id="healthLine" class="status-line">检查中...</div>
+
+      <!-- 服务器地址设置：Web / Windows / Android 三端通用
+           手机端必须填写电脑的局域网 IP（如 http://192.168.1.8:5190），
+           因为 127.0.0.1 在手机上指向手机自身；仅当通过 USB 执行
+           `adb reverse tcp:5190 tcp:5190` 时 127.0.0.1 才可用。 -->
+      <div class="form-field" style="margin-top:12px">
+        <label>服务器地址（手机端填写电脑的局域网 IP）</label>
+        <input id="apiBaseInput" type="text" inputmode="url" autocapitalize="off" autocorrect="off"
+               placeholder="例如 http://192.168.1.8:5190" />
+      </div>
+      <div class="page-header__actions">
+        <button type="button" class="button" id="btnApiSave">保存并测试</button>
+        <button type="button" class="button" id="btnApiProbe">自动探测</button>
+        <button type="button" class="button" id="btnApiReset">恢复默认</button>
+      </div>
+      <div id="apiDiag" class="status-line">尚未检测。手机端请先在同一 Wi-Fi 下填入电脑 IP。</div>
     </section>
   </main>
 
@@ -617,6 +633,44 @@ body { -webkit-tap-highlight-color: transparent; overscroll-behavior-y: contain;
 "use strict";
 
 const FALLBACK_API = "http://127.0.0.1:5190";
+// 用户显式配置的服务器地址（localStorage 持久化，三端通用）
+const API_BASE_KEY = "astralpath_api_base_user";
+
+function savedApiBase() {
+  try {
+    const v = localStorage.getItem(API_BASE_KEY);
+    return v && v.trim() ? v.trim().replace(/\/+$/, "") : "";
+  } catch (e) { return ""; }
+}
+function saveApiBase(v) {
+  try {
+    if (v) localStorage.setItem(API_BASE_KEY, v);
+    else localStorage.removeItem(API_BASE_KEY);
+  } catch (e) { /* 隐私模式下可能不可写，忽略 */ }
+}
+// 归一化：补 http:// 前缀、缺端口补 5190、去尾部斜杠
+function normalizeBase(v) {
+  let t = (v || "").trim();
+  if (!t) return "";
+  if (!/^https?:\/\//i.test(t)) t = "http://" + t;
+  t = t.replace(/\/+$/, "");
+  if (!/:[0-9]+$/.test(t)) t += ":5190";
+  return t;
+}
+// 候选顺序：用户配置 > 宿主注入 > 页面来源 > Android 模拟器宿主映射 > 回退
+function apiCandidates() {
+  const list = [];
+  const push = function (u) { if (u && list.indexOf(u) < 0) list.push(u); };
+  push(savedApiBase());
+  if (typeof window !== "undefined" && window.__ASTRALPATH_API__) {
+    push(normalizeBase(window.__ASTRALPATH_API__));
+  }
+  if (location.protocol === "http:" || location.protocol === "https:") push(location.origin);
+  push("http://10.0.2.2:5190");     // Android 模拟器访问宿主机的固定地址
+  push(FALLBACK_API);
+  push("http://localhost:5190");
+  return list;
+}
 let api = "";
 let apiResolved = false;
 let currentPage = "home";
@@ -661,26 +715,27 @@ async function probeApi(base) {
   }
 }
 
-async function resolveApiBase() {
-  if (apiResolved) return api;
-  const candidates = [];
-  if (location.protocol === "http:" || location.protocol === "https:") candidates.push(location.origin);
-  candidates.push(FALLBACK_API, "http://localhost:5190");
-  const seen = new Set();
-  for (const base of candidates) {
-    if (!base || seen.has(base)) continue;
-    seen.add(base);
+async function resolveApiBase(force) {
+  if (apiResolved && !force) return api;
+  for (const base of apiCandidates()) {
     if (await probeApi(base)) {
       api = base; apiResolved = true;
       try { sessionStorage.setItem("astralpath_api_base", api); } catch (e) {}
       return api;
     }
   }
-  let cached = null;
-  try { cached = sessionStorage.getItem("astralpath_api_base"); } catch (e) {}
-  api = cached || FALLBACK_API;
+  api = savedApiBase() || api || FALLBACK_API;
   apiResolved = true;
   return api;
+}
+
+// 逐个探测候选地址，供「自动探测」按钮与排障使用
+async function apiDiagnostics() {
+  const rows = [];
+  for (const base of apiCandidates()) {
+    rows.push({ base: base, ok: await probeApi(base) });
+  }
+  return rows;
 }
 
 async function j(path, opt) {
@@ -1249,7 +1304,9 @@ async function loadHome() {
       " · students=" + (h.checks && h.checks.students) + " · pack=" + (h.checks && h.checks.packId);
     $("healthLine").className = "status-line ok";
   } catch (e) {
-    $("healthLine").textContent = "API 不可用：" + e.message + "。请打开 " + FALLBACK_API + "/";
+    $("healthLine").textContent = "API 不可用：" + e.message + "。当前地址 " + api +
+      "。请在下方「服务器地址」填写电脑的局域网 IP（如 http://192.168.1.8:5190），" +
+      "或用 USB 执行 adb reverse tcp:5190 tcp:5190。";
     $("healthLine").className = "status-line error";
   }
   try { $("statMaterials").textContent = (await j("/v1/materials") || []).length; } catch (e) { $("statMaterials").textContent = "0"; }
@@ -3130,6 +3187,70 @@ $("studentSelect").addEventListener("change", function () {
 applyAuthUi();
 setAuthMode("login");
 go("home");
+
+// ── 服务器地址设置：绑定交互（放在最后，确保 DOM 已就绪）────────────────
+(function initApiSettings() {
+  const input = document.getElementById("apiBaseInput");
+  const diag = document.getElementById("apiDiag");
+  const btnSave = document.getElementById("btnApiSave");
+  const btnProbe = document.getElementById("btnApiProbe");
+  const btnReset = document.getElementById("btnApiReset");
+  if (!input || !btnSave) return;
+
+  function renderDiag(rows, extra) {
+    if (!diag) return;
+    const okRow = rows.filter(function (r) { return r.ok; });
+    const lines = rows.map(function (r) {
+      return (r.ok ? "✅ " : "❌ ") + r.base;
+    });
+    diag.textContent = (extra ? extra + " " : "") +
+      (okRow.length ? ("可用：" + okRow[0].base) : "未找到可用后端") + "｜候选：" + lines.join("  ");
+    diag.className = "status-line " + (okRow.length ? "ok" : "error");
+  }
+
+  input.value = savedApiBase();
+
+  btnSave.addEventListener("click", async function () {
+    const base = normalizeBase(input.value);
+    if (!base) { saveApiBase(""); input.value = ""; apiResolved = false; await loadHome(); return; }
+    input.value = base;
+    saveApiBase(base);
+    const ok = await probeApi(base);
+    if (ok) {
+      api = base; apiResolved = true;
+      try { sessionStorage.setItem("astralpath_api_base", base); } catch (e) {}
+      if (diag) { diag.textContent = "✅ 已连接 " + base + "，正在刷新数据…"; diag.className = "status-line ok"; }
+      await loadHome();
+    } else {
+      apiResolved = false;
+      const rows = await apiDiagnostics();
+      renderDiag(rows, "⚠ 该地址不可用：" + base + "。");
+      await loadHome();
+    }
+  });
+
+  btnProbe.addEventListener("click", async function () {
+    if (diag) { diag.textContent = "探测中…"; diag.className = "status-line"; }
+    const rows = await apiDiagnostics();
+    renderDiag(rows, "");
+    const okRow = rows.filter(function (r) { return r.ok; });
+    if (okRow.length) {
+      api = okRow[0].base; apiResolved = true;
+      try { sessionStorage.setItem("astralpath_api_base", api); } catch (e) {}
+      if (!savedApiBase()) { saveApiBase(""); }
+      await loadHome();
+    }
+  });
+
+  btnReset.addEventListener("click", async function () {
+    saveApiBase("");
+    input.value = "";
+    apiResolved = false;
+    const rows = await apiDiagnostics();
+    renderDiag(rows, "已恢复默认（自动探测）。");
+    await loadHome();
+  });
+})();
 </script>
 </body>
 </html>
