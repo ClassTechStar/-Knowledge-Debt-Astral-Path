@@ -375,7 +375,7 @@ public sealed class PageViewModelTests
         Assert.False(AppSettings.Current.HighContrast);
         Assert.False(AppSettings.Current.ReduceMotion);
         Assert.False(string.IsNullOrWhiteSpace(vm.StatusMessage));
-        Assert.Contains("1.3.0", vm.AppVersion, StringComparison.Ordinal);
+        Assert.Contains("1.4.0", vm.AppVersion, StringComparison.Ordinal);
     }
 
     [Fact]

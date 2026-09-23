@@ -423,39 +423,93 @@ def build_nodes_edges(chapters: list[dict], terms: list[dict], material_title: s
         nid += 1
         return value
 
+    course = (material_title or "MATERIAL")[:24]
     chapter_nodes: list[str] = []
+    section_nodes: list[str] = []
     for ch in chapters:
-        if len(chapter_nodes) >= 24:
+        if len(chapter_nodes) + len(section_nodes) >= 36:
             break
         node_id = next_id()
+        kind = ch.get("kind", "chapter")
         nodes.append({
             "id": node_id,
             "name": ch["title"][:40],
-            "course": material_title[:24] or "MATERIAL",
-            "description": ch.get("kind", "chapter"),
-            "source": f"tesseract:{ch.get('kind')}",
+            "course": course,
+            "description": kind,
+            "source": f"text:{kind}",
         })
-        chapter_nodes.append(node_id)
+        if kind == "chapter":
+            chapter_nodes.append(node_id)
+        else:
+            section_nodes.append(node_id)
 
+    # 章顺序先修
     for a, b in zip(chapter_nodes, chapter_nodes[1:]):
         edges.append({"from": a, "to": b, "edgeType": "prerequisite", "weight": 1.2,
                       "source": "auto:chapter-sequence"})
 
+    # 小节挂到所属章（按标题里的章节号启发式）
+    sec_re = re.compile(r"(\d{1,2})\.(\d{1,2})")
+    ch_map = {}
+    for idx, ch in enumerate(chapters):
+        if ch.get("kind") == "chapter" and idx < len(chapter_nodes):
+            m = re.search(r"第\s*(\d+)", ch.get("title", ""))
+            if m:
+                ch_map[int(m.group(1))] = chapter_nodes[idx]
+    for sec in chapters:
+        if sec.get("kind") != "section":
+            continue
+        m = sec_re.search(sec.get("title", ""))
+        if not m:
+            continue
+        ch_num = int(m.group(1))
+        parent = ch_map.get(ch_num)
+        # find node id for this section by order — rebuild lookup
+    # simpler: zip sections to chapter by title prefix number
+    sec_node_by_title = {}
+    s_i = 0
+    for ch in chapters:
+        if ch.get("kind") != "section":
+            continue
+        if s_i < len(section_nodes):
+            sec_node_by_title[ch.get("title", "")] = section_nodes[s_i]
+            s_i += 1
+    for ch in chapters:
+        if ch.get("kind") != "section":
+            continue
+        title = ch.get("title", "")
+        m = sec_re.search(title) or re.search(r"第\s*(\d+)", title)
+        parent = None
+        if sec_re.search(title):
+            parent = ch_map.get(int(sec_re.search(title).group(1)))
+        elif m:
+            parent = ch_map.get(int(m.group(1)))
+        sec_id = sec_node_by_title.get(title)
+        if parent and sec_id:
+            edges.append({"from": parent, "to": sec_id, "edgeType": "prerequisite",
+                          "weight": 1.0, "source": "auto:chapter-section"})
+
+    # 关键词：挂到前两章 + 彼此弱边（共现近似）
+    term_ids = []
     for term in terms[:20]:
         node_id = next_id()
         nodes.append({
             "id": node_id,
             "name": term["term"][:28],
-            "course": material_title[:24] or "MATERIAL",
+            "course": course,
             "description": f"关键词 freq={term['freq']}",
             "source": "auto:term-frequency",
         })
-        if chapter_nodes:
-            edges.append({"from": node_id, "to": chapter_nodes[0], "edgeType": "prerequisite",
-                          "weight": 1.0, "source": "auto:term-anchor"})
+        term_ids.append(node_id)
+        for anchor in chapter_nodes[:2]:
+            edges.append({"from": node_id, "to": anchor, "edgeType": "prerequisite",
+                          "weight": 0.8, "source": "auto:term-anchor"})
+    for a, b in zip(term_ids, term_ids[1:3] + term_ids[3:4]):
+        if a != b:
+            edges.append({"from": a, "to": b, "edgeType": "related", "weight": 0.7,
+                          "source": "auto:term-cooccur"})
 
-    if not chapter_nodes:
-        term_ids = [n["id"] for n in nodes]
+    if not chapter_nodes and not section_nodes:
         for a, b in zip(term_ids, term_ids[1:]):
             edges.append({"from": a, "to": b, "edgeType": "prerequisite", "weight": 0.9,
                           "source": "auto:term-sequence"})
@@ -506,7 +560,7 @@ def extract_full_text(path: Path, ocr_mode: str = "standard") -> tuple[str, int,
     info = tesseract_info()
     ocr_used = False
 
-    if len(text) < 80 or density < 80:
+    if len(text) < 80 or density < 120:
         notes.append(f"text_layer_sparse:density={density:.1f}")
         if ocr_mode in ("standard", "quick", "deep") and info.get("available"):
             total = pages or 30

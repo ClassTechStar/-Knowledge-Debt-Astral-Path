@@ -23,7 +23,11 @@ public sealed class MaterialsController : ControllerBase
     }
 
     [HttpGet("/v1/materials")]
-    public IResult ListMaterials() => HttpResults.Success(MaterialRegistry.ListMaterials());
+    public IResult ListMaterials()
+    {
+        MaterialRegistry.HydrateFromDirectory(MaterialsDir);
+        return HttpResults.Success(MaterialRegistry.ListMaterials());
+    }
 
     [HttpPost("/v1/materials/upload")]
     [Consumes("multipart/form-data")]
@@ -103,6 +107,12 @@ public sealed class MaterialsController : ControllerBase
             {
                 await file.CopyToAsync(fs);
             }
+            try
+            {
+                await System.IO.File.WriteAllTextAsync(dest + ".meta.json",
+                    System.Text.Json.JsonSerializer.Serialize(new { id, name = displayName, size = file.Length }));
+            }
+            catch { /* meta is best-effort */ }
 
             var doc = new MaterialDoc(id, displayName, dest, file.Length, "parsing", ocr, false, 0, 0, 0, 0,
                 null, "batch-upload", DateTime.UtcNow, DateTime.UtcNow, null);
@@ -353,6 +363,7 @@ public sealed class MaterialsController : ControllerBase
             @"C:\Users\18948\Downloads\深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF",
             @"C:\Users\18948\Downloads\图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf",
             @"C:\Users\18948\Downloads\DeepLearning-Goodfellow-花书.pdf",
+            @"C:\Users\18948\Downloads\深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf",
             @"C:\Users\18948\Downloads\黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf",
         };
 
@@ -393,6 +404,7 @@ public sealed class MaterialsController : ControllerBase
     [HttpPost("/v1/materials/parse-all")]
     public IResult ParseAll([FromQuery] string ocr = "quick")
     {
+        MaterialRegistry.HydrateFromDirectory(MaterialsDir);
         var pending = MaterialRegistry.ListMaterials()
             .Where(m => (m.Status is "uploaded" or "failed" or "parsing") && m.NodeCount == 0)
             .Select(m => m.Id)

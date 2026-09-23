@@ -49,7 +49,7 @@ public sealed partial class SettingsViewModel : ViewModelBase
     [ObservableProperty]
     private string? _statusMessage;
 
-    public string AppVersion => "1.3.0";
+    public string AppVersion => "1.4.0";
 
     public string AboutFormula => FormulaText;
 

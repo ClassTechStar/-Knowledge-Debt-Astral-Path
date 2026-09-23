@@ -65,6 +65,9 @@ public sealed class AstralPathModules
                 "clarify" => $"为了帮你处理「{route.IntentId}」，还需要：{string.Join("、", route.MissingSlots)}。",
                 _ => "我可以帮你：知识债诊断、14 天计划、今日任务、图谱查看、知识库检索。请描述你的目标。"
             };
+            // 低置信但命中 execute 时补一句可执行入口，避免“已识别意图”空话
+            if (route.Decision == "execute" && route.Score < 0.7)
+                response = response + "\n（置信度 " + route.Score.ToString("0.00") + "，若不是你想要的，可换个说法）";
             if (banned || _router.IsBanned(response))
             {
                 response = NarrativeAssembler.Sanitize(response, _router.Banned);
@@ -88,18 +91,229 @@ public sealed class AstralPathModules
         }
     }
 
-    private static string BuildExecuteResponse(string intentId, string userId) => intentId switch
+    private string BuildExecuteResponse(string intentId, string userId) => intentId switch
     {
-        "debt.diagnose" => "已定位知识债诊断意图。请在「知债」页查看红边与 impact。",
-        "plan.create" => "可生成 14 天修复计划（任一天 ≤35 分钟）。",
-        "today.tasks" => "今日任务来自教材真题与课程债边计划。",
-        "graph.view" => "请打开「识网」查看教材知识图谱 / 思维导图。",
-        "material.parse" => "请在藏书阁上传教材，系统会 OCR/解析并自动建图。",
-        "kb.search" => "知识库检索：仅返回你有可见性的文档。",
-        "profile.optout" => "已收到画像退出请求，将关闭个性化标签展示。",
+        "debt.diagnose" => BuildDebtDiagnose(userId),
+        "debt.explain" => BuildDebtExplain(userId),
+        "plan.create" => BuildPlanCreate(userId),
+        "plan.rebalance" => "已记录减负诉求。请在「知债」页点「减负 / 重排」，或告诉我每天可用分钟数（如 20）。",
+        "today.tasks" => BuildTodayTasks(),
+        "practice.start" => BuildPractice(),
+        "progress.check" => BuildProgress(userId),
+        "graph.view" => BuildGraphView(),
+        "material.parse" => BuildMaterialParse(),
+        "kb.search" => "知识库检索已开启：请直接说出关键词（如「递归」），我只返回你有可见性的文档。",
+        "kb.ingest" => "知识入库需要教师权限。请到「藏书阁」上传并解析，再在知识库中发布。",
+        "profile.view" => BuildProfile(userId),
+        "profile.optout" => "已收到画像退出请求，将关闭个性化标签展示。可在「画像」页重新开启。",
+        "consent.grant" => "已记录授权意向。请在「账户」页确认「同意教师可见」。",
         "consent.revoke" => "将撤销教师可见授权，并即时清除相关缓存。",
+        "whatif.simulate" => "What-if：告诉我目标知识点（如「反向传播」），我会模拟先修债清掉后 impact 的变化。",
+        "narrative.read" => BuildDebtExplain(userId),
+        "sale.check" => BuildSaleCheck(userId),
+        "teacher.hotspots" => "班级热点：按红边 impact 聚合共性问题（需教师权限）。",
+        "meta.feedback" => "已收到反馈。演示版会记录在会话轨迹中。",
+        "meta.help" => "我是知债学习助手。可问：\n·「帮我诊断知识债」— 读出当前红边\n·「生成14天计划」— 按 ≤35 分钟/天排程\n·「今日任务」— 教材真题 + 债边修复\n·「图谱 / 识网」— 教材知识点 DAG\n·「不想活了」— 自动转人工",
         _ => $"已识别意图：{intentId}。"
     };
+
+    private string BuildDebtDiagnose(string userId)
+    {
+        try
+        {
+            var store = _store;
+            if (store is null) return "已定位知识债诊断。当前未连接学情库，请在「知债」页查看红边。";
+            var gver = store.Graph.GraphVersion;
+            var scanned = store.ScanDebts(userId, 5);
+            if (scanned.Count == 0)
+            {
+                var open = store.Students.TryGetValue(userId, out var st)
+                    ? st.DebtEdges.Count(d => d.Status != "cleared")
+                    : 0;
+                return open == 0
+                    ? $"诊断完成（图版本 {gver}）：当前没有开放债边。继续保持，可做今日任务巩固。"
+                    : $"诊断完成（图版本 {gver}）：库中有 {open} 条历史债边，但 impact 未达红线。可在「知债」页看详情。";
+            }
+            var sb = new StringBuilder();
+            sb.Append($"诊断完成（图版本 {gver}）：发现 {scanned.Count} 条知识债红边，按 impact 排序：\n");
+            for (var i = 0; i < scanned.Count; i++)
+            {
+                var d = scanned[i];
+                sb.Append($"{i + 1}. {d.FromKpName} → {d.ToKpName}  impact={d.Impact:0.#}（前掌握 {d.ScoreFrom:0.#} / 后 {d.ScoreTo:0.#}，错题 {d.Freq} 次）\n");
+            }
+            sb.Append("建议：先补前置知识点，再回到目标知识点。要生成 14 天计划吗？");
+            return sb.ToString();
+        }
+        catch (Exception ex)
+        {
+            return $"诊断失败：{ex.Message}";
+        }
+    }
+
+    private string BuildDebtExplain(string userId)
+    {
+        try
+        {
+            var store = _store;
+            if (store is null) return "请在「知债」页点某条红边的「解释」。";
+            var top = store.ScanDebts(userId, 1).FirstOrDefault();
+            if (top is null) return "当前没有开放债边，无需解释。可先做今日任务。";
+            return NarrativeAssembler.BuildDebtStory(top.FromKpName, top.ToKpName, top.ScoreFrom, top.ScoreTo, top.Impact);
+        }
+        catch (Exception ex)
+        {
+            return $"解释失败：{ex.Message}";
+        }
+    }
+
+    private string BuildPlanCreate(string userId)
+    {
+        try
+        {
+            var store = _store;
+            var (book, tasks) = MaterialRegistry.GetLatestTasks();
+            if (store is not null)
+            {
+                if (store.Students.ContainsKey(userId) && store.Students[userId].DebtEdges.Count == 0)
+                    store.ScanDebts(userId);
+                var debts = store.Students.TryGetValue(userId, out var st)
+                    ? st.DebtEdges.Where(d => d.Status is "open" or "repairing" || d.Impact > 0)
+                        .OrderByDescending(d => d.Impact).Take(5).ToList()
+                    : new();
+                if (debts.Count > 0)
+                {
+                    var sb = new StringBuilder();
+                    sb.AppendLine($"已按 {debts.Count} 条债边生成 14 天修复草图（任一天 ≤35 分钟，基于《{book}》）：");
+                    for (var i = 0; i < 7; i++)
+                    {
+                        var d = debts[i % debts.Count];
+                        var focus = i % 2 == 0 ? d.FromKpName : d.ToKpName;
+                        sb.AppendLine($"D{i + 1}–D{i + 8}：巩固「{focus}」约 {18 + (i % 3) * 5} 分钟（覆盖 {d.FromKpName}→{d.ToKpName}）");
+                    }
+                    sb.Append("完整排程请到「知债」页点「生成 14 天计划」。");
+                    return sb.ToString();
+                }
+            }
+            if (tasks.Count > 0)
+            {
+                var focus = !string.IsNullOrEmpty(tasks[0].KpName) ? tasks[0].KpName : (tasks[0].Stem.Length > 16 ? tasks[0].Stem[..16] : tasks[0].Stem);
+                return NarrativeAssembler.BuildPlanCoach(book, focus, 35) +
+                       "\n今日起 14 天：每天 25–35 分钟，前 7 天打前置，后 7 天回收目标知识点。点「今日」开始。";
+            }
+            return "可生成 14 天修复计划（任一天 ≤35 分钟）。请先导入教材，或直接说「按当前债边排」。";
+        }
+        catch (Exception ex)
+        {
+            return $"生成计划失败：{ex.Message}";
+        }
+    }
+
+    private string BuildTodayTasks()
+    {
+        var (book, tasks) = MaterialRegistry.GetLatestTasks();
+        if (tasks.Count == 0)
+        {
+            var ready = MaterialRegistry.ListMaterials().Where(m => m.Status == "ready").ToList();
+            return ready.Count == 0
+                ? "今日暂无任务。请先到「藏书阁」导入并解析教材。"
+                : $"已解析 {ready.Count} 本教材，但尚未生成任务。请点「导入示例教材」或「今日」页刷新。";
+        }
+        var sb = new StringBuilder();
+        sb.AppendLine($"今日任务（《{book}》，{tasks.Count} 项，约 {tasks.Sum(t => t.EstMin)} 分钟）：");
+        var n = 0;
+        foreach (var t in tasks.Take(6))
+        {
+            n++;
+            var label = string.IsNullOrWhiteSpace(t.Stem) ? t.Why : t.Stem;
+            if (label.Length > 40) label = label[..40] + "…";
+            sb.AppendLine($"{n}. [{t.EstMin} 分] {label}（{t.KpName}）");
+        }
+        if (tasks.Count > 6) sb.AppendLine($"…另有 {tasks.Count - 6} 项，见「今日」页。");
+        sb.Append("做完可在「今日」提交，系统会更新掌握度与债边。");
+        return sb.ToString();
+    }
+
+    private string BuildPractice()
+    {
+        var (book, tasks) = MaterialRegistry.GetLatestTasks();
+        var t = tasks.FirstOrDefault(x => x.Type is "mcq" or "quiz" or "question") ?? tasks.FirstOrDefault();
+        if (t is null) return "暂无练习题。请先解析教材，或点「换一批」从题库抽取。";
+        var stem = t.Stem.Length > 48 ? t.Stem[..48] + "…" : t.Stem;
+        return $"开始练习（《{book}》· {t.KpName}）：{stem}\n预计 {t.EstMin} 分钟。到「今日」页作答并提交。";
+    }
+
+    private string BuildProgress(string userId)
+    {
+        try
+        {
+            var store = _store;
+            if (store is null || !store.Students.TryGetValue(userId, out var st))
+                return "进度：请在「画像」页查看掌握度与销账条件。";
+            var open = st.DebtEdges.Count(d => d.Status == "open");
+            var repairing = st.DebtEdges.Count(d => d.Status == "repairing");
+            var cleared = st.DebtEdges.Count(d => d.Status == "cleared");
+            return $"销账进度：开放 {open} · 修复中 {repairing} · 已清 {cleared}。\n" +
+                   "销账条件：目标知识点掌握度 ≥60，且前置债边 impact 归零。可在「知债」页点「销账检查」。";
+        }
+        catch (Exception ex)
+        {
+            return $"进度查询失败：{ex.Message}";
+        }
+    }
+
+    private string BuildGraphView()
+    {
+        var graphs = MaterialRegistry.ListGraphs();
+        if (graphs.Count == 0) return "识网为空。请先解析教材，系统会自动建知识点 DAG。";
+        var g = graphs[0];
+        var tasks = MaterialRegistry.GetTasksForGraph(g.GraphId);
+        return $"识网已就绪：《{g.MaterialName}》共 {g.Nodes.Count} 个知识点 / {g.Edges.Count} 条先修边。\n" +
+               $"已生成 {tasks.Count} 道今日任务。打开「识网」可看章节树、正文与思维导图。";
+    }
+
+    private string BuildMaterialParse()
+    {
+        var list = MaterialRegistry.ListMaterials();
+        if (list.Count == 0) return "藏书阁为空。点「导入示例教材」，或上传 PDF/扫描件（自动 OCR）。";
+        var ready = list.Count(m => m.Status == "ready");
+        var parsing = list.Count(m => m.Status == "parsing");
+        var failed = list.Count(m => m.Status == "failed");
+        var top = list.Where(m => m.Status == "ready").Take(3)
+            .Select(m => $"{Trunc(m.Name, 18)}（{m.PageCount} 页 / {m.NodeCount} 节点）");
+        return $"资料库共 {list.Count} 本：就绪 {ready} · 解析中 {parsing} · 失败 {failed}。\n" +
+               string.Join("\n", top.Select(s => "· " + s)) +
+               "\n到「藏书阁」可查看解析详情并按章出题。";
+    }
+
+    private string BuildProfile(string userId)
+    {
+        var p = GetProfile(userId, teacherSide: false);
+        return "画像已读取（可在「画像」页看雷达图）。\n" +
+               "标签仅用于学习规划；可随时 opt-out 关闭个性化。\n" +
+               "（若显示「样本不足」，说明练习量还不够 k-匿名阈值）";
+    }
+
+    private string BuildSaleCheck(string userId)
+    {
+        try
+        {
+            var store = _store;
+            if (store is null) return "销账检查：目标知识点掌握度需 ≥60，且无开放债边。";
+            var top = store.ScanDebts(userId, 1).FirstOrDefault();
+            if (top is null) return "销账检查通过：当前无开放债边。可在「今日」继续巩固。";
+            return $"销账检查未通过：仍有债边 {top.FromKpName}→{top.ToKpName}（impact={top.Impact:0.#}）。\n" +
+                   $"条件：{top.FromKpName} 掌握度建议 ≥60，{top.ToKpName} 错题频次归零后再试。";
+        }
+        catch (Exception ex)
+        {
+            return $"销账检查失败：{ex.Message}";
+        }
+    }
+
+    private static string Trunc(string s, int n) => s.Length <= n ? s : s[..n] + "…";
+
+    /// <summary>可选学情库：智能体执行工具时读真实债边/学生。</summary>
+    private AstralPathStore? _store;
 
     public KbDocument IngestKb(string title, string ownerUserId, string visibility, string courseCode, string text, string[]? tags = null)
     {
@@ -277,10 +491,11 @@ public sealed class AstralPathModules
     private readonly Dictionary<string, Dictionary<string, object?>> _sessions = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>提交一轮对话：写入会话状态（§44.4 对话状态跟踪）。</summary>
-    public object AgentTurn(string sessionId, string userId, string role, string utterance)
+    public object AgentTurn(string sessionId, string userId, string role, string utterance, AstralPathStore? store = null)
     {
         lock (_gate)
         {
+            _store = store;
             var turn = (Dictionary<string, object?>)AgentConverse(userId, role, utterance);
             var intentId = (string)turn["intentId"]!;
             var decision = (string)turn["decision"]!;

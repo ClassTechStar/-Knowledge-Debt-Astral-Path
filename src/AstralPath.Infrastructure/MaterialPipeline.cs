@@ -66,12 +66,13 @@ public static class MaterialPipeline
 
         var candidates = new[]
         {
+            Environment.GetEnvironmentVariable("MIMO_PYTHON") ?? "",
             @"C:\Users\18948\XiaomiMiMoProjects\Knowledge Debt Astral Path\tools\ocr-venv\Scripts\python.exe",
             @"C:\Program Files\Xiaomi MiMo\resources\runtimes\win32-x64\python\python.exe"
         };
         foreach (var c in candidates)
         {
-            if (File.Exists(c)) return c;
+            if (!string.IsNullOrWhiteSpace(c) && File.Exists(c)) return c;
         }
         return "python";
     }
@@ -390,10 +391,12 @@ public static class MaterialPipeline
         var stem = Path.GetFileNameWithoutExtension(name) ?? "MATERIAL";
         stem = stem.Trim();
         if (stem.Length == 0) return "MATERIAL";
-        // 可读短标签：优先取前 16 字，去掉路径非法字符
-        var cleaned = new string(stem.Take(16).ToArray())
-            .Replace('/', '_').Replace('\\', '_').Replace(':', '_');
-        return string.IsNullOrWhiteSpace(cleaned) ? "MATERIAL" : cleaned;
+        // 去掉版本号/作者括号噪声，保留可读短书名
+        stem = System.Text.RegularExpressions.Regex.Replace(stem, @"[（(\[].{0,24}[)）\]]", " ");
+        stem = System.Text.RegularExpressions.Regex.Replace(stem, @"[_+\s]+", " ").Trim();
+        if (stem.StartsWith("C ", StringComparison.Ordinal)) stem = "C#" + stem[2..];
+        if (stem.Length > 12) stem = stem[..12];
+        return string.IsNullOrWhiteSpace(stem) ? "MATERIAL" : stem;
     }
 
     private static string NormalizeCourseLabel(string raw, string fallback)

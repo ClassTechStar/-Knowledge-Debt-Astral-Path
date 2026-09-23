@@ -58,7 +58,7 @@ public sealed class AgentKbProfileController : ControllerBase
             return HttpResults.Fail(400, ErrorCodes.ValidationError, $"role 无效：{body.Role}");
 
         var sessionId = string.IsNullOrWhiteSpace(body.SessionId) ? $"sess-{Guid.NewGuid():N}" : body.SessionId!;
-        return _store.Lock(() => HttpResults.Success(_modules.AgentTurn(sessionId, body.UserId, body.Role, body.Utterance)));
+        return _store.Lock(() => HttpResults.Success(_modules.AgentTurn(sessionId, body.UserId, body.Role, body.Utterance, _store)));
     }
 
     [HttpGet("/v1/agent/sessions/{sessionId}")]

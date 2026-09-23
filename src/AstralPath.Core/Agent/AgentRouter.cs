@@ -179,19 +179,50 @@ public sealed class AgentRouter
                 return new AgentRouteResult(intent.IntentId, 1.0, "clarify", intent.RequiredSlots, "R1:awaiting_slot");
         }
 
-        // R2 角色位图 + R3 锚点
+        // R2 角色位图 + R3 锚点（多锚点打分，取最高；比首个命中更稳）
         var roleMask = _roleMasks.GetValueOrDefault(role, 0u);
+        AgentIntent? best = null;
+        var bestScore = 0.0;
+        var bestAnchor = "";
         foreach (var it in _intents)
         {
             var bit = 1u << (it.Bit % 32);
             if ((roleMask & bit) == 0) continue;
+            var hitScore = 0.0;
+            var hitAnchor = "";
             foreach (var anchor in it.Anchors)
             {
                 var a = PatternSet.Normalize(anchor);
-                if (a.Length > 0 && norm.Contains(a, StringComparison.Ordinal))
-                    return new AgentRouteResult(it.IntentId, 1.0, it.RequiredSlots.Length == 0 ? "execute" : "clarify",
-                        it.RequiredSlots, $"R3:anchor:{anchor}");
+                if (a.Length == 0) continue;
+                if (!norm.Contains(a, StringComparison.Ordinal)) continue;
+                // 更长锚点更特异，得分更高
+                var s = 0.55 + Math.Min(0.45, a.Length / 12.0);
+                if (s > hitScore)
+                {
+                    hitScore = s;
+                    hitAnchor = anchor;
+                }
             }
+            // 意图描述里的核心词也算弱证据
+            var desc = PatternSet.Normalize(it.Description);
+            if (desc.Length >= 2 && norm.Contains(desc, StringComparison.Ordinal))
+                hitScore = Math.Max(hitScore, 0.5);
+
+            if (hitScore > bestScore)
+            {
+                bestScore = hitScore;
+                best = it;
+                bestAnchor = hitAnchor;
+            }
+        }
+
+        if (best is not null && bestScore >= 0.5)
+        {
+            // 槽位未填则 clarify，否则 execute（分数不足阈值时仍 execute，但标记低置信）
+            var decision = best.RequiredSlots.Length == 0 ? "execute" : "clarify";
+            var score = Math.Clamp(bestScore, 0.0, 1.0);
+            return new AgentRouteResult(best.IntentId, score, decision, best.RequiredSlots,
+                $"R3:anchor:{bestAnchor};score={score:0.00}");
         }
 
         // 默认兜底（无外部向量/模型时）

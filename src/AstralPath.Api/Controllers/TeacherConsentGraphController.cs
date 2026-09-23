@@ -146,8 +146,12 @@ public sealed class TeacherConsentGraphController : ControllerBase
     }
 
     [HttpPost("/v1/what-if")]
-    public IResult WhatIf([FromBody] WhatIfRequest request)
+    public IResult WhatIf([FromBody] WhatIfRequest? request)
     {
+        if (request is null || string.IsNullOrWhiteSpace(request.StudentId))
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "studentId 必填");
+        if (string.IsNullOrWhiteSpace(request.FromKp) || string.IsNullOrWhiteSpace(request.ToKp))
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "fromKp 与 toKp 必填（可传学生债边上的知识点 ID）");
         return _store.Lock(() =>
         {
             if (!_store.Students.TryGetValue(request.StudentId, out var student))

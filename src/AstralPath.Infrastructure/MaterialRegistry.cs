@@ -49,6 +49,60 @@ public static class MaterialRegistry
         lock (Gate) Materials[doc.Id] = doc;
     }
 
+    /// <summary>从 uploads 目录热加载已有 PDF（进程重启后恢复资料列表）。</summary>
+    public static int HydrateFromDirectory(string dir)
+    {
+        if (string.IsNullOrWhiteSpace(dir) || !Directory.Exists(dir)) return 0;
+        var added = 0;
+        lock (Gate)
+        {
+            foreach (var file in Directory.EnumerateFiles(dir))
+            {
+                if (file.EndsWith(".meta.json", StringComparison.OrdinalIgnoreCase)) continue;
+                var fileName = Path.GetFileName(file);
+                // 约定：{32hex id}_{safeName}
+                var underscore = fileName.IndexOf('_');
+                if (underscore != 32) continue;
+                var id = fileName[..32];
+                if (!id.All(Uri.IsHexDigit)) continue;
+                if (Materials.ContainsKey(id)) continue;
+                var safeName = fileName[(underscore + 1)..];
+                var display = safeName;
+                var metaPath = file + ".meta.json";
+                if (System.IO.File.Exists(metaPath))
+                {
+                    try
+                    {
+                        using var doc = System.Text.Json.JsonDocument.Parse(System.IO.File.ReadAllText(metaPath));
+                        if (doc.RootElement.TryGetProperty("name", out var n))
+                        {
+                            var metaName = n.GetString();
+                            if (!string.IsNullOrWhiteSpace(metaName)) display = metaName!;
+                        }
+                    }
+                    catch { /* fall back to safeName */ }
+                }
+                else
+                {
+                    // 尽量恢复扩展名与常见符号
+                    display = safeName.Replace('_', ' ').Trim();
+                }
+                if (string.IsNullOrWhiteSpace(display)) display = fileName;
+                try
+                {
+                    var info = new FileInfo(file);
+                    if (info.Length <= 0) continue;
+                    Materials[id] = new MaterialDoc(id, display, file, info.Length,
+                        "uploaded", "standard", false, 0, 0, 0, 0, null, "hydrated",
+                        info.LastWriteTimeUtc, info.LastWriteTimeUtc, null);
+                    added++;
+                }
+                catch { /* skip unreadable */ }
+            }
+        }
+        return added;
+    }
+
     public static void UpsertGraph(AutoKnowledgeGraph graph, List<TodayTaskDto>? tasks = null)
     {
         lock (Gate)
