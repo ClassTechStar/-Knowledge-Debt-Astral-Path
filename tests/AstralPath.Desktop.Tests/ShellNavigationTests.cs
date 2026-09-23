@@ -7,7 +7,6 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using AstralPath.Desktop.Views;
 using Xunit;
 
 namespace AstralPath.Desktop.Tests;
@@ -20,7 +19,7 @@ public sealed class ShellNavigationTests
     {
         AppSettings.Current.Reset();
         var (shell, _) = Composition.CreateShell(touchTarget: 44);
-        var window = new MainWindow { DataContext = shell, Width = 1440, Height = 900 };
+        var window = new ShellWindow { DataContext = shell };
         window.Show();
         Dispatcher.UIThread.RunJobs();
 
@@ -68,7 +67,7 @@ public sealed class ShellNavigationTests
     {
         AppSettings.Current.Reset();
         var (shell, _) = Composition.CreateShell(touchTarget: 44);
-        var window = new MainWindow { DataContext = shell, Width = 1440, Height = 900 };
+        var window = new ShellWindow { DataContext = shell };
         window.Show();
         Dispatcher.UIThread.RunJobs();
 
@@ -94,7 +93,7 @@ public sealed class ShellNavigationTests
     {
         AppSettings.Current.Reset();
         var (shell, _) = Composition.CreateShell(touchTarget: 44);
-        var window = new MainWindow { DataContext = shell, Width = 1200, Height = 800 };
+        var window = new ShellWindow { DataContext = shell, Width = 1200, Height = 800 };
         window.Show();
         Dispatcher.UIThread.RunJobs();
 

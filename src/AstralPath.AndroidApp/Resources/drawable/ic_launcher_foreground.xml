@@ -1,0 +1,42 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+  <!--
+    应用图标前景：知识债图谱的抽象形态——四个知识点节点由三条「债边」相连。
+    自适应图标的可见安全区是中央 72dp（半径 36dp 的圆），因此图形全部收在
+    半径 26dp 以内，任何厂商遮罩都不会裁掉主体。
+  -->
+
+  <!-- 债边：先画边再画节点，节点压在边的端点之上 -->
+  <path
+      android:pathData="M46,44 L62,54 L80,42 M46,44 L62,54 L62,74 M62,54 L82,70"
+      android:strokeColor="#93C2F7"
+      android:strokeWidth="3"
+      android:strokeLineCap="round" />
+
+  <!-- 节点 -->
+  <path
+      android:fillColor="#1B9E77"
+      android:pathData="M46,44 m-8,0 a8,8 0 1,0 16,0 a8,8 0 1,0 -16,0" />
+  <path
+      android:fillColor="#3B82F6"
+      android:pathData="M62,54 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0" />
+  <path
+      android:fillColor="#D95F02"
+      android:pathData="M82,42 m-7,0 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0" />
+  <path
+      android:fillColor="#7570B3"
+      android:pathData="M62,74 m-7,0 a7,7 0 1,0 14,0 a7,7 0 1,0 -14,0" />
+  <path
+      android:fillColor="#3B82F6"
+      android:pathData="M82,70 m-6,0 a6,6 0 1,0 12,0 a6,6 0 1,0 -12,0" />
+
+  <!-- 高光：让中心节点有层次 -->
+  <path
+      android:fillColor="#FFFFFF"
+      android:fillAlpha="0.35"
+      android:pathData="M58,49 m-4,0 a4,4 0 1,0 8,0 a4,4 0 1,0 -8,0" />
+</vector>

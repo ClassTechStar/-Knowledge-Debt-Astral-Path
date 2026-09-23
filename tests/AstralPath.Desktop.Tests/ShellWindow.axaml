@@ -1,0 +1,56 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AstralPath.Shared.ViewModels"
+        xmlns:conv="using:AstralPath.Shared.Converters"
+        x:Class="AstralPath.Desktop.Tests.ShellWindow"
+        x:DataType="vm:ShellViewModel"
+        Title="ShellWindow"
+        Width="1440" Height="900" MinWidth="380" MinHeight="520"
+        Background="{StaticResource AppBackgroundBrush}">
+
+  <!--
+    与 AstralPath.Desktop 的桌面壳同构的**测试宿主**：左导航 / 内容 / 右信息栏三栏，
+    断点由 code-behind 回写。仅用于 Headless 断言断点与导航可达性。
+  -->
+  <Grid RowDefinitions="Auto,*,Auto">
+
+    <Border Grid.Row="0" Padding="12,8"></Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="Auto,*,Auto">
+      <Border x:Name="LeftNav" Grid.Column="0" Width="220" Padding="10"
+              Background="{StaticResource SurfaceBrush}"
+              IsVisible="{Binding !IsNarrow}">
+        <ItemsControl x:Name="NavList" ItemsSource="{Binding NavItems}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:NavItem">
+              <Button Classes="nav" Classes.active="{Binding IsActive}"
+                      Command="{Binding Navigate}" CommandParameter="{Binding Page}"
+                      AutomationProperties.Name="{Binding Label}"
+                      Content="{Binding Label}" />
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </Border>
+
+      <ContentControl x:Name="PageHost" Grid.Column="1" Content="{Binding Current}" />
+
+      <Border x:Name="RightInfo" Grid.Column="2" Width="300" Padding="14"
+              Background="{StaticResource SurfaceBrush}"
+              IsVisible="{Binding IsWide}">
+        <ScrollViewer>
+          <StackPanel Spacing="10">
+            <TextBlock Classes="h2" Text="教师可见性" />
+            <Button Classes="primary" Content="撤销授权"
+                    Command="{Binding RevokeTeacherConsentCommand}" />
+            <Button Classes="ghost" Content="授权" Command="{Binding GrantTeacherConsentCommand}" />
+            <TextBlock Classes="muted" Text="{Binding StatusMessage}" />
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Grid>
+
+    <Border Grid.Row="2" Padding="12,6">
+      <TextBlock Classes="disclaimer" Text="{Binding FooterDisclaimer}" />
+    </Border>
+  </Grid>
+</Window>

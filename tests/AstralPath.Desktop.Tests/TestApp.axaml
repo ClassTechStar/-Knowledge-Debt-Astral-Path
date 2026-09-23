@@ -1,0 +1,19 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:views="using:AstralPath.Shared.Views"
+             x:Class="AstralPath.Desktop.Tests.TestApp"
+             RequestedThemeVariant="Light">
+
+  <!--
+    Headless 测试宿主：与生产端共用 Shared 主题样式与 ViewLocator，
+    不含任何业务覆盖，避免「测试看到的外观 ≠ 用户看到的外观」。
+  -->
+  <Application.Styles>
+    <FluentTheme />
+    <StyleInclude Source="avares://AstralPath.Shared/Styles/AppTheme.axaml" />
+  </Application.Styles>
+
+  <Application.DataTemplates>
+    <views:ViewLocator />
+  </Application.DataTemplates>
+</Application>

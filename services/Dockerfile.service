@@ -1,0 +1,25 @@
+# 知债：星穹学途 · 扩展服务镜像（§19.11）
+# 用法（在仓库根目录）：
+#   docker build -f services/concept-diffusion-svc/Dockerfile -t astralpath/concept-diffusion-svc:1.3.0 .
+# 构建上下文必须是仓库根，以便引用共享库 src/AstralPath.* 与 services/*
+
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+COPY Directory.Build.props ./
+COPY NuGet.Config ./
+COPY src/ ./src/
+COPY services/ ./services/
+ARG SERVICE=concept-diffusion-svc
+RUN dotnet restore "services/${SERVICE}/${SERVICE}.csproj" \
+ && dotnet publish "services/${SERVICE}/${SERVICE}.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
+ARG SERVICE=concept-diffusion-svc
+COPY --from=build /app/publish .
+ENV ASPNETCORE_URLS=http://0.0.0.0:8080
+ENV DOTNET_EnableDiagnostics=0
+EXPOSE 8080
+HEALTHCHECK --interval=15s --timeout=3s --start-period=20s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:8080/health/ready || exit 1
+ENTRYPOINT ["sh","-c","exec dotnet ${SERVICE}.dll"]

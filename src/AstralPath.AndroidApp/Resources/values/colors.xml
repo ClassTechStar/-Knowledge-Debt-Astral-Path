@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <!-- 与 Web 端浅色主题一致（#F5F7FA 应用底 / #F3F4F5 系统栏） -->
+  <color name="astral_background">#F5F7FA</color>
+  <color name="astral_surface">#FFFFFF</color>
+  <color name="astral_primary">#3B82F6</color>
+  <color name="astral_canvas">#0F0F1A</color>
+
+  <style name="Theme.AstralPath" parent="@android:style/Theme.Material.Light.NoActionBar">
+    <item name="android:statusBarColor">#F3F4F5</item>
+    <item name="android:navigationBarColor">#F3F4F5</item>
+    <item name="android:windowBackground">@color/astral_background</item>
+    <item name="android:colorPrimary">@color/astral_primary</item>
+    <item name="android:windowLightStatusBar">true</item>
+    <item name="android:windowLightNavigationBar">true</item>
+  </style>
+</resources>

@@ -288,7 +288,7 @@ def generate_chapter_questions(
             "difficulty": 2,
             "estMin": 6,
             "kp": chapter_title[:24],
-            "stem": f"《{material_title[:18]}》「{chapter_title[:20]}」中提到：{fact[:40]}… 下列理解更合理的是？",
+            "stem": f"根据正文证据，「{chapter_title[:20]}」的合理理解是？",
             "options": [
                 "这是本章要建立的核心概念/方法，应先理解定义再练题",
                 "可以完全跳过，不影响后续章节",
@@ -297,6 +297,8 @@ def generate_chapter_questions(
             ],
             "correctIndex": 0,
             "why": f"本章「{chapter_title[:18]}」的主干内容需优先掌握",
+            "evidence": fact[:120],
+            "evidenceSource": "chapter-body",
         })
     else:
         qs.append({

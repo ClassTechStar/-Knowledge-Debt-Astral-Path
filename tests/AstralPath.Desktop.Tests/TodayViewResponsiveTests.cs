@@ -8,7 +8,6 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
-using AstralPath.Desktop.Views;
 using AstralPath.Mobile.Views;
 using Xunit;
 
@@ -17,8 +16,8 @@ namespace AstralPath.Desktop.Tests;
 /// <summary>
 /// 双端布局与响应式（方案 §12.3 / §12.4 / §13 / 附录 X.1）。
 ///
-/// 触达下限：Shared 主题给出桌面下限 44px；移动端由 <c>Mobile/App.axaml</c>
-/// 覆盖为 48px。本测试在共享下限（44px）上断言，因为测试宿主用的是桌面 App 的样式表。
+/// 触达下限：Shared 主题给出桌面下限 44px；移动端由 <c>Mobile/App.axaml</c> 覆盖为 48px。
+/// 本测试在共享下限（44px）上断言，移动端 Tab 另按 48px 单独断言。
 /// </summary>
 public sealed class TodayViewResponsiveTests
 {
@@ -36,7 +35,7 @@ public sealed class TodayViewResponsiveTests
         AppSettings.Current.Reset();
 
         var (shell, _) = Composition.CreateShell(touchTarget: 44);
-        var window = new MainWindow { DataContext = shell, Width = width, Height = height };
+        var window = new ShellWindow { DataContext = shell, Width = width, Height = height };
         window.Show();
         Dispatcher.UIThread.RunJobs();
         window.UpdateLayout();
@@ -65,7 +64,7 @@ public sealed class TodayViewResponsiveTests
     {
         AppSettings.Current.Reset();
         var (shell, _) = Composition.CreateShell(44);
-        var window = new MainWindow { DataContext = shell, Width = MobileWidth, Height = MobileHeight };
+        var window = new ShellWindow { DataContext = shell, Width = MobileWidth, Height = MobileHeight };
         window.Show();
         Dispatcher.UIThread.RunJobs();
         window.UpdateLayout();
@@ -118,7 +117,7 @@ public sealed class TodayViewResponsiveTests
     {
         AppSettings.Current.Reset();
         var (shell, _) = Composition.CreateShell(44);
-        var window = new MainWindow { DataContext = shell, Width = DesktopWidth, Height = DesktopHeight };
+        var window = new ShellWindow { DataContext = shell, Width = DesktopWidth, Height = DesktopHeight };
         window.Show();
         Dispatcher.UIThread.RunJobs();
         window.UpdateLayout();

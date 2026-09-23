@@ -72,3 +72,11 @@ src/AstralPath.Android/dist/*.idsig
 src/AstralPath.Android/dist/*.png
 src/AstralPath.Android/dist/*.xml
 src/AstralPath.Android/dist/test-shots/
+
+# ── 构建产物（Gradle / MSBuild 中间输出不再入库）────────────────────────
+# 注：已被历史跟踪的 src/AstralPath.Native/app/build/** 需另行 git rm --cached 清理，
+#     本规则至少可阻止**新的**构建产物继续被 git add 进来。
+**/app/build/
+**/build/
+*.dex
+.gradle/
