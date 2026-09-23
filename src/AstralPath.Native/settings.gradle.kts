@@ -1,16 +1,11 @@
 pluginManagement {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
+    repositories { google(); mavenCentral(); gradlePluginPortal() }
+    plugins {
+        id("com.android.application") version "9.0.0"
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.PREFER_SETTINGS)
-    repositories {
-        google()
-        mavenCentral()
-    }
+    repositories { google(); mavenCentral() }
 }
-rootProject.name = "AstralPathAndroid"
+rootProject.name = "AstralPath"
 include(":app")

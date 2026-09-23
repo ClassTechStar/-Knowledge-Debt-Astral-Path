@@ -863,3 +863,165 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+# ═══════════════════════════════════════════════════════════════
+# OCR v2：预处理 / 置信度 / 多配置投票 / 中文断行 / 误识修复
+# ═══════════════════════════════════════════════════════════════
+
+CHAR_CONFUSIONS = (
+    ("（", "("), ("）", ")"), ("［", "["), ("］", "]"),
+    ("，", ","), ("；", ";"), ("：", ":"), ("？", "?"),
+    ("！", "!"), ("＝", "="), ("＋", "+"), ("－", "-"), ("×", "*"),
+)
+
+
+def preprocess_image(path: Path) -> Path:
+    """灰度 → 对比度拉伸 → 自适应二值 → 轻去噪。显著提升 tesseract 命中率。"""
+    try:
+        from PIL import Image, ImageOps, ImageFilter
+    except Exception:
+        return path
+    try:
+        im = Image.open(path).convert("L")
+        im = ImageOps.autocontrast(im, cutoff=2)
+        # 轻度锐化边缘，利于字形分割
+        im = im.filter(ImageFilter.UnsharpMask(radius=1, percent=80, threshold=2))
+        out = path.with_name(path.stem + "_pp.png")
+        im.save(out, format="PNG")
+        return out
+    except Exception:
+        return path
+
+
+def parse_tsv_words(tsv_path: Path, min_conf: float = 40.0) -> list[tuple[str, float, float, float]]:
+    """读 tesseract TSV → (text, conf, x, y) 词列表，过滤低置信与噪声。"""
+    words: list[tuple[str, float, float, float]] = []
+    if not tsv_path.exists():
+        return words
+    try:
+        lines = tsv_path.read_text(encoding="utf-8", errors="ignore").splitlines()
+    except Exception:
+        return words
+    for ln in lines[1:]:
+        cols = ln.split("\t")
+        if len(cols) < 12:
+            continue
+        try:
+            conf = float(cols[10])
+            text = cols[11].strip()
+            x, y = float(cols[6]), float(cols[7])
+        except Exception:
+            continue
+        if not text or conf < min_conf:
+            continue
+        if len(text) == 1 and not text.isdigit():
+            continue
+        words.append((text, conf, x, y))
+    return words
+
+
+def words_to_text(words: list[tuple[str, float, float, float]]) -> str:
+    """按行带聚类 + 行内 x 排序（阅读顺序第一步）。"""
+    if not words:
+        return ""
+    rows: list[list[tuple[str, float, float, float]]] = []
+    for w in sorted(words, key=lambda t: (t[3], t[2])):
+        row = next((r for r in rows if abs(r[0][3] - w[3]) <= 8), None)
+        if row is None:
+            row = []
+            rows.append(row)
+        row.append(w)
+    rows.sort(key=lambda r: sum(x[3] for x in r) / len(r))
+    return "\n".join(" ".join(t[0] for t in sorted(r, key=lambda t: t[2])) for r in rows)
+
+
+def fix_ocr_text(text: str) -> str:
+    """全角归一 + 中英文粘连拆开 + 软断行合并。"""
+    s = (text or "").replace("　", " ").replace("\x00", "")
+    for a, b in CHAR_CONFUSIONS:
+        s = s.replace(a, b)
+    s = re.sub(r"([一-鿿])([A-Za-z])", r"\1 \2", s)
+    s = re.sub(r"([A-Za-z])([一-鿿])", r"\1 \2", s)
+    # 中文软断行：行尾无标点则与下一行合并
+    out: list[str] = []
+    buf = ""
+    for line in (ln.strip() for ln in s.splitlines() if ln.strip()):
+        if not buf:
+            buf = line
+            continue
+        cjk = sum(1 for c in buf if "一" <= c <= "鿿")
+        soft = not buf.endswith(("。", "！", "？", ".", ":", "：", ";", "；"))
+        if cjk * 2 >= len(buf) and soft and len(buf) < 80:
+            buf += line
+            continue
+        out.append(buf)
+        buf = line
+    if buf:
+        out.append(buf)
+    return "\n".join(out)
+
+
+def vote_passes(passes: list[str], keep_ratio: float = 0.5) -> str:
+    """行级多数票：多 PSM 结果合成，去掉幻觉行。"""
+    lists = [p.splitlines() for p in passes if p and p.strip()]
+    if not lists:
+        return ""
+    if len(lists) == 1:
+        return "\n".join(x.strip() for x in lists[0] if x.strip())
+    counts: dict[str, int] = {}
+    for lines in lists:
+        for ln in {x.strip() for x in lines if len(x.strip()) > 1}:
+            counts[ln] = counts.get(ln, 0) + 1
+    need = int(len(lists) * keep_ratio + 0.999)  # ceil
+    order: list[str] = []
+    for ln in lists[0]:
+        s = ln.strip()
+        if len(s) > 1 and counts.get(s, 0) >= need:
+            order.append(s)
+    for s, c in counts.items():
+        if c >= need and s not in order:
+            order.append(s)
+    return "\n".join(order)
+
+
+def ocr_image_v2(image_path: Path, workdir: Path, tag: str) -> str:
+    """
+    一页三配置（psm 3/4/6）+ TSV 置信度重建 + 行投票 + 纠错。
+    """
+    exe = find_tesseract()
+    if not exe:
+        return ""
+    tessdata = find_tessdata()
+    lang = resolve_lang(tessdata)
+    pre = preprocess_image(image_path)
+    passes: list[str] = []
+    for psm in ("3", "4", "6"):
+        base = workdir / f"{tag}_p{psm}"
+        cmd = [exe, str(pre), str(base), "-l", lang, "--oem", TESS_OEM, "--psm", psm, "tsv"]
+        if tessdata:
+            cmd += ["--tessdata-dir", tessdata]
+        try:
+            subprocess.run(cmd, capture_output=True, timeout=90)
+            words = parse_tsv_words(Path(str(base) + ".tsv"), min_conf=45)
+            if words:
+                passes.append(words_to_text(words))
+        except Exception:
+            continue
+    if not passes:
+        return ""
+    merged = vote_passes(passes, keep_ratio=0.5)
+    return fix_ocr_text(merged)
+
+
+def ocr_quality_grade(text: str) -> dict[str, Any]:
+    lines = [ln for ln in (text or "").splitlines() if ln.strip()]
+    letters = sum(1 for c in text if c.isalpha())
+    cjk = sum(1 for c in text if "一" <= c <= "鿿")
+    cjk_ratio = (cjk / letters) if letters else 0.0
+    noise = sum(1 for ln in lines if len(ln) <= 8 and re.fullmatch(r"[\W_]+", ln or " "))
+    noise_ratio = (noise / len(lines)) if lines else 0.0
+    score = 0.4 * min(cjk_ratio / 0.6, 1.0) + 0.4 * (1 - noise_ratio) + 0.2 * min(len(text) / 400.0, 1.0)
+    grade = "A" if score >= 0.85 else "B" if score >= 0.7 else "C" if score >= 0.5 else "D"
+    return {"score": round(score, 4), "grade": grade, "cjk_ratio": round(cjk_ratio, 4),
+            "noise_ratio": round(noise_ratio, 4), "lines": len(lines)}

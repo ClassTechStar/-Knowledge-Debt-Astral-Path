@@ -1,0 +1,24 @@
+{
+  "packId": "accounting-v1",
+  "nodes": [
+    { "kp_id": "N1", "title": "会计要素", "course": "会计基础", "difficulty": 1 },
+    { "kp_id": "N2", "title": "会计等式", "course": "会计基础", "difficulty": 2 },
+    { "kp_id": "N3", "title": "借贷记账法", "course": "会计基础", "difficulty": 3 },
+    { "kp_id": "N4", "title": "会计分录", "course": "会计基础", "difficulty": 3 },
+    { "kp_id": "N5", "title": "试算平衡", "course": "会计基础", "difficulty": 2 },
+    { "kp_id": "N6", "title": "账户结构", "course": "会计基础", "difficulty": 2 },
+    { "kp_id": "N7", "title": "财产清查", "course": "会计基础", "difficulty": 2 },
+    { "kp_id": "N8", "title": "财务报表", "course": "会计基础", "difficulty": 4 }
+  ],
+  "edges": [
+    { "from_kp": "N1", "to_kp": "N2", "edge_type": "prerequisite", "weight": 1.0 },
+    { "from_kp": "N2", "to_kp": "N3", "edge_type": "prerequisite", "weight": 1.2 },
+    { "from_kp": "N3", "to_kp": "N4", "edge_type": "prerequisite", "weight": 1.1 },
+    { "from_kp": "N4", "to_kp": "N5", "edge_type": "prerequisite", "weight": 1.0 },
+    { "from_kp": "N2", "to_kp": "N6", "edge_type": "prerequisite", "weight": 0.9 },
+    { "from_kp": "N6", "to_kp": "N4", "edge_type": "transfer_gap", "weight": 0.8 },
+    { "from_kp": "N5", "to_kp": "N7", "edge_type": "prerequisite", "weight": 0.9 },
+    { "from_kp": "N7", "to_kp": "N8", "edge_type": "prerequisite", "weight": 1.0 },
+    { "from_kp": "N3", "to_kp": "N5", "edge_type": "transfer_gap", "weight": 0.7 }
+  ]
+}

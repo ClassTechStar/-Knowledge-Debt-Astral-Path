@@ -1,7 +1,6 @@
 package com.astralpath.app
 
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.os.Bundle
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
@@ -10,19 +9,26 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.webkit.WebViewAssetLoader
 import java.io.BufferedReader
 
-/** 与 Web / Windows 同一 UI：内嵌 www/index.html + 本机 REST */
-class MainActivity : Activity() {
+/**
+ * 与 Windows（WebView2）/ Web 完全同构：
+ * 加载同一份 www/index.html，UI 与前端逻辑逐字节一致。
+ * Android 仅作壳 + 性能（硬件加速、DOM 存储、无缩放抖动）。
+ */
+class MainActivity : AppCompatActivity() {
     private lateinit var web: WebView
     private lateinit var assetLoader: WebViewAssetLoader
-    private val apiBase = "http://127.0.0.1:5190/"
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        web = WebView(this)
+        web = WebView(this).apply {
+            // 性能：强制硬件层，列表/滚动更顺
+            setLayerType(android.view.View.LAYER_TYPE_HARDWARE, null)
+        }
         setContentView(web)
         assetLoader = WebViewAssetLoader.Builder()
             .addPathHandler("/assets/", WebViewAssetLoader.AssetsPathHandler(this))
@@ -30,11 +36,20 @@ class MainActivity : Activity() {
         web.settings.apply {
             javaScriptEnabled = true
             domStorageEnabled = true
+            databaseEnabled = true
             allowFileAccess = true
+            allowContentAccess = false
             useWideViewPort = true
             loadWithOverviewMode = true
+            setSupportZoom(false)
+            builtInZoomControls = false
+            displayZoomControls = false
             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+            cacheMode = WebSettings.LOAD_DEFAULT
             textZoom = 100
+            mediaPlaybackRequiresUserGesture = false
+            // 大页 DOM 更稳
+            setGeolocationEnabled(false)
         }
         web.webChromeClient = object : WebChromeClient() {
             override fun onJsAlert(view: WebView?, url: String?, message: String?, result: android.webkit.JsResult?): Boolean {
@@ -50,32 +65,36 @@ class MainActivity : Activity() {
                 else super.shouldInterceptRequest(view, request)
             }
         }
+
+        // 同一份前端：与 Web/Desktop 的 wwwroot/index.html 相同
         val htmlRaw = assets.open("www/index.html").bufferedReader().use(BufferedReader::readText)
-        // 手机独立：探测不到电脑 API 时自动进入离线核心（不依赖 adb reverse / 局域网）
-        val html = if (htmlRaw.contains("__ASTRALPATH_OFFLINE__=true") || htmlRaw.contains("__ASTRALPATH_OFFLINE__ = true")) {
-            htmlRaw
-        } else {
-            htmlRaw.replaceFirst("<script>", "<script>window.__ASTRALPATH_OFFLINE__=false;window.__ASTRALPATH_FORCE_ONLINE__=false;</script><script>", ignoreCase = true)
-        }
-        web.loadDataWithBaseURL("https://appassets.androidplatform.net/assets/www/", html, "text/html", "utf-8", null)
-        // 后台探测本机/电脑 API；失败则重载为强制离线
-        Thread {
-            val online = try {
-                java.net.URL("http://127.0.0.1:5190/health/ready").openConnection().apply { connectTimeout = 1500; readTimeout = 1500 }.getInputStream().use { it.read() >= 0 }
-            } catch (_: Exception) { false }
-            if (!online) {
-                runOnUiThread {
-                    val offlineHtml = html.replaceFirst(
-                        "window.__ASTRALPATH_OFFLINE__=false",
-                        "window.__ASTRALPATH_OFFLINE__=true",
-                        ignoreCase = true
-                    ).let {
-                        if (it.contains("__ASTRALPATH_OFFLINE__=true")) it
-                        else it.replaceFirst("<script>", "<script>window.__ASTRALPATH_OFFLINE__=true;</script><script>", ignoreCase = true)
-                    }
-                    web.loadDataWithBaseURL("https://appassets.androidplatform.net/assets/www/", offlineHtml, "text/html", "utf-8", null)
-                }
-            }
-        }.start()
+        // 手机优先走离线核心；若连上电脑 API 则由前端自动切回
+        val html = injectOffline(htmlRaw)
+        web.loadDataWithBaseURL(
+            "https://appassets.androidplatform.net/assets/www/",
+            html, "text/html", "utf-8", null
+        )
+    }
+
+    private fun injectOffline(raw: String): String {
+        if (raw.contains("__ASTRALPATH_OFFLINE__=true")) return raw
+        val flag = "<script>window.__ASTRALPATH_OFFLINE__=true;window.__ASTRALPATH_FORCE_ONLINE__=false;</script>"
+        val i = raw.indexOf("<script>", ignoreCase = true)
+        return if (i >= 0) raw.substring(0, i) + flag + raw.substring(i) else flag + raw
+    }
+
+    override fun onPause() {
+        web.onPause()
+        super.onPause()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        web.onResume()
+    }
+
+    override fun onDestroy() {
+        web.destroy()
+        super.onDestroy()
     }
 }

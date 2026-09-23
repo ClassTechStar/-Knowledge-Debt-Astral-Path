@@ -9,11 +9,22 @@ android {
         applicationId = "com.astralpath.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 16
-        versionName = "1.4.1"
+        versionCode = 30
+        versionName = "3.0.0"
+    }
+    signingConfigs {
+        create("release") {
+            storeFile = file("../astralpath-release.keystore")
+            storePassword = "astralpath2026"
+            keyAlias = "astralpath"
+            keyPassword = "astralpath2026"
+        }
     }
     buildTypes {
-        release { isMinifyEnabled = false }
+        release {
+            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("release")
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
