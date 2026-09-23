@@ -116,6 +116,7 @@ public sealed class MainForm : Form
             _status.Text = $"本地服务启动中 · http://127.0.0.1:{_port} · 首次启动可能需要数秒";
 
             var url = $"http://127.0.0.1:{_port}/";
+            _status.Text = $"本地服务启动中 · http://127.0.0.1:{_port} · 正在预热全部功能…";
             var healthy = await WaitForHealthAsync(url + "health/ready", TimeSpan.FromSeconds(60));
             if (!healthy)
             {
@@ -132,6 +133,14 @@ public sealed class MainForm : Form
                     "地址：" + url + "\n日志：" + _logPath +
                     (string.IsNullOrWhiteSpace(tail) ? "" : "\n\n" + tail),
                     "知债：星穹学途", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            else
+            {
+                // 启动时立即拉起/确认全部服务：资料热加载、OCR、图谱、智能体
+                var svcSummary = await WarmupServicesAsync(url);
+                _status.Text = string.IsNullOrWhiteSpace(svcSummary)
+                    ? $"全部服务已就绪 · http://127.0.0.1:{_port}/ · {DateTime.Now:HH:mm}"
+                    : $"全部服务已就绪 · {svcSummary} · {DateTime.Now:HH:mm}";
             }
 
             var env = await Microsoft.Web.WebView2.Core.CoreWebView2Environment.CreateAsync(
@@ -199,6 +208,34 @@ public sealed class MainForm : Form
             await Task.Delay(400);
         }
         return false;
+    }
+
+    /// <summary>启动时立即预热全部服务（资料/OCR/图谱/智能体），返回状态摘要。</summary>
+    private static async Task<string> WarmupServicesAsync(string baseUrl)
+    {
+        try
+        {
+            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
+            try { await http.PostAsync(baseUrl.TrimEnd('/') + "/api/services/warmup", null); } catch { /* best-effort */ }
+            var json = await http.GetStringAsync(baseUrl.TrimEnd('/') + "/api/services");
+            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            var root = doc.RootElement;
+            if (root.TryGetProperty("services", out var svc))
+            {
+                var parts = new List<string>();
+                if (svc.TryGetProperty("materials", out var m) && m.TryGetProperty("count", out var mc))
+                    parts.Add($"资料 {mc.GetInt32()}");
+                if (svc.TryGetProperty("knowledgeGraphs", out var g) && g.TryGetProperty("count", out var gc))
+                    parts.Add($"图谱 {gc.GetInt32()}");
+                if (svc.TryGetProperty("ocr", out var o) && o.TryGetProperty("ok", out var ook))
+                    parts.Add(ook.GetBoolean() ? "OCR 就绪" : "OCR 可选");
+                if (svc.TryGetProperty("agent", out var a) && a.TryGetProperty("ok", out var aok) && aok.GetBoolean())
+                    parts.Add("智能体就绪");
+                return string.Join(" · ", parts);
+            }
+        }
+        catch { /* non-fatal */ }
+        return "";
     }
 
     private void StopApi()

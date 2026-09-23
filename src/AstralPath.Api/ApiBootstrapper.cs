@@ -33,7 +33,7 @@ public sealed class ApiBootstrapper
     /// <param name="webRoot">静态文件根；null 表示沿用 <c>{contentRoot}/wwwroot</c> 及兼容探测。</param>
     public static WebApplication Build(string[]? args = null, string? contentRoot = null, string? webRoot = null)
     {
-        // 支持大体积教材 PDF（Go/C# 等扫描版可超过 100MB）
+        // 支持大体积教材 PDF（Go/C# 等扫描版可超过 100MB）；多选一次可到 1GB+
         var builder = WebApplication.CreateBuilder(args ?? Array.Empty<string>());
         if (!string.IsNullOrWhiteSpace(contentRoot))
             builder.WebHost.UseContentRoot(contentRoot!);
@@ -42,11 +42,11 @@ public sealed class ApiBootstrapper
 
         builder.WebHost.ConfigureKestrel(options =>
         {
-            options.Limits.MaxRequestBodySize = 512L * 1024 * 1024;
+            options.Limits.MaxRequestBodySize = 2L * 1024 * 1024 * 1024; // 2GB
         });
         builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
         {
-            options.MultipartBodyLengthLimit = 512L * 1024 * 1024;
+            options.MultipartBodyLengthLimit = 2L * 1024 * 1024 * 1024;
             options.ValueLengthLimit = int.MaxValue;
             options.MultipartHeadersLengthLimit = int.MaxValue;
         });
@@ -140,6 +140,50 @@ public sealed class ApiBootstrapper
             }
         }));
 
+        // 启动即拉起全部服务并暴露状态（桌面壳 / 手机端可等待「全部就绪」）
+        app.MapGet("/api/services", () =>
+        {
+            var python = MaterialPipeline.ResolvePython();
+            var tess = MaterialPipeline.ResolveTesseract();
+            var tessdata = MaterialPipeline.ResolveTessdata();
+            string script;
+            try { script = MaterialPipeline.ResolveOcrScript(); }
+            catch { script = ""; }
+            var materialsDir = Path.Combine(AppContext.BaseDirectory, "materials-uploads");
+            var hydrated = MaterialRegistry.HydrateFromDirectory(materialsDir);
+            var mats = MaterialRegistry.ListMaterials();
+            var graphs = MaterialRegistry.ListGraphs();
+            return Results.Json(new
+            {
+                status = "ready",
+                startedAt = DateTime.UtcNow,
+                services = new Dictionary<string, object>
+                {
+                    ["api"] = new { ok = true, url = $"{app.Urls.FirstOrDefault() ?? "http://127.0.0.1"}" },
+                    ["graph"] = new { ok = store.Graph.Validate().Ok, version = store.Graph.GraphVersion, packId = store.PackId },
+                    ["students"] = new { ok = store.Students.Count > 0, count = store.Students.Count },
+                    ["ocr"] = new
+                    {
+                        ok = !string.IsNullOrEmpty(script) && (tess != null || python != "python"),
+                        python,
+                        tesseract = tess,
+                        tessdata,
+                        script
+                    },
+                    ["materials"] = new { ok = true, count = mats.Count, hydratedNow = hydrated, dir = materialsDir },
+                    ["knowledgeGraphs"] = new { ok = true, count = graphs.Count },
+                    ["agent"] = new { ok = true, note = "受约束路由已加载" }
+                }
+            });
+        });
+
+        app.MapPost("/api/services/warmup", () =>
+        {
+            var materialsDir = Path.Combine(AppContext.BaseDirectory, "materials-uploads");
+            var hydrated = MaterialRegistry.HydrateFromDirectory(materialsDir);
+            return Results.Json(new { ok = true, hydrated, materials = MaterialRegistry.ListMaterials().Count });
+        });
+
         // 便于前端探测真实 API 根地址（防 file:// / 预览面板误连导致 404）
         app.MapGet("/api/meta", (HttpContext ctx) => Results.Json(new
         {
@@ -162,6 +206,20 @@ public sealed class ApiBootstrapper
         // （手机端 127.0.0.1 指向手机自身，必须使用电脑的局域网 IP）
         app.Lifetime.ApplicationStarted.Register(() =>
         {
+            // 启动即预热：资料热加载 + OCR 运行时探测，保证上传/解析开箱可用
+            try
+            {
+                var materialsDir = Path.Combine(AppContext.BaseDirectory, "materials-uploads");
+                var n = MaterialRegistry.HydrateFromDirectory(materialsDir);
+                var tess = MaterialPipeline.ResolveTesseract();
+                var py = MaterialPipeline.ResolvePython();
+                Console.WriteLine($"[AstralPath] 服务预热完成：资料 {MaterialRegistry.ListMaterials().Count}（本次热加载 {n}）· python={py} · tesseract={(tess ?? "未安装")}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[AstralPath] 服务预热警告：{ex.Message}");
+            }
+
             var bound = app.Urls.ToList();
             Console.WriteLine($"[AstralPath] 已启动，监听：{(bound.Count == 0 ? "(默认)" : string.Join("  ", bound))}");
 

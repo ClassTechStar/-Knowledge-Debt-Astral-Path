@@ -31,38 +31,54 @@ public sealed class MaterialsController : ControllerBase
 
     [HttpPost("/v1/materials/upload")]
     [Consumes("multipart/form-data")]
-    [RequestSizeLimit(512L * 1024 * 1024)]
-    [RequestFormLimits(MultipartBodyLengthLimit = 512L * 1024 * 1024)]
+    [RequestSizeLimit(2L * 1024 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 2L * 1024 * 1024 * 1024)]
     public async Task<IResult> Upload([FromForm(Name = "file")] IFormFile? file, [FromQuery] string ocr = "standard")
     {
-        var list = await SaveUploadedFilesAsync(file, null, ocr);
-        if (list == null)
+        try
         {
-            return HttpResults.Fail(400, ErrorCodes.ValidationError,
-                "请上传资料文件（PDF/图片/文本）。字段名 file 或 files。",
-                new
-                {
-                    hint = "支持一次选择多个文件；也可对每个文件分别上传",
-                    contentType = Request.ContentType,
-                    formKeys = Request.HasFormContentType ? Request.Form.Keys.ToArray() : Array.Empty<string>()
-                });
+            var list = await SaveUploadedFilesAsync(file, null, ocr);
+            if (list == null)
+            {
+                return HttpResults.Fail(400, ErrorCodes.ValidationError,
+                    "请上传资料文件（PDF/图片/文本）。字段名 file 或 files。",
+                    new
+                    {
+                        hint = "支持一次选择多个文件；也可对每个文件分别上传",
+                        contentType = Request.ContentType,
+                        formKeys = Request.HasFormContentType ? Request.Form.Keys.ToArray() : Array.Empty<string>()
+                    });
+            }
+            object payload = list.Count == 1 ? list[0] : list;
+            return HttpResults.Created(payload);
         }
-        object payload = list.Count == 1 ? list[0] : list;
-        return HttpResults.Created(payload);
+        catch (Exception ex)
+        {
+            return HttpResults.Fail(500, ErrorCodes.InternalError, $"保存上传失败：{ex.Message}",
+                new { hint = "可减小单次体积后重试，或改用 upload-batch 分批" });
+        }
     }
 
     /// <summary>一次上传多个文件并排队解析。</summary>
     [HttpPost("/v1/materials/upload-batch")]
     [Consumes("multipart/form-data")]
-    [RequestSizeLimit(512L * 1024 * 1024)]
-    [RequestFormLimits(MultipartBodyLengthLimit = 512L * 1024 * 1024)]
+    [RequestSizeLimit(2L * 1024 * 1024 * 1024)]
+    [RequestFormLimits(MultipartBodyLengthLimit = 2L * 1024 * 1024 * 1024)]
     public async Task<IResult> UploadBatch([FromForm(Name = "files")] List<IFormFile>? files, [FromQuery] string ocr = "standard")
     {
-        var first = files?.FirstOrDefault(f => f is { Length: > 0 });
-        var list = await SaveUploadedFilesAsync(first, files, ocr);
-        if (list == null || list.Count == 0)
-            return HttpResults.Fail(400, ErrorCodes.ValidationError, "请至少上传一个资料文件（字段名 files）");
-        return HttpResults.Created(new { count = list.Count, items = list });
+        try
+        {
+            var first = files?.FirstOrDefault(f => f is { Length: > 0 });
+            var list = await SaveUploadedFilesAsync(first, files, ocr);
+            if (list == null || list.Count == 0)
+                return HttpResults.Fail(400, ErrorCodes.ValidationError, "请至少上传一个资料文件（字段名 files）");
+            return HttpResults.Created(new { count = list.Count, items = list });
+        }
+        catch (Exception ex)
+        {
+            return HttpResults.Fail(500, ErrorCodes.InternalError, $"批量保存上传失败：{ex.Message}",
+                new { hint = "建议每批 ≤8 个文件或总大小 ≤400MB" });
+        }
     }
 
     private async Task<List<MaterialDoc>?> SaveUploadedFilesAsync(IFormFile? single, List<IFormFile>? multi, string ocr)
@@ -681,6 +697,12 @@ public sealed class MaterialsController : ControllerBase
             _ => ch
         }).ToArray();
         var cleaned = new string(chars).Trim();
-        return string.IsNullOrWhiteSpace(cleaned) ? "material.pdf" : cleaned;
+        if (string.IsNullOrWhiteSpace(cleaned)) cleaned = "material.pdf";
+        // Windows MAX_PATH：目录前缀较长时中文文件名易超 260，截断主体保留扩展名
+        var ext = Path.GetExtension(cleaned);
+        var stem = Path.GetFileNameWithoutExtension(cleaned);
+        if (stem.Length > 80) stem = stem[..80];
+        cleaned = stem + ext;
+        return cleaned;
     }
 }

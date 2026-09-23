@@ -1406,10 +1406,46 @@ async function uploadMaterial() {
     fd.append("files", f, f.name.replace(/[\\]/g, "_"));
   });
 
+  // 分批上传：每批最多 4 个文件且总大小 ≤400MB，避免一次 POST 过大被拒
+  function chunkFiles(list) {
+    const batches = [];
+    let cur = [], curBytes = 0;
+    const MAX_N = 4, MAX_BYTES = 400 * 1024 * 1024;
+    for (const f of list) {
+      if (cur.length >= MAX_N || (curBytes + f.size > MAX_BYTES && cur.length > 0)) {
+        batches.push(cur); cur = []; curBytes = 0;
+      }
+      cur.push(f); curBytes += f.size;
+    }
+    if (cur.length) batches.push(cur);
+    return batches;
+  }
+
   try {
     let created = null;
     try {
-      created = await j("/v1/materials/upload-batch?ocr=" + encodeURIComponent(mode), { method: "POST", body: fd });
+      const batches = chunkFiles(files);
+      const items = [];
+      for (let bi = 0; bi < batches.length; bi++) {
+        const batch = batches[bi];
+        status.textContent = "上传第 " + (bi + 1) + "/" + batches.length + " 批（" + batch.length + " 个文件）…";
+        const body = new FormData();
+        batch.forEach(function (f) { body.append("files", f, f.name.replace(/[\\]/g, "_")); });
+        try {
+          const r = await j("/v1/materials/upload-batch?ocr=" + encodeURIComponent(mode), { method: "POST", body: body });
+          (r && r.items ? r.items : (Array.isArray(r) ? r : (r ? [r] : []))).forEach(function (x) { items.push(x); });
+        } catch (eBatch) {
+          // 该批失败则逐个上传
+          for (let i = 0; i < batch.length; i++) {
+            const one = new FormData();
+            one.append("file", batch[i], batch[i].name.replace(/[\\]/g, "_"));
+            status.textContent = "上传中 " + (i + 1) + "/" + batch.length + "：" + batch[i].name;
+            const item = await j("/v1/materials/upload?ocr=" + encodeURIComponent(mode), { method: "POST", body: one });
+            items.push(item);
+          }
+        }
+      }
+      created = { count: items.length, items: items };
     } catch (e1) {
       // 回退：逐个上传
       status.textContent = "批量接口不可用，改为逐个上传 " + files.length + " 个文件…";
