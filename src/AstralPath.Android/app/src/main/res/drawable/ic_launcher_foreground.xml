@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  自适应图标前景层：知识图谱意象（两个先修节点 → 中心节点，含向上的修复箭头）
+  安全区：内容限制在 108x108 画布的中心 72x72 内，避免被各厂商图标蒙版裁切。
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- 先修 → 后继的连线 -->
+    <path
+        android:pathData="M40,46 L54,60"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M68,46 L54,60"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round" />
+
+    <!-- 左侧先修节点 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,40m-7,0a7,7 0 1,0 14,0a7,7 0 1,0 -14,0" />
+    <!-- 右侧先修节点 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M68,40m-7,0a7,7 0 1,0 14,0a7,7 0 1,0 -14,0" />
+    <!-- 中心（当前知识点）：空心环，与实心节点区分层级 -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,60m-11,0a11,11 0 1,0 22,0a11,11 0 1,0 -22,0" />
+    <path
+        android:fillColor="@color/astralpath_brand"
+        android:pathData="M54,60m-5,0a5,5 0 1,0 10,0a5,5 0 1,0 -10,0" />
+
+    <!-- 向上的修复箭头（销账/补强） -->
+    <path
+        android:pathData="M54,78 L54,68 M49,72.5 L54,68 L59,72.5"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>

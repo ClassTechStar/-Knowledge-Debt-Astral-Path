@@ -60,3 +60,15 @@ src/AstralPath.Android/build-manual/
 src/AstralPath.Android/local.properties
 *.keystore
 src/AstralPath.Android/dist/test-shots/
+
+# ── Android 构建（签名材料与中间产物不入库）──────────────────────────────
+src/AstralPath.Android/keystore/
+src/AstralPath.Android/keystore.properties
+src/AstralPath.Android/build-manual/
+src/AstralPath.Android/.gradle/
+src/AstralPath.Android/local.properties
+# 中间输出与测试截图；APK 本体保留在 dist/ 作为交付物
+src/AstralPath.Android/dist/*.idsig
+src/AstralPath.Android/dist/*.png
+src/AstralPath.Android/dist/*.xml
+src/AstralPath.Android/dist/test-shots/

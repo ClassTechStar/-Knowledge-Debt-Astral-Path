@@ -5,21 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
 <title>知债：星穹学途</title>
 <style>
-/* 为滑动流畅度服务：少圆角/无阴影/无transform层/文档滚动 */
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 html{background:#f3f4f5}
-body{
-  font-family:"Microsoft YaHei","PingFang SC",sans-serif;
-  color:#303236;background:#f3f4f5;
-  -webkit-text-size-adjust:100%;
-  overscroll-behavior-y:none;
-  padding-bottom:calc(64px + env(safe-area-inset-bottom));
-}
-header{
-  /* 不用 sticky：Android WebView 滚动时强制重算，易掉帧 */
-  background:#f3f4f5;
-  border-bottom:1px solid #c7cacf;padding:8px 12px;
-}
+body{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#303236;background:#f3f4f5;
+  -webkit-text-size-adjust:100%;overscroll-behavior-y:none;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+header{background:#f3f4f5;border-bottom:1px solid #c7cacf;padding:8px 12px}
 .brand{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .mk{width:28px;height:28px;line-height:28px;text-align:center;background:#0D72D9;color:#fff;font-weight:700;border-radius:4px;font-size:12px}
 .brand b{font-size:14px}
@@ -49,7 +39,9 @@ section.hidden{display:none}
 .toc{max-height:200px;overflow-y:auto;border:1px solid #e8eaec;border-radius:6px;padding:0 8px}
 .body{max-height:140px;overflow-y:auto;font-size:12px;line-height:1.5;white-space:pre-wrap;border:1px solid #e8eaec;border-radius:6px;padding:8px;background:#fafbfc}
 .opt{display:block;width:100%;text-align:left;margin-top:6px;padding:8px;border:1px solid #c7cacf;border-radius:6px;background:#fafbfc;font-size:12px;min-height:40px}
-.opt.ok{border-color:#2f6b50;color:#2f6b50}
+.opt.ok{border-color:#2f6b50;color:#2f6b50;background:#eef8f1}
+.opt.no{border-color:#b64a58;color:#b64a58}
+.ev{margin-top:6px;padding:6px 8px;border-left:3px solid #0D72D9;background:#eef4fb;font-size:11px;color:#303236}
 table{width:100%;border-collapse:collapse;font-size:12px}
 th,td{padding:5px 3px;border-bottom:1px solid #e8eaec;text-align:left}
 .bar{height:6px;background:#e8eaec;border-radius:3px;overflow:hidden;margin:2px 0 8px}
@@ -58,20 +50,15 @@ th,td{padding:5px 3px;border-bottom:1px solid #e8eaec;text-align:left}
 .bubble.u{margin-left:auto;background:#0D72D9;color:#fff}
 .bubble.b{background:#e8eaec}
 #chat{min-height:120px}
-input[type=text],input[type=email],input[type=password],textarea{
-  min-height:36px;border:1px solid #c7cacf;border-radius:6px;padding:6px 8px;background:#fff;width:100%}
-nav.tabs{
-  position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;
-  background:#fff;border-top:1px solid #c7cacf;
-  padding-bottom:env(safe-area-inset-bottom);
-}
-nav.tabs button{
-  flex:1;min-height:56px;border:0;background:transparent;color:#70757a;
-  font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
-}
+input[type=text],input[type=email],input[type=password]{min-height:36px;border:1px solid #c7cacf;border-radius:6px;padding:6px 8px;background:#fff;width:100%}
+nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;background:#fff;border-top:1px solid #c7cacf;padding-bottom:env(safe-area-inset-bottom)}
+nav.tabs button{flex:1;min-height:56px;border:0;background:transparent;color:#70757a;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 nav.tabs button.on{color:#0D72D9;font-weight:700;background:#eef4fb}
 nav.tabs i{font-style:normal;font-size:15px;line-height:1}
 .more{display:block;width:100%;margin:8px 0;min-height:36px;border:1px dashed #c7cacf;background:#fff;border-radius:6px;font-size:12px;color:#70757a}
+#toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);background:#303236;color:#fff;
+  padding:10px 14px;border-radius:8px;font-size:12px;z-index:99;display:none;max-width:90%}
+input[type=file]{font-size:12px;width:100%}
 </style>
 </head>
 <body>
@@ -80,9 +67,9 @@ nav.tabs i{font-style:normal;font-size:15px;line-height:1}
     <div class="mk">债</div>
     <div style="flex:1;min-width:120px">
       <b>知债：星穹学途</b>
-      <small id="apiLine">…</small>
+      <small id="apiLine">连接中…</small>
     </div>
-    <span class="muted" id="uiTag">UI-mob-fast</span>
+    <span class="muted" id="uiTag">UI-mob-fix1</span>
   </div>
   <div class="hrow">
     <select id="stu">
@@ -111,7 +98,17 @@ nav.tabs i{font-style:normal;font-size:15px;line-height:1}
         <button class="btn pri" data-go="lib">藏书阁</button>
         <button class="btn" data-go="debt">知债</button>
         <button class="btn" data-go="today">今日</button>
+        <button class="btn" data-go="agent">智能体</button>
       </div>
+    </div>
+    <div class="card">
+      <h2>演示 / 合规</h2>
+      <div class="row">
+        <button class="btn sm" id="btnAdvance">Demo +1 天</button>
+        <button class="btn sm" id="btnGrant">授权教师可见</button>
+        <button class="btn sm" id="btnRevoke">撤销授权</button>
+      </div>
+      <div class="muted" style="margin-top:6px">consent fail-closed · 教学辅助，不构成处分依据</div>
     </div>
   </section>
 
@@ -121,7 +118,9 @@ nav.tabs i{font-style:normal;font-size:15px;line-height:1}
       <div class="row">
         <button class="btn pri" id="btnSeed">导入示例</button>
         <button class="btn" id="btnParseAll">解析全部</button>
+        <label class="btn sm">上传 PDF<input id="filePdf" type="file" accept=".pdf,application/pdf" multiple hidden /></label>
       </div>
+      <div class="muted" id="upMsg" style="margin:6px 0"></div>
       <div id="matList"></div>
       <button class="more" id="matMore" hidden>加载更多</button>
     </div>
@@ -136,7 +135,7 @@ nav.tabs i{font-style:normal;font-size:15px;line-height:1}
       <button class="more" id="chMore" hidden>加载更多章节</button>
       <h3>正文</h3>
       <div class="body" id="chBody">点章节…</div>
-      <h3>题目</h3>
+      <h3>题目（含正文证据）</h3>
       <div id="chQ"></div>
     </div>
   </section>
@@ -148,6 +147,9 @@ nav.tabs i{font-style:normal;font-size:15px;line-height:1}
     </div>
     <div class="card">
       <h2>What-if</h2>
+      <div class="row">
+        <select id="wfEdge" style="flex:1;min-height:36px"><option>K02→K03 会计等式→借贷记账法</option><option>K03→K05 借贷→分录</option></select>
+      </div>
       <div class="muted">p <span id="wfA">28</span> · c <span id="wfB">41</span> · f <span id="wfC">6</span></div>
       <input type="range" id="wfp" min="0" max="100" value="28"/>
       <input type="range" id="wft" min="0" max="100" value="41"/>
@@ -200,6 +202,9 @@ nav.tabs i{font-style:normal;font-size:15px;line-height:1}
       <div id="mastery"></div>
       <h3>时间线</h3>
       <div class="muted" id="tl"></div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn sm" id="btnOpt">画像 Opt-out</button>
+      </div>
     </div>
   </section>
 
@@ -228,15 +233,27 @@ nav.tabs i{font-style:normal;font-size:15px;line-height:1}
   <button data-p="profile"><i>像</i>画像</button>
   <button data-p="auth"><i>户</i>账户</button>
 </nav>
+<div id="toast"></div>
 
 <script>
 const API = (window.__ASTRALPATH_API__ || "http://127.0.0.1:5190").replace(/\/$/, "");
 let token = null, graphId = null, materialId = null, agentSid = null;
-let matPage = 0, chPage = 0, todayCache = [], todayPage = 0;
+let matPage = 0, chPage = 0, todayCache = [], todayPage = 0, chAll = [];
 const PAGE = 12;
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
 const fmt = (n) => Number.isFinite(Number(n)) ? Math.round(Number(n)*100)/100 : "-";
+const on = (id, ev, fn) => { const el = $(id); if (el) el.addEventListener(ev, fn); };
+
+let toastTimer = null;
+function toast(msg) {
+  const t = $("toast");
+  if (!t) return;
+  t.textContent = msg;
+  t.style.display = "block";
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { t.style.display = "none"; }, 2200);
+}
 
 async function j(path, opt) {
   opt = opt || {};
@@ -251,16 +268,16 @@ async function j(path, opt) {
 function go(page) {
   document.querySelectorAll("#tabs button").forEach(b => b.classList.toggle("on", b.getAttribute("data-p") === page));
   ["home","lib","graph","debt","today","agent","profile","auth"].forEach(p => {
-    $("p-" + p).classList.toggle("hidden", p !== page);
+    const el = $("p-" + p); if (el) el.classList.toggle("hidden", p !== page);
   });
   window.scrollTo(0, 0);
   load(page);
 }
 document.querySelectorAll("#tabs button").forEach(b => b.addEventListener("click", () => go(b.getAttribute("data-p"))));
 document.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => go(b.getAttribute("data-go"))));
-$("btnRefresh").addEventListener("click", () => {
-  const on = document.querySelector("#tabs button.on");
-  load(on ? on.getAttribute("data-p") : "home");
+on("btnRefresh", "click", () => {
+  const onB = document.querySelector("#tabs button.on");
+  load(onB ? onB.getAttribute("data-p") : "home");
 });
 
 function load(p) {
@@ -276,12 +293,11 @@ function load(p) {
 async function loadHome() {
   try {
     const h = await fetch(API + "/health/ready").then(r => r.json());
-    $("health").textContent = "API status=" + h.status + " · graph=" + (h.checks && h.checks.graph) +
-      " · students=" + (h.checks && h.checks.students);
+    $("health").textContent = "API status=" + h.status + " · graph=" + (h.checks && h.checks.graph);
     $("apiLine").textContent = "API " + API;
   } catch (e) {
-    $("health").textContent = "API 不可用：" + e.message;
-    $("apiLine").textContent = "离线";
+    $("health").textContent = "API 不可用（演示数据）：" + e.message;
+    $("apiLine").textContent = "离线演示";
   }
   try { $("sMat").textContent = ((await j("/v1/materials")) || []).length; } catch (e) { $("sMat").textContent = "0"; }
   try { $("sGr").textContent = ((await j("/v1/knowledge-graphs")) || []).length; } catch (e) { $("sGr").textContent = "0"; }
@@ -306,46 +322,65 @@ async function loadLib(reset) {
     '</div><div class="row" style="margin-top:4px">' +
     '<button class="btn sm" data-parse="' + m.id + '">解析</button>' +
     '<button class="btn sm" data-gid="' + esc(m.graphId || ("auto-" + m.id)) + '" data-mid="' + m.id + '">识网</button></div></div>'
-  ).join("");
+  ).join("") || '<div class="muted">暂无资料</div>';
   $("matMore").hidden = slice.length >= mats.length;
   $("matList").querySelectorAll("[data-parse]").forEach(b => b.addEventListener("click", async () => {
     b.textContent = "…";
-    try { await j("/v1/materials/" + b.getAttribute("data-parse") + "/parse?ocr=quick", { method: "POST" }); loadLib(true); }
-    catch (e) { b.textContent = e.message.slice(0, 12); }
+    try { await j("/v1/materials/" + b.getAttribute("data-parse") + "/parse?ocr=quick", { method: "POST" }); toast("解析完成"); loadLib(true); }
+    catch (e) { b.textContent = "解析"; toast(e.message); }
   }));
   $("matList").querySelectorAll("[data-gid]").forEach(b => b.addEventListener("click", () => {
     graphId = b.getAttribute("data-gid"); materialId = b.getAttribute("data-mid"); go("graph");
   }));
 }
-$("matMore").addEventListener("click", () => { matPage++; loadLib(false); });
-$("btnSeed").addEventListener("click", async () => {
-  try { await j("/v1/materials/seed-samples?parse=true", { method: "POST" }); loadLib(true); }
-  catch (e) { alert(e.message); }
+on("matMore", "click", () => { matPage++; loadLib(false); });
+on("btnSeed", "click", async () => {
+  try { const r = await j("/v1/materials/seed-samples?parse=true", { method: "POST" }); toast("已导入 " + (r.seeded || 0) + " 份"); loadLib(true); }
+  catch (e) { toast("导入失败：" + e.message); }
 });
-$("btnParseAll").addEventListener("click", async () => {
-  try { await j("/v1/materials/parse-all?ocr=quick", { method: "POST" }); alert("已排队"); }
-  catch (e) { alert(e.message); }
+on("btnParseAll", "click", async () => {
+  try { const r = await j("/v1/materials/parse-all?ocr=quick", { method: "POST" }); toast("已排队 " + (r.queued || 0)); }
+  catch (e) { toast(e.message); }
+});
+on("filePdf", "change", async (e) => {
+  const files = e.target.files;
+  if (!files || !files.length) return;
+  $("upMsg").textContent = "上传中…";
+  try {
+    const fd = new FormData();
+    for (let i = 0; i < files.length; i++) fd.append("files", files[i]);
+    const r = await fetch(API + "/v1/materials/upload-batch?ocr=quick", { method: "POST", body: fd });
+    const data = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error((data && data.error && data.error.message) || ("HTTP " + r.status));
+    $("upMsg").textContent = "已上传 " + (data.data && data.data.count || files.length) + " 个，解析中…";
+    toast("上传成功");
+    loadLib(true);
+  } catch (err) {
+    $("upMsg").textContent = "上传失败：" + err.message;
+    toast("上传失败");
+  }
+  e.target.value = "";
 });
 
-let chAll = [];
 async function loadGraph() {
   let gs = [];
   try { gs = (await j("/v1/knowledge-graphs")) || []; } catch (e) {}
   if (!graphId && gs[0]) { graphId = gs[0].graphId; materialId = gs[0].materialId; }
-  $("bookChips").innerHTML = gs.slice(0, 16).map(g =>
+  $("bookChips").innerHTML = gs.slice(0, 20).map(g =>
     '<button data-g="' + esc(g.graphId) + '" data-m="' + esc(g.materialId) + '"' +
     (g.graphId === graphId ? ' class="on"' : '') + '>' +
     esc((g.materialName || "").slice(0, 10)) + "</button>"
-  ).join("");
+  ).join("") || '<span class="muted">暂无图谱</span>';
   $("bookChips").querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
     graphId = b.getAttribute("data-g"); materialId = b.getAttribute("data-m"); chPage = 0; loadGraph();
   }));
-  if (!materialId) return;
+  if (!materialId) { $("chList").innerHTML = '<div class="muted">请先在藏书阁解析</div>'; return; }
   try {
     const ch = await j("/v1/materials/" + materialId + "/chapters");
     chAll = (ch.chapters || []).concat(ch.sections || []);
-  } catch (e) { $("chList").innerHTML = esc(e.message); return; }
-  renderToc();
+    renderToc();
+    if (chAll[0]) openCh(chAll[0].id);
+  } catch (e) { $("chList").innerHTML = esc(e.message); }
 }
 function renderToc() {
   const slice = chAll.slice(0, (chPage + 1) * PAGE);
@@ -358,24 +393,29 @@ function renderToc() {
   $("chList").querySelectorAll("[data-c]").forEach(el =>
     el.addEventListener("click", () => openCh(el.getAttribute("data-c"))));
 }
-$("chMore").addEventListener("click", () => { chPage++; renderToc(); });
+on("chMore", "click", () => { chPage++; renderToc(); });
 
 async function openCh(id) {
   $("chBody").textContent = "…";
   try {
     const d = await j("/v1/materials/" + materialId + "/chapters/" + encodeURIComponent(id));
     $("chBody").textContent = (d.content || "").slice(0, 2000) || "（无）";
-    const qs = (d.questions || []).slice(0, 4);
+    const qs = (d.questions || []).slice(0, 5);
     $("chQ").innerHTML = qs.map((q, i) =>
       '<div class="item"><div class="t">' + (i + 1) + ". " + esc(q.stem) + "</div>" +
+      (q.evidence ? '<div class="ev">证据：「' + esc(String(q.evidence).slice(0, 100)) + '」</div>' : "") +
       (q.options || []).map((o, oi) =>
         '<button class="opt' + (oi === q.correctIndex ? " ok" : "") + '" data-cq="' + esc(q.id || id) +
         '" data-ki="' + esc(q.kp || d.title || "ch") + '" data-ok="' + (oi === q.correctIndex ? 1 : 0) +
-        '">' + "ABCD"[oi] + ". " + esc(o) + (oi === q.correctIndex ? " ✓" : "") + "</button>"
-      ).join("") + "</div>"
-    ).join("");
+        '">' + "ABCD"[oi] + ". " + esc(o) + "</button>"
+      ).join("") + '<div class="muted" data-fb="' + i + '"></div></div>'
+    ).join("") || '<div class="muted">无题目</div>';
     $("chQ").querySelectorAll("[data-cq]").forEach(btn => btn.addEventListener("click", () => {
       const ok = btn.getAttribute("data-ok") === "1";
+      const box = btn.parentElement;
+      box.querySelectorAll(".opt").forEach(x => { if (x.getAttribute("data-ok") === "1") x.classList.add("ok"); });
+      if (!ok) btn.classList.add("no");
+      const fb = box.querySelector("[data-fb]");
       j("/v1/attempts", {
         method: "POST",
         body: JSON.stringify({
@@ -383,7 +423,8 @@ async function openCh(id) {
           kpId: btn.getAttribute("data-ki"), questionId: btn.getAttribute("data-cq"),
           correct: ok, selfConf: ok ? 4 : 2, latencyMs: 700
         })
-      }).then(() => btn.classList.toggle("ok", ok)).catch(e => { btn.textContent = e.message.slice(0, 16); });
+      }).then(() => { if (fb) fb.textContent = ok ? "✓ 已提交（正确）" : "已提交（再练一次）"; toast("已记录"); })
+        .catch(e => { if (fb) fb.textContent = "提交失败：" + e.message; });
     }));
   } catch (e) { $("chBody").textContent = e.message; }
 }
@@ -396,8 +437,14 @@ async function loadDebt() {
     $("debtList").innerHTML = debts.map((x, i) =>
       '<div class="item"><div class="t">' + esc(x.fromKpName) + " → " + esc(x.toKpName) +
       '</div><div class="m">impact ' + fmt(x.impact) + " · " +
-      esc((narr[i] && narr[i].story) || "").slice(0, 60) + "</div></div>"
+      esc((narr[i] && narr[i].story) || "").slice(0, 60) + "</div>" +
+      '<button class="btn sm" data-wf="' + esc(x.fromKp) + "|" + esc(x.toKp) + '">What-if 此边</button></div>'
     ).join("") || '<div class="muted">无</div>';
+    $("debtList").querySelectorAll("[data-wf]").forEach(b => b.addEventListener("click", () => {
+      const parts = b.getAttribute("data-wf").split("|");
+      window.__wfFrom = parts[0]; window.__wfTo = parts[1];
+      runWf(); toast("已选边 " + parts[0] + "→" + parts[1]);
+    }));
   } catch (e) { $("debtList").innerHTML = esc(e.message); }
   runWf();
 }
@@ -407,21 +454,31 @@ function runWf() {
   const det = p < 40 && t < 50 && f > 0;
   const imp = det ? f * (50 - t) * 1.2 : 0;
   $("wfOut").textContent = "det=" + det + " impact≈" + fmt(imp);
+  const sel = $("wfEdge");
+  let from = window.__wfFrom || "K02", to = window.__wfTo || "K03";
+  if (!window.__wfFrom && sel && sel.value) {
+    const m = sel.value.match(/^(K\d+).*(K\d+)/);
+    if (m) { from = m[1]; to = m[2]; }
+  }
   j("/v1/what-if", {
     method: "POST",
-    body: JSON.stringify({ studentId: $("stu").value, fromKp: "K02", toKp: "K03",
+    body: JSON.stringify({ studentId: $("stu").value, fromKp: from, toKp: to,
       overrideScoreFrom: p, overrideScoreTo: t, overrideFreq: f, overrideDays: 0 })
-  }).then(d => { $("wfOut").textContent += " | API=" + fmt(d.impact); }).catch(() => {});
+  }).then(d => { $("wfOut").textContent += " | API=" + fmt(d.impact); }).catch(e => { $("wfOut").textContent += " | " + e.message; });
 }
-["wfp","wft","wff"].forEach(id => $(id).addEventListener("input", runWf));
-$("btnPlan").addEventListener("click", async () => {
+["wfp","wft","wff"].forEach(id => on(id, "input", runWf));
+on("wfEdge", "change", () => { window.__wfFrom = null; window.__wfTo = null; runWf(); });
+on("btnPlan", "click", async () => {
   try {
     const p = await j("/v1/students/" + $("stu").value + "/plans", {
       method: "POST",
       body: JSON.stringify({ graphVersion: 1, dayBudgetMin: 35, horizonDays: 14 })
     });
     $("planBox").innerHTML = "约束：" + (p.constraintsChecked ? "通过" : "未通过") + "<br/>" +
-      (p.days || []).slice(0, 4).map(d => "D" + d.day + " " + (d.minutes || 0) + "min").join(" · ");
+      (p.days || []).slice(0, 5).map(d =>
+        "D" + d.day + " · " + (d.minutes || 0) + "min · " + ((d.items || []).length) + "项"
+      ).join("<br/>");
+    toast("计划已生成");
   } catch (e) { $("planBox").textContent = e.message; }
 });
 
@@ -436,15 +493,19 @@ async function loadToday(reset) {
   const slice = todayCache.slice(0, (todayPage + 1) * PAGE);
   $("todayBox").innerHTML = slice.map((x, i) =>
     '<div class="item"><div class="t">' + (i + 1) + ". " + esc(x.kpName) + '</div><div class="m">' +
-    esc(x.stem || "") + "</div>" +
+    esc(x.stem || x.why || "") + "</div>" +
     (x.options || []).map((o, oi) =>
-      '<button class="opt" data-qid="' + esc(x.questionId) + '" data-ki="' + esc(x.kpId) +
+      '<button class="opt" data-qid="' + esc(x.questionId || ("q" + i)) + '" data-ki="' + esc(x.kpId || "K01") +
       '" data-ok="' + (oi === (x.correctIndex || 0) ? 1 : 0) + '">' + "ABCD"[oi] + ". " + esc(o) + "</button>"
-    ).join("") + "</div>"
+    ).join("") + '<div class="muted" data-fb></div></div>'
   ).join("") || '<div class="muted">无</div>';
   $("todayMore").hidden = slice.length >= todayCache.length;
   $("todayBox").querySelectorAll("[data-qid]").forEach(btn => btn.addEventListener("click", () => {
     const ok = btn.getAttribute("data-ok") === "1";
+    const box = btn.parentElement;
+    box.querySelectorAll(".opt").forEach(x => { if (x.getAttribute("data-ok") === "1") x.classList.add("ok"); });
+    if (!ok) btn.classList.add("no");
+    const fb = box.querySelector("[data-fb]");
     j("/v1/attempts", {
       method: "POST",
       body: JSON.stringify({
@@ -452,25 +513,27 @@ async function loadToday(reset) {
         kpId: btn.getAttribute("data-ki"), questionId: btn.getAttribute("data-qid"),
         correct: ok, selfConf: ok ? 4 : 2, latencyMs: 800
       })
-    }).then(() => btn.classList.toggle("ok", ok)).catch(() => {});
+    }).then(() => { if (fb) fb.textContent = ok ? "✓ 正确" : "再练一次"; toast("已记录"); })
+      .catch(e => { if (fb) fb.textContent = e.message; });
   }));
 }
-$("todayMore").addEventListener("click", () => { todayPage++; loadToday(false); });
-$("btnToday").addEventListener("click", () => loadToday(true));
-$("btnRotate").addEventListener("click", () => loadToday(true));
+on("todayMore", "click", () => { todayPage++; loadToday(false); });
+on("btnToday", "click", () => loadToday(true));
+on("btnRotate", "click", () => loadToday(true));
 
 function bubble(role, html) {
   const d = document.createElement("div");
   d.className = "bubble " + role;
   d.textContent = html;
   $("chat").appendChild(d);
+  $("chat").scrollTop = $("chat").scrollHeight;
 }
 async function loadAgent() {
-  if (!$("chat").children.length) bubble("b", "可问「诊断债」「生成计划」。危机词转人工。");
+  if (!$("chat").children.length) bubble("b", "可问「诊断债」「生成计划」。危机词自动转人工。");
   try {
     const d = await j("/v1/agent/tools?role=student");
     const tools = (d.tools || d || []).slice(0, 12);
-    $("tools").textContent = tools.map(t => t.intentId).join(" · ");
+    $("tools").textContent = tools.map(t => (t.intentId || t) + "").join(" · ");
   } catch (e) { $("tools").textContent = e.message; }
 }
 async function sendAgent(text) {
@@ -484,13 +547,15 @@ async function sendAgent(text) {
       body: JSON.stringify({ userId: $("stu").value, role: "student", utterance: text, sessionId: agentSid })
     });
     agentSid = d.sessionId || agentSid;
-    const rep = d.response || d.reply || "ok";
+    let rep = d.response || d.reply || d.message || "";
+    if (typeof rep !== "string") rep = JSON.stringify(rep);
+    if (!rep) rep = "意图：" + (d.intentId || "?") + " · " + (d.decision || "ok");
     const crisis = d.decision === "crisis.handoff" || d.intentId === "crisis.handoff";
-    bubble("b", rep + (crisis ? "【已转人工】" : ""));
+    bubble("b", rep + (crisis ? " 【已转人工】" : ""));
   } catch (e) { bubble("b", e.message); }
 }
-$("btnSend").addEventListener("click", () => sendAgent());
-$("agentIn").addEventListener("keydown", e => { if (e.key === "Enter") sendAgent(); });
+on("btnSend", "click", () => sendAgent());
+on("agentIn", "keydown", e => { if (e.key === "Enter") sendAgent(); });
 document.querySelectorAll("[data-q]").forEach(b => b.addEventListener("click", () => sendAgent(b.getAttribute("data-q"))));
 
 async function loadProfile() {
@@ -513,11 +578,38 @@ async function loadProfile() {
   try {
     const t = await j("/v1/profile/" + sid + "/timeline");
     $("tl").textContent = (t.snapshots || []).slice(0, 5).map(s =>
-      s.date + " score=" + fmt(s.avgScore)
+      s.date + " score=" + fmt(s.avgScore) + " 债" + (s.openDebts != null ? s.openDebts : "-")
     ).join(" · ") || "暂无";
   } catch (e) { $("tl").textContent = e.message; }
 }
-$("btnLogin").addEventListener("click", async () => {
+on("btnOpt", "click", async () => {
+  try { await j("/v1/profile/" + $("stu").value + "/opt-out", { method: "POST", body: "{}" }); toast("已 opt-out"); loadProfile(); }
+  catch (e) { toast(e.message); }
+});
+
+on("btnAdvance", "click", async () => {
+  try {
+    const d = await j("/v1/demo/advance", { method: "POST", body: JSON.stringify({ studentId: $("stu").value }) });
+    toast("Demo day=" + (d.day != null ? d.day : "?") + " cleared=" + (d.cleared != null ? d.cleared : "-"));
+    loadHome();
+  } catch (e) { toast(e.message); }
+});
+on("btnGrant", "click", async () => {
+  try {
+    await j("/v1/consents/" + $("stu").value + "/grant", { method: "POST",
+      body: JSON.stringify({ teacherId: "demo-teacher", purpose: "teacher_hotspots", actorId: "demo-student-a" }) });
+    toast("已授权教师可见");
+  } catch (e) { toast(e.message); }
+});
+on("btnRevoke", "click", async () => {
+  try {
+    await j("/v1/consents/" + $("stu").value + "/revoke", { method: "POST",
+      body: JSON.stringify({ teacherId: "demo-teacher", purpose: "teacher_hotspots", actorId: "demo-student-a" }) });
+    toast("已撤销授权");
+  } catch (e) { toast(e.message); }
+});
+
+on("btnLogin", "click", async () => {
   try {
     const d = await j("/api/v1/auth/sessions", {
       method: "POST",
@@ -525,12 +617,13 @@ $("btnLogin").addEventListener("click", async () => {
     });
     token = d.accessToken || null;
     $("authMsg").textContent = "登录成功";
-  } catch (e) { $("authMsg").textContent = e.message; }
+    toast("登录成功");
+  } catch (e) { $("authMsg").textContent = e.message; toast("登录失败"); }
 });
-$("btnLogout").addEventListener("click", () => { token = null; $("authMsg").textContent = "已退出"; });
-$("stu").addEventListener("change", () => {
-  const on = document.querySelector("#tabs button.on");
-  load(on ? on.getAttribute("data-p") : "home");
+on("btnLogout", "click", () => { token = null; $("authMsg").textContent = "已退出"; toast("已退出"); });
+on("stu", "change", () => {
+  const onB = document.querySelector("#tabs button.on");
+  load(onB ? onB.getAttribute("data-p") : "home");
 });
 
 load("home");

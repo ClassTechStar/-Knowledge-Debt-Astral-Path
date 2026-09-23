@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 品牌主色：用于自适应图标背景与系统栏（与 Web/Windows 端浅色主题协调） -->
+    <color name="astralpath_brand">#2B5CE6</color>
+    <color name="astralpath_surface">#F3F4F5</color>
+</resources>
