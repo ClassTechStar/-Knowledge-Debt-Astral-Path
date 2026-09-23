@@ -673,10 +673,144 @@ function apiCandidates() {
 }
 let api = "";
 let apiResolved = false;
+let offlineMode = !!(typeof window !== "undefined" && window.__ASTRALPATH_OFFLINE__);
 let currentPage = "home";
 let authMode = "login";
 let authSession = null;
 let materials = [];
+
+// ── 手机离线核心：不依赖电脑 API 时的本地实现 ─────────────────────
+const OFFLINE_KEY = "astralpath_offline_store_v1";
+function offlineStore() {
+  try {
+    const raw = localStorage.getItem(OFFLINE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  const seed = {
+    studentId: "demo-student-a",
+    materials: [
+      { id: "off-m1", name: "示例·会计等式与借贷记账.pdf", status: "ready", pageCount: 128, extractedChars: 42000, nodeCount: 36, edgeCount: 42, graphId: "auto-off-m1", ocrMode: "standard", ocrUsed: false, notes: "offline-seed", sizeBytes: 2400000, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+      { id: "off-m2", name: "示例·Python 基础语法.pdf", status: "ready", pageCount: 96, extractedChars: 31000, nodeCount: 28, edgeCount: 30, graphId: "auto-off-m2", ocrMode: "standard", ocrUsed: false, notes: "offline-seed", sizeBytes: 1800000, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+    ],
+    graphs: {
+      "auto-off-m1": {
+        graphId: "auto-off-m1", materialId: "off-m1", materialName: "示例·会计等式与借贷记账.pdf", graphVersion: 1,
+        nodes: [
+          { id: "K01", name: "会计要素", course: "会计基础", description: "chapter" },
+          { id: "K02", name: "会计等式", course: "会计基础", description: "chapter" },
+          { id: "K03", name: "借贷记账法", course: "会计基础", description: "chapter" },
+          { id: "K04", name: "会计分录", course: "会计基础", description: "chapter" }
+        ],
+        edges: [
+          { from: "K01", to: "K02", edgeType: "prerequisite", weight: 1.2 },
+          { from: "K02", to: "K03", edgeType: "prerequisite", weight: 1.3 },
+          { from: "K03", to: "K04", edgeType: "prerequisite", weight: 1.2 }
+        ],
+        tasks: [
+          { id: "off-t1", kpId: "K02", kpName: "会计等式", type: "quiz", difficulty: 2, estMin: 6, why: "离线示例", questionId: "q1", stem: "资产 = 负债 + ？", options: ["所有者权益", "收入", "费用", "利润"], correctIndex: 0 },
+          { id: "off-t2", kpId: "K03", kpName: "借贷记账法", type: "quiz", difficulty: 2, estMin: 8, why: "离线示例", questionId: "q2", stem: "借方登记增加的账户是？", options: ["资产类", "负债类", "所有者权益", "收入"], correctIndex: 0 }
+        ]
+      }
+    },
+    debts: [
+      { fromKp: "K02", toKp: "K03", fromKpName: "会计等式", toKpName: "借贷记账法", scoreFrom: 28, scoreTo: 32, freq: 5, impact: 176, status: "open" },
+      { fromKp: "K03", toKp: "K04", fromKpName: "借贷记账法", toKpName: "会计分录", scoreFrom: 32, scoreTo: 38, freq: 4, impact: 120, status: "open" }
+    ],
+    optOut: false
+  };
+  try { localStorage.setItem(OFFLINE_KEY, JSON.stringify(seed)); } catch (e) {}
+  return seed;
+}
+function offlineSave(st) {
+  try { localStorage.setItem(OFFLINE_KEY, JSON.stringify(st)); } catch (e) {}
+}
+
+function offlineApi(path, opt) {
+  const method = ((opt && opt.method) || "GET").toUpperCase();
+  const st = offlineStore();
+  const ok = (data) => ({ data: data, meta: { offline: true }, traceId: "offline" });
+  if (path.indexOf("/api/meta") === 0) return ok({ service: "astralpath", upload: "/v1/materials/upload", offline: true, baseUrl: "offline://local" });
+  if (path.indexOf("/api/services") === 0) return ok({
+    status: "ready", services: {
+      api: { ok: true, url: "offline://local" },
+      graph: { ok: true, version: 1, packId: "offline" },
+      students: { ok: true, count: 1 },
+      ocr: { ok: false, note: "离线模式不调用 OCR" },
+      materials: { ok: true, count: st.materials.length },
+      knowledgeGraphs: { ok: true, count: Object.keys(st.graphs).length },
+      agent: { ok: true, note: "本地受约束路由" }
+    }
+  });
+  if (path.indexOf("/health/ready") === 0) return ok({ status: "ready", checks: { graph: "ok", students: "1", packId: "offline", graphVersion: "1" } });
+  if (path.indexOf("/api/demo/students") === 0) return ok([{ studentId: st.studentId, displayName: "王小明（有债）", demoGroup: "A", debtCount: st.debts.length }]);
+  if (path.indexOf("/v1/materials") === 0 && method === "GET" && !path.match(/\/v1\/materials\/[^/]+/)) return ok(st.materials);
+  if (path.indexOf("/v1/knowledge-graphs") === 0 && method === "GET") {
+    const list = Object.keys(st.graphs).map(function (k) {
+      const g = st.graphs[k];
+      return { graphId: g.graphId, materialId: g.materialId, materialName: g.materialName, nodeCount: g.nodes.length, edgeCount: g.edges.length, taskCount: (g.tasks || []).length, graphVersion: g.graphVersion, generatedAt: g.generatedAt || new Date().toISOString() };
+    });
+    return ok(list);
+  }
+  const gmatch = path.match(/\/v1\/knowledge-graphs\/([^/?]+)/);
+  if (gmatch && method === "GET") {
+    const g = st.graphs[gmatch[1]];
+    if (!g) throw Object.assign(new Error("知识图谱不存在"), { status: 404 });
+    return ok(g);
+  }
+  const mmatch = path.match(/\/v1\/materials\/([^/?]+)/);
+  if (mmatch && method === "GET") {
+    const m = st.materials.filter(function (x) { return x.id === mmatch[1]; })[0];
+    if (!m) throw Object.assign(new Error("资料不存在"), { status: 404 });
+    return ok(m);
+  }
+  if (path.indexOf("/v1/students/") === 0 && path.indexOf("/diagnose") > 0) {
+    return ok({ studentId: st.studentId, graphVer: 1, weightVer: "1.0.0", formula: { score: "offline" }, topDebts: st.debts.map(function (d) { return { fromKp: d.fromKp, toKp: d.toKp, fromKpName: d.fromKpName, toKpName: d.toKpName, scoreFrom: d.scoreFrom, scoreTo: d.scoreTo, freq: d.freq, impact: d.impact, status: d.status }; }), narratives: [] });
+  }
+  if (path.indexOf("/v1/students/") === 0 && path.indexOf("/mastery") > 0) {
+    return ok([{ kpId: "K02", name: "会计等式", recentAcc: 0.4, sev: 0.5, selfConf: 2, score: 38, band: "red" }]);
+  }
+  if (path.indexOf("/v1/profile/") === 0) return ok({ profile: { studentId: st.studentId, tags: [], optOut: st.optOut, updatedAt: new Date().toISOString() }, features: {}, note: st.optOut ? "学生已 opt-out" : "ok" });
+  if (path.indexOf("/v1/agent/tools") === 0) return ok({ role: "student", count: 8, tools: [{ intentId: "debt.diagnose", description: "知识债诊断" }, { intentId: "today.tasks", description: "今日任务" }] });
+  if (path.indexOf("/v1/agent/turns") === 0 && method === "POST") {
+    let utter = "";
+    try { utter = (opt && opt.body && JSON.parse(opt.body).utterance) || ""; } catch (e) {}
+    let intent = "meta.help", reply = "离线助手：可问「诊断」「今日」「计划」「图谱」。";
+    if (/债|诊断|红边/.test(utter)) {
+      intent = "debt.diagnose";
+      reply = "【离线】发现 " + st.debts.length + " 条知识债：\n" + st.debts.map(function (d, i) { return (i + 1) + ". " + d.fromKpName + "→" + d.toKpName + " impact=" + d.impact; }).join("\n");
+    } else if (/今日|任务/.test(utter)) {
+      intent = "today.tasks";
+      const g = st.graphs["auto-off-m1"];
+      const tasks = (g && g.tasks) || [];
+      reply = "【离线】今日 " + tasks.length + " 项：\n" + tasks.map(function (t, i) { return (i + 1) + ". " + t.stem; }).join("\n");
+    } else if (/计划|14/.test(utter)) {
+      intent = "plan.create";
+      reply = "【离线】14 天草图：前 7 天补「会计等式/借贷记账」，后 7 天回收「会计分录」。每天 ≤35 分钟。";
+    } else if (/图谱|识网/.test(utter)) {
+      intent = "graph.view";
+      reply = "【离线】示例识网 4 节点 / 3 先修边，见「识网」页。";
+    }
+    return ok({ userId: st.studentId, role: "student", intentId: intent, score: 0.9, decision: "execute", response: reply, offline: true, sessionId: "off-" + Date.now(), phase: "responding", turnCount: 1, ts: new Date().toISOString() });
+  }
+  if (path.indexOf("/v1/materials/today-from-books") === 0 || path.indexOf("/v1/students/") === 0 && path.indexOf("/today") > 0) {
+    const g = st.graphs["auto-off-m1"];
+    return ok({ studentId: st.studentId, day: 1, date: new Date().toISOString(), totalMinutes: 20, coachMessage: "【离线】先做示例真题，再还债边。", tasks: (g && g.tasks) || [] });
+  }
+  throw Object.assign(new Error("离线模式暂不支持：" + path), { status: 501, offline: true });
+}
+
+function setOfflineBadge() {
+  try {
+    const el = document.querySelector(".badge") || document.getElementById("apiBaseInput");
+    if (offlineMode && el) {
+      const b = document.createElement("span");
+      b.id = "offlineBadge";
+      b.textContent = "离线独立模式";
+      b.style.cssText = "margin-left:8px;padding:2px 8px;border-radius:999px;background:#fff3cd;color:#856404;font-size:12px;border:1px solid #ffe08a";
+      if (el.parentNode) el.parentNode.appendChild(b);
+    }
+  } catch (e) {}
+}
 let graphs = [];
 let currentGraph = null;
 let selectedMaterialId = "";
@@ -715,6 +849,20 @@ async function probeApi(base) {
   }
 }
 
+// 启动时：若探测不到任何 API 且允许离线，则进入独立模式（手机可脱离电脑）
+async function maybeEnableOffline() {
+  if (offlineMode) return true;
+  for (const base of apiCandidates()) {
+    if (await probeApi(base)) return false;
+  }
+  if (window.__ASTRALPATH_FORCE_ONLINE__) return false;
+  offlineMode = true;
+  api = "offline://local";
+  apiResolved = true;
+  setOfflineBadge();
+  return true;
+}
+
 async function resolveApiBase(force) {
   if (apiResolved && !force) return api;
   for (const base of apiCandidates()) {
@@ -729,6 +877,20 @@ async function resolveApiBase(force) {
   return api;
 }
 
+// 启动时：若探测不到任何 API 且允许离线，则进入独立模式（手机可脱离电脑）
+async function maybeEnableOffline() {
+  if (offlineMode) return true;
+  for (const base of apiCandidates()) {
+    if (await probeApi(base)) return false;
+  }
+  if (window.__ASTRALPATH_FORCE_ONLINE__) return false;
+  offlineMode = true;
+  api = "offline://local";
+  apiResolved = true;
+  setOfflineBadge();
+  return true;
+}
+
 // 逐个探测候选地址，供「自动探测」按钮与排障使用
 async function apiDiagnostics() {
   const rows = [];
@@ -738,7 +900,24 @@ async function apiDiagnostics() {
   return rows;
 }
 
+async function fetchWithRetry(url, opt, retries) {
+  retries = retries || 2;
+  let lastErr = null;
+  for (let a = 0; a <= retries; a++) {
+    try {
+      return await fetch(url, opt);
+    } catch (e) {
+      lastErr = e;
+      if (a < retries) await new Promise(function (r) { setTimeout(r, 300 * (a + 1)); });
+    }
+  }
+  throw lastErr || new Error("network");
+}
+
 async function j(path, opt) {
+  if (offlineMode) {
+    try { return offlineApi(path, opt); } catch (e) { throw e; }
+  }
   await resolveApiBase();
   const urls = [api + path];
   if (api.indexOf("127.0.0.1:5190") < 0 && api !== FALLBACK_API) urls.push(FALLBACK_API + path);
@@ -746,7 +925,11 @@ async function j(path, opt) {
   for (let i = 0; i < urls.length; i++) {
     const url = urls[i];
     try {
-      const r = await fetch(url, opt);
+      // FormData 不可重放：仅对非 body 或可克隆的 JSON 做网络重试
+      const canRetry = !(opt && opt.body && typeof FormData !== "undefined" && opt.body instanceof FormData);
+      const r = canRetry
+        ? await fetchWithRetry(url, opt, 2)
+        : await fetch(url, opt);
       const text = await r.text();
       let body = null;
       try { body = text ? JSON.parse(text) : null; } catch (e) { body = null; }
@@ -790,11 +973,13 @@ function go(page) {
   document.querySelectorAll(".rail-nav button").forEach(function (b) {
     b.classList.toggle("active", b.getAttribute("data-page") === page);
   });
-  resolveApiBase().then(function (base) {
+  maybeEnableOffline().finally(function () {
+    return resolveApiBase();
+  }).then(function (base) {
     const hint = $("apiHint");
-    if (hint) hint.textContent = "API " + base;
+    if (hint) hint.textContent = offlineMode ? "离线独立模式 · 本地数据" : ("API " + base);
     const uv = $("uiVersion");
-    if (uv) uv.textContent = "UI-full-v13";
+    if (uv) uv.textContent = "UI-full-v14";
     if (page === "home") loadHome();
     if (page === "materials") loadMaterials();
     if (page === "agent") loadAgentPage();

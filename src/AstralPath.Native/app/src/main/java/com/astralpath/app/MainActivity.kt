@@ -50,7 +50,32 @@ class MainActivity : Activity() {
                 else super.shouldInterceptRequest(view, request)
             }
         }
-        val html = assets.open("www/index.html").bufferedReader().use(BufferedReader::readText)
-        web.loadDataWithBaseURL(apiBase, html, "text/html", "utf-8", null)
+        val htmlRaw = assets.open("www/index.html").bufferedReader().use(BufferedReader::readText)
+        // 手机独立：探测不到电脑 API 时自动进入离线核心（不依赖 adb reverse / 局域网）
+        val html = if (htmlRaw.contains("__ASTRALPATH_OFFLINE__=true") || htmlRaw.contains("__ASTRALPATH_OFFLINE__ = true")) {
+            htmlRaw
+        } else {
+            htmlRaw.replaceFirst("<script>", "<script>window.__ASTRALPATH_OFFLINE__=false;window.__ASTRALPATH_FORCE_ONLINE__=false;</script><script>", ignoreCase = true)
+        }
+        web.loadDataWithBaseURL("https://appassets.androidplatform.net/assets/www/", html, "text/html", "utf-8", null)
+        // 后台探测本机/电脑 API；失败则重载为强制离线
+        Thread {
+            val online = try {
+                java.net.URL("http://127.0.0.1:5190/health/ready").openConnection().apply { connectTimeout = 1500; readTimeout = 1500 }.getInputStream().use { it.read() >= 0 }
+            } catch (_: Exception) { false }
+            if (!online) {
+                runOnUiThread {
+                    val offlineHtml = html.replaceFirst(
+                        "window.__ASTRALPATH_OFFLINE__=false",
+                        "window.__ASTRALPATH_OFFLINE__=true",
+                        ignoreCase = true
+                    ).let {
+                        if (it.contains("__ASTRALPATH_OFFLINE__=true")) it
+                        else it.replaceFirst("<script>", "<script>window.__ASTRALPATH_OFFLINE__=true;</script><script>", ignoreCase = true)
+                    }
+                    web.loadDataWithBaseURL("https://appassets.androidplatform.net/assets/www/", offlineHtml, "text/html", "utf-8", null)
+                }
+            }
+        }.start()
     }
 }

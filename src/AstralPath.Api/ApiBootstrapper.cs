@@ -90,6 +90,57 @@ public sealed class ApiBootstrapper
 
         var app = builder.Build();
 
+        // 全局异常兜底：避免未捕获异常变成空白 500，统一 ApiFailure 形状
+        app.Use(async (context, next) =>
+        {
+            try
+            {
+                await next();
+            }
+            catch (BadHttpRequestException ex)
+            {
+                context.Response.StatusCode = 400;
+                context.Response.ContentType = "application/json; charset=utf-8";
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    data = (object?)null,
+                    error = new { code = "VALIDATION_ERROR", message = ex.Message, details = new { } },
+                    traceId = context.TraceIdentifier
+                });
+            }
+            catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
+            {
+                context.Response.StatusCode = 499;
+            }
+            catch (Exception ex)
+            {
+                var status = ex switch
+                {
+                    FileNotFoundException => 404,
+                    DirectoryNotFoundException => 404,
+                    UnauthorizedAccessException => 403,
+                    InvalidDataException => 400,
+                    IOException => 503,
+                    TimeoutException => 504,
+                    _ => 500
+                };
+                context.Response.StatusCode = status;
+                context.Response.ContentType = "application/json; charset=utf-8";
+                Console.WriteLine($"[AstralPath] unhandled {context.Request.Method} {context.Request.Path}: {ex}");
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    data = (object?)null,
+                    error = new
+                    {
+                        code = status == 500 ? "INTERNAL_ERROR" : "REQUEST_ERROR",
+                        message = status == 500 ? "服务内部错误，请稍后重试" : ex.Message,
+                        details = new { type = ex.GetType().Name }
+                    },
+                    traceId = context.TraceIdentifier
+                });
+            }
+        });
+
         app.UseSwagger();
         app.UseSwaggerUI();
         app.UseCors("demo");

@@ -102,7 +102,28 @@ public static class MaterialPipeline
         return candidates.FirstOrDefault(Directory.Exists);
     }
 
+    /// <summary>OCR 进程并发闸：高负载时避免多份 Python/Tesseract 打满 CPU/内存。</summary>
+    private static readonly SemaphoreSlim OcrGate = new(2, 2);
+
     public static async Task<JsonElement> RunOcrAsync(string filePath, string ocrMode, CancellationToken ct = default)
+    {
+        if (!File.Exists(filePath))
+            throw new FileNotFoundException("资料文件不存在或已被删除", filePath);
+        if (new FileInfo(filePath).Length <= 0)
+            throw new InvalidDataException("资料文件为空");
+
+        await OcrGate.WaitAsync(ct);
+        try
+        {
+            return await RunOcrCoreAsync(filePath, ocrMode, ct);
+        }
+        finally
+        {
+            OcrGate.Release();
+        }
+    }
+
+    private static async Task<JsonElement> RunOcrCoreAsync(string filePath, string ocrMode, CancellationToken ct)
     {
         var script = ResolveOcrScript();
         var python = ResolvePython();

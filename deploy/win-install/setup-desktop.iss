@@ -4,7 +4,7 @@
 
 #define MyAppName "知债：星穹学途"
 #define MyAppNameEn "Knowledge Debt: Astral Path"
-#define MyAppVersion "1.4.1"
+#define MyAppVersion "1.5.0"
 #define MyAppPublisher "知债：星穹学途四人团队"
 #define MyAppURL "https://github.com/ClassTechStar/-Knowledge-Debt-Astral-Path"
 #define MyAppExeName "AstralPath.Desktop.exe"
@@ -12,7 +12,7 @@
 
 [Setup]
 ; 新 GUID + 新安装目录，与 1.3.0 / 1.4.0 安装包并存、互不覆盖
-AppId={{C9F5E3D2-6B7A-49FA-8D4E-25B3C9A1F882}
+AppId={{D0A6F4E3-7C8B-4A0B-9E5F-36C4D0B2A993}
 AppName={#MyAppName}
 AppVerName={#MyAppName} {#MyAppVersion}
 AppPublisher={#MyAppPublisher}
@@ -23,7 +23,7 @@ VersionInfoProductVersion={#MyAppVersion}.0
 VersionInfoDescription=知债：星穹学途 桌面应用（与 Web 端一致）
 VersionInfoProductName=知债：星穹学途
 VersionInfoCompany={#MyAppPublisher}
-DefaultDirName={autopf}\AstralPath-1.4.1
+DefaultDirName={autopf}\AstralPath-1.5
 DefaultGroupName={#MyAppName} 1.4
 DisableProgramGroupPage=yes
 OutputDir=dist

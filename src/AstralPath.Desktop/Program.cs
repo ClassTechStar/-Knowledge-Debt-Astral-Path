@@ -27,6 +27,12 @@ public sealed class MainForm : Form
         Text = "知债：星穹学途（Knowledge Debt: Astral Path）";
         Width = 1280;
         Height = 840;
+        try
+        {
+            var iconPath = Path.Combine(AppContext.BaseDirectory, "Resources", "astralpath-icon.ico");
+            if (File.Exists(iconPath)) Icon = new Icon(iconPath);
+        }
+        catch { /* 图标缺失不影响启动 */ }
         StartPosition = FormStartPosition.CenterScreen;
         MinimumSize = new Size(960, 640);
         Controls.Add(_web);

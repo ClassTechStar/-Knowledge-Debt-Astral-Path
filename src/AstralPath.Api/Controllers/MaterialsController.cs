@@ -9,6 +9,7 @@ namespace AstralPath.Api.Controllers;
 public sealed class MaterialsController : ControllerBase
 {
     private readonly AstralPathStore _store;
+    private static readonly SemaphoreSlim ParseGate = new(2, 2);
 
     public MaterialsController(AstralPathStore store) => _store = store;
 
@@ -174,6 +175,25 @@ public sealed class MaterialsController : ControllerBase
 
     private static async Task<MaterialDoc> ParseAndRegisterAsync(MaterialDoc material)
     {
+        await ParseGate.WaitAsync();
+        try
+        {
+            return await ParseAndRegisterCoreAsync(material);
+        }
+        finally
+        {
+            ParseGate.Release();
+        }
+    }
+
+    private static async Task<MaterialDoc> ParseAndRegisterCoreAsync(MaterialDoc material)
+    {
+        if (!System.IO.File.Exists(material.Path))
+        {
+            var missing = material with { Status = "failed", Error = "文件不存在或已被删除", UpdatedAt = DateTime.UtcNow };
+            MaterialRegistry.UpsertMaterial(missing);
+            return missing;
+        }
         var payload = await MaterialPipeline.RunOcrAsync(material.Path, material.OcrMode ?? "standard");
         var doc = MaterialPipeline.ToDto(material.Id, material.Name, material.Path, material.SizeBytes, payload, material.OcrMode ?? "standard");
         var graph = MaterialPipeline.ToGraph(doc, payload);
