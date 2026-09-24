@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>知债：星穹学途 · 项目方案 v4（可复刻开发）</title>
+<style>
+:root{
+  --bg:#f3f4f5; --surface:#fbfbfc; --soft:#e8eaec; --ink:#303236; --muted:#70757a;
+  --rule:#c7cacf; --primary:#0D72D9; --ok:#55a77b; --danger:#b64a58;
+  --code-bg:#0f1524; --code-fg:#d7e2ff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.6 -apple-system,"PingFang SC","Segoe UI",sans-serif}
+.wrap{max-width:980px;margin:0 auto;padding:28px 18px 64px}
+h1{font-size:32px;letter-spacing:-.03em;margin:0 0 4px}
+.sub{color:var(--muted);margin-bottom:22px}
+h2{font-size:20px;margin:28px 0 10px;border-left:3px solid var(--primary);padding-left:10px}
+h3{font-size:16px;margin:18px 0 8px}
+p,li{line-height:1.65}
+ul,ol{padding-left:1.25em}
+code{background:#e8eaec;padding:1px 6px;border-radius:6px;font-size:13px;
+  font-family:ui-monospace,Menlo,Consolas,monospace}
+pre{background:var(--code-bg);color:var(--code-fg);padding:14px;border-radius:12px;
+  overflow:auto;font-size:12.5px;line-height:1.5}
+pre code{background:transparent;color:inherit;padding:0}
+table{width:100%;border-collapse:collapse;font-size:13px;margin:8px 0 14px}
+th,td{border:1px solid var(--rule);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:var(--soft);font-weight:600}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:14px;
+  padding:16px 18px;margin:12px 0}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:999px;
+  background:#dcf4e7;color:#1e5d43;margin-right:6px}
+.tag.blue{background:#e7f0fb;color:#1d4f8c}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:720px){.grid{grid-template-columns:1fr}}
+nav.toc{position:sticky;top:0;z-index:5;background:rgba(243,244,245,.95);
+  border-bottom:1px solid var(--rule);padding:10px 0;margin:-28px -18px 18px;
+  backdrop-filter:blur(8px)}
+nav.toc .inner{max-width:980px;margin:0 auto;padding:0 18px;display:flex;
+  gap:12px;flex-wrap:wrap;font-size:13px}
+nav.toc a{color:var(--primary);text-decoration:none}
+.warn{background:#e7f5ee;border-left:3px solid var(--ok);padding:10px 14px;margin:10px 0;border-radius:0 10px 10px 0}
+.danger{background:#fdecec;border-left:3px solid var(--danger);padding:10px 14px;margin:10px 0;border-radius:0 10px 10px 0}
+</style>
+</head>
+<body>
+<nav class="toc"><div class="inner">
+  <a href="#goal">定位</a><a href="#arch">架构</a><a href="#core">核心算法</a>
+  <a href="#db">数据</a><a href="#api">接口</a><a href="#ui">UI 一致</a>
+  <a href="#build">构建</a><a href="#test">测试</a><a href="#deliver">交付</a><a href="#repro">复刻清单</a>
+</div></nav>
+<div class="wrap">
+
+<h1>知债：星穹学途</h1>
+<div class="sub">Knowledge Debt: Astral Path · AstralPath<br/>
+跨课程知识债诊断与修复智能体 · 项目方案 v4 · 供第三人完整复刻</div>
+
+<div class="card">
+  <span class="tag">纯函数 Core</span><span class="tag">三端同源 UI</span>
+  <span class="tag">离线可跑</span><span class="tag blue">62 测试全绿</span>
+  <p style="margin-top:10px">目标：把讲义变成识网，把欠债算清楚；诊断 → 计划 → 练习 → 销账全链路本地计算，数字可金样复现（1e-6）。</p>
+</div>
+
+<h2 id="goal">0. 产品定位与铁律</h2>
+<table>
+  <tr><th>项</th><th>约定</th></tr>
+  <tr><td>中文全称</td><td>知债：星穹学途</td></tr>
+  <tr><td>英文标识</td><td>Knowledge Debt: Astral Path / <code>AstralPath</code></td></tr>
+  <tr><td>仓库</td><td><code>https://github.com/ClassTechStar/-Knowledge-Debt-Astral-Path</code></td></tr>
+  <tr><td>禁用命名</td><td>知债图 / ZhiZhaiTu / zhizhaitu / zz_</td></tr>
+</table>
+<div class="danger"><strong>铁律</strong>：① score/impact/K1–K5/销账全部纯函数端上算；② LLM（若有）只能填叙事槽位，禁止改数字；③ 禁词命中必须降级模板；④ 不发明先修边；⑤ 不写 <code>cleared</code>，只由 <code>SaleStateMachine</code> 判定。</div>
+
+<h2 id="arch">1. 系统架构（三端同构）</h2>
+<pre>AstralPath.Mobile.sln / 主仓 sln
+├── AstralPath.Core/          # net10.0 纯函数，无 UI/IO/HTTP
+│   ├── Formula/FormulaConstants.cs      # score-v2 / impact-v2 常量
+│   ├── Algorithms/                       # 掌握度·债边·计划·销账·选题·拓扑
+│   ├── Graph/                            # 构图·度量·布局·学习路径
+│   ├── Ocr/                              # 文本引擎·阅读顺序
+│   ├── Profiling/UserProfiler.cs         # 画像 v2
+│   ├── Filtering/BannedWordFilter.cs
+│   ├── Formatting/NumberFormatter.cs     # score/impact 一律 F6
+│   ├── Resources/{strings.zh-CN.resx, ErrorCatalog.cs}
+│   └── Models/Dtos.cs
+├── AstralPath.Api/           # ASP.NET Core（Web/Windows 共用）
+│   ├── wwwroot/index.html                # ★ 唯一前端，三端共用
+│   ├── Controllers/                      # materials/students/plans/agent/...
+│   ├── ApiBootstrapper.cs                # 管线唯一事实源
+│   └── tools/ocr_pipeline.py             # OCR v2 Python 管线
+├── AstralPath.Desktop/       # WebView2 壳 + 同一份 index.html
+├── AstralPath.Native/        # Android WebView 壳（2.8MB）
+├── AstralPath.Mobile.Offline/# Avalonia 11 + SQLite 离线单体
+└── tests/AstralPath.Mobile.Tests/        # 金样 62 条</pre>
+<div class="warn">Windows = WebView2 + <code>index.html</code>；Android = WebView + <strong>同一字节</strong> <code>index.html</code>。改 UI 只改这一份文件，三端自动一致。</div>
+
+<h2 id="core">2. 核心算法（必须逐字实现）</h2>
+
+<h3>2.1 掌握度 score-v2</h3>
+<pre>score = min( 0.50·know + 0.30·retention + 0.20·prereqSupport , 0.55+0.45·min(prereq) )
+know   = 0.85·Beta(成功,失败; Jeffreys) + 0.15·(meanConf/5)
+Beta   = (s+0.5) / (attempts + 1)
+retention = exp(-age_days / S)
+S = 2.5 · (1 + 0.45·streak) · (1 + 0.25·ln(1+attempts))
+prereqSupport = 0.35·mean(prereq) + 0.65·min(prereq)   // 最弱链
+// 域恒为 [0,1]</pre>
+
+<h3>2.2 影响分 impact-v2</h3>
+<pre>impact = 0.55 · readiness · gap · weight · cross · cascade · volume
+readiness = σ((score[from] - 0.55) · 8)     // σ = 1/(1+e^-x)
+gap       = σ((0.50 - score[to]) · 8)
+cross     = 1.0 | 1.15 (transfer_gap)
+cascade   = 1 + 0.12·ln(1 + 下游节点数)
+volume    = 1 + 0.08·ln(1 + freq)
+// 命中：freq>0 且 impact ≥ 0.08（无悬崖门限）</pre>
+
+<h3>2.3 销账 sale-v2</h3>
+<pre>Weighted = 0.7·acc + 0.3·(conf/5) ≥ 0.65
+         ∧ acc ≥ 0.7 ∧ conf ≥ 3
+cleared  ⇔ 近期连续 2 次达标 ∧ 累计作答 ≥ 3 次
+         且 status ∈ {open, repairing}
+// 只能由 SaleStateMachine.Transition 写 cleared（终态）</pre>
+
+<h3>2.4 计划 K1–K5 + PlannerBuilder</h3>
+<table>
+  <tr><th>码</th><th>约束</th></tr>
+  <tr><td>K1</td><td>每日总时长 ≤ 预算（默认 40）</td></tr>
+  <tr><td>K2</td><td>先修任务日 ≤ 依赖任务日</td></tr>
+  <tr><td>K3</td><td>core ≤ 25 分 / challenge ≤ 15 分</td></tr>
+  <tr><td>K4</td><td>同一 KP 两次任务间隔 ≥ 1 天</td></tr>
+  <tr><td>K5</td><td>所有 open 债边被覆盖或显式跳过</td></tr>
+</table>
+<pre>PlannerBuilder：impact 降序 → From 先于 To（拓扑）
+间隔重复 day = 1 + {0, 2, 6} 三遍
+在 preferDay 附近找合法日塞入，自动满足 K1/K3/K4</pre>
+
+<h3>2.5 选题 QuestionScheduler</h3>
+<pre>Priority = (1-score)^1.2 × (impact+0.05) × exp(-4·(d - (score+0.15))²) × (1+age/14)
+// 目标难度 = 能力 + 0.15（最近发展区）</pre>
+
+<h3>2.6 知识图谱</h3>
+<pre>// 构图 GraphInference.BuildFromText
+TextRank 窗口加权共现 → 概念重要性（替代词频）
+PMI 边权 = max(0, log2(co·N / a·b))，≥1.0 才连边
+依赖句式「先学X再Y / 基于X…才能…」→ prerequisite
+章节 backbone 弱边 + 概念挂靠
+
+// 拓扑 GraphTopology
+Layers(n) = 1+max(Layer(prereq))          // 难度代理
+CriticalPath                              // 最长硬骨头链
+Bottlenecks：删点后「全图源点」不可达数   // 真割点
+DownstreamMass：下游传递闭包规模          // 喺 impact.cascade
+
+// 度量 / 布局 / 路径
+PageRank(d=0.85) · Hub=√(in·out)+0.25(in+out)
+GraphLayout：x=拓扑层，同层重心排序减交叉（Sugiyama 简化）
+LearningPath：2.5×瓶颈 + 1.5×关键路径 + 层 + PageRank</pre>
+
+<h3>2.7 OCR v2</h3>
+<pre>预处理：灰度 → autocontrast(2%) → UnsharpMask
+识别：PSM 3/4/6 三配置 + TSV conf≥45 词
+重建：(Y 行带 8px, X) 阅读顺序；XY-cut 两栏
+投票：行级多数票（≥⌈n/2⌉）
+后处理：全角/数学号归一、中英粘连拆开、中文软断行合并、页眉过滤
+质量分：CJK 占比 × 噪声率 × 置信度 → A/B/C/D</pre>
+
+<h3>2.8 画像 UserProfiler</h3>
+<pre>Brier = mean((conf/5 − 1{对})²)          // 信心校准
+CalibBias = E[conf/5] − E[对]            // &gt;0 过度自信
+StyleVector = (AccuracyFirst, Calibrated, Steady, Independent, DeepDive)
+Topics.Weight = (1−mastery) × (0.4+0.6·interest) × 难度适中
+Smooth：EMA α=0.25
+TeacherView：禁列域 {sensitive,crisis,semantic} + k-匿名（&lt;3 抑制）
+SoftNudge：软提示，禁止处分性文案</pre>
+
+<h2 id="db">3. SQLite（手写 SQL，禁用 EF）</h2>
+<pre>local_kp_node(kp_id PK, title, course, difficulty)
+local_kp_edge(from_kp, to_kp, edge_type, weight)
+local_mastery(kp_id PK, raw, age_days, streak, score)
+local_debt_edge(from_kp, to_kp, impact, status, streak, PK(from,to))
+local_plan_item(id AI, day, kp_id, layer, minutes, status)
+local_attempt(id PK, kp_id, correct, self_conf, created_at)
+local_question(id PK, kp_id, stem, answer_kind, correct_payload, difficulty)
+-- 全部参数化 $ 占位；状态机外禁止 UPDATE status='cleared'</pre>
+
+<h2 id="api">4. 关键 API（REST）</h2>
+<table>
+  <tr><th>方法</th><th>路径</th><th>说明</th></tr>
+  <tr><td>GET</td><td><code>/health/ready</code> <code>/api/meta</code> <code>/api/services</code></td><td>健康与服务预热</td></tr>
+  <tr><td>POST</td><td><code>/v1/materials/upload</code> | <code>upload-batch</code></td><td>上传（2GB 上限、文件名截 80 字）</td></tr>
+  <tr><td>POST</td><td><code>/v1/materials/parse-all</code></td><td>批量解析（并发闸 ≤2）</td></tr>
+  <tr><td>GET</td><td><code>/v1/knowledge-graphs</code></td><td>识网 DAG</td></tr>
+  <tr><td>GET</td><td><code>/v1/students/{id}/diagnose</code></td><td>红边诊断（graph_ver 必填）</td></tr>
+  <tr><td>POST</td><td><code>/v1/students/{id}/plans</code></td><td>14 天计划 + K1–K5</td></tr>
+  <tr><td>POST</td><td><code>/v1/attempts</code></td><td>作答 → 掌握度/销账</td></tr>
+  <tr><td>POST</td><td><code>/v1/agent/turns</code></td><td>智能体（userId 必填）</td></tr>
+  <tr><td>POST</td><td><code>/v1/what-if</code></td><td>空参 400，不 500</td></tr>
+</table>
+<div class="warn">错误响应统一 <code>{data:null,error:{code,message,details},traceId}</code>；全局异常兜底映射 400/403/404/503/504。</div>
+
+<h2 id="ui">5. UI/UX 一致（三端）</h2>
+<pre>--canvas:#f3f4f5  --surface:#fbfbfc  --surface-soft:#e8eaec  --ink:#303236
+--muted:#70757a   --rule:#c7cacf     --field:#eff0f2         --primary:#0D72D9
+--danger:#b64a58  --node-ok:#55a77b  --node-target:#d95a67   --node-chapter:#6d9fc7
+--radius-control:12px  --radius-group:16px  --radius-shell:22px</pre>
+<table>
+  <tr><th>组件</th><th>规格</th></tr>
+  <tr><td>导航</td><td>胶囊栏：起点·藏书阁·识网·知债·今日·智能体·画像·账户（顺序固定）</td></tr>
+  <tr><td>主按钮</td><td><code>#0D72D9</code> 底白字，radius 12，min-height 40</td></tr>
+  <tr><td>卡片</td><td>白底 1px rule，radius 16（shell 22）</td></tr>
+  <tr><td>状态条</td><td>左侧 3px 色条（ok 绿 / warn 灰）</td></tr>
+  <tr><td>badge</td><td>ready 绿 / parsing 黄→<strong>要求全绿</strong> / failed 红</td></tr>
+  <tr><td>气泡</td><td>用户右 primary 白字；机器人左 surface-soft；radius 14；max-width 88%；字号 13</td></tr>
+  <tr><td>输入框</td><td>智能体 radius 18；表单 radius 12、min-height 42、field 底</td></tr>
+  <tr><td>文案</td><td>一律走 <code>strings.zh-CN.resx</code>，禁止硬编码；F6 显示 score/impact</td></tr>
+  <tr><td>触控</td><td>Mobile ≥44px；色盲安全（同一调色板）</td></tr>
+</table>
+
+<h2 id="build">6. 构建与运行</h2>
+<pre># 环境：.NET 10 SDK · Android workload · JDK17 · Gradle 9.7.1 · Inno Setup 7
+# NuGet 若报 path1=null，先补：PROGRAMDATA / PROGRAMFILES(X86) / ALLUSERSPROFILE / CheckEolWorkloads=false
+
+# 测试
+dotnet test tests/AstralPath.Mobile.Tests -c Release     # 62 全绿
+
+# Web / API
+dotnet run --project src/AstralPath.Api --urls http://127.0.0.1:5190
+
+# Android WebView 壳（与 Web 同 UI）
+$env:JAVA_HOME="C:\Temp\jdk-17"
+&amp; "C:\Gradle\bin\gradle.bat" -p src/AstralPath.Native assembleRelease
+
+# Windows 安装包（新 AppId/目录，可与旧版并存）
+dotnet publish src/AstralPath.Desktop -c Release -r win-x64 --self-contained -o deploy/win-install/AstralPath-Setup/bin
+&amp; "C:\Program Files\Inno Setup 7\ISCC.exe" deploy/win-install/setup-desktop.iss
+
+# Avalonia 离线单体（须 ASCII 路径，如 C:\Temp\AstralPathMobile）
+dotnet build AstralPath.Mobile.Android -c Release</pre>
+<div class="danger">APK 打包路径必须 <strong>纯 ASCII</strong>（中文路径触发 AAPT2265）。商店签名 keystore：<code>alias=astralpath</code> / <code>pass=astralpath2026</code>。</div>
+
+<h2 id="test">7. 测试与金样</h2>
+<table>
+  <tr><th>套件</th><th>条数</th><th>要点</th></tr>
+  <tr><td>GoldenScoreTests</td><td>10</td><td>Beta 收缩、遗忘、最弱先修封顶</td></tr>
+  <tr><td>GoldenImpactTests</td><td>6</td><td>软门限单调、级联、弱父不归责</td></tr>
+  <tr><td>GoldenSaleTests</td><td>4</td><td>加权线、≥3 次、终态</td></tr>
+  <tr><td>QuestionScheduler</td><td>2</td><td>薄弱优先、难度匹配</td></tr>
+  <tr><td>ConstraintChecker</td><td>3</td><td>K1/K5 + Builder 满足 K1/K3/K4</td></tr>
+  <tr><td>GraphIntelligence</td><td>12</td><td>分层/关键路径/瓶颈/布局/构图</td></tr>
+  <tr><td>OcrEngine</td><td>8</td><td>混淆/断行/TSV/投票/阅读顺序/质量分</td></tr>
+  <tr><td>UserProfiler</td><td>10</td><td>Brier/风格/EMA/k-匿名/软提示</td></tr>
+  <tr><td>走读</td><td>1</td><td>诊断→计划→练习→销账端到端</td></tr>
+</table>
+<pre>验收：dotnet test 全绿 · 容差 1e-6 · score∈[0,1] · 无旧命名 · 文案走 resx</pre>
+
+<h2 id="deliver">8. 交付物</h2>
+<ul>
+  <li><code>AstralPath-Android-3.0.0-Store.apk</code>（WebView 同构，~2.8MB，商店签名）</li>
+  <li><code>AstralPath-Setup-1.5.0-Desktop.exe</code> / <code>1.4.x</code>（新 AppId 可并存）</li>
+  <li><code>index.html</code>（工作区算法/UI 预览；Web 真身在 <code>src/AstralPath.Api/wwwroot/</code>）</li>
+  <li>应用图标：星穹轨道 + 打开的书 + 三色图节点（<code>deploy/icons/</code>，16–1024 + ICO）</li>
+</ul>
+
+<h2 id="repro">9. 第三人复刻清单（按序打勾）</h2>
+<ol>
+  <li>克隆仓库 <code>ClassTechStar/-Knowledge-Debt-Astral-Path</code>，装 .NET 10 + Android workload + JDK17。</li>
+  <li>按 §2 逐字实现 Core 五个方向算法 + 金样测试，跑 <code>dotnet test</code> 至 62 全绿。</li>
+  <li>实现 SQLite 七表 + LocalStore（计划/作答/销账走 Core 状态机）。</li>
+  <li>粘贴 <code>wwwroot/index.html</code>（唯一前端），接 REST；实现 Desktop WebView2 与 Android WebView 两壳。</li>
+  <li>按 §5 色板/文案/控件校对 UI；按 §6 打 APK/EXE（注意 ASCII 路径与新 AppId）。</li>
+  <li>跑 §7 全部测试 + 走读 + 真机（离线可诊断→计划→练习→销账）。</li>
+</ol>
+<div class="warn">复刻完成的判据：三端 UI 逐像素同构 · 金样 1e-6 · 断网全流程 · 无服务端强制依赖 · 包体 APK≤50MB 冷启动≤2s。</div>
+
+<h2>10. 自主决策 / 已知限制</h2>
+<ul>
+  <li><code>SaleStreakRequired=2</code> 且 <code>SaleMinAttempts=3</code>（防两题清账）。</li>
+  <li>LLM 默认关闭；接入后仅润色叙事，数字一律本地。</li>
+  <li>扫描版 OCR 为 tesseract 三配置投票；字准率依赖 tessdata 与预处理。</li>
+  <li>Android 构建目录建议 <code>C:\Temp\AstralPathMobile</code>。</li>
+</ul>
+
+<p class="sub" style="margin-top:32px">© 2026 知债：星穹学途四人团队 · 本方案为复刻唯一事实源</p>
+</div>
+</body>
+</html>

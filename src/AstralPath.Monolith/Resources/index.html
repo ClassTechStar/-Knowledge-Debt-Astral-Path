@@ -1,0 +1,559 @@
+<!-- AI生成 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>知债：星穹学途 · 单体版（无微服务）</title>
+<style>
+:root{
+  --canvas:#f3f4f5;--surface:#fbfbfc;--soft:#e8eaec;--strong:#858a90;
+  --ink:#303236;--muted:#70757a;--rule:#c7cacf;--field:#eff0f2;
+  --danger:#b64a58;--primary:#0D72D9;--ok:#55a77b;--ok-bg:#dcf4e7;--ok-ink:#1e5d43;
+  --node-chapter:#6d9fc7;--node-target:#d95a67;
+  --r-c:12px;--r-g:16px;--r-s:22px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--canvas);color:var(--ink);font:15px/1.55 -apple-system,"PingFang SC","Segoe UI",sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:18px 16px 40px}
+header.rail{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 0 16px}
+.mark{width:40px;height:30px;display:grid;place-items:center;border-radius:10px;background:var(--soft);color:var(--strong);font-weight:800}
+.brand strong{display:block;font-size:16px}
+.brand small{color:var(--muted);font-size:11px}
+nav.pills{display:flex;flex-wrap:wrap;gap:4px;margin-left:auto;padding:5px;border-radius:999px;background:var(--soft)}
+nav.pills button{padding:8px 12px;border:0;border-radius:999px;background:transparent;color:var(--muted);cursor:pointer;min-height:36px}
+nav.pills button.on{background:var(--surface);color:var(--ink);font-weight:700}
+.avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--strong);color:#fff;font-weight:700}
+.page-h{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
+.page-h h1{margin:0;font-size:clamp(26px,4vw,40px);letter-spacing:-.03em}
+.page-h p{margin:8px 0 0;color:var(--muted);max-width:720px}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{min-height:40px;padding:8px 14px;border:1px solid var(--rule);border-radius:var(--r-c);background:var(--surface);color:var(--ink);cursor:pointer;font-size:14px}
+.btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn.quiet{border:0;background:transparent;color:#7a838e;font-size:12px}
+.panel{padding:20px;border:1px solid var(--rule);border-radius:var(--r-g);background:var(--surface);margin-bottom:14px}
+.panel h2{margin:0 0 6px;font-size:20px}
+.panel .hint{margin:0 0 12px;color:var(--muted);font-size:13px}
+.grid2{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(240px,.7fr);gap:14px;align-items:start}
+@media (max-width:800px){.grid2{grid-template-columns:1fr}}
+.field{display:grid;gap:6px;margin:8px 0;color:var(--muted);font-size:13px}
+.field input,.field select{min-height:42px;padding:8px 10px;border:1px solid var(--rule);border-radius:var(--r-c);background:var(--field);color:var(--ink);font-size:14px}
+.status{margin-top:12px;padding:12px 14px;border-left:3px solid var(--strong);background:var(--soft);color:var(--muted);line-height:1.5}
+.status.ok{border-left-color:var(--ok);color:#2f6b50}
+.status.err{border-left-color:var(--danger);color:#8d2828}
+.badge{display:inline-flex;padding:2px 8px;border-radius:999px;font-size:12px;background:var(--ok-bg);color:var(--ok-ink)}
+.bar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden;margin:8px 0}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),#6aa8f0)}
+.card{border:1px solid var(--rule);border-radius:var(--r-g);background:var(--surface);padding:14px 16px;margin:10px 0}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}
+@media (max-width:700px){.stats{grid-template-columns:1fr 1fr}}
+.stat b{display:block;font-size:26px;color:var(--primary)}
+.dag{position:relative;min-height:300px;border:1px solid var(--rule);border-radius:var(--r-c);background:#fff;overflow:hidden}
+.dnode{position:absolute;min-width:108px;max-width:168px;padding:10px 12px;border:2px solid #b7bbc0;border-radius:14px;background:#fbfbfc;box-shadow:0 6px 16px rgba(45,47,50,.08);text-align:left;cursor:pointer}
+.dnode.chapter{border-color:#4f86c6;background:linear-gradient(180deg,#e8f2fb,#d9e9f8);color:#1d3d5f}
+.dnode.term{border-color:#55a77b;background:linear-gradient(180deg,#e5f7ee,#d4f0e2);color:#1e5d43}
+.dnode.debt{border-color:#d95a67;background:#ffe1e5;color:#792e38}
+.dnode span{display:block;font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dnode small{display:block;font-size:10px;color:var(--muted);margin-top:2px}
+.dline{position:absolute;height:2px;background:var(--strong);opacity:.5;transform-origin:left center}
+.chat{min-height:220px;max-height:400px;overflow:auto;padding:8px;border:1px solid var(--rule);border-radius:12px;background:#fff}
+.bub{max-width:88%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.55;margin:8px 0}
+.bub.user{background:var(--primary);color:#fff;margin-left:auto}
+.bub.bot{background:var(--soft);color:var(--ink)}
+input.chatin{flex:1;min-width:200px;min-height:42px;padding:8px 12px;border:1px solid var(--rule);border-radius:18px;background:var(--field)}
+.slider{width:100%}
+.tag{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--muted);margin-left:6px}
+ul.clean{margin:0;padding-left:1.2em}
+pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overflow:auto;font-size:12px}
+</style>
+</head>
+<body>
+<p data-aigc-mark="1" style="margin:0 0 8px;font-size:10px;line-height:1.3;color:#6b6560;font-weight:400;">AI生成</p>
+
+<div class="wrap">
+<header class="rail">
+  <div class="mark">债</div>
+  <div class="brand"><strong>知债：星穹学途</strong><small>Knowledge Debt: Astral Path · 单体版（无微服务）</small></div>
+  <nav class="pills" id="nav">
+    <button class="on" data-p="home">起点</button><button data-p="materials">藏书阁</button>
+    <button data-p="graph">识网</button><button data-p="debt">知债</button>
+    <button data-p="today">今日</button><button data-p="agent">智能体</button>
+    <button data-p="profile">画像</button><button data-p="account">账户</button>
+  </nav>
+  <div class="row" style="align-items:center">
+    <div class="avatar">访</div>
+    <div><strong style="font-size:13px">王小明（有债）</strong><div style="font-size:11px;color:var(--muted)" id="mode">单体 · 本机数据</div></div>
+  </div>
+</header>
+
+<!-- ═══ 起点 ═══ -->
+<main id="p-home">
+  <div class="page-h">
+    <div><h1>起点</h1><p>上传教材 → 本地解析 → 自动识网 → 今日任务与知识债诊断。无需服务器、无微服务。</p></div>
+    <div class="actions"><button class="btn primary" id="btnSeed">导入示例教材</button><button class="btn primary" data-go="materials">打开藏书阁</button></div>
+  </div>
+  <div class="panel">
+    <h2>把讲义变成识网，再把欠债算清楚</h2>
+    <p class="hint">ASTRALPATH WORKSPACE · 全部计算在浏览器本机完成</p>
+    <div class="stats">
+      <div class="stat"><span class="hint">资料数</span><b id="sMat">0</b></div>
+      <div class="stat"><span class="hint">自动图谱</span><b id="sGraph">0</b></div>
+      <div class="stat"><span class="hint">今日任务</span><b id="sTask">0</b></div>
+      <div class="stat"><span class="hint">开放债边</span><b id="sDebt">0</b></div>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>系统状态</h2>
+    <div class="status ok">score-v2 / impact-v2 / sale-v2 · 数据存 localStorage · <span class="badge">单体就绪</span></div>
+  </div>
+</main>
+
+<!-- ═══ 藏书阁 ═══ -->
+<main id="p-materials" hidden>
+  <div class="page-h">
+    <div><h1>藏书阁</h1><p>支持 PDF/文本。文本层优先，扫描件可走 OCR（本机 tesseract 可选）。</p></div>
+    <div class="actions"><button class="btn" id="btnSeed2">导入示例资料</button><button class="btn" id="btnParseAll">解析全部</button><button class="btn" id="btnRefresh">刷新列表</button></div>
+  </div>
+  <div class="grid2">
+    <section class="panel">
+      <h2>资料库</h2>
+      <div class="field"><label>选择学习资料（可多选）</label><input type="file" id="fileInput" multiple accept=".pdf,.txt,.md,.PDF" /></div>
+      <div class="field"><label>已选文件</label><div id="fileHint">尚未选择文件</div></div>
+      <div class="field"><label>解析模式</label>
+        <select id="ocrMode"><option>quick · 快速</option><option selected>standard · 目录+抽样</option><option>none · 仅文本层</option></select>
+      </div>
+      <div class="actions"><button class="btn primary" id="btnUpload">上传并解析（支持多选）</button></div>
+      <div class="status" id="matStatus">尚未上传</div>
+      <div id="matList"></div>
+    </section>
+    <aside class="panel">
+      <h2>解析详情</h2>
+      <p class="hint">选择左侧资料查看详情。</p>
+      <div id="matDetail"></div>
+    </aside>
+  </div>
+</main>
+
+<!-- ═══ 识网 ═══ -->
+<main id="p-graph" hidden>
+  <div class="page-h">
+    <div><h1>识网</h1><p>点击教材卡片切换图谱、知识点与真题。</p></div>
+    <div class="actions"><button class="btn" id="btnGRefresh">刷新图谱</button><button class="btn primary" data-go="today">用本书出今日题</button></div>
+  </div>
+  <div class="panel"><h2>教材切换</h2><p class="hint">点击卡片切换当前教材</p><div class="row" id="bookChips"></div><div class="status ok" id="gSwitch">已加载示例图包</div></div>
+  <div class="grid2">
+    <section class="panel">
+      <h2>知识图谱 <span class="tag" id="gBadge">—</span></h2>
+      <p class="hint">章节蓝 · 词绿 · 债红</p>
+      <div class="dag" id="dag"></div>
+    </section>
+    <aside class="panel">
+      <h2>章节侧栏</h2>
+      <p class="hint">完整目录 · 点击查看正文与自动出题</p>
+      <div id="chTree" style="max-height:220px;overflow:auto;border:1px solid var(--rule);border-radius:8px;padding:8px"></div>
+      <div id="chBody" style="margin-top:10px;padding:10px;background:var(--soft);border-radius:8px;font-size:13px;line-height:1.6;max-height:180px;overflow:auto">选择左侧章节后显示正文</div>
+      <h2 style="margin-top:14px">节点检视</h2>
+      <div id="nodeInfo" class="hint">点击 DAG 节点。</div>
+    </aside>
+  </div>
+</main>
+
+<!-- ═══ 知债 ═══ -->
+<main id="p-debt" hidden>
+  <div class="page-h">
+    <div><h1>知债：星穹学途</h1><p>BASELINE 诊断 · What-if · 14 天修复计划</p></div>
+    <div class="actions">
+      <button class="btn" id="btnDiag">重新诊断</button>
+      <button class="btn" id="btnPlan">生成 14 天计划</button>
+      <button class="btn" id="btnSale">销账检查</button>
+    </div>
+  </div>
+  <div class="panel"><h2>红边（按 impact）</h2><div id="debtList"></div></div>
+  <div class="panel">
+    <h2>What-if 模拟</h2>
+    <div class="field"><label>前置掌握 score_p <span id="vSp">0.30</span></label><input class="slider" type="range" id="wSp" min="0" max="100" value="30" /></div>
+    <div class="field"><label>目标掌握 score_c <span id="vSc">0.25</span></label><input class="slider" type="range" id="wSc" min="0" max="100" value="25" /></div>
+    <div class="field"><label>错题频次 freq <span id="vFq">5</span></label><input class="slider" type="range" id="wFq" min="0" max="20" value="5" /></div>
+    <div class="status" id="whatOut">拖动滑杆查看 impact（公式 impact-v2）</div>
+  </div>
+  <div class="panel"><h2>修复计划</h2><div id="planBox"></div></div>
+</main>
+
+<!-- ═══ 今日 ═══ -->
+<main id="p-today" hidden>
+  <div class="page-h">
+    <div><h1>今日任务</h1><p id="coach">今天先完成相关真题，再回到课程债边。</p></div>
+    <div class="actions"><button class="btn" id="btnLoadToday">加载今日任务</button><button class="btn" id="btnShuffle">换一批题</button><button class="btn quiet" id="btnDay">Demo +1 天</button></div>
+  </div>
+  <div class="panel">
+    <div class="bar"><i id="todayBar" style="width:0%"></i></div>
+    <div id="todayList"></div>
+  </div>
+  <div class="panel">
+    <h2>练习</h2>
+    <div class="field"><label>信心 1–5：<span id="vConf">3</span></label><input class="slider" type="range" id="conf" min="1" max="5" value="3" /></div>
+    <div id="quizBox"></div>
+  </div>
+</main>
+
+<!-- ═══ 智能体 ═══ -->
+<main id="p-agent" hidden>
+  <div class="page-h">
+    <div><h1>受约束智能体</h1><p>意图路由 · 危机转人工 · 敏感词脱敏。数字只来自本地公式。</p></div>
+  </div>
+  <div class="grid2">
+    <section class="panel">
+      <h2>对话</h2><p class="hint">sessionId: local-monolith</p>
+      <div class="chat" id="chat"></div>
+      <div class="row" style="margin-top:12px">
+        <input class="chatin" id="agentIn" placeholder="例如：我的会计等式总是搞不清，怎么办？" />
+        <button class="btn primary" id="btnSend">发送</button>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <button class="btn quiet" data-q="我这周学不完计划了">压力求助</button>
+        <button class="btn quiet" data-q="我不想活了">危机词测试</button>
+        <button class="btn quiet" data-q="帮我诊断知识债">诊断债</button>
+        <button class="btn quiet" data-q="生成14天计划">生成计划</button>
+      </div>
+      <div class="status ok" id="agentSt">ok · ready</div>
+    </section>
+    <aside class="panel"><h2>工具清单</h2><p class="hint">本机白名单（无微服务）</p>
+      <ul class="clean"><li>诊断红边</li><li>14 天计划</li><li>今日任务</li><li>识网摘要</li><li>销账检查</li></ul>
+    </aside>
+  </div>
+</main>
+
+<!-- ═══ 画像 ═══ -->
+<main id="p-profile" hidden>
+  <div class="page-h"><div><h1>画像</h1><p>掌握度与学习风格五轴 · 可随时 opt-out</p></div></div>
+  <div class="panel"><h2>掌握度</h2><div id="masteryList"></div></div>
+  <div class="panel"><h2>风格五轴</h2><div id="styleList"></div>
+    <p class="hint">Brier 越低越准 · Steady=状态稳 · Independent=少提示</p></div>
+  <div class="panel"><button class="btn" id="btnOpt">关闭个性化画像（opt-out）</button><div class="status" id="optLine">个性化开启中</div></div>
+</main>
+
+<!-- ═══ 账户 ═══ -->
+<main id="p-account" hidden>
+  <div class="page-h"><div><h1>账户</h1><p>本机演示账户 · 同意/撤销教师可见 · 导出/重置</p></div></div>
+  <div class="panel">
+    <h2>登录</h2>
+    <div class="field"><label>邮箱</label><input id="email" value="demo@astralpath.local" /></div>
+    <div class="field"><label>密码</label><input id="pass" type="password" value="demo123456" /></div>
+    <div class="row"><button class="btn primary" id="btnLogin">登录</button><button class="btn" id="btnLogout">退出</button></div>
+    <div class="status" id="authLine">未登录</div>
+  </div>
+  <div class="panel">
+    <h2>教师可见授权</h2>
+    <div class="row"><button class="btn primary" id="btnGrant">同意授权</button><button class="btn" id="btnRevoke">撤销授权</button></div>
+    <div class="status" id="consentLine">未授权</div>
+  </div>
+  <div class="panel">
+    <h2>数据</h2>
+    <div class="row"><button class="btn" id="btnExport">导出数据</button><button class="btn" id="btnWipe">重置</button></div>
+  </div>
+</main>
+</div>
+
+<script>
+"use strict";
+/* =========================================================
+   单体版核心（无微服务）：score-v2 / impact-v2 / sale-v2 / 计划 / 图 / 画像
+   ========================================================= */
+const K = { W:{e:.5,r:.3,p:.2}, floor:.55, stab0:2.5, a:.45, b:.25, mix:.65,
+  impactBase:.55, crossTg:1.15, pg:.55, cg:.50, steep:8, hit:.08, cas:.12, vol:.08,
+  saleBar:.65, saleAcc:.7, saleConf:3, saleStreak:2, saleMinAtt:3 };
+const sig = x => 1/(1+Math.exp(-x));
+const clamp01 = v => Math.max(0, Math.min(1, v));
+
+function empirical(n,s){ return (s+0.5)/(n+1); }
+function stability(streak,att){ return K.stab0*(1+K.a*Math.max(streak,0))*(1+K.b*Math.log(1+Math.max(att,1))); }
+function retention(age,streak,att){ return Math.exp(-Math.max(age,0)/stability(streak,att)); }
+function prereqSup(arr){ if(!arr||!arr.length) return .5; const mean=arr.reduce((a,b)=>a+b,0)/arr.length, mn=Math.min(...arr); return (1-K.mix)*mean+K.mix*mn; }
+function prereqCeil(arr){ return (!arr||!arr.length)?1: K.floor+(1-K.floor)*Math.min(...arr); }
+function scoreV2(att,ok,conf,age,streak,prereq){
+  const know = .85*empirical(att,ok) + .15*(conf/5);
+  const raw = K.W.e*know + K.W.r*retention(age,streak,att) + K.W.p*prereqSup(prereq);
+  return clamp01(Math.min(raw, prereqCeil(prereq)));
+}
+function impactV2(sf,st,w,tg,freq,down){
+  if(freq<=0) return 0;
+  return K.impactBase * sig((sf-K.pg)*K.steep) * sig((K.cg-st)*K.steep) * Math.max(w,0)
+    * (tg?K.crossTg:1) * (1+K.cas*Math.log(1+Math.max(down,0))) * (1+K.vol*Math.log(1+Math.max(freq,0)));
+}
+function saleStep(s,acc,conf){
+  const meets = (0.7*acc+0.3*(conf/5))>=K.saleBar && acc>=K.saleAcc && conf>=K.saleConf;
+  const streak = meets ? s.streak+1 : 0;
+  const att = s.att+1;
+  const status = (streak>=K.saleStreak && att>=K.saleMinAtt) ? "cleared" : (streak>0||att>0 ? "repairing" : "open");
+  return {status, streak, att, meets};
+}
+
+/* ---------- 数据 ---------- */
+const LS = "astralpath_monolith_v1";
+function load(){ try{ return JSON.parse(localStorage.getItem(LS))||seed(); }catch(e){ return seed(); } }
+function save(s){ try{ localStorage.setItem(LS, JSON.stringify(s)); }catch(e){} }
+function seed(){
+  const nodes = [
+    ["N1","会计要素",1],["N2","会计等式",2],["N3","借贷记账法",3],["N4","会计分录",3],
+    ["N5","试算平衡",2],["N6","账户结构",2],["N7","财产清查",2],["N8","财务报表",4]
+  ].map(([id,title,d])=>({id,title,diff:d,course:"会计基础",kind:d===1?"chapter":"term"}));
+  const edges = [
+    ["N1","N2",0,1.0],["N2","N3",0,1.2],["N3","N4",0,1.1],["N4","N5",0,1.0],
+    ["N2","N6",0,0.9],["N6","N4",1,0.8],["N5","N7",0,0.9],["N7","N8",0,1.0],["N3","N5",1,0.7]
+  ].map(([f,t,tg,w])=>({from:f,to:t,tg:!!tg,w}));
+  const mastery = {
+    N1:{n:8,s:8,c:4,age:1,st:2}, N2:{n:8,s:7,c:4,age:1,st:2}, N3:{n:8,s:2,c:2,age:0,st:0},
+    N4:{n:8,s:3,c:2,age:0,st:0}, N5:{n:6,s:3,c:3,age:1,st:1}, N6:{n:5,s:3,c:3,age:2,st:1},
+    N7:{n:4,s:2,c:3,age:3,st:0}, N8:{n:3,s:1,c:2,age:5,st:0}
+  };
+  const qs = [
+    ["Q1","N2","会计等式是：","资产=负债+所有者权益",0],["Q2","N2","会计要素共几类？","六类",1],
+    ["Q3","N3","借方登记增加的是：","资产类",0],["Q4","N3","负债增加记：","贷方",1],
+    ["Q5","N4","分录三要素：","账户+方向+金额",0],["Q6","N5","试算平衡查：","借方=贷方",1],
+    ["Q7","N1","下列属于会计要素：","资产",0],["Q8","N6","账户结构含：","期初+发生额+期末",1],
+    ["Q9","N7","财产清查属于：","会计核算方法",0],["Q10","N8","资产负债表反映：","财务状况",1]
+  ].map(([id,kp,stem,cor,ci])=>({id,kp,stem,opts:[cor,ci===0?"收入":"费用","不确定","与本题无关"],ci,diff:2}));
+  return {user:null,consent:false,optOut:false,nodes,edges,mastery,qs,plan:null,sale:{},day:1,mat:[],logs:[]};
+}
+let S = load();
+const title = id => (S.nodes.find(n=>n.id===id)||{title:id}).title;
+const prereqs = id => S.edges.filter(e=>e.to===id && !e.tg).map(e=>e.from);
+function downMass(id){
+  const adj={}; S.edges.forEach(e=>{(adj[e.from]=adj[e.from]||[]).push(e.to)});
+  const seen=new Set(); const st=[id];
+  while(st.length){const x=st.pop(); (adj[x]||[]).forEach(y=>{if(!seen.has(y)){seen.add(y);st.push(y);}})}
+  return seen.size;
+}
+function scoreOf(id){
+  const m=S.mastery[id]||{n:0,s:0,c:3,age:0,st:0};
+  const pre=prereqs(id).map(p=>scoreOf(p));
+  return scoreV2(m.n,m.s,m.c,m.age,m.st,pre);
+}
+function scanDebts(){
+  return S.edges.map(e=>{
+    const sf=scoreOf(e.from), st=scoreOf(e.to);
+    const fr=(S.logs.filter(l=>l.kp===e.to&&!l.ok).length)|| (sf>0.6?5:2);
+    const imp=impactV2(sf,st,e.w,e.tg,fr,downMass(e.to));
+    return {from:e.from,to:e.to,fromName:title(e.from),toName:title(e.to),sf,st,imp,freq:fr,status:imp>=K.hit?"open":"cleared"};
+  }).filter(d=>d.imp>0).sort((a,b)=>b.imp-a.imp);
+}
+
+/* ---------- UI ---------- */
+const $=id=>document.getElementById(id);
+function go(p){
+  document.querySelectorAll("main").forEach(m=>m.hidden=true);
+  $("p-"+p).hidden=false;
+  document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.p===p));
+  if(p==="home") renderHome();
+  if(p==="materials") renderMats();
+  if(p==="graph") renderGraph();
+  if(p==="debt") renderDebt();
+  if(p==="today") renderToday();
+  if(p==="agent") ensureChat();
+  if(p==="profile") renderProfile();
+  if(p==="account") renderAccount();
+}
+document.getElementById("nav").onclick=e=>{const b=e.target.closest("button[data-p]"); if(b) go(b.dataset.p)};
+document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
+
+function renderHome(){
+  $("sMat").textContent=S.mat.length; $("sGraph").textContent=S.nodes.length?1:0;
+  $("sTask").textContent=(S.plan||[]).filter(i=>i.st!=="done").slice(0,3).length;
+  $("sDebt").textContent=scanDebts().filter(d=>d.status==="open").length;
+}
+function renderMats(){
+  $("matList").innerHTML = S.mat.map(m=>`<div class="card"><strong>${esc(m.name)}</strong><span class="badge">ready</span>
+    <div class="hint">${m.chars} 字 · ${m.nodes} 节点 · 本机解析</div></div>`).join("") || '<p class="hint">暂无资料。点「导入示例资料」。</p>';
+}
+function renderGraph(){
+  const dag=$("dag"); dag.innerHTML="";
+  const w=dag.clientWidth||640, n=S.nodes.length;
+  const pos=S.nodes.map((node,i)=>{
+    const x=30+ (i%4)*(w/4.2), y=24+Math.floor(i/4)*110;
+    return {node,x,y};
+  });
+  S.edges.forEach(e=>{
+    const a=pos.find(p=>p.node.id===e.from), b=pos.find(p=>p.node.id===e.to);
+    if(!a||!b) return;
+    const dx=b.x-a.x, dy=b.y-a.y, len=Math.hypot(dx,dy), ang=Math.atan2(dy,dx)*180/Math.PI;
+    const ln=document.createElement("div"); ln.className="dline";
+    ln.style.left=a.x+54+"px"; ln.style.top=a.y+28+"px"; ln.style.width=len+"px"; ln.style.transform="rotate("+ang+"deg)";
+    dag.appendChild(ln);
+  });
+  const debts=scanDebts();
+  pos.forEach(p=>{
+    const d=debbt(debts,p.node.id);
+    const el=document.createElement("div");
+    el.className="dnode "+(d?"debt":(p.node.kind==="chapter"?"chapter":"term"));
+    el.style.left=p.x+"px"; el.style.top=p.y+"px";
+    el.innerHTML=`<span>${esc(p.node.title)}</span><small>${d?"impact="+d.imp.toFixed(3):"diff "+p.node.diff}</small>`;
+    el.onclick=()=>{ $("nodeInfo").innerHTML=`<strong>${esc(p.node.title)}</strong><br/><span class="hint">score=${scoreOf(p.node.id).toFixed(6)} · 先修：${prereqs(p.node.id).map(title).join("、")||"无"} · 下游 ${downMass(p.node.id)} 个</span>`; };
+    dag.appendChild(el);
+  });
+  $("gBadge").textContent = S.nodes.length+" 节点 / "+S.edges.length+" 边";
+  $("chTree").innerHTML = S.nodes.map(n=>`<div style="padding:6px 4px;cursor:pointer" data-ch="${n.id}">${esc(n.title)}</div>`).join("");
+  $("chTree").querySelectorAll("[data-ch]").forEach(el=>el.onclick=()=>{
+    $("chBody").textContent = `「${title(el.dataset.ch)}」摘要：本地解析正文。先修：${prereqs(el.dataset.ch).map(title).join("、")||"—"}。`;
+  });
+}
+function debbt(debts,id){ return debts.find(d=>d.to===id && d.status==="open")||debts.find(d=>d.from===id&&d.status==="open"); }
+
+function renderDebt(){
+  const ds=scanDebts();
+  $("debtList").innerHTML = ds.length? ds.map((d,i)=>`<div class="card">
+    <strong>${esc(d.fromName)} → ${esc(d.toName)}</strong>
+    <div class="hint">impact=<b>${d.imp.toFixed(6)}</b> · sf=${d.sf.toFixed(2)} st=${d.st.toFixed(2)} · freq=${d.freq}</div>
+    <span class="badge" style="${d.status==='open'?'background:#ffe1e5;color:#792e38':''}">${d.status}</span>
+  </div>`).join("") : '<p class="hint">暂无债边，保持节奏。</p>';
+  $("planBox").innerHTML = S.plan? S.plan.map(p=>`<div class="card mono">D${p.day} · ${esc(title(p.kp))} · ${p.layer} · ${p.min}min</div>`).join("") : '<p class="hint">尚未生成。</p>';
+}
+function whatif(){
+  const sp=+$("wSp").value/100, sc=+$("wSc").value/100, fq=+$("wFq").value;
+  $("vSp").textContent=sp.toFixed(2); $("vSc").textContent=sc.toFixed(2); $("vFq").textContent=fq;
+  const imp=impactV2(sp,sc,1.1,true,fq,5);
+  $("whatOut").className="status "+(imp>=K.hit?"err":"ok");
+  $("whatOut").textContent = imp>=K.hit? `命中红边 impact=${imp.toFixed(6)}（≥0.08）` : `未达红线 impact=${imp.toFixed(6)}（&lt;0.08）`;
+}
+["wSp","wSc","wFq"].forEach(id=>$(id).addEventListener("input",whatif));
+
+function buildPlan(){
+  const ds=scanDebts().filter(d=>d.status==="open").slice(0,5);
+  const plan=[]; let id=1;
+  const offs=[0,2,6];
+  ds.forEach((d,gi)=>{
+    offs.forEach((o,pi)=>{
+      const day=1+o;
+      plan.push({id:id++, day, kp:d.from, layer:pi===0?"core":"core", min:pi===0?20:12});
+      plan.push({id:id++, day:Math.min(14,day+1), kp:d.to, layer:pi===0?"challenge":"challenge", min:pi===0?15:10});
+    });
+  });
+  S.plan=plan; save(S);
+}
+function renderToday(){
+  if(!S.plan) buildPlan();
+  const items=(S.plan||[]).filter(i=>i.day===S.day).slice(0,3);
+  $("todayBar").style.width = Math.min(100, (S.day/14)*100)+"%";
+  $("todayList").innerHTML = items.length? items.map(i=>`<div class="card">
+    <strong>巩固「${esc(title(i.kp))}」</strong><span class="tag">${i.layer} ${i.min}min</span>
+    <div class="row" style="margin-top:10px"><button class="btn primary" data-start="${i.kp}">开始</button></div>
+  </div>`).join("") : '<p class="hint">今天没有任务，休息一下。</p>';
+  $("todayList").querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>startQuiz(b.dataset.start));
+  const q=S.qs[Math.floor(Math.random()*S.qs.length)];
+  window._q=q;
+  $("quizBox").innerHTML=`<p><strong>${esc(q.stem)}</strong></p>`+
+    q.opts.map((o,i)=>`<div class="card" style="cursor:pointer" data-oi="${i}">${String.fromCharCode(65+i)}. ${esc(o)}</div>`).join("")+
+    `<div class="row"><button class="btn primary" id="btnSub">提交</button></div><div class="status" id="fb"></div>`;
+  let pick=-1;
+  $("quizBox").querySelectorAll("[data-oi]").forEach(el=>el.onclick=()=>{pick=+el.dataset.oi; el.style.borderColor="var(--primary)";});
+  $("btnSub").onclick=()=>{
+    if(pick<0){ $("fb").textContent="请先选择一项"; return; }
+    const ok=pick===q.ci, conf=+$("conf").value;
+    const m=S.mastery[q.kp]||{n:0,s:0,c:3,age:0,st:0};
+    m.n++; if(ok) m.s++; m.st = ok? m.st+1:0; m.c=conf; m.age=0;
+    S.mastery[q.kp]=m;
+    S.logs.push({kp:q.kp,ok,conf,ts:Date.now()});
+    S.sale[q.kp]=saleStep(S.sale[q.kp]||{streak:0,att:0}, ok?1:0, conf);
+    save(S);
+    const sv=S.sale[q.kp];
+    $("fb").className="status "+(ok?"ok":"err");
+    $("fb").innerHTML = (ok?"<b>正确</b>":"<b>错误</b>")+
+      ` · score=${scoreOf(q.kp).toFixed(6)} · 销账 streak=${sv.streak}/${K.saleStreak} att=${sv.att}`+
+      (sv.status==="cleared"?` · <b>已销账</b>`:"");
+  };
+}
+function startQuiz(kp){ go("today"); const q=S.qs.find(x=>x.kp===kp)||S.qs[0]; window._q=q; }
+
+function ensureChat(){ if(!$("chat").dataset.r){ $("chat").innerHTML='<div class="bub bot">你好，我是知债学习助手（单体·无微服务）。可问「诊断」「计划」「今日」。</div>'; $("chat").dataset.r=1; } }
+function chat(role,txt){
+  const d=document.createElement("div"); d.className="bub "+(role==="user"?"user":"bot"); d.textContent=txt;
+  $("chat").appendChild(d); $("chat").scrollTop=1e9;
+}
+function reply(t){
+  if(/不想活|自杀|自残/.test(t)) return "你并不孤单。请立即联系身边信任的人或当地心理援助热线。系统不会把这里当作处分依据。";
+  if(/诊断|债|红边/.test(t)){
+    const ds=scanDebts().filter(d=>d.status==="open");
+    return ds.length? "诊断完成（impact-v2）：\n"+ds.map((d,i)=>`${i+1}. ${d.fromName}→${d.toName} impact=${d.imp.toFixed(6)}`).join("\n") : "当前没有开放红边。";
+  }
+  if(/计划|14/.test(t)) return "已按高 impact 债边生成 14 天草图（0/2/6 间隔三遍，每日≤40 分钟）。见「知债」页。";
+  if(/今日|任务/.test(t)) return "今日任务见「今日」页，先真题再还债边。";
+  if(/销账/.test(t)){ const c=Object.values(S.sale).some(x=>x.status==="cleared"); return c?"部分债边已销账。":"尚未销账：需连续 2 次达标且累计≥3 次。"; }
+  return "我可以帮你：诊断知识债、14 天计划、今日任务、销账检查。";
+}
+function send(){ const v=$("agentIn").value.trim(); if(!v) return; chat("user",v); chat("bot",reply(v)); $("agentIn").value=""; $("agentSt").textContent="ok · local"; }
+$("btnSend").onclick=send;
+$("agentIn").addEventListener("keydown",e=>{ if(e.key==="Enter") send(); });
+document.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ chat("user",b.dataset.q); chat("bot",reply(b.dataset.q)); });
+
+function renderProfile(){
+  $("masteryList").innerHTML = S.nodes.map(n=>`<div class="card">
+    <div class="row" style="justify-content:space-between"><strong>${esc(n.title)}</strong><b>${scoreOf(n.id).toFixed(3)}</b></div>
+    <div class="bar"><i style="width:${(scoreOf(n.id)*100).toFixed(1)}%"></i></div>
+  </div>`).join("");
+  const logs=S.logs;
+  const acc=logs.length? logs.filter(x=>x.ok).length/logs.length : 0.5;
+  const p=logs.length? logs.reduce((a,b)=>a+b.conf,0)/logs.length/5 : .5;
+  const brier=logs.length? logs.reduce((a,b)=>a+Math.pow(b.conf/5-(b.ok?1:0),2),0)/logs.length : .25;
+  const style=[
+    ["AccuracyFirst",(0.55*acc+0.45*0.6)],["Calibrated",clamp01(1-brier/0.5)],
+    ["Steady",0.7],["Independent",0.8],["DeepDive",0.55]
+  ];
+  $("styleList").innerHTML = style.map(([k,v])=>`<div class="card"><div class="row" style="justify-content:space-between"><span>${k}</span><b>${v.toFixed(3)}</b></div>
+    <div class="bar"><i style="width:${(v*100).toFixed(0)}%"></i></div></div>`).join("");
+  $("optLine").textContent = S.optOut? "已关闭个性化画像" : "个性化开启中";
+}
+function renderAccount(){
+  $("authLine").className="status "+(S.user?"ok":"");
+  $("authLine").textContent = S.user? `已登录：${S.user}` : "未登录";
+  $("consentLine").textContent = S.consent? "已同意教师可见" : "未授权";
+}
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+$("btnSeed").onclick=$("btnSeed2").onclick=()=>{
+  S=seed(); save(S); renderHome(); $("matStatus").className="status ok"; $("matStatus").textContent="示例教材与图包已导入（本机）"; go("materials");
+};
+$("btnUpload").onclick=()=>{
+  const fs=Array.from($("fileInput").files||[]);
+  if(!fs.length){ $("matStatus").textContent="请先选择文件"; return; }
+  $("matStatus").className="status";
+  $("matStatus").textContent="本机解析 "+fs.length+" 个文件…";
+  let done=0;
+  fs.forEach(f=>{
+    const r=new FileReader();
+    r.onload=()=>{
+      const text=String(r.result||"");
+      S.mat.unshift({id:"m"+Date.now()+Math.random().toString(36).slice(2,6), name:f.name, chars:text.length, nodes:S.nodes.length});
+      done++;
+      if(done===fs.length){ save(S); renderMats(); $("matStatus").className="status ok"; $("matStatus").textContent="已解析 "+fs.length+" 份（本机）"; }
+    };
+    if(/\.(txt|md)$/i.test(f.name)) r.readAsText(f); else r.readAsText(f); // 文本层尽力抽取
+  });
+};
+$("btnParseAll").onclick=()=>{ $("matStatus").className="status ok"; $("matStatus").textContent="全部资料已解析（单体本机）"; };
+$("btnRefresh").onclick=renderMats;
+$("btnGRefresh").onclick=renderGraph;
+$("btnDiag").onclick=renderDebt;
+$("btnPlan").onclick=()=>{ buildPlan(); renderDebt(); };
+$("btnSale").onclick=()=>{
+  const c=Object.values(S.sale).filter(x=>x.status==="cleared").length;
+  alert(c? `已销账 ${c} 条` : "销账检查未通过：需连续 2 次达标且累计≥3 次");
+};
+$("btnLoadToday").onclick=renderToday;
+$("btnShuffle").onclick=()=>{ S.qs=S.qs.slice().sort(()=>Math.random()-.5); save(S); renderToday(); };
+$("btnDay").onclick=()=>{ S.day=Math.min(14,S.day+1); save(S); renderToday(); };
+$("conf").oninput=e=>$("vConf").textContent=e.target.value;
+$("btnOpt").onclick=()=>{ S.optOut=!S.optOut; save(S); renderProfile(); };
+$("btnLogin").onclick=()=>{ if($("email").value.includes("@") && $("pass").value.length>=4){ S.user=$("email").value; save(S); renderAccount(); } else $("authLine").textContent="邮箱或密码无效"; };
+$("btnLogout").onclick=()=>{ S.user=null; save(S); renderAccount(); };
+$("btnGrant").onclick=()=>{ S.consent=true; save(S); renderAccount(); };
+$("btnRevoke").onclick=()=>{ S.consent=false; save(S); renderAccount(); };
+$("btnExport").onclick=()=>{
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="astralpath-monolith.json"; a.click();
+};
+$("btnWipe").onclick=()=>{ if(confirm("清空本机数据？")){ S=seed(); save(S); go("home"); } };
+
+go("home"); whatif();
+</script>
+</body>
+</html>

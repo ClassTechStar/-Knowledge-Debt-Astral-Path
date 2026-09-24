@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyTitle>知债：星穹学途</AssemblyTitle>
+    <Product>知债：星穹学途（Knowledge Debt: Astral Path）</Product>
+    <Version>2.0.0</Version>
+    <ApplicationIcon>Resources\astralpath-icon.ico</ApplicationIcon>
+    <SelfContained>true</SelfContained>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <PublishSingleFile>false</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2903.40" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Resources\index.html" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Resources\astralpath-icon.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
