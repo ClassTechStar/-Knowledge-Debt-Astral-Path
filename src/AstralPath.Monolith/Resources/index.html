@@ -4,7 +4,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>知债：星穹学途 · 单体版（无微服务）</title>
+<title>知债：星穹学途 · 单体版 2.1（无微服务）</title>
 <style>
 :root{
   --canvas:#f3f4f5;--surface:#fbfbfc;--soft:#e8eaec;--strong:#858a90;
@@ -74,7 +74,7 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
 <div class="wrap">
 <header class="rail">
   <div class="mark">债</div>
-  <div class="brand"><strong>知债：星穹学途</strong><small>Knowledge Debt: Astral Path · 单体版（无微服务）</small></div>
+  <div class="brand"><strong>知债：星穹学途</strong><small>Knowledge Debt: Astral Path · 单体版 2.1（无微服务）</small></div>
   <nav class="pills" id="nav">
     <button class="on" data-p="home">起点</button><button data-p="materials">藏书阁</button>
     <button data-p="graph">识网</button><button data-p="debt">知债</button>
@@ -295,25 +295,226 @@ function load(){ try{ return JSON.parse(localStorage.getItem(LS))||seed(); }catc
 function save(s){ try{ localStorage.setItem(LS, JSON.stringify(s)); }catch(e){} }
 function seed(){
   const nodes = [
-    ["N1","会计要素",1],["N2","会计等式",2],["N3","借贷记账法",3],["N4","会计分录",3],
-    ["N5","试算平衡",2],["N6","账户结构",2],["N7","财产清查",2],["N8","财务报表",4]
-  ].map(([id,title,d])=>({id,title,diff:d,course:"会计基础",kind:d===1?"chapter":"term"}));
+    {id:"N01",title:"会计对象",diff:1,course:"会计基础",kind:"chapter"},
+    {id:"N02",title:"会计要素",diff:1,course:"会计基础",kind:"chapter"},
+    {id:"N03",title:"会计等式",diff:2,course:"会计基础",kind:"chapter"},
+    {id:"N04",title:"会计科目",diff:2,course:"会计基础",kind:"chapter"},
+    {id:"N05",title:"账户结构",diff:2,course:"会计基础",kind:"chapter"},
+    {id:"N06",title:"借贷记账法",diff:3,course:"会计基础",kind:"term"},
+    {id:"N07",title:"会计分录",diff:3,course:"会计基础",kind:"term"},
+    {id:"N08",title:"试算平衡",diff:2,course:"会计基础",kind:"chapter"},
+    {id:"N09",title:"凭证填制",diff:2,course:"会计基础",kind:"chapter"},
+    {id:"N10",title:"账簿登记",diff:3,course:"会计基础",kind:"term"},
+    {id:"N11",title:"财产清查",diff:2,course:"会计基础",kind:"chapter"},
+    {id:"N12",title:"财务报表",diff:4,course:"会计基础",kind:"term"},
+    {id:"P01",title:"变量与类型",diff:1,course:"Python 入门",kind:"chapter"},
+    {id:"P02",title:"运算符与表达式",diff:1,course:"Python 入门",kind:"chapter"},
+    {id:"P03",title:"条件判断",diff:2,course:"Python 入门",kind:"chapter"},
+    {id:"P04",title:"循环",diff:2,course:"Python 入门",kind:"chapter"},
+    {id:"P05",title:"列表与字典",diff:2,course:"Python 入门",kind:"chapter"},
+    {id:"P06",title:"函数",diff:3,course:"Python 入门",kind:"term"},
+    {id:"P07",title:"文件读写",diff:3,course:"Python 入门",kind:"term"},
+    {id:"P08",title:"模块与包",diff:3,course:"Python 入门",kind:"term"},
+    {id:"P09",title:"异常处理",diff:3,course:"Python 入门",kind:"term"},
+    {id:"P10",title:"类与对象",diff:4,course:"Python 入门",kind:"term"},
+    {id:"D01",title:"神经元与激活",diff:1,course:"深度学习概论",kind:"chapter"},
+    {id:"D02",title:"损失函数",diff:2,course:"深度学习概论",kind:"chapter"},
+    {id:"D03",title:"梯度下降",diff:2,course:"深度学习概论",kind:"chapter"},
+    {id:"D04",title:"反向传播",diff:3,course:"深度学习概论",kind:"term"},
+    {id:"D05",title:"卷积网络",diff:3,course:"深度学习概论",kind:"term"},
+    {id:"D06",title:"池化",diff:2,course:"深度学习概论",kind:"chapter"},
+    {id:"D07",title:"循环网络",diff:4,course:"深度学习概论",kind:"term"},
+    {id:"D08",title:"注意力与Transformer",diff:5,course:"深度学习概论",kind:"term"},
+    {id:"D09",title:"过拟合与正则",diff:3,course:"深度学习概论",kind:"term"},
+    {id:"D10",title:"数据增强",diff:2,course:"深度学习概论",kind:"chapter"},
+    {id:"D11",title:"BatchNorm",diff:4,course:"深度学习概论",kind:"term"},
+    {id:"D12",title:"优化器Adam",diff:3,course:"深度学习概论",kind:"term"}
+  ];
   const edges = [
-    ["N1","N2",0,1.0],["N2","N3",0,1.2],["N3","N4",0,1.1],["N4","N5",0,1.0],
-    ["N2","N6",0,0.9],["N6","N4",1,0.8],["N5","N7",0,0.9],["N7","N8",0,1.0],["N3","N5",1,0.7]
-  ].map(([f,t,tg,w])=>({from:f,to:t,tg:!!tg,w}));
-  const mastery = {
-    N1:{n:8,s:8,c:4,age:1,st:2}, N2:{n:8,s:7,c:4,age:1,st:2}, N3:{n:8,s:2,c:2,age:0,st:0},
-    N4:{n:8,s:3,c:2,age:0,st:0}, N5:{n:6,s:3,c:3,age:1,st:1}, N6:{n:5,s:3,c:3,age:2,st:1},
-    N7:{n:4,s:2,c:3,age:3,st:0}, N8:{n:3,s:1,c:2,age:5,st:0}
-  };
+    {from:"N01",to:"N02",tg:false,w:1.0},
+    {from:"N02",to:"N03",tg:false,w:1.2},
+    {from:"N03",to:"N04",tg:false,w:1.0},
+    {from:"N04",to:"N05",tg:false,w:1.0},
+    {from:"N05",to:"N06",tg:false,w:1.1},
+    {from:"N06",to:"N07",tg:false,w:1.3},
+    {from:"N07",to:"N08",tg:false,w:1.1},
+    {from:"N04",to:"N09",tg:false,w:0.9},
+    {from:"N09",to:"N10",tg:false,w:1.0},
+    {from:"N10",to:"N11",tg:false,w:0.9},
+    {from:"N08",to:"N12",tg:false,w:1.2},
+    {from:"N11",to:"N12",tg:false,w:0.9},
+    {from:"N03",to:"N06",tg:true,w:0.8},
+    {from:"N06",to:"N08",tg:true,w:0.7},
+    {from:"N02",to:"N05",tg:false,w:0.8},
+    {from:"N05",to:"N07",tg:false,w:0.9},
+    {from:"N03",to:"N05",tg:false,w:0.8},
+    {from:"N06",to:"N10",tg:false,w:0.9},
+    {from:"N07",to:"N09",tg:false,w:0.7},
+    {from:"N08",to:"N11",tg:false,w:0.8},
+    {from:"P01",to:"P02",tg:false,w:1.0},
+    {from:"P02",to:"P03",tg:false,w:1.0},
+    {from:"P03",to:"P04",tg:false,w:1.0},
+    {from:"P04",to:"P05",tg:false,w:1.0},
+    {from:"P05",to:"P06",tg:false,w:1.0},
+    {from:"P06",to:"P07",tg:false,w:1.0},
+    {from:"P07",to:"P09",tg:false,w:1.0},
+    {from:"P06",to:"P08",tg:false,w:1.0},
+    {from:"P08",to:"P10",tg:false,w:1.0},
+    {from:"P05",to:"P07",tg:false,w:1.0},
+    {from:"P02",to:"P05",tg:false,w:1.0},
+    {from:"P04",to:"P06",tg:false,w:0.9},
+    {from:"P03",to:"P06",tg:true,w:0.6},
+    {from:"D01",to:"D02",tg:false,w:1.0},
+    {from:"D02",to:"D03",tg:false,w:1.0},
+    {from:"D03",to:"D04",tg:false,w:1.0},
+    {from:"D04",to:"D05",tg:false,w:1.0},
+    {from:"D05",to:"D06",tg:false,w:1.0},
+    {from:"D04",to:"D07",tg:false,w:1.0},
+    {from:"D07",to:"D08",tg:false,w:1.0},
+    {from:"D05",to:"D11",tg:false,w:1.0},
+    {from:"D03",to:"D12",tg:false,w:1.0},
+    {from:"D02",to:"D09",tg:false,w:1.0},
+    {from:"D09",to:"D10",tg:false,w:1.0},
+    {from:"D06",to:"D09",tg:false,w:1.0},
+    {from:"D04",to:"D11",tg:false,w:1.0},
+    {from:"D05",to:"D08",tg:false,w:1.0},
+    {from:"D02",to:"D12",tg:false,w:1.0},
+    {from:"N02",to:"P01",tg:true,w:0.5},
+    {from:"N03",to:"D02",tg:true,w:0.5},
+    {from:"P05",to:"D01",tg:true,w:0.5},
+    {from:"P06",to:"D03",tg:true,w:0.6},
+    {from:"N08",to:"P09",tg:true,w:0.5},
+    {from:"P10",to:"D01",tg:false,w:0.8},
+    {from:"N06",to:"P03",tg:true,w:0.4},
+    {from:"N12",to:"D02",tg:true,w:0.4},
+    {from:"P04",to:"D03",tg:false,w:0.7},
+    {from:"N01",to:"D01",tg:true,w:0.4},
+    {from:"P02",to:"D02",tg:true,w:0.4},
+    {from:"N05",to:"P05",tg:false,w:0.6},
+    {from:"P09",to:"D09",tg:true,w:0.5},
+    {from:"P08",to:"D12",tg:true,w:0.5},
+    {from:"N07",to:"P03",tg:true,w:0.4},
+    {from:"P06",to:"D04",tg:false,w:0.9},
+    {from:"P03",to:"D03",tg:true,w:0.5},
+    {from:"N04",to:"P01",tg:true,w:0.4},
+    {from:"N10",to:"P07",tg:true,w:0.5},
+    {from:"P09",to:"D03",tg:true,w:0.5},
+    {from:"N09",to:"P02",tg:true,w:0.4},
+    {from:"P07",to:"D10",tg:false,w:0.7},
+    {from:"N11",to:"P05",tg:true,w:0.4},
+    {from:"P08",to:"D11",tg:true,w:0.5},
+    {from:"P06",to:"D01",tg:true,w:0.4},
+    {from:"N03",to:"P02",tg:true,w:0.4}
+  ];
   const qs = [
-    ["Q1","N2","会计等式是：","资产=负债+所有者权益",0],["Q2","N2","会计要素共几类？","六类",1],
-    ["Q3","N3","借方登记增加的是：","资产类",0],["Q4","N3","负债增加记：","贷方",1],
-    ["Q5","N4","分录三要素：","账户+方向+金额",0],["Q6","N5","试算平衡查：","借方=贷方",1],
-    ["Q7","N1","下列属于会计要素：","资产",0],["Q8","N6","账户结构含：","期初+发生额+期末",1],
-    ["Q9","N7","财产清查属于：","会计核算方法",0],["Q10","N8","资产负债表反映：","财务状况",1]
-  ].map(([id,kp,stem,cor,ci])=>({id,kp,stem,opts:[cor,ci===0?"收入":"费用","不确定","与本题无关"],ci,diff:2}));
+    {id:"Q001",kp:"N01",stem:"会计的基本职能包括？",opts:["核算与监督", "只有核算", "只有监督", "只有预测"],ci:0,diff:1},
+    {id:"Q002",kp:"N01",stem:"会计对象是？",opts:["资金运动", "企业人员", "办公设备", "合同文本"],ci:0,diff:1},
+    {id:"Q003",kp:"N02",stem:"下列属于会计要素的是？",opts:["资产", "温度", "速度", "颜色"],ci:0,diff:1},
+    {id:"Q004",kp:"N02",stem:"会计要素共分几类？",opts:["六类", "三类", "九类", "十二类"],ci:0,diff:2},
+    {id:"Q005",kp:"N02",stem:"收入属于哪一类要素？",opts:["收入类", "资产类", "负债类", "成本类"],ci:0,diff:2},
+    {id:"Q006",kp:"N03",stem:"会计等式正确的是？",opts:["资产=负债+所有者权益", "资产=负债", "资产=收入", "负债=收入"],ci:0,diff:2},
+    {id:"Q007",kp:"N03",stem:"所有者权益=？",opts:["资产-负债", "资产+负债", "收入-费用", "资产-收入"],ci:0,diff:2},
+    {id:"Q008",kp:"N03",stem:"反映财务状况的等式是？",opts:["资产=负债+权益", "收入=费用+利润", "资产=收入", "负债=费用"],ci:0,diff:3},
+    {id:"Q009",kp:"N04",stem:"会计科目是对什么的分类？",opts:["会计要素", "会计凭证", "会计报表", "会计人员"],ci:0,diff:2},
+    {id:"Q010",kp:"N04",stem:"下列属于资产类科目的是？",opts:["银行存款", "实收资本", "主营业务收入", "管理费用"],ci:0,diff:2},
+    {id:"Q011",kp:"N05",stem:"账户的贷方登记？",opts:["负债与权益增加", "资产增加", "费用增加", "资产减少"],ci:0,diff:3},
+    {id:"Q012",kp:"N05",stem:"期末余额=？",opts:["期初+本期增加-本期减少", "期初+本期减少", "期初×2", "本期增加"],ci:0,diff:3},
+    {id:"Q013",kp:"N06",stem:"借贷记账法的记账符号是？",opts:["借贷", "增减", "收支", "进出"],ci:0,diff:1},
+    {id:"Q014",kp:"N06",stem:"资产增加记？",opts:["借方", "贷方", "双方", "不记账"],ci:0,diff:2},
+    {id:"Q015",kp:"N06",stem:"负债增加记？",opts:["贷方", "借方", "红字", "不记账"],ci:0,diff:2},
+    {id:"Q016",kp:"N06",stem:"费用增加记？",opts:["借方", "贷方", "借或贷", "从不"],ci:0,diff:3},
+    {id:"Q017",kp:"N07",stem:"会计分录不包括？",opts:["记账颜色", "账户名称", "记账方向", "金额"],ci:0,diff:2},
+    {id:"Q018",kp:"N07",stem:"复合分录是指？",opts:["一借多贷等", "只有借", "只有贷", "无金额"],ci:0,diff:3},
+    {id:"Q019",kp:"N08",stem:"试算平衡检查？",opts:["借方合计=贷方合计", "收入=资产", "负债=费用", "人员=编制"],ci:0,diff:2},
+    {id:"Q020",kp:"N08",stem:"试算平衡表平衡则记账？",opts:["基本无误", "一定正确", "一定错误", "无需审核"],ci:1,diff:3},
+    {id:"Q021",kp:"N09",stem:"原始凭证的作用是？",opts:["记录经济业务发生", "记录账簿页码", "记录会计政策", "记录报表格式"],ci:0,diff:2},
+    {id:"Q022",kp:"N09",stem:"记账凭证的依据是？",opts:["原始凭证", "会计报表", "会计科目表", "人员名单"],ci:0,diff:2},
+    {id:"Q023",kp:"N10",stem:"明细账通常采用？",opts:["活页式或卡片式", "仅订本式", "仅备查簿", "仅日记账"],ci:0,diff:3},
+    {id:"Q024",kp:"N10",stem:"日记账属于？",opts:["序时账簿", "分类账簿", "备查账簿", "联合账簿"],ci:0,diff:3},
+    {id:"Q025",kp:"N11",stem:"财产清查的目的是？",opts:["账实相符", "增加利润", "减少税收", "更换账簿"],ci:0,diff:2},
+    {id:"Q026",kp:"N11",stem:"银行存款清查采用？",opts:["银行对账单核对", "实地盘点", "技术推算", "函证核对"],ci:0,diff:3},
+    {id:"Q027",kp:"N11",stem:"库存现金清查采用？",opts:["实地盘点", "技术推算", "抽样估计", "账账核对"],ci:0,diff:2},
+    {id:"Q028",kp:"N12",stem:"资产负债表反映？",opts:["财务状况", "经营成果", "现金流量", "人员构成"],ci:0,diff:2},
+    {id:"Q029",kp:"N12",stem:"利润表反映？",opts:["经营成果", "财务状况", "市场份额", "股东人数"],ci:0,diff:2},
+    {id:"Q030",kp:"N12",stem:"资产负债表是？",opts:["静态报表", "动态报表", "统计报表", "税务报表"],ci:0,diff:3},
+    {id:"Q031",kp:"N03",stem:"收入-费用=？",opts:["利润", "资产", "负债", "权益"],ci:0,diff:2},
+    {id:"Q032",kp:"N06",stem:"借贷记账法的记账规则是？",opts:["有借必有贷，借贷必相等", "有借无贷", "只记借", "只记贷"],ci:0,diff:2},
+    {id:"Q033",kp:"N05",stem:"账户的基本结构分？",opts:["左右两方", "上下两方", "三方", "四方"],ci:0,diff:2},
+    {id:"Q034",kp:"N08",stem:"发生额试算平衡的依据是？",opts:["借贷记账法记账规则", "会计等式", "会计准则", "公司章程"],ci:0,diff:3},
+    {id:"Q035",kp:"P01",stem:"Python 中定义整数变量用？",opts:["x = 1", "int x = 1;", "var x = 1;", "let x = 1"],ci:0,diff:1},
+    {id:"Q036",kp:"P01",stem:"type(3.14) 是？",opts:["float", "int", "str", "bool"],ci:0,diff:1},
+    {id:"Q037",kp:"P01",stem:"下列是合法变量名？",opts:["my_var", "1var", "my-var", "class"],ci:0,diff:1},
+    {id:"Q038",kp:"P02",stem:"Python 的整除运算符是？",opts:["//", "/", "%", "**"],ci:0,diff:2},
+    {id:"Q039",kp:"P02",stem:"取余运算符是？",opts:["%", "//", "/", "*"],ci:0,diff:1},
+    {id:"Q040",kp:"P02",stem:"2 ** 3 的值是？",opts:["8", "6", "9", "5"],ci:0,diff:1},
+    {id:"Q041",kp:"P03",stem:"Python 用什么缩进表示块？",opts:["空格/Tab 一致", "大括号", "begin/end", "缩进可任意混用"],ci:0,diff:1},
+    {id:"Q042",kp:"P03",stem:"if 语句的正确写法是？",opts:["if x>1:", "if (x>1) {}", "if x>1 then", "if x>1"],ci:0,diff:2},
+    {id:"Q043",kp:"P03",stem:"elif 的含义是？",opts:["否则如果", "结束", "循环", "函数"],ci:0,diff:2},
+    {id:"Q044",kp:"P04",stem:"for i in range(3) 循环几次？",opts:["3 次", "2 次", "无限次", "0 次"],ci:0,diff:2},
+    {id:"Q045",kp:"P04",stem:"while 循环的条件为 True 表示？",opts:["无限循环直到 break", "循环 0 次", "语法错误", "只循环一次"],ci:0,diff:2},
+    {id:"Q046",kp:"P04",stem:"break 的作用是？",opts:["跳出当前循环", "跳出函数", "重启程序", "跳过本次并继续"],ci:0,diff:2},
+    {id:"Q047",kp:"P05",stem:"列表的类型是？",opts:["list", "dict", "set", "tuple"],ci:0,diff:1},
+    {id:"Q048",kp:"P05",stem:"字典的类型是？",opts:["dict", "list", "tuple", "str"],ci:0,diff:1},
+    {id:"Q049",kp:"P05",stem:"元组的特点是？",opts:["不可变", "可变", "可增删", "总是字典"],ci:0,diff:2},
+    {id:"Q050",kp:"P05",stem:"len([1,2,3]) 是？",opts:["3", "2", "1", "0"],ci:0,diff:1},
+    {id:"Q051",kp:"P05",stem:"字典取值用？",opts:["d['key']", "d(0)", "d[0] 必然", "d.key()"],ci:0,diff:2},
+    {id:"Q052",kp:"P06",stem:"定义函数用？",opts:["def f():", "func f() {}", "function f()", "fn f():"],ci:0,diff:1},
+    {id:"Q053",kp:"P06",stem:"函数返回值用？",opts:["return", "yield 仅此", "print", "echo"],ci:0,diff:1},
+    {id:"Q054",kp:"P06",stem:"默认参数写在？",opts:["形参列表", "调用时", "全局", "类里才可"],ci:0,diff:3},
+    {id:"Q055",kp:"P07",stem:"打开文件用？",opts:["open()", "file()", "read()", "load()"],ci:0,diff:2},
+    {id:"Q056",kp:"P07",stem:"写入文件的模式是？",opts:["w", "r", "rb", "r+"],ci:0,diff:2},
+    {id:"Q057",kp:"P07",stem:"读取全部文本的方法是？",opts:["read()", "readline() 仅一行", "write()", "close()"],ci:0,diff:2},
+    {id:"Q058",kp:"P08",stem:"导入模块用？",opts:["import", "include", "require", "using"],ci:0,diff:1},
+    {id:"Q059",kp:"P08",stem:"from math import sqrt 表示？",opts:["导入 sqrt 函数", "导入整个 math 重命名", "删除 math", "导入 sqrt 变量"],ci:0,diff:2},
+    {id:"Q060",kp:"P09",stem:"捕获异常用？",opts:["try/except", "if/else", "for/range", "def/return"],ci:0,diff:2},
+    {id:"Q061",kp:"P09",stem:"finally 的作用是？",opts:["无论如何都执行", "只在成功时", "只在失败时", "等价于 except"],ci:0,diff:3},
+    {id:"Q062",kp:"P09",stem:"raise 的作用是？",opts:["抛出异常", "捕获异常", "忽略异常", "打印异常"],ci:0,diff:2},
+    {id:"Q063",kp:"P10",stem:"定义类用？",opts:["class", "struct", "type", "def class"],ci:0,diff:1},
+    {id:"Q064",kp:"P10",stem:"构造方法名是？",opts:["__init__", "__new__", "__del__", "__build__"],ci:0,diff:2},
+    {id:"Q065",kp:"P10",stem:"self 表示？",opts:["实例自身", "类对象", "模块", "全局"],ci:0,diff:2},
+    {id:"Q066",kp:"P10",stem:"继承的写法是？",opts:["class B(A):", "class B extends A", "class B implements A", "class B inherits A"],ci:0,diff:3},
+    {id:"Q067",kp:"P02",stem:"比较等于用？",opts:["==", "=", "===", "!="],ci:0,diff:1},
+    {id:"Q068",kp:"D01",stem:"神经元的输出经过？",opts:["激活函数", "损失函数", "优化器", "池化"],ci:0,diff:1},
+    {id:"Q069",kp:"D01",stem:"常用激活函数不包括？",opts:["均方误差", "ReLU", "Sigmoid", "Tanh"],ci:0,diff:2},
+    {id:"Q070",kp:"D01",stem:"ReLU 的表达式是？",opts:["max(0,x)", "1/(1+e^-x)", "tanh(x)", "x^2"],ci:0,diff:2},
+    {id:"Q071",kp:"D02",stem:"分类任务常用损失是？",opts:["交叉熵", "MSE", "MAE", "Huber"],ci:0,diff:2},
+    {id:"Q072",kp:"D02",stem:"回归任务常用损失是？",opts:["均方误差", "交叉熵", "铰链损失", "CTC"],ci:0,diff:2},
+    {id:"Q073",kp:"D02",stem:"交叉熵衡量？",opts:["预测分布与真实分布差异", "参数大小", "学习率", "batch 大小"],ci:0,diff:3},
+    {id:"Q074",kp:"D03",stem:"梯度下降用于？",opts:["最小化损失", "最大化损失", "数据增强", "归一化"],ci:0,diff:1},
+    {id:"Q075",kp:"D03",stem:"学习率过大会？",opts:["震荡/不收敛", "必然收敛更快", "无影响", "自动调参"],ci:0,diff:2},
+    {id:"Q076",kp:"D03",stem:"SGD 是？",opts:["随机梯度下降", "一种激活", "一种卷积", "一种正则"],ci:0,diff:2},
+    {id:"Q077",kp:"D04",stem:"反向传播的本质是？",opts:["链式法则求梯度", "前向传播", "随机初始化", "数据洗牌"],ci:0,diff:2},
+    {id:"Q078",kp:"D04",stem:"梯度消失常见于？",opts:["深层网络", "输入层", "输出标签", "数据加载"],ci:0,diff:3},
+    {id:"Q079",kp:"D05",stem:"卷积核的作用是？",opts:["提取局部特征", "归一化", "优化参数", "生成标签"],ci:0,diff:2},
+    {id:"Q080",kp:"D05",stem:"卷积层的参数量主要取决于？",opts:["核大小与通道数", "batch size", "学习率", "轮数"],ci:0,diff:3},
+    {id:"Q081",kp:"D05",stem:"步长 stride 增大则输出？",opts:["尺寸变小", "尺寸变大", "不变", "通道变多"],ci:0,diff:2},
+    {id:"Q082",kp:"D06",stem:"池化的目的是？",opts:["降维/平移鲁棒", "增加参数", "提高学习率", "生成数据"],ci:0,diff:2},
+    {id:"Q083",kp:"D06",stem:"最大池化取？",opts:["窗口最大值", "窗口平均", "窗口最小", "窗口求和"],ci:0,diff:2},
+    {id:"Q084",kp:"D07",stem:"RNN 擅长？",opts:["序列数据", "图像分类", "目标检测", "点云"],ci:0,diff:2},
+    {id:"Q085",kp:"D07",stem:"LSTM 用于缓解？",opts:["梯度消失/长依赖", "过拟合完全消除", "数据缺失", "过曝"],ci:0,diff:3},
+    {id:"Q086",kp:"D08",stem:"Transformer 的核心是？",opts:["自注意力", "最大池化", "批归一化", "随机森林"],ci:0,diff:3},
+    {id:"Q087",kp:"D08",stem:"注意力权重表示？",opts:["相关程度", "学习率", "batch 大小", "文件路径"],ci:0,diff:3},
+    {id:"Q088",kp:"D08",stem:"位置编码解决？",opts:["序列顺序信息", "标签泄漏", "过拟合必然发生", "显存不足"],ci:0,diff:3},
+    {id:"Q089",kp:"D09",stem:"过拟合表现为？",opts:["训练好测试差", "训练差测试好", "两者都好", "两者都差"],ci:0,diff:2},
+    {id:"Q090",kp:"D09",stem:"Dropout 的作用是？",opts:["正则化防过拟合", "增加层数", "加速 IO", "生成标签"],ci:0,diff:2},
+    {id:"Q091",kp:"D09",stem:"L2 正则又称？",opts:["权重衰减", "Dropout", "数据增强", "批归一化"],ci:0,diff:3},
+    {id:"Q092",kp:"D10",stem:"数据增强可以？",opts:["扩充训练分布", "修改标签语义", "替换损失", "改优化器"],ci:0,diff:2},
+    {id:"Q093",kp:"D10",stem:"图像常用增强不包括？",opts:["改变标签编号", "翻转", "裁剪", "颜色抖动"],ci:0,diff:2},
+    {id:"Q094",kp:"D11",stem:"BatchNorm 的作用是？",opts:["稳定训练/加速收敛", "生成数据", "存储权重", "打印日志"],ci:0,diff:3},
+    {id:"Q095",kp:"D11",stem:"BN 通常加在？",opts:["激活前/后", "损失函数内", "输出标签上", "数据文件里"],ci:0,diff:3},
+    {id:"Q096",kp:"D12",stem:"Adam 结合了？",opts:["动量与自适应学习率", "只有 SGD", "只有 AdaGrad", "随机森林"],ci:0,diff:3},
+    {id:"Q097",kp:"D12",stem:"权重初始化常用？",opts:["Xavier/Kaiming", "全 0 必然最佳", "全 1", "NaN"],ci:0,diff:3},
+    {id:"Q098",kp:"D03",stem:"mini-batch 的优点是？",opts:["更快更稳的梯度估计", "必然全局最优", "无需损失", "自动标注"],ci:0,diff:3},
+    {id:"Q099",kp:"D01",stem:"深度学习属于？",opts:["机器学习子领域", "纯统计报表", "数据库系统", "操作系统"],ci:0,diff:1},
+    {id:"Q100",kp:"D05",stem:"卷积权值共享的好处是？",opts:["减少参数/平移等变", "增加过拟合", "降低准确率", "删除通道"],ci:0,diff:3}
+  ];
+  const mastery = {};
+  nodes.forEach(n => {
+    const weak = n.difficulty >= 3;
+    mastery[n.id] = weak
+      ? {n:8,s:2,c:2,age:0,st:0}
+      : {n:8,s:7,c:4,age:1,st:2};
+  });
   return {user:null,consent:false,optOut:false,nodes,edges,mastery,qs,plan:null,sale:{},day:1,mat:[],logs:[]};
 }
 let S = load();
@@ -418,10 +619,10 @@ function whatif(){
 ["wSp","wSc","wFq"].forEach(id=>$(id).addEventListener("input",whatif));
 
 function buildPlan(){
-  const ds=scanDebts().filter(d=>d.status==="open").slice(0,5);
-  const plan=[]; let id=1;
-  const offs=[0,2,6];
-  ds.forEach((d,gi)=>{
+  const ds=scanDebts().filter(d=>d.status==="open");
+  const source = ds.length? ds : S.edges.slice(0,5).map(e=>({from:e.from,to:e.to,fromName:title(e.from),toName:title(e.to),imp:0.5}));
+  const plan=[]; let id=1; const offs=[0,2,6];
+  source.forEach((d,gi)=>{
     offs.forEach((o,pi)=>{
       const day=1+o;
       plan.push({id:id++, day, kp:d.from, layer:pi===0?"core":"core", min:pi===0?20:12});

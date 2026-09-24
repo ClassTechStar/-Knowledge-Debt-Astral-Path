@@ -9,8 +9,8 @@ android {
         applicationId = "com.astralpath.app"
         minSdk = 26
         targetSdk = 35
-        versionCode = 30
-        versionName = "3.0.0"
+        versionCode = 31
+        versionName = "2.1.0"
     }
     signingConfigs {
         create("release") {
