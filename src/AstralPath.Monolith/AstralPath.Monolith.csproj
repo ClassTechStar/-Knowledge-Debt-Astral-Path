@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyTitle>知债：星穹学途</AssemblyTitle>
     <Product>知债：星穹学途（Knowledge Debt: Astral Path）</Product>
-    <Version>2.0.0</Version>
+    <Version>2.2.0</Version>
     <ApplicationIcon>Resources\astralpath-icon.ico</ApplicationIcon>
     <SelfContained>true</SelfContained>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
@@ -22,3 +22,4 @@
     <None Update="Resources\astralpath-icon.ico" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
+

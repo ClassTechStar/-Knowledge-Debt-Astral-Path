@@ -4,17 +4,17 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>知债：星穹学途 · 单体版 2.1（无微服务）</title>
+<title>知债：星穹学途 · 单体版 2.2（无微服务）</title>
 <style>
 :root{
   --canvas:#f3f4f5;--surface:#fbfbfc;--soft:#e8eaec;--strong:#858a90;
   --ink:#303236;--muted:#70757a;--rule:#c7cacf;--field:#eff0f2;
   --danger:#b64a58;--primary:#0D72D9;--ok:#55a77b;--ok-bg:#dcf4e7;--ok-ink:#1e5d43;
-  --node-chapter:#6d9fc7;--node-target:#d95a67;
-  --r-c:12px;--r-g:16px;--r-s:22px;
+  --warn:#b8860b;--warn-bg:#fff4d6;
+  --r-c:12px;--r-g:16px;
 }
 *{box-sizing:border-box}
-html,body{margin:0;background:var(--canvas);color:var(--ink);font:15px/1.55 -apple-system,"PingFang SC","Segoe UI",sans-serif}
+html,body{margin:0;background:var(--canvas);color:var(--ink);font:15px/1.55 -apple-system,"PingFang SC","Segoe UI","Microsoft YaHei",sans-serif}
 .wrap{max-width:1080px;margin:0 auto;padding:18px 16px 40px}
 header.rail{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 0 16px}
 .mark{width:40px;height:30px;display:grid;place-items:center;border-radius:10px;background:var(--soft);color:var(--strong);font-weight:800}
@@ -31,50 +31,62 @@ nav.pills button.on{background:var(--surface);color:var(--ink);font-weight:700}
 .btn{min-height:40px;padding:8px 14px;border:1px solid var(--rule);border-radius:var(--r-c);background:var(--surface);color:var(--ink);cursor:pointer;font-size:14px}
 .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
 .btn.quiet{border:0;background:transparent;color:#7a838e;font-size:12px}
+.btn.danger{border-color:var(--danger);color:var(--danger)}
 .panel{padding:20px;border:1px solid var(--rule);border-radius:var(--r-g);background:var(--surface);margin-bottom:14px}
 .panel h2{margin:0 0 6px;font-size:20px}
 .panel .hint{margin:0 0 12px;color:var(--muted);font-size:13px}
 .grid2{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(240px,.7fr);gap:14px;align-items:start}
 @media (max-width:800px){.grid2{grid-template-columns:1fr}}
 .field{display:grid;gap:6px;margin:8px 0;color:var(--muted);font-size:13px}
-.field input,.field select{min-height:42px;padding:8px 10px;border:1px solid var(--rule);border-radius:var(--r-c);background:var(--field);color:var(--ink);font-size:14px}
-.status{margin-top:12px;padding:12px 14px;border-left:3px solid var(--strong);background:var(--soft);color:var(--muted);line-height:1.5}
+.field input,.field select,.field textarea{min-height:42px;padding:8px 10px;border:1px solid var(--rule);border-radius:var(--r-c);background:var(--field);color:var(--ink);font-size:14px}
+.field textarea{min-height:100px;font-family:inherit;resize:vertical}
+.status{margin-top:12px;padding:12px 14px;border-left:3px solid var(--strong);background:var(--soft);color:var(--muted);line-height:1.5;word-break:break-word}
 .status.ok{border-left-color:var(--ok);color:#2f6b50}
 .status.err{border-left-color:var(--danger);color:#8d2828}
+.status.warn{border-left-color:var(--warn);color:#6a5010;background:var(--warn-bg)}
 .badge{display:inline-flex;padding:2px 8px;border-radius:999px;font-size:12px;background:var(--ok-bg);color:var(--ok-ink)}
+.badge.err{background:#ffe1e5;color:#792e38}
+.badge.warn{background:var(--warn-bg);color:#6a5010}
 .bar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden;margin:8px 0}
 .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),#6aa8f0)}
 .card{border:1px solid var(--rule);border-radius:var(--r-g);background:var(--surface);padding:14px 16px;margin:10px 0}
-.row{display:flex;gap:8px;flex-wrap:wrap}
+.card.active{border-color:var(--primary);box-shadow:0 0 0 2px rgba(13,114,217,.15)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:12px}
 @media (max-width:700px){.stats{grid-template-columns:1fr 1fr}}
 .stat b{display:block;font-size:26px;color:var(--primary)}
-.dag{position:relative;min-height:300px;border:1px solid var(--rule);border-radius:var(--r-c);background:#fff;overflow:hidden}
+.dag{position:relative;min-height:320px;border:1px solid var(--rule);border-radius:var(--r-c);background:#fff;overflow:auto}
 .dnode{position:absolute;min-width:108px;max-width:168px;padding:10px 12px;border:2px solid #b7bbc0;border-radius:14px;background:#fbfbfc;box-shadow:0 6px 16px rgba(45,47,50,.08);text-align:left;cursor:pointer}
 .dnode.chapter{border-color:#4f86c6;background:linear-gradient(180deg,#e8f2fb,#d9e9f8);color:#1d3d5f}
 .dnode.term{border-color:#55a77b;background:linear-gradient(180deg,#e5f7ee,#d4f0e2);color:#1e5d43}
 .dnode.debt{border-color:#d95a67;background:#ffe1e5;color:#792e38}
 .dnode span{display:block;font-size:12.5px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dnode small{display:block;font-size:10px;color:var(--muted);margin-top:2px}
-.dline{position:absolute;height:2px;background:var(--strong);opacity:.5;transform-origin:left center}
-.chat{min-height:220px;max-height:400px;overflow:auto;padding:8px;border:1px solid var(--rule);border-radius:12px;background:#fff}
-.bub{max-width:88%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.55;margin:8px 0}
+.dline{position:absolute;height:2px;background:var(--strong);opacity:.45;transform-origin:left center;pointer-events:none}
+.chat{min-height:220px;max-height:420px;overflow:auto;padding:8px;border:1px solid var(--rule);border-radius:12px;background:#fff}
+.bub{max-width:88%;padding:10px 12px;border-radius:14px;font-size:13px;line-height:1.55;margin:8px 0;white-space:pre-wrap;word-break:break-word}
 .bub.user{background:var(--primary);color:#fff;margin-left:auto}
 .bub.bot{background:var(--soft);color:var(--ink)}
+.bub.sys{background:var(--warn-bg);color:#6a5010;font-size:12px}
 input.chatin{flex:1;min-width:200px;min-height:42px;padding:8px 12px;border:1px solid var(--rule);border-radius:18px;background:var(--field)}
 .slider{width:100%}
 .tag{font-size:11px;padding:2px 8px;border-radius:999px;background:var(--soft);color:var(--muted);margin-left:6px}
 ul.clean{margin:0;padding-left:1.2em}
-pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overflow:auto;font-size:12px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 12px;border:1px solid var(--rule);border-radius:999px;background:var(--surface);cursor:pointer;font-size:13px}
+.chip.on{border-color:var(--primary);color:var(--primary);font-weight:700;background:#e8f2fb}
+.chip small{color:var(--muted);font-weight:400}
+.empty{padding:18px;color:var(--muted);font-size:13px;background:var(--soft);border-radius:10px;text-align:center}
+pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overflow:auto;font-size:12px;max-height:180px}
+.progress{height:4px;background:var(--soft);border-radius:99px;overflow:hidden;margin-top:8px}
+.progress>i{display:block;height:100%;width:0;background:var(--primary);transition:width .2s}
 </style>
 </head>
 <body>
 <p data-aigc-mark="1" style="margin:0 0 8px;font-size:10px;line-height:1.3;color:#6b6560;font-weight:400;">AI生成</p>
-
 <div class="wrap">
 <header class="rail">
   <div class="mark">债</div>
-  <div class="brand"><strong>知债：星穹学途</strong><small>Knowledge Debt: Astral Path · 单体版 2.1（无微服务）</small></div>
+  <div class="brand"><strong>知债：星穹学途</strong><small>Knowledge Debt: Astral Path · 单体版 2.2（无微服务）</small></div>
   <nav class="pills" id="nav">
     <button class="on" data-p="home">起点</button><button data-p="materials">藏书阁</button>
     <button data-p="graph">识网</button><button data-p="debt">知债</button>
@@ -83,14 +95,12 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
   </nav>
   <div class="row" style="align-items:center">
     <div class="avatar">访</div>
-    <div><strong style="font-size:13px">王小明（有债）</strong><div style="font-size:11px;color:var(--muted)" id="mode">单体 · 本机数据</div></div>
+    <div><strong style="font-size:13px" id="userName">王小明（有债）</strong><div style="font-size:11px;color:var(--muted)" id="mode">单体 · 本机数据</div></div>
   </div>
 </header>
-
-<!-- ═══ 起点 ═══ -->
 <main id="p-home">
   <div class="page-h">
-    <div><h1>起点</h1><p>上传教材 → 本地解析 → 自动识网 → 今日任务与知识债诊断。无需服务器、无微服务。</p></div>
+    <div><h1>起点</h1><p>上传教材 → 本机解析 → 自动识网 → 今日任务与知识债诊断。无需服务器、无微服务。</p></div>
     <div class="actions"><button class="btn primary" id="btnSeed">导入示例教材</button><button class="btn primary" data-go="materials">打开藏书阁</button></div>
   </div>
   <div class="panel">
@@ -103,54 +113,68 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
       <div class="stat"><span class="hint">开放债边</span><b id="sDebt">0</b></div>
     </div>
   </div>
-  <div class="panel">
-    <h2>系统状态</h2>
-    <div class="status ok">score-v2 / impact-v2 / sale-v2 · 数据存 localStorage · <span class="badge">单体就绪</span></div>
+  <div class="panel"><h2>当前教材</h2><div id="homeBook" class="hint">尚未选择教材</div></div>
+  <div class="panel"><h2>系统状态</h2>
+    <div class="status ok">score-v2 / impact-v2 / sale-v2 · 解析→构图→识网 本机闭环 · 数据存 localStorage · <span class="badge">单体就绪</span></div>
   </div>
 </main>
-
-<!-- ═══ 藏书阁 ═══ -->
 <main id="p-materials" hidden>
   <div class="page-h">
-    <div><h1>藏书阁</h1><p>支持 PDF/文本。文本层优先，扫描件可走 OCR（本机 tesseract 可选）。</p></div>
-    <div class="actions"><button class="btn" id="btnSeed2">导入示例资料</button><button class="btn" id="btnParseAll">解析全部</button><button class="btn" id="btnRefresh">刷新列表</button></div>
+    <div><h1>藏书阁</h1><p>支持 PDF/TXT/MD。解析后自动构图并写入识网；扫描件可粘贴正文兜底。</p></div>
+    <div class="actions">
+      <button class="btn" id="btnSeed2">导入示例资料</button>
+      <button class="btn" id="btnParseAll">解析全部</button>
+      <button class="btn" id="btnRefresh">刷新列表</button>
+    </div>
   </div>
   <div class="grid2">
     <section class="panel">
       <h2>资料库</h2>
-      <div class="field"><label>选择学习资料（可多选）</label><input type="file" id="fileInput" multiple accept=".pdf,.txt,.md,.PDF" /></div>
+      <div class="field"><label>选择学习资料（可多选）</label><input type="file" id="fileInput" multiple accept=".pdf,.txt,.md,.markdown,.PDF,.TXT,.MD" /></div>
       <div class="field"><label>已选文件</label><div id="fileHint">尚未选择文件</div></div>
       <div class="field"><label>解析模式</label>
-        <select id="ocrMode"><option>quick · 快速</option><option selected>standard · 目录+抽样</option><option>none · 仅文本层</option></select>
+        <select id="ocrMode">
+          <option value="quick">quick · 快速（章标题+抽样）</option>
+          <option value="standard" selected>standard · 目录+正文构图</option>
+          <option value="none">none · 仅文本层/原文</option>
+        </select>
       </div>
       <div class="actions"><button class="btn primary" id="btnUpload">上传并解析（支持多选）</button></div>
+      <div class="progress" id="parseProg" hidden><i id="parseProgBar"></i></div>
       <div class="status" id="matStatus">尚未上传</div>
+      <div class="field" style="margin-top:14px">
+        <label>粘贴正文（PDF 抽不出文本层时的兜底）</label>
+        <textarea id="pasteText" placeholder="把教材正文粘贴到这里，点下方「从粘贴文本解析」也会生成知识图谱"></textarea>
+        <div class="actions"><button class="btn" id="btnPasteParse">从粘贴文本解析</button></div>
+      </div>
       <div id="matList"></div>
     </section>
     <aside class="panel">
       <h2>解析详情</h2>
-      <p class="hint">选择左侧资料查看详情。</p>
-      <div id="matDetail"></div>
+      <p class="hint">选择左侧资料查看章节、节点与预览。</p>
+      <div id="matDetail"><div class="empty">暂无详情</div></div>
     </aside>
   </div>
 </main>
-
-<!-- ═══ 识网 ═══ -->
 <main id="p-graph" hidden>
   <div class="page-h">
-    <div><h1>识网</h1><p>点击教材卡片切换图谱、知识点与真题。</p></div>
-    <div class="actions"><button class="btn" id="btnGRefresh">刷新图谱</button><button class="btn primary" data-go="today">用本书出今日题</button></div>
+    <div><h1>识网</h1><p>解析完成后这里会展示该文件生成的知识图谱。点击教材卡片切换。</p></div>
+    <div class="actions">
+      <button class="btn" id="btnGRefresh">刷新图谱</button>
+      <button class="btn primary" data-go="today">用本书出今日题</button>
+      <button class="btn" data-go="materials">去藏书阁解析</button>
+    </div>
   </div>
-  <div class="panel"><h2>教材切换</h2><p class="hint">点击卡片切换当前教材</p><div class="row" id="bookChips"></div><div class="status ok" id="gSwitch">已加载示例图包</div></div>
+  <div class="panel"><h2>教材切换</h2><p class="hint">点击卡片切换当前教材图谱</p><div class="row" id="bookChips"></div><div class="status" id="gSwitch">已加载示例图包</div></div>
   <div class="grid2">
     <section class="panel">
       <h2>知识图谱 <span class="tag" id="gBadge">—</span></h2>
-      <p class="hint">章节蓝 · 词绿 · 债红</p>
+      <p class="hint">章节蓝 · 词绿 · 债红 · <span id="gSource">来源：示例</span></p>
       <div class="dag" id="dag"></div>
     </section>
     <aside class="panel">
       <h2>章节侧栏</h2>
-      <p class="hint">完整目录 · 点击查看正文与自动出题</p>
+      <p class="hint">完整目录 · 点击查看正文摘要与出题</p>
       <div id="chTree" style="max-height:220px;overflow:auto;border:1px solid var(--rule);border-radius:8px;padding:8px"></div>
       <div id="chBody" style="margin-top:10px;padding:10px;background:var(--soft);border-radius:8px;font-size:13px;line-height:1.6;max-height:180px;overflow:auto">选择左侧章节后显示正文</div>
       <h2 style="margin-top:14px">节点检视</h2>
@@ -158,8 +182,6 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
     </aside>
   </div>
 </main>
-
-<!-- ═══ 知债 ═══ -->
 <main id="p-debt" hidden>
   <div class="page-h">
     <div><h1>知债：星穹学途</h1><p>BASELINE 诊断 · What-if · 14 天修复计划</p></div>
@@ -179,32 +201,33 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
   </div>
   <div class="panel"><h2>修复计划</h2><div id="planBox"></div></div>
 </main>
-
-<!-- ═══ 今日 ═══ -->
 <main id="p-today" hidden>
   <div class="page-h">
     <div><h1>今日任务</h1><p id="coach">今天先完成相关真题，再回到课程债边。</p></div>
-    <div class="actions"><button class="btn" id="btnLoadToday">加载今日任务</button><button class="btn" id="btnShuffle">换一批题</button><button class="btn quiet" id="btnDay">Demo +1 天</button></div>
+    <div class="actions">
+      <button class="btn" id="btnLoadToday">加载今日任务</button>
+      <button class="btn" id="btnShuffle">换一批题</button>
+      <button class="btn quiet" id="btnDay">Demo +1 天</button>
+    </div>
   </div>
   <div class="panel">
     <div class="bar"><i id="todayBar" style="width:0%"></i></div>
     <div id="todayList"></div>
   </div>
   <div class="panel">
-    <h2>练习</h2>
+    <h2>练习 <span class="tag" id="quizKp">—</span></h2>
     <div class="field"><label>信心 1–5：<span id="vConf">3</span></label><input class="slider" type="range" id="conf" min="1" max="5" value="3" /></div>
     <div id="quizBox"></div>
+    <div class="row" style="margin-top:10px"><button class="btn" id="btnNextQ">换一题</button></div>
   </div>
 </main>
-
-<!-- ═══ 智能体 ═══ -->
 <main id="p-agent" hidden>
   <div class="page-h">
     <div><h1>受约束智能体</h1><p>意图路由 · 危机转人工 · 敏感词脱敏。数字只来自本地公式。</p></div>
   </div>
   <div class="grid2">
     <section class="panel">
-      <h2>对话</h2><p class="hint">sessionId: local-monolith</p>
+      <h2>对话</h2><p class="hint">sessionId: local-monolith · 本机工具白名单</p>
       <div class="chat" id="chat"></div>
       <div class="row" style="margin-top:12px">
         <input class="chatin" id="agentIn" placeholder="例如：我的会计等式总是搞不清，怎么办？" />
@@ -215,16 +238,20 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
         <button class="btn quiet" data-q="我不想活了">危机词测试</button>
         <button class="btn quiet" data-q="帮我诊断知识债">诊断债</button>
         <button class="btn quiet" data-q="生成14天计划">生成计划</button>
+        <button class="btn quiet" data-q="图谱里有哪些章节">识网摘要</button>
+        <button class="btn quiet" data-q="销账条件是什么">销账检查</button>
       </div>
       <div class="status ok" id="agentSt">ok · ready</div>
+      <div class="status" id="agentTrace">路由轨迹将显示在此</div>
     </section>
     <aside class="panel"><h2>工具清单</h2><p class="hint">本机白名单（无微服务）</p>
-      <ul class="clean"><li>诊断红边</li><li>14 天计划</li><li>今日任务</li><li>识网摘要</li><li>销账检查</li></ul>
+      <ul class="clean">
+        <li>诊断红边（impact-v2）</li><li>14 天计划（间隔三遍）</li><li>今日任务</li>
+        <li>识网摘要 / 章节检索</li><li>销账检查（sale-v2）</li><li>What-if 模拟</li><li>资料解析引导</li>
+      </ul>
     </aside>
   </div>
 </main>
-
-<!-- ═══ 画像 ═══ -->
 <main id="p-profile" hidden>
   <div class="page-h"><div><h1>画像</h1><p>掌握度与学习风格五轴 · 可随时 opt-out</p></div></div>
   <div class="panel"><h2>掌握度</h2><div id="masteryList"></div></div>
@@ -232,8 +259,6 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
     <p class="hint">Brier 越低越准 · Steady=状态稳 · Independent=少提示</p></div>
   <div class="panel"><button class="btn" id="btnOpt">关闭个性化画像（opt-out）</button><div class="status" id="optLine">个性化开启中</div></div>
 </main>
-
-<!-- ═══ 账户 ═══ -->
 <main id="p-account" hidden>
   <div class="page-h"><div><h1>账户</h1><p>本机演示账户 · 同意/撤销教师可见 · 导出/重置</p></div></div>
   <div class="panel">
@@ -250,511 +275,849 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
   </div>
   <div class="panel">
     <h2>数据</h2>
-    <div class="row"><button class="btn" id="btnExport">导出数据</button><button class="btn" id="btnWipe">重置</button></div>
+    <div class="row"><button class="btn" id="btnExport">导出数据</button><button class="btn danger" id="btnWipe">重置</button></div>
   </div>
 </main>
 </div>
-
 <script>
-"use strict";
-/* =========================================================
-   单体版核心（无微服务）：score-v2 / impact-v2 / sale-v2 / 计划 / 图 / 画像
-   ========================================================= */
-const K = { W:{e:.5,r:.3,p:.2}, floor:.55, stab0:2.5, a:.45, b:.25, mix:.65,
-  impactBase:.55, crossTg:1.15, pg:.55, cg:.50, steep:8, hit:.08, cas:.12, vol:.08,
-  saleBar:.65, saleAcc:.7, saleConf:3, saleStreak:2, saleMinAtt:3 };
-const sig = x => 1/(1+Math.exp(-x));
-const clamp01 = v => Math.max(0, Math.min(1, v));
 
-function empirical(n,s){ return (s+0.5)/(n+1); }
-function stability(streak,att){ return K.stab0*(1+K.a*Math.max(streak,0))*(1+K.b*Math.log(1+Math.max(att,1))); }
-function retention(age,streak,att){ return Math.exp(-Math.max(age,0)/stability(streak,att)); }
-function prereqSup(arr){ if(!arr||!arr.length) return .5; const mean=arr.reduce((a,b)=>a+b,0)/arr.length, mn=Math.min(...arr); return (1-K.mix)*mean+K.mix*mn; }
-function prereqCeil(arr){ return (!arr||!arr.length)?1: K.floor+(1-K.floor)*Math.min(...arr); }
+"use strict";
+const K={W:{e:.5,r:.3,p:.2},floor:.55,stab0:2.5,a:.45,b:.25,mix:.65,impactBase:.55,crossTg:1.15,pg:.55,cg:.50,steep:8,hit:.08,cas:.12,vol:.08,saleBar:.65,saleAcc:.7,saleConf:3,saleStreak:2,saleMinAtt:3};
+const sig=x=>1/(1+Math.exp(-x));
+const clamp01=v=>Math.max(0,Math.min(1,v));
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];});}
+const $=id=>document.getElementById(id);
+function empirical(n,s){return (s+0.5)/(n+1);}
+function stability(streak,att){return K.stab0*(1+K.a*Math.max(streak,0))*(1+K.b*Math.log(1+Math.max(att,1)));}
+function retention(age,streak,att){return Math.exp(-Math.max(age,0)/stability(streak,att));}
+function prereqSup(arr){if(!arr||!arr.length)return .5;const mean=arr.reduce((a,b)=>a+b,0)/arr.length,mn=Math.min.apply(null,arr);return (1-K.mix)*mean+K.mix*mn;}
+function prereqCeil(arr){return (!arr||!arr.length)?1:K.floor+(1-K.floor)*Math.min.apply(null,arr);}
 function scoreV2(att,ok,conf,age,streak,prereq){
-  const know = .85*empirical(att,ok) + .15*(conf/5);
-  const raw = K.W.e*know + K.W.r*retention(age,streak,att) + K.W.p*prereqSup(prereq);
-  return clamp01(Math.min(raw, prereqCeil(prereq)));
+  const know=.85*empirical(att,ok)+.15*clamp01(conf/5);
+  const raw=K.W.e*know+K.W.r*retention(age,streak,att)+K.W.p*prereqSup(prereq);
+  return clamp01(Math.min(raw,prereqCeil(prereq)));
 }
 function impactV2(sf,st,w,tg,freq,down){
-  if(freq<=0) return 0;
-  return K.impactBase * sig((sf-K.pg)*K.steep) * sig((K.cg-st)*K.steep) * Math.max(w,0)
-    * (tg?K.crossTg:1) * (1+K.cas*Math.log(1+Math.max(down,0))) * (1+K.vol*Math.log(1+Math.max(freq,0)));
+  if(!(freq>0))return 0;
+  const ww=Number.isFinite(w)?Math.max(w,0):0;
+  return K.impactBase*sig((sf-K.pg)*K.steep)*sig((K.cg-st)*K.steep)*ww*(tg?K.crossTg:1)*(1+K.cas*Math.log(1+Math.max(down,0)))*(1+K.vol*Math.log(1+Math.max(freq,0)));
 }
 function saleStep(s,acc,conf){
-  const meets = (0.7*acc+0.3*(conf/5))>=K.saleBar && acc>=K.saleAcc && conf>=K.saleConf;
-  const streak = meets ? s.streak+1 : 0;
-  const att = s.att+1;
-  const status = (streak>=K.saleStreak && att>=K.saleMinAtt) ? "cleared" : (streak>0||att>0 ? "repairing" : "open");
-  return {status, streak, att, meets};
+  const st0=s||{streak:0,att:0};
+  const meets=(0.7*acc+0.3*clamp01(conf/5))>=K.saleBar&&acc>=K.saleAcc&&conf>=K.saleConf;
+  const streak=meets?st0.streak+1:0;
+  const att=st0.att+1;
+  const status=(streak>=K.saleStreak&&att>=K.saleMinAtt)?"cleared":(streak>0||att>0?"repairing":"open");
+  return {status,streak,att,meets};
+}
+function latin1(u8){let s="";const CH=8192;for(let i=0;i<u8.length;i+=CH)s+=String.fromCharCode.apply(null,u8.subarray(i,Math.min(u8.length,i+CH)));return s;}
+function countReadable(s){return (String(s).match(/[一-鿿A-Za-z0-9]/g)||[]).length;}
+function extractTj(src){
+  const out=[];
+  const re=/\((?:\\.|[^\\)])*\)|<[0-9A-Fa-f\s]+>/g;
+  const blocks=src.match(/BT[\s\S]{0,8000}?ET/g)||[src];
+  for(const b of blocks){
+    let m;re.lastIndex=0;
+    while((m=re.exec(b))){
+      const t=m[0];
+      if(t.charAt(0)==="<"){
+        const hex=t.slice(1,-1).replace(/\s+/g,"");
+        if(hex.length>=4&&hex.length%4===0){
+          let s="";for(let i=0;i<hex.length;i+=4)s+=String.fromCharCode(parseInt(hex.substr(i,4),16));
+          if(/[一-鿿A-Za-z0-9]/.test(s))out.push(s);
+        }
+      }else{
+        let s=t.slice(1,-1).replace(/\\n/g,"\n").replace(/\\r/g,"\r").replace(/\\t/g,"\t").replace(/\\([()\\])/g,"$1");
+        if(/[一-鿿A-Za-z0-9]/.test(s))out.push(s);
+      }
+    }
+    out.push("\n");
+  }
+  return out.join("").replace(/\n{3,}/g,"\n\n").trim();
+}
+async function inflatePdfStreams(bytes,raw){
+  const parts=[];let idx=0;
+  while(true){
+    const s=raw.indexOf("stream",idx);if(s<0)break;
+    let p=s+6;if(raw.charAt(p)==="\r")p++;if(raw.charAt(p)==="\n")p++;
+    const e=raw.indexOf("endstream",p);if(e<0)break;
+    const slice=bytes.subarray(p,e);
+    try{const ds=new DecompressionStream("deflate");const ab=await new Response(new Blob([slice]).stream().pipeThrough(ds)).arrayBuffer();parts.push(latin1(new Uint8Array(ab)));}
+    catch(_1){try{const ds=new DecompressionStream("deflate-raw");const ab=await new Response(new Blob([slice]).stream().pipeThrough(ds)).arrayBuffer();parts.push(latin1(new Uint8Array(ab)));}catch(_2){parts.push(latin1(slice));}}
+    idx=e+9;
+  }
+  return parts;
+}
+function sanitizeText(t){
+  return String(t||"").replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g," ");
+}
+async function readFileAsText(file){
+  const name=file.name||"untitled";
+  const buf=await file.arrayBuffer();
+  const u8=new Uint8Array(buf);
+  const isPdf=/\.pdf$/i.test(name)||(u8[0]===0x25&&u8[1]===0x50&&u8[2]===0x44&&u8[3]===0x46);
+  if(isPdf){
+    let text="";
+    try{
+      const raw=latin1(u8);
+      text=extractTj(raw);
+      const parts=await inflatePdfStreams(u8,raw);
+      const more=parts.map(extractTj).join("\n");
+      if(more.length>text.length)text=more;
+    }catch(e){text="";}
+    text=sanitizeText(text).trim();
+    const readable=countReadable(text);
+    if(readable<40)return {text:text,ok:false,reason:"PDF 文本层不足（扫描件或 CID 字体），请用「粘贴正文」或改用 TXT/MD",chars:readable};
+    return {text:text,ok:true,chars:readable};
+  }
+  let text="";
+  try{text=new TextDecoder("utf-8",{fatal:false}).decode(u8);}catch(e){text=latin1(u8);}
+  if(u8[0]===0xFF&&u8[1]===0xFE)text=new TextDecoder("utf-16le").decode(u8);
+  if(u8[0]===0xFE&&u8[1]===0xFF)text=new TextDecoder("utf-16be").decode(u8);
+  text=sanitizeText(text.replace(/\r\n/g,"\n"));
+  const readable=countReadable(text);
+  if(readable<10)return {text:"",ok:false,reason:"文件几乎没有可读文本",chars:readable};
+  return {text:text,ok:true,chars:readable};
 }
 
-/* ---------- 数据 ---------- */
-const LS = "astralpath_monolith_v1";
-function load(){ try{ return JSON.parse(localStorage.getItem(LS))||seed(); }catch(e){ return seed(); } }
-function save(s){ try{ localStorage.setItem(LS, JSON.stringify(s)); }catch(e){} }
-function seed(){
-  const nodes = [
-    {id:"N01",title:"会计对象",diff:1,course:"会计基础",kind:"chapter"},
-    {id:"N02",title:"会计要素",diff:1,course:"会计基础",kind:"chapter"},
-    {id:"N03",title:"会计等式",diff:2,course:"会计基础",kind:"chapter"},
-    {id:"N04",title:"会计科目",diff:2,course:"会计基础",kind:"chapter"},
-    {id:"N05",title:"账户结构",diff:2,course:"会计基础",kind:"chapter"},
-    {id:"N06",title:"借贷记账法",diff:3,course:"会计基础",kind:"term"},
-    {id:"N07",title:"会计分录",diff:3,course:"会计基础",kind:"term"},
-    {id:"N08",title:"试算平衡",diff:2,course:"会计基础",kind:"chapter"},
-    {id:"N09",title:"凭证填制",diff:2,course:"会计基础",kind:"chapter"},
-    {id:"N10",title:"账簿登记",diff:3,course:"会计基础",kind:"term"},
-    {id:"N11",title:"财产清查",diff:2,course:"会计基础",kind:"chapter"},
-    {id:"N12",title:"财务报表",diff:4,course:"会计基础",kind:"term"},
-    {id:"P01",title:"变量与类型",diff:1,course:"Python 入门",kind:"chapter"},
-    {id:"P02",title:"运算符与表达式",diff:1,course:"Python 入门",kind:"chapter"},
-    {id:"P03",title:"条件判断",diff:2,course:"Python 入门",kind:"chapter"},
-    {id:"P04",title:"循环",diff:2,course:"Python 入门",kind:"chapter"},
-    {id:"P05",title:"列表与字典",diff:2,course:"Python 入门",kind:"chapter"},
-    {id:"P06",title:"函数",diff:3,course:"Python 入门",kind:"term"},
-    {id:"P07",title:"文件读写",diff:3,course:"Python 入门",kind:"term"},
-    {id:"P08",title:"模块与包",diff:3,course:"Python 入门",kind:"term"},
-    {id:"P09",title:"异常处理",diff:3,course:"Python 入门",kind:"term"},
-    {id:"P10",title:"类与对象",diff:4,course:"Python 入门",kind:"term"},
-    {id:"D01",title:"神经元与激活",diff:1,course:"深度学习概论",kind:"chapter"},
-    {id:"D02",title:"损失函数",diff:2,course:"深度学习概论",kind:"chapter"},
-    {id:"D03",title:"梯度下降",diff:2,course:"深度学习概论",kind:"chapter"},
-    {id:"D04",title:"反向传播",diff:3,course:"深度学习概论",kind:"term"},
-    {id:"D05",title:"卷积网络",diff:3,course:"深度学习概论",kind:"term"},
-    {id:"D06",title:"池化",diff:2,course:"深度学习概论",kind:"chapter"},
-    {id:"D07",title:"循环网络",diff:4,course:"深度学习概论",kind:"term"},
-    {id:"D08",title:"注意力与Transformer",diff:5,course:"深度学习概论",kind:"term"},
-    {id:"D09",title:"过拟合与正则",diff:3,course:"深度学习概论",kind:"term"},
-    {id:"D10",title:"数据增强",diff:2,course:"深度学习概论",kind:"chapter"},
-    {id:"D11",title:"BatchNorm",diff:4,course:"深度学习概论",kind:"term"},
-    {id:"D12",title:"优化器Adam",diff:3,course:"深度学习概论",kind:"term"}
-  ];
-  const edges = [
-    {from:"N01",to:"N02",tg:false,w:1.0},
-    {from:"N02",to:"N03",tg:false,w:1.2},
-    {from:"N03",to:"N04",tg:false,w:1.0},
-    {from:"N04",to:"N05",tg:false,w:1.0},
-    {from:"N05",to:"N06",tg:false,w:1.1},
-    {from:"N06",to:"N07",tg:false,w:1.3},
-    {from:"N07",to:"N08",tg:false,w:1.1},
-    {from:"N04",to:"N09",tg:false,w:0.9},
-    {from:"N09",to:"N10",tg:false,w:1.0},
-    {from:"N10",to:"N11",tg:false,w:0.9},
-    {from:"N08",to:"N12",tg:false,w:1.2},
-    {from:"N11",to:"N12",tg:false,w:0.9},
-    {from:"N03",to:"N06",tg:true,w:0.8},
-    {from:"N06",to:"N08",tg:true,w:0.7},
-    {from:"N02",to:"N05",tg:false,w:0.8},
-    {from:"N05",to:"N07",tg:false,w:0.9},
-    {from:"N03",to:"N05",tg:false,w:0.8},
-    {from:"N06",to:"N10",tg:false,w:0.9},
-    {from:"N07",to:"N09",tg:false,w:0.7},
-    {from:"N08",to:"N11",tg:false,w:0.8},
-    {from:"P01",to:"P02",tg:false,w:1.0},
-    {from:"P02",to:"P03",tg:false,w:1.0},
-    {from:"P03",to:"P04",tg:false,w:1.0},
-    {from:"P04",to:"P05",tg:false,w:1.0},
-    {from:"P05",to:"P06",tg:false,w:1.0},
-    {from:"P06",to:"P07",tg:false,w:1.0},
-    {from:"P07",to:"P09",tg:false,w:1.0},
-    {from:"P06",to:"P08",tg:false,w:1.0},
-    {from:"P08",to:"P10",tg:false,w:1.0},
-    {from:"P05",to:"P07",tg:false,w:1.0},
-    {from:"P02",to:"P05",tg:false,w:1.0},
-    {from:"P04",to:"P06",tg:false,w:0.9},
-    {from:"P03",to:"P06",tg:true,w:0.6},
-    {from:"D01",to:"D02",tg:false,w:1.0},
-    {from:"D02",to:"D03",tg:false,w:1.0},
-    {from:"D03",to:"D04",tg:false,w:1.0},
-    {from:"D04",to:"D05",tg:false,w:1.0},
-    {from:"D05",to:"D06",tg:false,w:1.0},
-    {from:"D04",to:"D07",tg:false,w:1.0},
-    {from:"D07",to:"D08",tg:false,w:1.0},
-    {from:"D05",to:"D11",tg:false,w:1.0},
-    {from:"D03",to:"D12",tg:false,w:1.0},
-    {from:"D02",to:"D09",tg:false,w:1.0},
-    {from:"D09",to:"D10",tg:false,w:1.0},
-    {from:"D06",to:"D09",tg:false,w:1.0},
-    {from:"D04",to:"D11",tg:false,w:1.0},
-    {from:"D05",to:"D08",tg:false,w:1.0},
-    {from:"D02",to:"D12",tg:false,w:1.0},
-    {from:"N02",to:"P01",tg:true,w:0.5},
-    {from:"N03",to:"D02",tg:true,w:0.5},
-    {from:"P05",to:"D01",tg:true,w:0.5},
-    {from:"P06",to:"D03",tg:true,w:0.6},
-    {from:"N08",to:"P09",tg:true,w:0.5},
-    {from:"P10",to:"D01",tg:false,w:0.8},
-    {from:"N06",to:"P03",tg:true,w:0.4},
-    {from:"N12",to:"D02",tg:true,w:0.4},
-    {from:"P04",to:"D03",tg:false,w:0.7},
-    {from:"N01",to:"D01",tg:true,w:0.4},
-    {from:"P02",to:"D02",tg:true,w:0.4},
-    {from:"N05",to:"P05",tg:false,w:0.6},
-    {from:"P09",to:"D09",tg:true,w:0.5},
-    {from:"P08",to:"D12",tg:true,w:0.5},
-    {from:"N07",to:"P03",tg:true,w:0.4},
-    {from:"P06",to:"D04",tg:false,w:0.9},
-    {from:"P03",to:"D03",tg:true,w:0.5},
-    {from:"N04",to:"P01",tg:true,w:0.4},
-    {from:"N10",to:"P07",tg:true,w:0.5},
-    {from:"P09",to:"D03",tg:true,w:0.5},
-    {from:"N09",to:"P02",tg:true,w:0.4},
-    {from:"P07",to:"D10",tg:false,w:0.7},
-    {from:"N11",to:"P05",tg:true,w:0.4},
-    {from:"P08",to:"D11",tg:true,w:0.5},
-    {from:"P06",to:"D01",tg:true,w:0.4},
-    {from:"N03",to:"P02",tg:true,w:0.4}
-  ];
-  const qs = [
-    {id:"Q001",kp:"N01",stem:"会计的基本职能包括？",opts:["核算与监督", "只有核算", "只有监督", "只有预测"],ci:0,diff:1},
-    {id:"Q002",kp:"N01",stem:"会计对象是？",opts:["资金运动", "企业人员", "办公设备", "合同文本"],ci:0,diff:1},
-    {id:"Q003",kp:"N02",stem:"下列属于会计要素的是？",opts:["资产", "温度", "速度", "颜色"],ci:0,diff:1},
-    {id:"Q004",kp:"N02",stem:"会计要素共分几类？",opts:["六类", "三类", "九类", "十二类"],ci:0,diff:2},
-    {id:"Q005",kp:"N02",stem:"收入属于哪一类要素？",opts:["收入类", "资产类", "负债类", "成本类"],ci:0,diff:2},
-    {id:"Q006",kp:"N03",stem:"会计等式正确的是？",opts:["资产=负债+所有者权益", "资产=负债", "资产=收入", "负债=收入"],ci:0,diff:2},
-    {id:"Q007",kp:"N03",stem:"所有者权益=？",opts:["资产-负债", "资产+负债", "收入-费用", "资产-收入"],ci:0,diff:2},
-    {id:"Q008",kp:"N03",stem:"反映财务状况的等式是？",opts:["资产=负债+权益", "收入=费用+利润", "资产=收入", "负债=费用"],ci:0,diff:3},
-    {id:"Q009",kp:"N04",stem:"会计科目是对什么的分类？",opts:["会计要素", "会计凭证", "会计报表", "会计人员"],ci:0,diff:2},
-    {id:"Q010",kp:"N04",stem:"下列属于资产类科目的是？",opts:["银行存款", "实收资本", "主营业务收入", "管理费用"],ci:0,diff:2},
-    {id:"Q011",kp:"N05",stem:"账户的贷方登记？",opts:["负债与权益增加", "资产增加", "费用增加", "资产减少"],ci:0,diff:3},
-    {id:"Q012",kp:"N05",stem:"期末余额=？",opts:["期初+本期增加-本期减少", "期初+本期减少", "期初×2", "本期增加"],ci:0,diff:3},
-    {id:"Q013",kp:"N06",stem:"借贷记账法的记账符号是？",opts:["借贷", "增减", "收支", "进出"],ci:0,diff:1},
-    {id:"Q014",kp:"N06",stem:"资产增加记？",opts:["借方", "贷方", "双方", "不记账"],ci:0,diff:2},
-    {id:"Q015",kp:"N06",stem:"负债增加记？",opts:["贷方", "借方", "红字", "不记账"],ci:0,diff:2},
-    {id:"Q016",kp:"N06",stem:"费用增加记？",opts:["借方", "贷方", "借或贷", "从不"],ci:0,diff:3},
-    {id:"Q017",kp:"N07",stem:"会计分录不包括？",opts:["记账颜色", "账户名称", "记账方向", "金额"],ci:0,diff:2},
-    {id:"Q018",kp:"N07",stem:"复合分录是指？",opts:["一借多贷等", "只有借", "只有贷", "无金额"],ci:0,diff:3},
-    {id:"Q019",kp:"N08",stem:"试算平衡检查？",opts:["借方合计=贷方合计", "收入=资产", "负债=费用", "人员=编制"],ci:0,diff:2},
-    {id:"Q020",kp:"N08",stem:"试算平衡表平衡则记账？",opts:["基本无误", "一定正确", "一定错误", "无需审核"],ci:1,diff:3},
-    {id:"Q021",kp:"N09",stem:"原始凭证的作用是？",opts:["记录经济业务发生", "记录账簿页码", "记录会计政策", "记录报表格式"],ci:0,diff:2},
-    {id:"Q022",kp:"N09",stem:"记账凭证的依据是？",opts:["原始凭证", "会计报表", "会计科目表", "人员名单"],ci:0,diff:2},
-    {id:"Q023",kp:"N10",stem:"明细账通常采用？",opts:["活页式或卡片式", "仅订本式", "仅备查簿", "仅日记账"],ci:0,diff:3},
-    {id:"Q024",kp:"N10",stem:"日记账属于？",opts:["序时账簿", "分类账簿", "备查账簿", "联合账簿"],ci:0,diff:3},
-    {id:"Q025",kp:"N11",stem:"财产清查的目的是？",opts:["账实相符", "增加利润", "减少税收", "更换账簿"],ci:0,diff:2},
-    {id:"Q026",kp:"N11",stem:"银行存款清查采用？",opts:["银行对账单核对", "实地盘点", "技术推算", "函证核对"],ci:0,diff:3},
-    {id:"Q027",kp:"N11",stem:"库存现金清查采用？",opts:["实地盘点", "技术推算", "抽样估计", "账账核对"],ci:0,diff:2},
-    {id:"Q028",kp:"N12",stem:"资产负债表反映？",opts:["财务状况", "经营成果", "现金流量", "人员构成"],ci:0,diff:2},
-    {id:"Q029",kp:"N12",stem:"利润表反映？",opts:["经营成果", "财务状况", "市场份额", "股东人数"],ci:0,diff:2},
-    {id:"Q030",kp:"N12",stem:"资产负债表是？",opts:["静态报表", "动态报表", "统计报表", "税务报表"],ci:0,diff:3},
-    {id:"Q031",kp:"N03",stem:"收入-费用=？",opts:["利润", "资产", "负债", "权益"],ci:0,diff:2},
-    {id:"Q032",kp:"N06",stem:"借贷记账法的记账规则是？",opts:["有借必有贷，借贷必相等", "有借无贷", "只记借", "只记贷"],ci:0,diff:2},
-    {id:"Q033",kp:"N05",stem:"账户的基本结构分？",opts:["左右两方", "上下两方", "三方", "四方"],ci:0,diff:2},
-    {id:"Q034",kp:"N08",stem:"发生额试算平衡的依据是？",opts:["借贷记账法记账规则", "会计等式", "会计准则", "公司章程"],ci:0,diff:3},
-    {id:"Q035",kp:"P01",stem:"Python 中定义整数变量用？",opts:["x = 1", "int x = 1;", "var x = 1;", "let x = 1"],ci:0,diff:1},
-    {id:"Q036",kp:"P01",stem:"type(3.14) 是？",opts:["float", "int", "str", "bool"],ci:0,diff:1},
-    {id:"Q037",kp:"P01",stem:"下列是合法变量名？",opts:["my_var", "1var", "my-var", "class"],ci:0,diff:1},
-    {id:"Q038",kp:"P02",stem:"Python 的整除运算符是？",opts:["//", "/", "%", "**"],ci:0,diff:2},
-    {id:"Q039",kp:"P02",stem:"取余运算符是？",opts:["%", "//", "/", "*"],ci:0,diff:1},
-    {id:"Q040",kp:"P02",stem:"2 ** 3 的值是？",opts:["8", "6", "9", "5"],ci:0,diff:1},
-    {id:"Q041",kp:"P03",stem:"Python 用什么缩进表示块？",opts:["空格/Tab 一致", "大括号", "begin/end", "缩进可任意混用"],ci:0,diff:1},
-    {id:"Q042",kp:"P03",stem:"if 语句的正确写法是？",opts:["if x>1:", "if (x>1) {}", "if x>1 then", "if x>1"],ci:0,diff:2},
-    {id:"Q043",kp:"P03",stem:"elif 的含义是？",opts:["否则如果", "结束", "循环", "函数"],ci:0,diff:2},
-    {id:"Q044",kp:"P04",stem:"for i in range(3) 循环几次？",opts:["3 次", "2 次", "无限次", "0 次"],ci:0,diff:2},
-    {id:"Q045",kp:"P04",stem:"while 循环的条件为 True 表示？",opts:["无限循环直到 break", "循环 0 次", "语法错误", "只循环一次"],ci:0,diff:2},
-    {id:"Q046",kp:"P04",stem:"break 的作用是？",opts:["跳出当前循环", "跳出函数", "重启程序", "跳过本次并继续"],ci:0,diff:2},
-    {id:"Q047",kp:"P05",stem:"列表的类型是？",opts:["list", "dict", "set", "tuple"],ci:0,diff:1},
-    {id:"Q048",kp:"P05",stem:"字典的类型是？",opts:["dict", "list", "tuple", "str"],ci:0,diff:1},
-    {id:"Q049",kp:"P05",stem:"元组的特点是？",opts:["不可变", "可变", "可增删", "总是字典"],ci:0,diff:2},
-    {id:"Q050",kp:"P05",stem:"len([1,2,3]) 是？",opts:["3", "2", "1", "0"],ci:0,diff:1},
-    {id:"Q051",kp:"P05",stem:"字典取值用？",opts:["d['key']", "d(0)", "d[0] 必然", "d.key()"],ci:0,diff:2},
-    {id:"Q052",kp:"P06",stem:"定义函数用？",opts:["def f():", "func f() {}", "function f()", "fn f():"],ci:0,diff:1},
-    {id:"Q053",kp:"P06",stem:"函数返回值用？",opts:["return", "yield 仅此", "print", "echo"],ci:0,diff:1},
-    {id:"Q054",kp:"P06",stem:"默认参数写在？",opts:["形参列表", "调用时", "全局", "类里才可"],ci:0,diff:3},
-    {id:"Q055",kp:"P07",stem:"打开文件用？",opts:["open()", "file()", "read()", "load()"],ci:0,diff:2},
-    {id:"Q056",kp:"P07",stem:"写入文件的模式是？",opts:["w", "r", "rb", "r+"],ci:0,diff:2},
-    {id:"Q057",kp:"P07",stem:"读取全部文本的方法是？",opts:["read()", "readline() 仅一行", "write()", "close()"],ci:0,diff:2},
-    {id:"Q058",kp:"P08",stem:"导入模块用？",opts:["import", "include", "require", "using"],ci:0,diff:1},
-    {id:"Q059",kp:"P08",stem:"from math import sqrt 表示？",opts:["导入 sqrt 函数", "导入整个 math 重命名", "删除 math", "导入 sqrt 变量"],ci:0,diff:2},
-    {id:"Q060",kp:"P09",stem:"捕获异常用？",opts:["try/except", "if/else", "for/range", "def/return"],ci:0,diff:2},
-    {id:"Q061",kp:"P09",stem:"finally 的作用是？",opts:["无论如何都执行", "只在成功时", "只在失败时", "等价于 except"],ci:0,diff:3},
-    {id:"Q062",kp:"P09",stem:"raise 的作用是？",opts:["抛出异常", "捕获异常", "忽略异常", "打印异常"],ci:0,diff:2},
-    {id:"Q063",kp:"P10",stem:"定义类用？",opts:["class", "struct", "type", "def class"],ci:0,diff:1},
-    {id:"Q064",kp:"P10",stem:"构造方法名是？",opts:["__init__", "__new__", "__del__", "__build__"],ci:0,diff:2},
-    {id:"Q065",kp:"P10",stem:"self 表示？",opts:["实例自身", "类对象", "模块", "全局"],ci:0,diff:2},
-    {id:"Q066",kp:"P10",stem:"继承的写法是？",opts:["class B(A):", "class B extends A", "class B implements A", "class B inherits A"],ci:0,diff:3},
-    {id:"Q067",kp:"P02",stem:"比较等于用？",opts:["==", "=", "===", "!="],ci:0,diff:1},
-    {id:"Q068",kp:"D01",stem:"神经元的输出经过？",opts:["激活函数", "损失函数", "优化器", "池化"],ci:0,diff:1},
-    {id:"Q069",kp:"D01",stem:"常用激活函数不包括？",opts:["均方误差", "ReLU", "Sigmoid", "Tanh"],ci:0,diff:2},
-    {id:"Q070",kp:"D01",stem:"ReLU 的表达式是？",opts:["max(0,x)", "1/(1+e^-x)", "tanh(x)", "x^2"],ci:0,diff:2},
-    {id:"Q071",kp:"D02",stem:"分类任务常用损失是？",opts:["交叉熵", "MSE", "MAE", "Huber"],ci:0,diff:2},
-    {id:"Q072",kp:"D02",stem:"回归任务常用损失是？",opts:["均方误差", "交叉熵", "铰链损失", "CTC"],ci:0,diff:2},
-    {id:"Q073",kp:"D02",stem:"交叉熵衡量？",opts:["预测分布与真实分布差异", "参数大小", "学习率", "batch 大小"],ci:0,diff:3},
-    {id:"Q074",kp:"D03",stem:"梯度下降用于？",opts:["最小化损失", "最大化损失", "数据增强", "归一化"],ci:0,diff:1},
-    {id:"Q075",kp:"D03",stem:"学习率过大会？",opts:["震荡/不收敛", "必然收敛更快", "无影响", "自动调参"],ci:0,diff:2},
-    {id:"Q076",kp:"D03",stem:"SGD 是？",opts:["随机梯度下降", "一种激活", "一种卷积", "一种正则"],ci:0,diff:2},
-    {id:"Q077",kp:"D04",stem:"反向传播的本质是？",opts:["链式法则求梯度", "前向传播", "随机初始化", "数据洗牌"],ci:0,diff:2},
-    {id:"Q078",kp:"D04",stem:"梯度消失常见于？",opts:["深层网络", "输入层", "输出标签", "数据加载"],ci:0,diff:3},
-    {id:"Q079",kp:"D05",stem:"卷积核的作用是？",opts:["提取局部特征", "归一化", "优化参数", "生成标签"],ci:0,diff:2},
-    {id:"Q080",kp:"D05",stem:"卷积层的参数量主要取决于？",opts:["核大小与通道数", "batch size", "学习率", "轮数"],ci:0,diff:3},
-    {id:"Q081",kp:"D05",stem:"步长 stride 增大则输出？",opts:["尺寸变小", "尺寸变大", "不变", "通道变多"],ci:0,diff:2},
-    {id:"Q082",kp:"D06",stem:"池化的目的是？",opts:["降维/平移鲁棒", "增加参数", "提高学习率", "生成数据"],ci:0,diff:2},
-    {id:"Q083",kp:"D06",stem:"最大池化取？",opts:["窗口最大值", "窗口平均", "窗口最小", "窗口求和"],ci:0,diff:2},
-    {id:"Q084",kp:"D07",stem:"RNN 擅长？",opts:["序列数据", "图像分类", "目标检测", "点云"],ci:0,diff:2},
-    {id:"Q085",kp:"D07",stem:"LSTM 用于缓解？",opts:["梯度消失/长依赖", "过拟合完全消除", "数据缺失", "过曝"],ci:0,diff:3},
-    {id:"Q086",kp:"D08",stem:"Transformer 的核心是？",opts:["自注意力", "最大池化", "批归一化", "随机森林"],ci:0,diff:3},
-    {id:"Q087",kp:"D08",stem:"注意力权重表示？",opts:["相关程度", "学习率", "batch 大小", "文件路径"],ci:0,diff:3},
-    {id:"Q088",kp:"D08",stem:"位置编码解决？",opts:["序列顺序信息", "标签泄漏", "过拟合必然发生", "显存不足"],ci:0,diff:3},
-    {id:"Q089",kp:"D09",stem:"过拟合表现为？",opts:["训练好测试差", "训练差测试好", "两者都好", "两者都差"],ci:0,diff:2},
-    {id:"Q090",kp:"D09",stem:"Dropout 的作用是？",opts:["正则化防过拟合", "增加层数", "加速 IO", "生成标签"],ci:0,diff:2},
-    {id:"Q091",kp:"D09",stem:"L2 正则又称？",opts:["权重衰减", "Dropout", "数据增强", "批归一化"],ci:0,diff:3},
-    {id:"Q092",kp:"D10",stem:"数据增强可以？",opts:["扩充训练分布", "修改标签语义", "替换损失", "改优化器"],ci:0,diff:2},
-    {id:"Q093",kp:"D10",stem:"图像常用增强不包括？",opts:["改变标签编号", "翻转", "裁剪", "颜色抖动"],ci:0,diff:2},
-    {id:"Q094",kp:"D11",stem:"BatchNorm 的作用是？",opts:["稳定训练/加速收敛", "生成数据", "存储权重", "打印日志"],ci:0,diff:3},
-    {id:"Q095",kp:"D11",stem:"BN 通常加在？",opts:["激活前/后", "损失函数内", "输出标签上", "数据文件里"],ci:0,diff:3},
-    {id:"Q096",kp:"D12",stem:"Adam 结合了？",opts:["动量与自适应学习率", "只有 SGD", "只有 AdaGrad", "随机森林"],ci:0,diff:3},
-    {id:"Q097",kp:"D12",stem:"权重初始化常用？",opts:["Xavier/Kaiming", "全 0 必然最佳", "全 1", "NaN"],ci:0,diff:3},
-    {id:"Q098",kp:"D03",stem:"mini-batch 的优点是？",opts:["更快更稳的梯度估计", "必然全局最优", "无需损失", "自动标注"],ci:0,diff:3},
-    {id:"Q099",kp:"D01",stem:"深度学习属于？",opts:["机器学习子领域", "纯统计报表", "数据库系统", "操作系统"],ci:0,diff:1},
-    {id:"Q100",kp:"D05",stem:"卷积权值共享的好处是？",opts:["减少参数/平移等变", "增加过拟合", "降低准确率", "删除通道"],ci:0,diff:3}
-  ];
-  const mastery = {};
-  nodes.forEach(n => {
-    const weak = n.difficulty >= 3;
-    mastery[n.id] = weak
-      ? {n:8,s:2,c:2,age:0,st:0}
-      : {n:8,s:7,c:4,age:1,st:2};
-  });
-  return {user:null,consent:false,optOut:false,nodes,edges,mastery,qs,plan:null,sale:{},day:1,mat:[],logs:[]};
+function extractChapters(text,maxCh){
+  maxCh=maxCh||40;
+  const lines=String(text).split("\n");const marks=[];
+  for(let i=0;i<lines.length;i++){
+    const ln=lines[i].trim();if(!ln||ln.length>60)continue;
+    let title=null,level=1;
+    const md=/^#{1,3}\s+(.+)$/.exec(ln);
+    if(md){title=md[1].trim();level=ln.indexOf("###")===0?3:(ln.indexOf("##")===0?2:1);}
+    if(!title){const ch=/^第\s*[0-9一二三四五六七八九十百千]+\s*[章节回讲]\s*[:：·.、-]?\s*(.*)$/.exec(ln);if(ch){title=(ch[1]||ln).trim();level=1;}}
+    if(!title){const en=/^Chapter\s+(\d+)\s*[:：.]?\s*(.*)$/i.exec(ln);if(en){title=(en[2]||("Chapter "+en[1])).trim();level=1;}}
+    if(!title){const num=/^(\d+(?:\.\d+)+)\s+([^\s].{1,40})$/.exec(ln);if(num){title=num[2].trim();level=num[1].split(".").length;}}
+    if(!title){const cn=/^([一二三四五六七八九十]+)、\s*(.+)$/.exec(ln);if(cn){title=cn[2].trim();level=1;}}
+    if(title&&title.length>=2&&title.length<=40&&!/^[=\-–—_*]{2,}$/.test(title))marks.push({i:i,title:title.replace(/\s+/g," ").slice(0,40),level:level});
+  }
+  const uniq=[];
+  for(let k=0;k<marks.length;k++){
+    const m=marks[k];
+    if(!uniq.length||uniq[uniq.length-1].title!==m.title)uniq.push(m);
+    else uniq[uniq.length-1]=m;
+  }
+  const list=uniq.slice(0,maxCh);
+  if(list.length<2){
+    const paras=String(text).split(/\n{2,}/);
+    const out=[];
+    for(let idx=0;idx<paras.length;idx++){
+      const body=paras[idx];
+      const first=(body.split("\n")[0]||"").trim();
+      const title=(first&&first.length<=30)?first:("段落 "+(idx+1));
+      out.push({id:"C"+String(idx+1).padStart(2,"0"),title:title,body:body,order:idx,level:1});
+    }
+    return out.slice(0,maxCh);
+  }
+  const chs=[];
+  for(let k=0;k<list.length;k++){
+    const a=list[k].i,b=(k+1<list.length)?list[k+1].i:lines.length;
+    chs.push({id:"C"+String(k+1).padStart(2,"0"),title:list[k].title,body:lines.slice(a,b).join("\n").trim(),order:k,level:list[k].level});
+  }
+  return chs;
 }
-let S = load();
-const title = id => (S.nodes.find(n=>n.id===id)||{title:id}).title;
-const prereqs = id => S.edges.filter(e=>e.to===id && !e.tg).map(e=>e.from);
+function tokenize(text){return (String(text).match(/[一-鿿]{2,8}|[A-Za-z][A-Za-z0-9_\.]{1,20}/g)||[]).filter(function(t){return t.length>=2;});}
+function textRank(tokens,window,iterations,damping){
+  window=window||5;iterations=iterations||12;damping=damping||0.85;
+  const vocab=[];const seen={};
+  for(let i=0;i<tokens.length;i++){if(!seen[tokens[i]]){seen[tokens[i]]=1;vocab.push(tokens[i]);}}
+  if(!vocab.length)return {};
+  const idx={};for(let i=0;i<vocab.length;i++)idx[vocab[i]]=i;
+  const n=vocab.length;
+  const w=[];for(let i=0;i<n;i++)w.push(new Float64Array(n));
+  for(let i=0;i<tokens.length;i++){
+    const a=idx[tokens[i]];
+    for(let j=i+1;j<Math.min(tokens.length,i+window);j++){
+      const b=idx[tokens[j]];const v=1/(j-i);w[a][b]+=v;w[b][a]=w[a][b];
+    }
+  }
+  const rowSum=new Float64Array(n);
+  for(let i=0;i<n;i++){let s=0;for(let j=0;j<n;j++)s+=w[i][j];rowSum[i]=s;}
+  let rank=new Float64Array(n);for(let i=0;i<n;i++)rank[i]=1/n;
+  for(let it=0;it<iterations;it++){
+    const next=new Float64Array(n);
+    for(let i=0;i<n;i++){
+      let s=0;
+      for(let j=0;j<n;j++){if(w[j][i]<=0)continue;if(rowSum[j]>0)s+=(w[j][i]/rowSum[j])*rank[j];}
+      next[i]=(1-damping)/n+damping*s;
+    }
+    rank=next;
+  }
+  const out={};for(let i=0;i<n;i++)out[vocab[i]]=rank[i];return out;
+}
+function pmi(co,a,b,total){if(co<=0||a<=0||b<=0||total<=0)return 0;return Math.max(0,Math.log2((co*total)/(a*b)));}
+function dependencyEdges(text,concepts){
+  const out=[];
+  for(let ci=0;ci<concepts.length;ci++){
+    const c=concepts[ci];
+    try{
+      const re=new RegExp("(?:基于|先学|掌握|了解|学会)\\s*"+c.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")+"\\s*(?:后|之后|再|然后|才能|才能理解|的基础上)\\s*([一-鿿A-Za-z0-9_·、]{2,12})","g");
+      let m;
+      while((m=re.exec(text))){
+        const target=m[1].trim();
+        let hit=null;
+        for(let k=0;k<concepts.length;k++){
+          if(target.indexOf(concepts[k])>=0||concepts[k].indexOf(target)>=0){hit=concepts[k];break;}
+        }
+        if(hit&&hit!==c)out.push([c,hit]);
+      }
+    }catch(e){}
+  }
+  return out;
+}
+function buildGraphFromText(text,chapters,opts){
+  const maxConcepts=(opts&&opts.maxConcepts)||20;
+  const nodes=[],edges=[],idOf={};
+  const course=(opts&&opts.course)||"本地教材";
+  for(let i=0;i<chapters.length;i++){
+    const ch=chapters[i];
+    idOf[ch.title]=ch.id;
+    const diff=Math.min(5,1+Math.floor(ch.order/Math.max(1,Math.ceil(chapters.length/4))));
+    nodes.push({id:ch.id,title:ch.title,diff:diff,course:course,kind:"chapter",body:ch.body?String(ch.body).slice(0,400):""});
+  }
+  for(let i=0;i<chapters.length-1;i++)edges.push({from:chapters[i].id,to:chapters[i+1].id,tg:false,w:.85,etype:"prerequisite"});
+  const tokens=tokenize(text);
+  const ranks=textRank(tokens);
+  const all=Object.keys(ranks).sort(function(a,b){return ranks[b]-ranks[a];});
+  const top=[];
+  for(let i=0;i<all.length&&top.length<maxConcepts;i++){
+    const t=all[i];
+    if(t.length<2)continue;
+    let inTitle=false;
+    for(let k=0;k<chapters.length;k++){if(chapters[k].title.indexOf(t)>=0&&t.length<=chapters[k].title.length){inTitle=true;break;}}
+    if(!inTitle)top.push(t);
+  }
+  for(let i=0;i<top.length;i++){
+    const t=top[i];
+    const id="T"+String(i+1).padStart(2,"0");
+    idOf[t]=id;
+    nodes.push({id:id,title:t,diff:Math.min(5,2+Math.floor((ranks[t]||0)*8)),course:course,kind:"term",rank:ranks[t]});
+  }
+  const co={},cnt={};
+  for(let i=0;i<top.length;i++)cnt[top[i]]=0;
+  const window=8;
+  for(let i=0;i<tokens.length;i++){
+    const ti=tokens[i];if(!(ti in cnt))continue;
+    cnt[ti]++;
+    for(let j=i+1;j<Math.min(tokens.length,i+window);j++){
+      const tj=tokens[j];if(!(tj in cnt)||ti===tj)continue;
+      const key=ti<tj?(ti+"\t"+tj):(tj+"\t"+ti);
+      co[key]=(co[key]||0)+1;
+    }
+  }
+  let total=0;for(const k in cnt)total+=cnt[k];total=Math.max(total,1);
+  const seen={};
+  for(const key in co){
+    const parts=key.split("\t");const a=parts[0],b=parts[1];
+    const p=pmi(co[key],cnt[a]||0,cnt[b]||0,total);
+    if(p<1.0)continue;
+    const ia=idOf[a],ib=idOf[b];if(!ia||!ib)continue;
+    const ek=[ia,ib].sort().join(">");
+    if(seen[ek])continue;seen[ek]=1;
+    edges.push({from:ia,to:ib,tg:false,w:Math.min(p/6,2),etype:"related",conf:Math.min(p/8,1)});
+  }
+  const deps=dependencyEdges(text,top);
+  for(let i=0;i<deps.length;i++){
+    const ia=idOf[deps[i][0]],ib=idOf[deps[i][1]];if(!ia||!ib)continue;
+    const ek=[ia,ib].sort().join(">");if(seen[ek])continue;seen[ek]=1;
+    edges.push({from:ia,to:ib,tg:true,w:1.3,etype:"prerequisite",conf:.9});
+  }
+  for(let i=0;i<nodes.length;i++){
+    const n=nodes[i];if(n.kind!=="term")continue;
+    let ch=null;
+    for(let k=0;k<chapters.length;k++){if(chapters[k].body&&String(chapters[k].body).indexOf(n.title)>=0){ch=chapters[k];break;}}
+    if(!ch)ch=chapters[0];
+    if(ch){const ek=[ch.id,n.id].sort().join(">");if(!seen[ek]){seen[ek]=1;edges.push({from:ch.id,to:n.id,tg:false,w:.55,etype:"attach",conf:.5});}}
+  }
+  return {nodes:nodes,edges:edges.filter(function(e){return e.from&&e.to&&e.from!==e.to;})};
+}
+function generateQuestions(book){
+  const qs=[];let n=1;const nodes=book.nodes||[];
+  for(let i=0;i<nodes.length;i++){
+    const node=nodes[i];
+    let body=(node.body||"");
+    const chs=book.chapters||[];
+    for(let k=0;k<chs.length;k++){if(chs[k].id===node.id&&chs[k].body)body=chs[k].body;}
+    body=String(body).replace(/\s+/g," ").slice(0,180);
+    const stem=node.kind==="chapter"?("「"+node.title+"」这一章最核心要掌握的是？"):("关于「"+node.title+"」的说法，正确的是理解其在本教材中的作用。下列哪项更合适作为自测切入点？");
+    const opts=node.kind==="chapter"?["掌握本章核心概念与前后衔接","只背标题","跳过练习","只看结论"]:["能解释「"+node.title+"」并关联先修点","只记住名词","忽略上下文","不做练习"];
+    qs.push({id:"A"+String(n++).padStart(3,"0"),kp:node.id,stem:stem,opts:opts,ci:0,diff:node.diff||2,src:"auto"});
+    if(body&&body.length>40)qs.push({id:"A"+String(n++).padStart(3,"0"),kp:node.id,stem:"根据解析正文，「"+node.title+"」附近的关键内容更接近：",opts:[body.slice(0,60)+"…","与正文无关的闲聊","空白页","纯广告"],ci:0,diff:Math.min(5,(node.diff||2)+1),src:"auto"});
+    if(qs.length>=80)break;
+  }
+  return qs;
+}
+function makeBookFromFile(name,text,mode,kind){
+  const chapters=extractChapters(text);
+  const course=String(name).replace(/\.(pdf|txt|md|markdown)$/i,"").slice(0,24);
+  const g=buildGraphFromText(text,chapters,{course:course,maxConcepts:mode==="quick"?12:(mode==="none"?8:20)});
+  const book={id:"m"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:name,chars:text.length,kind:kind||"user",parsedAt:Date.now(),parseMode:mode,status:"ready",chapters:chapters,nodes:g.nodes,edges:g.edges,qs:[],sourceText:String(text).slice(0,4000),masterySeed:null};
+  book.qs=generateQuestions(book);
+  return book;
+}
+async function parseFiles(fileList,mode){
+  const files=Array.prototype.slice.call(fileList||[]);
+  if(!files.length)throw new Error("请先选择文件");
+  const results=[],errors=[];
+  $("parseProg").hidden=false;
+  for(let i=0;i<files.length;i++){
+    const f=files[i];
+    $("parseProgBar").style.width=Math.round(i/files.length*100)+"%";
+    try{
+      if(f.size>8*1024*1024)throw new Error("文件超过 8MB，请拆分或粘贴正文");
+      const r=await readFileAsText(f);
+      if(!r.ok){errors.push({name:f.name,reason:r.reason||"解析失败"});continue;}
+      const text=r.text||"";
+      if(countReadable(text)<20)throw new Error("可读文本过少");
+      results.push(makeBookFromFile(f.name,text,mode,"user"));
+    }catch(e){errors.push({name:f.name,reason:e.message||String(e)});}
+    $("parseProgBar").style.width=Math.round((i+1)/files.length*100)+"%";
+  }
+  $("parseProg").hidden=true;$("parseProgBar").style.width="0%";
+  return {results:results,errors:errors};
+}
+
+function sampleBook(){
+  const nodes=[
+    {id:"N01",title:"会计对象",diff:1,course:"会计基础",kind:"chapter",body:"会计对象是资金运动。"},
+    {id:"N02",title:"会计要素",diff:1,course:"会计基础",kind:"chapter",body:"会计要素包括资产、负债、所有者权益、收入、费用、利润。"},
+    {id:"N03",title:"会计等式",diff:2,course:"会计基础",kind:"chapter",body:"资产=负债+所有者权益。"},
+    {id:"N04",title:"会计科目",diff:2,course:"会计基础",kind:"chapter",body:"会计科目是对会计要素的分类。"},
+    {id:"N05",title:"账户结构",diff:2,course:"会计基础",kind:"chapter",body:"账户分借贷两方。"},
+    {id:"N06",title:"借贷记账法",diff:3,course:"会计基础",kind:"term",body:"有借必有贷，借贷必相等。"},
+    {id:"N07",title:"会计分录",diff:3,course:"会计基础",kind:"term",body:"分录记录账户、方向与金额。"},
+    {id:"N08",title:"试算平衡",diff:2,course:"会计基础",kind:"chapter",body:"试算平衡检查借贷合计。"},
+    {id:"N09",title:"凭证填制",diff:2,course:"会计基础",kind:"chapter",body:"原始凭证记录业务发生。"},
+    {id:"N10",title:"账簿登记",diff:3,course:"会计基础",kind:"term",body:"明细账可采用活页式。"},
+    {id:"N11",title:"财产清查",diff:2,course:"会计基础",kind:"chapter",body:"清查保证账实相符。"},
+    {id:"N12",title:"财务报表",diff:4,course:"会计基础",kind:"term",body:"资产负债表反映财务状况。"},
+    {id:"P01",title:"变量与类型",diff:1,course:"Python 入门",kind:"chapter",body:"Python 动态类型。"},
+    {id:"P02",title:"运算符与表达式",diff:1,course:"Python 入门",kind:"chapter",body:"运算符与表达式。"},
+    {id:"P03",title:"条件判断",diff:2,course:"Python 入门",kind:"chapter",body:"if/elif/else。"},
+    {id:"P04",title:"循环",diff:2,course:"Python 入门",kind:"chapter",body:"for/while。"},
+    {id:"P05",title:"列表与字典",diff:2,course:"Python 入门",kind:"chapter",body:"list/dict。"},
+    {id:"P06",title:"函数",diff:3,course:"Python 入门",kind:"term",body:"def/return。"},
+    {id:"P07",title:"文件读写",diff:3,course:"Python 入门",kind:"term",body:"open/read/write。"},
+    {id:"P08",title:"模块与包",diff:3,course:"Python 入门",kind:"term",body:"import。"},
+    {id:"P09",title:"异常处理",diff:3,course:"Python 入门",kind:"term",body:"try/except。"},
+    {id:"P10",title:"类与对象",diff:4,course:"Python 入门",kind:"term",body:"class/self。"},
+    {id:"D01",title:"神经元与激活",diff:1,course:"深度学习概论",kind:"chapter",body:"激活函数。"},
+    {id:"D02",title:"损失函数",diff:2,course:"深度学习概论",kind:"chapter",body:"交叉熵/MSE。"},
+    {id:"D03",title:"梯度下降",diff:2,course:"深度学习概论",kind:"chapter",body:"最小化损失。"},
+    {id:"D04",title:"反向传播",diff:3,course:"深度学习概论",kind:"term",body:"链式法则。"},
+    {id:"D05",title:"卷积网络",diff:3,course:"深度学习概论",kind:"term",body:"卷积提取局部特征。"},
+    {id:"D06",title:"池化",diff:2,course:"深度学习概论",kind:"chapter",body:"降维。"},
+    {id:"D07",title:"循环网络",diff:4,course:"深度学习概论",kind:"term",body:"序列。"},
+    {id:"D08",title:"注意力与Transformer",diff:5,course:"深度学习概论",kind:"term",body:"自注意力。"},
+    {id:"D09",title:"过拟合与正则",diff:3,course:"深度学习概论",kind:"term",body:"Dropout/L2。"},
+    {id:"D10",title:"数据增强",diff:2,course:"深度学习概论",kind:"chapter",body:"扩充分布。"},
+    {id:"D11",title:"BatchNorm",diff:4,course:"深度学习概论",kind:"term",body:"稳定训练。"},
+    {id:"D12",title:"优化器Adam",diff:3,course:"深度学习概论",kind:"term",body:"动量+自适应。"}
+  ];
+  const rawEdges=[
+    ["N01","N02",0,1],["N02","N03",0,1.2],["N03","N04",0,1],["N04","N05",0,1],
+    ["N05","N06",0,1.1],["N06","N07",0,1.3],["N07","N08",0,1.1],["N04","N09",0,0.9],
+    ["N09","N10",0,1],["N10","N11",0,0.9],["N08","N12",0,1.2],["N11","N12",0,0.9],
+    ["N03","N06",1,0.8],["N06","N08",1,0.7],["N02","N05",0,0.8],["N05","N07",0,0.9],
+    ["N03","N05",0,0.8],["N06","N10",0,0.9],["N07","N09",0,0.7],["N08","N11",0,0.8],
+    ["P01","P02",0,1],["P02","P03",0,1],["P03","P04",0,1],["P04","P05",0,1],
+    ["P05","P06",0,1],["P06","P07",0,1],["P07","P09",0,1],["P06","P08",0,1],
+    ["P08","P10",0,1],["P05","P07",0,1],["P02","P05",0,1],["P04","P06",0,0.9],
+    ["P03","P06",1,0.6],
+    ["D01","D02",0,1],["D02","D03",0,1],["D03","D04",0,1],["D04","D05",0,1],
+    ["D05","D06",0,1],["D04","D07",0,1],["D07","D08",0,1],["D05","D11",0,1],
+    ["D03","D12",0,1],["D02","D09",0,1],["D09","D10",0,1],["D06","D09",0,1],
+    ["D04","D11",0,1],["D05","D08",0,1],["D02","D12",0,1],
+    ["N02","P01",1,0.5],["N03","D02",1,0.5],["P05","D01",1,0.5],["P06","D03",1,0.6],
+    ["N08","P09",1,0.5],["P10","D01",0,0.8],["N06","P03",1,0.4],["N12","D02",1,0.4],
+    ["P04","D03",0,0.7],["N01","D01",1,0.4],["P02","D02",1,0.4],["N05","P05",0,0.6],
+    ["P09","D09",1,0.5],["P08","D12",1,0.5],["N07","P03",1,0.4],["P06","D04",0,0.9],
+    ["P03","D03",1,0.5],["N04","P01",1,0.4],["N10","P07",1,0.5],["P09","D03",1,0.5],
+    ["N09","P02",1,0.4],["P07","D10",0,0.7],["N11","P05",1,0.4],["P08","D11",1,0.5],
+    ["P06","D01",1,0.4],["N03","P02",1,0.4]
+  ];
+  const edges=rawEdges.map(function(x){return {from:x[0],to:x[1],tg:!!x[2],w:x[3]};});
+  const base=[
+    ["N01","会计的基本职能包括？",["核算与监督","只有核算","只有监督","只有预测"],0,1],
+    ["N01","会计对象是？",["资金运动","企业人员","办公设备","合同文本"],0,1],
+    ["N02","下列属于会计要素的是？",["资产","温度","速度","颜色"],0,1],
+    ["N03","会计等式正确的是？",["资产=负债+所有者权益","资产=负债","资产=收入","负债=收入"],0,2],
+    ["N06","借贷记账法的记账符号是？",["借贷","增减","收支","进出"],0,1],
+    ["N06","资产增加记？",["借方","贷方","双方","不记账"],0,2],
+    ["N08","试算平衡检查？",["借方合计=贷方合计","收入=资产","负债=费用","人员=编制"],0,2],
+    ["N12","资产负债表反映？",["财务状况","经营成果","现金流量","人员构成"],0,2],
+    ["P01","Python 中定义整数变量用？",["x = 1","int x = 1;","var x = 1;","let x = 1"],0,1],
+    ["P06","定义函数用？",["def f():","func f() {}","function f()","fn f():"],0,1],
+    ["P09","捕获异常用？",["try/except","if/else","for/range","def/return"],0,2],
+    ["D02","分类任务常用损失是？",["交叉熵","MSE","MAE","Huber"],0,2],
+    ["D03","梯度下降用于？",["最小化损失","最大化损失","数据增强","归一化"],0,1],
+    ["D08","Transformer 的核心是？",["自注意力","最大池化","批归一化","随机森林"],0,3]
+  ].map(function(q,i){return {id:"Q"+String(i+1).padStart(3,"0"),kp:q[0],stem:q[1],opts:q[2],ci:q[3],diff:q[4]};});
+  const chapters=nodes.map(function(n,i){return {id:n.id,title:n.title,body:n.body||n.title,order:i,level:1};});
+  const qs=base.concat(generateQuestions({nodes:nodes,chapters:chapters}).slice(0,86));
+  while(qs.length<100){
+    const n=qs.length+1;
+    qs.push({id:"Q"+String(n).padStart(3,"0"),kp:nodes[n%nodes.length].id,stem:"综合自测题 "+n,opts:["掌握核心","只背结论","跳过","放弃"],ci:0,diff:2});
+  }
+  const mastery={};
+  nodes.forEach(function(n){const weak=(n.diff||2)>=3;mastery[n.id]=weak?{n:8,s:2,c:2,age:0,st:0}:{n:8,s:7,c:4,age:1,st:2};});
+  return {id:"sample-2-2",name:"示例图包 · 会计/Python/深度学习",chars:12000,kind:"sample",parsedAt:Date.now(),parseMode:"seed",status:"ready",chapters:chapters,nodes:nodes,edges:edges,qs:qs.slice(0,100),sourceText:"",masterySeed:mastery};
+}
+const LS="astralpath_monolith_v2";
+function defaultState(){
+  const book=sampleBook();
+  return {user:null,consent:false,optOut:false,books:[book],activeBookId:book.id,mastery:book.masterySeed,plan:null,sale:{},day:1,logs:[],chat:null};
+}
+function migrate(raw){
+  if(!raw||typeof raw!=="object")return defaultState();
+  if(Array.isArray(raw.books)&&raw.books.length){
+    if(!raw.activeBookId)raw.activeBookId=raw.books[0].id;
+    if(!raw.mastery)raw.mastery={};if(!raw.sale)raw.sale={};if(!raw.logs)raw.logs=[];if(raw.day==null)raw.day=1;
+    return raw;
+  }
+  const d=defaultState();
+  if(Array.isArray(raw.nodes)&&raw.nodes.length){
+    const b={id:"legacy",name:"迁移数据",chars:0,kind:"sample",parsedAt:Date.now(),parseMode:"migrate",status:"ready",
+      chapters:raw.nodes.map(function(n,i){return {id:n.id,title:n.title,body:n.title,order:i,level:1};}),
+      nodes:raw.nodes,edges:raw.edges||[],qs:raw.qs||[],sourceText:"",masterySeed:raw.mastery||{}};
+    d.books=[b,d.books[0]];d.activeBookId=b.id;d.mastery=raw.mastery||{};
+    d.plan=raw.plan||null;d.sale=raw.sale||{};d.day=raw.day||1;d.logs=raw.logs||[];
+    d.user=raw.user;d.consent=raw.consent;d.optOut=raw.optOut;return d;
+  }
+  Object.assign(d,raw);return d;
+}
+function load(){try{return migrate(JSON.parse(localStorage.getItem(LS)));}catch(e){return defaultState();}}
+function save(s){
+  try{localStorage.setItem(LS,JSON.stringify(s));return true;}
+  catch(e){
+    try{
+      s.books.forEach(function(b){if(b.sourceText&&b.sourceText.length>2000)b.sourceText=b.sourceText.slice(0,2000);(b.chapters||[]).forEach(function(c){if(c.body&&c.body.length>800)c.body=c.body.slice(0,800);});});
+      localStorage.setItem(LS,JSON.stringify(s));return true;
+    }catch(e2){return false;}
+  }
+}
+let S=load();
+function activeBook(){return S.books.find(function(b){return b.id===S.activeBookId;})||S.books[0]||sampleBook();}
+function ensureMastery(book){
+  S.mastery=S.mastery||{};
+  (book.nodes||[]).forEach(function(n){if(!S.mastery[n.id]){const weak=(n.diff||2)>=3;S.mastery[n.id]=weak?{n:4,s:1,c:2,age:0,st:0}:{n:4,s:3,c:3,age:0,st:1};}});
+}
+function activeNodes(){return activeBook().nodes||[];}
+function activeEdges(){return activeBook().edges||[];}
+function activeQs(){const b=activeBook();return b.qs&&b.qs.length?b.qs:[];}
+function title(id){const n=activeNodes().find(function(x){return x.id===id;});return n?n.title:id;}
+function prereqs(id){return activeEdges().filter(function(e){return e.to===id&&!e.tg;}).map(function(e){return e.from;});}
 function downMass(id){
-  const adj={}; S.edges.forEach(e=>{(adj[e.from]=adj[e.from]||[]).push(e.to)});
-  const seen=new Set(); const st=[id];
-  while(st.length){const x=st.pop(); (adj[x]||[]).forEach(y=>{if(!seen.has(y)){seen.add(y);st.push(y);}})}
-  return seen.size;
+  const adj={};activeEdges().forEach(function(e){(adj[e.from]=adj[e.from]||[]).push(e.to);});
+  const seen={},st=[id];const has=function(x){return Object.prototype.hasOwnProperty.call(seen,x);};
+  while(st.length){const x=st.pop();(adj[x]||[]).forEach(function(y){if(!has(y)){seen[y]=1;st.push(y);}});}
+  return Object.keys(seen).length;
 }
 function scoreOf(id){
   const m=S.mastery[id]||{n:0,s:0,c:3,age:0,st:0};
-  const pre=prereqs(id).map(p=>scoreOf(p));
-  return scoreV2(m.n,m.s,m.c,m.age,m.st,pre);
+  return scoreV2(m.n,m.s,m.c,m.age,m.st,prereqs(id).map(scoreOf));
 }
 function scanDebts(){
-  return S.edges.map(e=>{
-    const sf=scoreOf(e.from), st=scoreOf(e.to);
-    const fr=(S.logs.filter(l=>l.kp===e.to&&!l.ok).length)|| (sf>0.6?5:2);
+  return activeEdges().map(function(e){
+    const sf=scoreOf(e.from),st=scoreOf(e.to);
+    const fr=(S.logs.filter(function(l){return l.kp===e.to&&!l.ok;}).length)||(sf>0.6?5:2);
     const imp=impactV2(sf,st,e.w,e.tg,fr,downMass(e.to));
-    return {from:e.from,to:e.to,fromName:title(e.from),toName:title(e.to),sf,st,imp,freq:fr,status:imp>=K.hit?"open":"cleared"};
-  }).filter(d=>d.imp>0).sort((a,b)=>b.imp-a.imp);
+    return {from:e.from,to:e.to,fromName:title(e.from),toName:title(e.to),sf:sf,st:st,imp:imp,freq:fr,status:imp>=K.hit?"open":"cleared"};
+  }).filter(function(d){return d.imp>0;}).sort(function(a,b){return b.imp-a.imp;});
 }
-
-/* ---------- UI ---------- */
-const $=id=>document.getElementById(id);
+function ingestBook(book){
+  S.books=[book].concat(S.books.filter(function(b){return b.id!==book.id;}));
+  S.activeBookId=book.id;ensureMastery(book);save(S);
+}
 function go(p){
   document.querySelectorAll("main").forEach(m=>m.hidden=true);
-  $("p-"+p).hidden=false;
+  const el=$("p-"+p);if(el)el.hidden=false;
   document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.p===p));
-  if(p==="home") renderHome();
-  if(p==="materials") renderMats();
-  if(p==="graph") renderGraph();
-  if(p==="debt") renderDebt();
-  if(p==="today") renderToday();
-  if(p==="agent") ensureChat();
-  if(p==="profile") renderProfile();
-  if(p==="account") renderAccount();
+  try{
+    if(p==="home")renderHome();if(p==="materials")renderMats();if(p==="graph")renderGraph();
+    if(p==="debt")renderDebt();if(p==="today")renderToday();if(p==="agent")ensureChat();
+    if(p==="profile")renderProfile();if(p==="account")renderAccount();
+  }catch(e){console.error(e);const st=$("matStatus");if(st){st.className="status err";st.textContent="渲染失败："+(e.message||e);}}
 }
-document.getElementById("nav").onclick=e=>{const b=e.target.closest("button[data-p]"); if(b) go(b.dataset.p)};
+document.getElementById("nav").onclick=e=>{const b=e.target.closest("button[data-p]");if(b)go(b.dataset.p);};
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
-
+function setMatStatus(kind,msg){const el=$("matStatus");el.className="status "+(kind||"");el.textContent=msg;}
 function renderHome(){
-  $("sMat").textContent=S.mat.length; $("sGraph").textContent=S.nodes.length?1:0;
-  $("sTask").textContent=(S.plan||[]).filter(i=>i.st!=="done").slice(0,3).length;
+  const b=activeBook();
+  $("sMat").textContent=S.books.length;
+  $("sGraph").textContent=S.books.filter(x=>x.nodes&&x.nodes.length).length;
+  $("sTask").textContent=(S.plan||[]).filter(i=>i.day===S.day&&i.st!=="done").slice(0,3).length;
   $("sDebt").textContent=scanDebts().filter(d=>d.status==="open").length;
+  $("homeBook").innerHTML=b?("<strong>"+esc(b.name)+"</strong><div class=\"hint\">"+(b.nodes||[]).length+" 节点 · "+(b.edges||[]).length+" 边 · "+(b.qs||[]).length+" 题 · "+esc(b.status||"ready")+"</div>"):'<div class="empty">尚未选择教材，请到藏书阁上传或导入示例</div>';
 }
 function renderMats(){
-  $("matList").innerHTML = S.mat.map(m=>`<div class="card"><strong>${esc(m.name)}</strong><span class="badge">ready</span>
-    <div class="hint">${m.chars} 字 · ${m.nodes} 节点 · 本机解析</div></div>`).join("") || '<p class="hint">暂无资料。点「导入示例资料」。</p>';
-}
-function renderGraph(){
-  const dag=$("dag"); dag.innerHTML="";
-  const w=dag.clientWidth||640, n=S.nodes.length;
-  const pos=S.nodes.map((node,i)=>{
-    const x=30+ (i%4)*(w/4.2), y=24+Math.floor(i/4)*110;
-    return {node,x,y};
+  const list=S.books||[];
+  $("matList").innerHTML=list.length?list.map(m=>{
+    const st=m.status==="ready"?"ready":m.status==="error"?"error":"partial";
+    const cls=st==="ready"?"":st==="error"?"err":"warn";
+    return '<div class="card '+(m.id===S.activeBookId?"active":"")+'" data-book="'+esc(m.id)+'"><div class="row" style="justify-content:space-between"><strong>'+esc(m.name)+'</strong><span class="badge '+cls+'">'+st+'</span></div><div class="hint">'+(m.chars||0)+' 字 · '+(m.nodes||[]).length+' 节点 · '+(m.edges||[]).length+' 边 · '+(m.chapters||[]).length+' 章 · '+esc(m.parseMode||"-")+'</div><div class="row" style="margin-top:8px"><button class="btn" data-view="'+esc(m.id)+'">查看详情</button><button class="btn primary" data-use="'+esc(m.id)+'">用此书识网</button><button class="btn danger" data-del="'+esc(m.id)+'">删除</button></div></div>';
+  }).join(""):'<div class="empty">暂无资料。点「导入示例资料」，或上传 TXT/MD；PDF 请确保含文本层。</div>';
+  $("matList").querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>showDetail(b.dataset.view));
+  $("matList").querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{setActive(b.dataset.use);go("graph");});
+  $("matList").querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
+    if(!confirm("删除该资料及其图谱？"))return;
+    S.books=S.books.filter(x=>x.id!==b.dataset.del);
+    if(!S.books.length)S.books=[sampleBook()];
+    if(S.activeBookId===b.dataset.del)S.activeBookId=S.books[0].id;
+    ensureMastery(activeBook());save(S);renderMats();
   });
-  S.edges.forEach(e=>{
-    const a=pos.find(p=>p.node.id===e.from), b=pos.find(p=>p.node.id===e.to);
-    if(!a||!b) return;
-    const dx=b.x-a.x, dy=b.y-a.y, len=Math.hypot(dx,dy), ang=Math.atan2(dy,dx)*180/Math.PI;
-    const ln=document.createElement("div"); ln.className="dline";
-    ln.style.left=a.x+54+"px"; ln.style.top=a.y+28+"px"; ln.style.width=len+"px"; ln.style.transform="rotate("+ang+"deg)";
+}
+function showDetail(id){
+  const m=S.books.find(x=>x.id===id);if(!m)return;
+  const preview=(m.chapters||[]).slice(0,8).map(c=>'<div class="card"><strong>'+esc(c.title)+'</strong><div class="hint">'+esc((c.body||"").slice(0,120))+'</div></div>').join("");
+  $("matDetail").innerHTML="<strong>"+esc(m.name)+"</strong><div class=\"hint\">状态 "+esc(m.status)+" · 模式 "+esc(m.parseMode)+" · "+(m.chars||0)+" 字</div><div class=\"row\" style=\"margin:8px 0\"><span class=\"badge\">"+(m.nodes||[]).length+" 节点</span><span class=\"badge\">"+(m.edges||[]).length+" 边</span><span class=\"badge\">"+(m.qs||[]).length+" 题</span><span class=\"badge\">"+(m.chapters||[]).length+" 章</span></div>"+(m.error?'<div class="status err">'+esc(m.error)+'</div>':"")+(preview||'<div class="empty">无章节</div>')+'<pre class="code">'+esc((m.sourceText||"").slice(0,500)||"（无正文预览）")+'</pre>';
+}
+function setActive(id){
+  const b=S.books.find(x=>x.id===id);if(!b)return;
+  S.activeBookId=id;ensureMastery(b);save(S);
+  $("gSwitch").className="status ok";
+  $("gSwitch").textContent="已切换教材："+b.name+"（"+(b.nodes||[]).length+" 节点 / "+(b.edges||[]).length+" 边）";
+}
+function findDebt(debts,id){return debts.find(d=>d.to===id&&d.status==="open")||debts.find(d=>d.from===id&&d.status==="open");}
+function renderGraph(){
+  const book=activeBook();ensureMastery(book);save(S);
+  const chips=$("bookChips");
+  chips.innerHTML=(S.books||[]).map(b=>'<span class="chip '+(b.id===S.activeBookId?"on":"")+'" data-chip="'+esc(b.id)+'">'+esc(String(b.name).slice(0,18))+'<small>'+(b.nodes||[]).length+'n</small></span>').join("")||'<div class="empty">无教材</div>';
+  chips.querySelectorAll("[data-chip]").forEach(el=>el.onclick=()=>{setActive(el.dataset.chip);renderGraph();});
+  const dag=$("dag");dag.innerHTML="";
+  const nodes=activeNodes(),edges=activeEdges();
+  if(!nodes.length){
+    dag.innerHTML='<div class="empty" style="margin:20px">该教材暂无图谱。请到藏书阁解析文件，或导入示例教材。</div>';
+    $("gBadge").textContent="0 节点 / 0 边";$("chTree").innerHTML='<div class="empty">无章节</div>';return;
+  }
+  $("gSource").textContent="来源："+(book.kind==="sample"?"示例图包":"文件解析 · "+(book.name||""));
+  const w=Math.max(dag.clientWidth||640,520);
+  const cols=Math.min(4,Math.max(2,Math.floor(w/150)));
+  const pos=nodes.map((node,i)=>({node,x:24+(i%cols)*(w/(cols+0.2)),y:18+Math.floor(i/cols)*112}));
+  const idPos=new Map(pos.map(p=>[p.node.id,p]));
+  edges.forEach(e=>{
+    const a=idPos.get(e.from),b=idPos.get(e.to);if(!a||!b)return;
+    const dx=b.x-a.x,dy=b.y-a.y,len=Math.hypot(dx,dy),ang=Math.atan2(dy,dx)*180/Math.PI;
+    const ln=document.createElement("div");ln.className="dline";
+    ln.style.left=(a.x+54)+"px";ln.style.top=(a.y+28)+"px";ln.style.width=len+"px";ln.style.transform="rotate("+ang+"deg)";
     dag.appendChild(ln);
   });
   const debts=scanDebts();
   pos.forEach(p=>{
-    const d=debbt(debts,p.node.id);
+    const d=findDebt(debts,p.node.id);
     const el=document.createElement("div");
     el.className="dnode "+(d?"debt":(p.node.kind==="chapter"?"chapter":"term"));
-    el.style.left=p.x+"px"; el.style.top=p.y+"px";
-    el.innerHTML=`<span>${esc(p.node.title)}</span><small>${d?"impact="+d.imp.toFixed(3):"diff "+p.node.diff}</small>`;
-    el.onclick=()=>{ $("nodeInfo").innerHTML=`<strong>${esc(p.node.title)}</strong><br/><span class="hint">score=${scoreOf(p.node.id).toFixed(6)} · 先修：${prereqs(p.node.id).map(title).join("、")||"无"} · 下游 ${downMass(p.node.id)} 个</span>`; };
+    el.style.left=p.x+"px";el.style.top=p.y+"px";
+    el.innerHTML="<span>"+esc(p.node.title)+"</span><small>"+(d?"impact="+d.imp.toFixed(3):"diff "+(p.node.diff||2))+"</small>";
+    el.onclick=()=>{
+      const body=(book.chapters||[]).find(c=>c.id===p.node.id);
+      $("nodeInfo").innerHTML="<strong>"+esc(p.node.title)+"</strong><br/><span class=\"hint\">score="+scoreOf(p.node.id).toFixed(6)+" · 先修："+prereqs(p.node.id).map(title).join("、")||"无"+" · 下游 "+downMass(p.node.id)+" 个"+(body?"<br/>"+esc((body.body||"").slice(0,160)):"")+"</span>";
+    };
     dag.appendChild(el);
   });
-  $("gBadge").textContent = S.nodes.length+" 节点 / "+S.edges.length+" 边";
-  $("chTree").innerHTML = S.nodes.map(n=>`<div style="padding:6px 4px;cursor:pointer" data-ch="${n.id}">${esc(n.title)}</div>`).join("");
+  dag.style.minHeight=Math.max(320,Math.ceil(nodes.length/cols)*112+40)+"px";
+  $("gBadge").textContent=nodes.length+" 节点 / "+edges.length+" 边";
+  $("gSwitch").className="status ok";
+  $("gSwitch").textContent="已加载《"+book.name+"》图谱 · "+nodes.length+" 节点 / "+edges.length+" 边";
+  $("chTree").innerHTML=(book.chapters||[]).map(n=>'<div style="padding:6px 4px;cursor:pointer;border-bottom:1px solid var(--soft)" data-ch="'+esc(n.id)+'">'+esc(n.title)+'</div>').join("")||'<div class="empty">无目录</div>';
   $("chTree").querySelectorAll("[data-ch]").forEach(el=>el.onclick=()=>{
-    $("chBody").textContent = `「${title(el.dataset.ch)}」摘要：本地解析正文。先修：${prereqs(el.dataset.ch).map(title).join("、")||"—"}。`;
+    const ch=(book.chapters||[]).find(c=>c.id===el.dataset.ch);
+    if(!ch){$("chBody").textContent="章节不存在";return;}
+    $("chBody").innerHTML="<strong>"+esc(ch.title)+"</strong><div style=\"margin-top:6px\">"+esc((ch.body||ch.title).slice(0,400))+"</div><div class=\"hint\" style=\"margin-top:8px\">先修："+prereqs(ch.id).map(title).join("、")+" · score="+scoreOf(ch.id).toFixed(4)+"</div>";
   });
 }
-function debbt(debts,id){ return debts.find(d=>d.to===id && d.status==="open")||debts.find(d=>d.from===id&&d.status==="open"); }
-
 function renderDebt(){
   const ds=scanDebts();
-  $("debtList").innerHTML = ds.length? ds.map((d,i)=>`<div class="card">
-    <strong>${esc(d.fromName)} → ${esc(d.toName)}</strong>
-    <div class="hint">impact=<b>${d.imp.toFixed(6)}</b> · sf=${d.sf.toFixed(2)} st=${d.st.toFixed(2)} · freq=${d.freq}</div>
-    <span class="badge" style="${d.status==='open'?'background:#ffe1e5;color:#792e38':''}">${d.status}</span>
-  </div>`).join("") : '<p class="hint">暂无债边，保持节奏。</p>';
-  $("planBox").innerHTML = S.plan? S.plan.map(p=>`<div class="card mono">D${p.day} · ${esc(title(p.kp))} · ${p.layer} · ${p.min}min</div>`).join("") : '<p class="hint">尚未生成。</p>';
+  $("debtList").innerHTML=ds.length?ds.map(d=>'<div class="card"><strong>'+esc(d.fromName)+' → '+esc(d.toName)+'</strong><div class="hint">impact=<b>'+d.imp.toFixed(6)+'</b> · sf='+d.sf.toFixed(2)+' st='+d.st.toFixed(2)+' · freq='+d.freq+'</div><span class="badge" style="'+(d.status==='open'?'background:#ffe1e5;color:#792e38':'')+'">'+d.status+'</span></div>').join(""):'<div class="empty">暂无债边。可先解析教材或做题积累数据。</div>';
+  $("planBox").innerHTML=S.plan?S.plan.map(p=>'<div class="card"><strong>D'+p.day+'</strong> · '+esc(title(p.kp))+' · '+esc(p.layer)+' · '+p.min+'min</div>').join(""):'<div class="empty">尚未生成。点「生成 14 天计划」。</div>';
 }
 function whatif(){
-  const sp=+$("wSp").value/100, sc=+$("wSc").value/100, fq=+$("wFq").value;
-  $("vSp").textContent=sp.toFixed(2); $("vSc").textContent=sc.toFixed(2); $("vFq").textContent=fq;
+  const sp=+$("wSp").value/100,sc=+$("wSc").value/100,fq=+$("wFq").value;
+  $("vSp").textContent=sp.toFixed(2);$("vSc").textContent=sc.toFixed(2);$("vFq").textContent=fq;
   const imp=impactV2(sp,sc,1.1,true,fq,5);
   $("whatOut").className="status "+(imp>=K.hit?"err":"ok");
-  $("whatOut").textContent = imp>=K.hit? `命中红边 impact=${imp.toFixed(6)}（≥0.08）` : `未达红线 impact=${imp.toFixed(6)}（&lt;0.08）`;
+  $("whatOut").textContent=imp>=K.hit?("命中红边 impact="+imp.toFixed(6)+"（≥0.08）"):("未达红线 impact="+imp.toFixed(6)+"（<0.08）");
 }
 ["wSp","wSc","wFq"].forEach(id=>$(id).addEventListener("input",whatif));
-
 function buildPlan(){
   const ds=scanDebts().filter(d=>d.status==="open");
-  const source = ds.length? ds : S.edges.slice(0,5).map(e=>({from:e.from,to:e.to,fromName:title(e.from),toName:title(e.to),imp:0.5}));
-  const plan=[]; let id=1; const offs=[0,2,6];
-  source.forEach((d,gi)=>{
+  const source=ds.length?ds:activeEdges().slice(0,5).map(e=>({from:e.from,to:e.to,imp:.5}));
+  if(!source.length){S.plan=[];save(S);return S.plan;}
+  const plan=[];let id=1;const offs=[0,2,6];
+  source.slice(0,8).forEach(d=>{
     offs.forEach((o,pi)=>{
       const day=1+o;
-      plan.push({id:id++, day, kp:d.from, layer:pi===0?"core":"core", min:pi===0?20:12});
-      plan.push({id:id++, day:Math.min(14,day+1), kp:d.to, layer:pi===0?"challenge":"challenge", min:pi===0?15:10});
+      plan.push({id:id++,day,kp:d.from,layer:"core",min:pi===0?20:12,st:"todo"});
+      plan.push({id:id++,day:Math.min(14,day+1),kp:d.to,layer:"challenge",min:pi===0?15:10,st:"todo"});
     });
   });
-  S.plan=plan; save(S);
+  S.plan=plan;save(S);return plan;
 }
-function renderToday(){
-  if(!S.plan) buildPlan();
-  const items=(S.plan||[]).filter(i=>i.day===S.day).slice(0,3);
-  $("todayBar").style.width = Math.min(100, (S.day/14)*100)+"%";
-  $("todayList").innerHTML = items.length? items.map(i=>`<div class="card">
-    <strong>巩固「${esc(title(i.kp))}」</strong><span class="tag">${i.layer} ${i.min}min</span>
-    <div class="row" style="margin-top:10px"><button class="btn primary" data-start="${i.kp}">开始</button></div>
-  </div>`).join("") : '<p class="hint">今天没有任务，休息一下。</p>';
-  $("todayList").querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>startQuiz(b.dataset.start));
-  const q=S.qs[Math.floor(Math.random()*S.qs.length)];
-  window._q=q;
-  $("quizBox").innerHTML=`<p><strong>${esc(q.stem)}</strong></p>`+
-    q.opts.map((o,i)=>`<div class="card" style="cursor:pointer" data-oi="${i}">${String.fromCharCode(65+i)}. ${esc(o)}</div>`).join("")+
-    `<div class="row"><button class="btn primary" id="btnSub">提交</button></div><div class="status" id="fb"></div>`;
+function pickQuestion(kp){
+  const qs=activeQs();if(!qs.length)return null;
+  if(kp){const hit=qs.filter(q=>q.kp===kp);if(hit.length)return hit[Math.floor(Math.random()*hit.length)];}
+  return qs[Math.floor(Math.random()*qs.length)];
+}
+function loadQuiz(kp){window._q=pickQuestion(kp);paintQuiz(window._q);}
+function paintQuiz(q){
+  if(!q){$("quizBox").innerHTML='<div class="empty">当前教材没有题目。请解析资料或导入示例。</div>';return;}
+  $("quizKp").textContent=title(q.kp);
+  $("quizBox").innerHTML="<p><strong>"+esc(q.stem)+"</strong></p>"+q.opts.map((o,i)=>'<div class="card" style="cursor:pointer" data-oi="'+i+'">'+String.fromCharCode(65+i)+". "+esc(o)+"</div>").join("")+'<div class="row"><button class="btn primary" id="btnSub">提交</button></div><div class="status" id="fb">选择一项后提交</div>';
   let pick=-1;
-  $("quizBox").querySelectorAll("[data-oi]").forEach(el=>el.onclick=()=>{pick=+el.dataset.oi; el.style.borderColor="var(--primary)";});
-  $("btnSub").onclick=()=>{
-    if(pick<0){ $("fb").textContent="请先选择一项"; return; }
-    const ok=pick===q.ci, conf=+$("conf").value;
-    const m=S.mastery[q.kp]||{n:0,s:0,c:3,age:0,st:0};
-    m.n++; if(ok) m.s++; m.st = ok? m.st+1:0; m.c=conf; m.age=0;
-    S.mastery[q.kp]=m;
-    S.logs.push({kp:q.kp,ok,conf,ts:Date.now()});
-    S.sale[q.kp]=saleStep(S.sale[q.kp]||{streak:0,att:0}, ok?1:0, conf);
-    save(S);
-    const sv=S.sale[q.kp];
-    $("fb").className="status "+(ok?"ok":"err");
-    $("fb").innerHTML = (ok?"<b>正确</b>":"<b>错误</b>")+
-      ` · score=${scoreOf(q.kp).toFixed(6)} · 销账 streak=${sv.streak}/${K.saleStreak} att=${sv.att}`+
-      (sv.status==="cleared"?` · <b>已销账</b>`:"");
+  $("quizBox").querySelectorAll("[data-oi]").forEach(el=>el.onclick=()=>{
+    pick=+el.dataset.oi;
+    $("quizBox").querySelectorAll("[data-oi]").forEach(x=>x.style.borderColor="var(--rule)");
+    el.style.borderColor="var(--primary)";
+  });
+  const btn=$("btnSub");if(!btn)return;
+  btn.onclick=()=>{
+    if(pick<0){$("fb").className="status warn";$("fb").textContent="请先选择一项";return;}
+    try{
+      const ok=pick===q.ci,conf=+$("conf").value;
+      const m=S.mastery[q.kp]||{n:0,s:0,c:3,age:0,st:0};
+      m.n++;if(ok)m.s++;m.st=ok?((m.st||0)+1):0;m.c=conf;m.age=0;S.mastery[q.kp]=m;
+      S.logs.push({kp:q.kp,ok,conf,ts:Date.now()});
+      if(S.logs.length>500)S.logs=S.logs.slice(-500);
+      S.sale[q.kp]=saleStep(S.sale[q.kp]||{streak:0,att:0},ok?1:0,conf);
+      save(S);
+      const sv=S.sale[q.kp];
+      $("fb").className="status "+(ok?"ok":"err");
+      $("fb").innerHTML=(ok?"<b>正确</b>":"<b>错误</b>")+" · score="+scoreOf(q.kp).toFixed(6)+" · 销账 streak="+sv.streak+"/"+K.saleStreak+" att="+sv.att+(sv.status==="cleared"?" · <b>已销账</b>":"");
+    }catch(e){$("fb").className="status err";$("fb").textContent="提交失败："+(e.message||e);}
   };
 }
-function startQuiz(kp){ go("today"); const q=S.qs.find(x=>x.kp===kp)||S.qs[0]; window._q=q; }
-
-function ensureChat(){ if(!$("chat").dataset.r){ $("chat").innerHTML='<div class="bub bot">你好，我是知债学习助手（单体·无微服务）。可问「诊断」「计划」「今日」。</div>'; $("chat").dataset.r=1; } }
+function renderToday(){
+  if(!S.plan)buildPlan();
+  const items=(S.plan||[]).filter(i=>i.day===S.day).slice(0,3);
+  $("todayBar").style.width=Math.min(100,(S.day/14)*100)+"%";
+  $("todayList").innerHTML=items.length?items.map(i=>'<div class="card"><strong>巩固「'+esc(title(i.kp))+'」</strong><span class="tag">'+esc(i.layer)+" "+i.min+'min</span><div class="row" style="margin-top:10px"><button class="btn primary" data-start="'+esc(i.kp)+'">开始练习</button></div></div>').join(""):'<div class="empty">今天没有任务。可点「加载今日任务」或到知债页生成计划。</div>';
+  $("todayList").querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>loadQuiz(b.dataset.start));
+  if(!window._q)loadQuiz(null);else paintQuiz(window._q);
+}
+const CRISIS=["不想活","自杀","轻生","结束生命","自残","伤害自己","跳楼","上吊","suicide","kill myself","活不下去"];
+const BANNED=["身份证","银行卡密码","详细住址"];
+const NEGATIVE=["哈哈","呵呵","随便","没事了","thanks","thank you","ok","好的"];
+function normalize(s){
+  return String(s||"").replace(/[！-～]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/　/g," ").replace(/\s+/g," ").toLowerCase().trim();
+}
+function intentRoute(t){
+  const norm=normalize(t);
+  if(CRISIS.some(c=>norm.includes(normalize(c))))return {id:"crisis.handoff",score:1,decision:"crisis.handoff",trace:"R0:crisis"};
+  if(NEGATIVE.some(c=>norm===normalize(c)||norm.includes(normalize(c))))return {id:"meta.help",score:0,decision:"fallback",trace:"R2.5:negative"};
+  const intents=[
+    ["debt.diagnose",["知识债","债边","诊断","红边","薄弱"]],
+    ["debt.explain",["解释","为什么","怎么来的","公式"]],
+    ["plan.create",["计划","14天","安排","复习计划"]],
+    ["plan.rebalance",["减负","重排","调整计划","太重"]],
+    ["today.tasks",["今日","今天做","今日任务"]],
+    ["practice.start",["练习","做题","小测","测验"]],
+    ["progress.check",["进度","销账","进展","streak"]],
+    ["graph.view",["图谱","识网","知识图谱","思维导图"]],
+    ["material.parse",["解析资料","上传","ocr","教材","藏书"]],
+    ["kb.search",["知识库","检索","查资料","文档"]],
+    ["profile.view",["画像","我的标签","学习画像"]],
+    ["profile.optout",["退出画像","关闭画像","opt-out"]],
+    ["whatif.simulate",["what-if","如果","模拟","假设"]],
+    ["sale.check",["销账检查","能否销账","销账条件"]],
+    ["meta.help",["帮助","怎么用","说明"]]
+  ];
+  let best=null,bestScore=0,bestAnchor="";
+  for(const pair of intents){
+    const id=pair[0],anchors=pair[1];let hit=0,anc="";
+    for(const a of anchors){const aa=normalize(a);if(!aa)continue;if(norm.includes(aa)){const s=0.55+Math.min(0.45,aa.length/12);if(s>hit){hit=s;anc=a;}}}
+    if(hit>bestScore){bestScore=hit;best=id;bestAnchor=anc;}
+  }
+  if(best&&bestScore>=0.5)return {id:best,score:bestScore,decision:"execute",trace:"R3:anchor:"+bestAnchor+";score="+bestScore.toFixed(2)};
+  return {id:"meta.help",score:0,decision:"fallback",trace:"R6:fallback"};
+}
+function sanitize(text){let t=String(text||"");for(const w of BANNED){if(t.includes(w))return "这段内容暂时无法展示，请查看教材原文或联系老师。";}return t;}
+function graphSummary(){
+  const b=activeBook();const chs=(b.chapters||[]).slice(0,6).map(c=>c.title);
+  return "《"+b.name+"》识网摘要："+(b.nodes||[]).length+" 节点 / "+(b.edges||[]).length+" 边 / "+(b.chapters||[]).length+" 章。\n主要章节："+chs.join("、")+((b.chapters||[]).length>6?" 等":"")+"。\n完整图谱见「识网」页。";
+}
+function searchKb(q){
+  const b=activeBook();const nq=normalize(q);const hits=[];
+  for(const n of (b.nodes||[])){
+    if(nq.includes(normalize(n.title))||normalize(n.title).includes(nq.replace(/[？?。！!]/g,"")))hits.push({t:n.title,s:scoreOf(n.id),kind:n.kind,body:n.body||""});
+  }
+  return hits.slice(0,4);
+}
+function executeIntent(id,raw){
+  switch(id){
+    case "crisis.handoff":return "你并不孤单。请立即联系身边信任的人或当地心理援助热线。系统不会把这里当作处分依据。";
+    case "debt.diagnose":{
+      const ds=scanDebts().filter(d=>d.status==="open");
+      return ds.length?"诊断完成（impact-v2，数字仅本地公式）：\n"+ds.slice(0,6).map((d,i)=>(i+1)+". "+d.fromName+"→"+d.toName+" impact="+d.imp.toFixed(6)).join("\n"):"当前没有开放红边。保持练习节奏即可。";
+    }
+    case "debt.explain":{
+      const ds=scanDebts().filter(d=>d.status==="open").slice(0,2);
+      if(!ds.length)return "暂无红边可解释。impact-v2 = base · σ(sf-pg) · σ(cg-st) · w · 跨章系数 · 级联 · 频次。";
+      return ds.map(d=>"你在「"+d.toName+"」相关练习上偏弱，回溯显示先修「"+d.fromName+"」掌握度 "+d.sf.toFixed(2)+"，当前点 "+d.st.toFixed(2)+"，影响分 "+d.imp.toFixed(3)+"。建议先巩固"+d.fromName+"，再回到"+d.toName+"。").join("\n");
+    }
+    case "plan.create":{buildPlan();return "已按高 impact 债边生成 14 天草图（0/2/6 间隔三遍，每日≤40 分钟）。见「知债」页。计划条目 "+(S.plan||[]).length+" 项。";}
+    case "plan.rebalance":{
+      if(!S.plan||!S.plan.length)buildPlan();
+      const before=(S.plan||[]).length;
+      S.plan=(S.plan||[]).map(p=>({id:p.id,day:p.day,kp:p.kp,layer:p.layer,st:p.st,min:Math.max(8,Math.round(p.min*0.75))}));
+      save(S);return "已减负："+before+" 项计划时长下调约 25%（单日合计更易完成）。见「知债」页。";
+    }
+    case "today.tasks":{
+      if(!S.plan)buildPlan();
+      const items=(S.plan||[]).filter(i=>i.day===S.day).slice(0,3);
+      return items.length?("今日任务（D"+S.day+"）：\n"+items.map((i,idx)=>(idx+1)+". 巩固「"+title(i.kp)+"」 · "+i.layer+" "+i.min+"min").join("\n")+"\n到「今日」页开始练习。"):"今天没有排任务。可到知债页生成 14 天计划。";
+    }
+    case "practice.start":return "已为你准备练习入口。到「今日」页点「开始练习」或「换一题」。当前题库 "+activeQs().length+" 题。";
+    case "progress.check":
+    case "sale.check":{
+      const vals=Object.values(S.sale||{});
+      const c=vals.filter(x=>x&&x.status==="cleared").length,r=vals.filter(x=>x&&x.status==="repairing").length;
+      return "销账进度（sale-v2）：已销账 "+c+" · 修复中 "+r+" · 条件=连续 "+K.saleStreak+" 次达标且累计≥"+K.saleMinAtt+" 次（acc≥"+K.saleAcc+"，conf≥"+K.saleConf+"）。";
+    }
+    case "graph.view":return graphSummary();
+    case "material.parse":return "到「藏书阁」上传 PDF/TXT/MD（PDF 需文本层），或粘贴正文后点「从粘贴文本解析」。解析完成会自动写入识网图谱。";
+    case "kb.search":{
+      const hits=searchKb(raw);
+      if(!hits.length)return "在当前《"+activeBook().name+"》中没找到直接匹配。可换个关键词，或到识网翻章节。";
+      return "检索命中：\n"+hits.map(h=>"· "+h.t+"（"+h.kind+"，score="+h.s.toFixed(3)+"）"+(h.body?"\n  "+h.body.slice(0,60):"")).join("\n");
+    }
+    case "profile.view":return "画像五轴见「画像」页。当前个性化："+(S.optOut?"已关闭":"开启中")+"。掌握度由 score-v2 本地公式计算。";
+    case "profile.optout":S.optOut=true;save(S);return "已关闭个性化画像（opt-out）。可在画像页重新开启。";
+    case "whatif.simulate":{
+      const imp=impactV2(0.3,0.25,1.1,true,5,5);
+      return "What-if 示例（本地公式）：score_p=0.30, score_c=0.25, freq=5 → impact="+imp.toFixed(6)+(imp>=K.hit?"（命中红边）":"（未达红线）")+"。可在「知债」页拖滑杆细调。";
+    }
+    default:return "我可以帮你：诊断知识债、解释红边、14 天计划、今日任务、识网摘要、章节检索、销账检查、资料解析引导、What-if。数字只来自本地公式。";
+  }
+}
+function ensureChat(){
+  const box=$("chat");if(box.dataset.r)return;
+  box.innerHTML='<div class="bub bot">你好，我是知债学习助手（单体·无微服务）。可问「诊断」「计划」「今日」「图谱」「销账」。</div>';
+  box.dataset.r=1;
+}
 function chat(role,txt){
-  const d=document.createElement("div"); d.className="bub "+(role==="user"?"user":"bot"); d.textContent=txt;
-  $("chat").appendChild(d); $("chat").scrollTop=1e9;
+  const d=document.createElement("div");
+  d.className="bub "+(role==="user"?"user":role==="sys"?"sys":"bot");
+  d.textContent=txt;$("chat").appendChild(d);$("chat").scrollTop=1e9;
 }
 function reply(t){
-  if(/不想活|自杀|自残/.test(t)) return "你并不孤单。请立即联系身边信任的人或当地心理援助热线。系统不会把这里当作处分依据。";
-  if(/诊断|债|红边/.test(t)){
-    const ds=scanDebts().filter(d=>d.status==="open");
-    return ds.length? "诊断完成（impact-v2）：\n"+ds.map((d,i)=>`${i+1}. ${d.fromName}→${d.toName} impact=${d.imp.toFixed(6)}`).join("\n") : "当前没有开放红边。";
-  }
-  if(/计划|14/.test(t)) return "已按高 impact 债边生成 14 天草图（0/2/6 间隔三遍，每日≤40 分钟）。见「知债」页。";
-  if(/今日|任务/.test(t)) return "今日任务见「今日」页，先真题再还债边。";
-  if(/销账/.test(t)){ const c=Object.values(S.sale).some(x=>x.status==="cleared"); return c?"部分债边已销账。":"尚未销账：需连续 2 次达标且累计≥3 次。"; }
-  return "我可以帮你：诊断知识债、14 天计划、今日任务、销账检查。";
+  const r=intentRoute(t);
+  $("agentTrace").textContent="路由："+r.id+" · "+r.decision+" · "+r.trace;
+  return sanitize(executeIntent(r.id,t));
 }
-function send(){ const v=$("agentIn").value.trim(); if(!v) return; chat("user",v); chat("bot",reply(v)); $("agentIn").value=""; $("agentSt").textContent="ok · local"; }
+function send(){
+  const v=$("agentIn").value.trim();if(!v)return;
+  chat("user",v);
+  try{chat("bot",reply(v));$("agentSt").className="status ok";$("agentSt").textContent="ok · local · "+new Date().toLocaleTimeString();}
+  catch(e){chat("sys","处理失败："+(e.message||e));$("agentSt").className="status err";$("agentSt").textContent="err · "+(e.message||e);}
+  $("agentIn").value="";
+}
 $("btnSend").onclick=send;
-$("agentIn").addEventListener("keydown",e=>{ if(e.key==="Enter") send(); });
-document.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{ chat("user",b.dataset.q); chat("bot",reply(b.dataset.q)); });
-
+$("agentIn").addEventListener("keydown",e=>{if(e.key==="Enter")send();});
+document.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{chat("user",b.dataset.q);chat("bot",reply(b.dataset.q));});
 function renderProfile(){
-  $("masteryList").innerHTML = S.nodes.map(n=>`<div class="card">
-    <div class="row" style="justify-content:space-between"><strong>${esc(n.title)}</strong><b>${scoreOf(n.id).toFixed(3)}</b></div>
-    <div class="bar"><i style="width:${(scoreOf(n.id)*100).toFixed(1)}%"></i></div>
-  </div>`).join("");
-  const logs=S.logs;
-  const acc=logs.length? logs.filter(x=>x.ok).length/logs.length : 0.5;
-  const p=logs.length? logs.reduce((a,b)=>a+b.conf,0)/logs.length/5 : .5;
-  const brier=logs.length? logs.reduce((a,b)=>a+Math.pow(b.conf/5-(b.ok?1:0),2),0)/logs.length : .25;
-  const style=[
-    ["AccuracyFirst",(0.55*acc+0.45*0.6)],["Calibrated",clamp01(1-brier/0.5)],
-    ["Steady",0.7],["Independent",0.8],["DeepDive",0.55]
-  ];
-  $("styleList").innerHTML = style.map(([k,v])=>`<div class="card"><div class="row" style="justify-content:space-between"><span>${k}</span><b>${v.toFixed(3)}</b></div>
-    <div class="bar"><i style="width:${(v*100).toFixed(0)}%"></i></div></div>`).join("");
-  $("optLine").textContent = S.optOut? "已关闭个性化画像" : "个性化开启中";
+  const nodes=activeNodes();
+  $("masteryList").innerHTML=nodes.length?nodes.map(n=>'<div class="card"><div class="row" style="justify-content:space-between"><strong>'+esc(n.title)+'</strong><b>'+scoreOf(n.id).toFixed(3)+'</b></div><div class="bar"><i style="width:'+(scoreOf(n.id)*100).toFixed(1)+'%"></i></div></div>').join(""):'<div class="empty">暂无知识点</div>';
+  const logs=S.logs||[];
+  const acc=logs.length?logs.filter(x=>x.ok).length/logs.length:0.5;
+  const brier=logs.length?logs.reduce((a,b)=>a+Math.pow(b.conf/5-(b.ok?1:0),2),0)/logs.length:.25;
+  const style=[["AccuracyFirst",(0.55*acc+0.45*0.6)],["Calibrated",clamp01(1-brier/0.5)],["Steady",logs.length>5?0.7:0.5],["Independent",0.8],["DeepDive",0.55]];
+  $("styleList").innerHTML=style.map(kv=>'<div class="card"><div class="row" style="justify-content:space-between"><span>'+kv[0]+'</span><b>'+kv[1].toFixed(3)+'</b></div><div class="bar"><i style="width:'+(kv[1]*100).toFixed(0)+'%"></i></div></div>').join("");
+  $("optLine").textContent=S.optOut?"已关闭个性化画像":"个性化开启中";
 }
 function renderAccount(){
   $("authLine").className="status "+(S.user?"ok":"");
-  $("authLine").textContent = S.user? `已登录：${S.user}` : "未登录";
-  $("consentLine").textContent = S.consent? "已同意教师可见" : "未授权";
+  $("authLine").textContent=S.user?("已登录："+S.user):"未登录";
+  $("consentLine").textContent=S.consent?"已同意教师可见":"未授权";
+  $("userName").textContent=S.user?(S.user.split("@")[0]+"（有债）"):"王小明（有债）";
 }
-function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
-
-$("btnSeed").onclick=$("btnSeed2").onclick=()=>{
-  S=seed(); save(S); renderHome(); $("matStatus").className="status ok"; $("matStatus").textContent="示例教材与图包已导入（本机）"; go("materials");
-};
-$("btnUpload").onclick=()=>{
+$("fileInput").onchange=()=>{
   const fs=Array.from($("fileInput").files||[]);
-  if(!fs.length){ $("matStatus").textContent="请先选择文件"; return; }
-  $("matStatus").className="status";
-  $("matStatus").textContent="本机解析 "+fs.length+" 个文件…";
-  let done=0;
-  fs.forEach(f=>{
-    const r=new FileReader();
-    r.onload=()=>{
-      const text=String(r.result||"");
-      S.mat.unshift({id:"m"+Date.now()+Math.random().toString(36).slice(2,6), name:f.name, chars:text.length, nodes:S.nodes.length});
-      done++;
-      if(done===fs.length){ save(S); renderMats(); $("matStatus").className="status ok"; $("matStatus").textContent="已解析 "+fs.length+" 份（本机）"; }
-    };
-    if(/\.(txt|md)$/i.test(f.name)) r.readAsText(f); else r.readAsText(f); // 文本层尽力抽取
-  });
+  $("fileHint").textContent=fs.length?fs.map(f=>f.name+"（"+Math.max(1,Math.round(f.size/1024))+"KB）").join("、"):"尚未选择文件";
 };
-$("btnParseAll").onclick=()=>{ $("matStatus").className="status ok"; $("matStatus").textContent="全部资料已解析（单体本机）"; };
+$("btnSeed").onclick=$("btnSeed2").onclick=()=>{
+  try{
+    const book=sampleBook();
+    if(!S.books.some(b=>b.id===book.id))S.books=[book].concat(S.books);
+    S.activeBookId=book.id;ensureMastery(book);save(S);
+    setMatStatus("ok","示例教材与图包已导入（本机）· "+book.nodes.length+" 节点 / "+book.edges.length+" 边");
+    renderHome();go("materials");
+  }catch(e){setMatStatus("err","导入失败："+(e.message||e));}
+};
+$("btnUpload").onclick=async()=>{
+  const fs=$("fileInput").files;const mode=$("ocrMode").value||"standard";
+  if(!fs||!fs.length){setMatStatus("warn","请先选择文件");return;}
+  setMatStatus("","本机解析 "+fs.length+" 个文件…");
+  try{
+    const rr=await parseFiles(fs,mode);
+    rr.results.forEach(ingestBook);
+    if(rr.results.length){
+      renderMats();
+      const b=rr.results[0];
+      setMatStatus("ok","已解析 "+rr.results.length+" 份 → 识网图谱已生成。当前《"+b.name+"》："+b.nodes.length+" 节点 / "+b.edges.length+" 边 / "+b.chapters.length+" 章 / "+b.qs.length+" 题"+(rr.errors.length?("；失败 "+rr.errors.length+"："+rr.errors.map(e=>e.name+"（"+e.reason+"）").join("；")):""));
+      setTimeout(()=>go("graph"),300);
+    }else setMatStatus("err","解析失败："+rr.errors.map(e=>e.name+"："+e.reason).join("；")+"。可用「粘贴正文」兜底。");
+  }catch(e){setMatStatus("err","解析异常："+(e.message||e));}
+};
+$("btnPasteParse").onclick=()=>{
+  const text=($("pasteText").value||"").trim();
+  if(countReadable(text)<20){setMatStatus("warn","粘贴内容过少（可读字符≥20）");return;}
+  try{
+    const book=makeBookFromFile("粘贴教材·"+new Date().toLocaleTimeString(),text,$("ocrMode").value||"standard","user");
+    ingestBook(book);renderMats();
+    setMatStatus("ok","已从粘贴文本生成图谱："+book.nodes.length+" 节点 / "+book.edges.length+" 边 / "+book.chapters.length+" 章");
+    setTimeout(()=>go("graph"),200);
+  }catch(e){setMatStatus("err","粘贴解析失败："+(e.message||e));}
+};
+$("btnParseAll").onclick=()=>{
+  if(!S.books.length){setMatStatus("warn","没有可解析资料");return;}
+  setMatStatus("","正在重建全部图谱…");
+  try{
+    let n=0;
+    for(const b of S.books){
+      if(b.kind==="sample"||!b.sourceText){n++;continue;}
+      const g=buildGraphFromText(b.sourceText,b.chapters,{course:b.name,maxConcepts:20});
+      b.nodes=g.nodes;b.edges=g.edges;b.qs=generateQuestions(b);b.parsedAt=Date.now();n++;
+    }
+    ensureMastery(activeBook());save(S);renderMats();
+    setMatStatus("ok","全部资料已重新解析并构图（"+n+"）");
+  }catch(e){setMatStatus("err","解析全部失败："+(e.message||e));}
+};
 $("btnRefresh").onclick=renderMats;
-$("btnGRefresh").onclick=renderGraph;
+$("btnGRefresh").onclick=()=>{try{renderGraph();$("gSwitch").className="status ok";$("gSwitch").textContent="图谱已刷新";}catch(e){$("gSwitch").className="status err";$("gSwitch").textContent="刷新失败："+e.message;}};
 $("btnDiag").onclick=renderDebt;
-$("btnPlan").onclick=()=>{ buildPlan(); renderDebt(); };
+$("btnPlan").onclick=()=>{try{buildPlan();renderDebt();}catch(e){$("planBox").innerHTML='<div class="status err">计划生成失败：'+esc(e.message||e)+'</div>';}};
 $("btnSale").onclick=()=>{
-  const c=Object.values(S.sale).filter(x=>x.status==="cleared").length;
-  alert(c? `已销账 ${c} 条` : "销账检查未通过：需连续 2 次达标且累计≥3 次");
+  const c=Object.values(S.sale||{}).filter(x=>x&&x.status==="cleared").length;
+  alert(c?("已销账 "+c+" 条"):("销账检查未通过：需连续 "+K.saleStreak+" 次达标且累计≥"+K.saleMinAtt+" 次"));
 };
 $("btnLoadToday").onclick=renderToday;
-$("btnShuffle").onclick=()=>{ S.qs=S.qs.slice().sort(()=>Math.random()-.5); save(S); renderToday(); };
-$("btnDay").onclick=()=>{ S.day=Math.min(14,S.day+1); save(S); renderToday(); };
+$("btnShuffle").onclick=()=>{window._q=null;loadQuiz(null);};
+$("btnNextQ").onclick=()=>{loadQuiz((window._q&&window._q.kp)||null);};
+$("btnDay").onclick=()=>{S.day=Math.min(14,(S.day||1)+1);save(S);renderToday();};
 $("conf").oninput=e=>$("vConf").textContent=e.target.value;
-$("btnOpt").onclick=()=>{ S.optOut=!S.optOut; save(S); renderProfile(); };
-$("btnLogin").onclick=()=>{ if($("email").value.includes("@") && $("pass").value.length>=4){ S.user=$("email").value; save(S); renderAccount(); } else $("authLine").textContent="邮箱或密码无效"; };
-$("btnLogout").onclick=()=>{ S.user=null; save(S); renderAccount(); };
-$("btnGrant").onclick=()=>{ S.consent=true; save(S); renderAccount(); };
-$("btnRevoke").onclick=()=>{ S.consent=false; save(S); renderAccount(); };
-$("btnExport").onclick=()=>{
-  const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="astralpath-monolith.json"; a.click();
+$("btnOpt").onclick=()=>{S.optOut=!S.optOut;save(S);renderProfile();};
+$("btnLogin").onclick=()=>{
+  const em=$("email").value.trim(),pw=$("pass").value;
+  if(em.includes("@")&&pw.length>=4){S.user=em;save(S);renderAccount();}else $("authLine").textContent="邮箱或密码无效";
 };
-$("btnWipe").onclick=()=>{ if(confirm("清空本机数据？")){ S=seed(); save(S); go("home"); } };
-
-go("home"); whatif();
+$("btnLogout").onclick=()=>{S.user=null;save(S);renderAccount();};
+$("btnGrant").onclick=()=>{S.consent=true;save(S);renderAccount();};
+$("btnRevoke").onclick=()=>{S.consent=false;save(S);renderAccount();};
+$("btnExport").onclick=()=>{
+  try{
+    const blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+    const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="astralpath-monolith.json";a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+  }catch(e){alert("导出失败："+e.message);}
+};
+$("btnWipe").onclick=()=>{if(confirm("清空本机数据？")){S=defaultState();save(S);go("home");}};
+(function init(){
+  try{ensureMastery(activeBook());go("home");whatif();ensureChat();}
+  catch(e){console.error(e);document.body.insertAdjacentHTML("beforeend",'<div class="status err">初始化失败：'+esc(e.message||e)+'</div>');}
+})();
 </script>
 </body>
 </html>

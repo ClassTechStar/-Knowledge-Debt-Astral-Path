@@ -6,11 +6,11 @@ android {
     namespace = "com.astralpath.app"
     compileSdk = 35
     defaultConfig {
-        applicationId = "com.astralpath.app"
+        applicationId = "com.astralpath.app.v22"
         minSdk = 26
         targetSdk = 35
-        versionCode = 31
-        versionName = "2.1.0"
+        versionCode = 32
+        versionName = "2.2.0"
     }
     signingConfigs {
         create("release") {
@@ -40,3 +40,5 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.webkit:webkit:1.12.1")
 }
+
+
