@@ -2,7 +2,7 @@
 
 跨课程**知识债**诊断与修复智能体：用确定性公式找出你「欠」了哪门课的先修债，用约束满足生成可完成的还债计划，用受约束智能体陪伴销账，并守住教育伦理底线。
 
-> **2026 iCAN AI / DuMate 竞赛实现** · 版本 **2.0.0-algo-v2** · Windows 10/11 · Android 8.0+
+> **2026 iCAN AI / DuMate 竞赛实现** · 版本 **2.2.0**（contract-v2.2.0-algo-v2） · Windows 10/11 · Android 8.0+
 >
 > **项目名称规范**：全称「知债：星穹学途（Knowledge Debt: Astral Path）」；中文简称「知债：星穹学途」；代码标识 **AstralPath**。禁止旧名「知债图 / ZhiZhaiTu」。
 
@@ -45,15 +45,18 @@
 
 | 产物 | 路径 | 说明 |
 |------|------|------|
-| **Web 单体版** | `deploy/monolith-web/index.html` | 全功能、无服务器、浏览器直接打开 |
-| **Windows 单体安装包** | `deploy/win-install/dist/AstralPath-Monolith-Setup-2.0.0.exe` | WebView2 壳 + 同一 HTML；与旧版并存 |
+| **Web 单体版** | `deploy/monolith-web/index.html` | 全功能、无服务器、浏览器直接打开（2.2，73 KB） |
+| **Windows 单体安装包** | `deploy/win-install/dist/AstralPath-Monolith-Setup-2.2.0.exe` | WebView2 壳 + 同一 HTML；与旧版并存 |
 | **Windows 桌面安装包** | `deploy/win-install/dist/AstralPath-Setup-1.5.0-Desktop.exe` | 全功能桌面端（可选本地 API） |
-| **Android APK** | `src/AstralPath.Native/dist/AstralPath-WebUI-1.5.0.apk` | WebView 同构 + 离线核心 |
-| **100 题库** | `eval/question_bank.db` / `question_bank.json` | 会计 34 / Python 33 / DL 33 |
-| **34 点图包** | `graph-packs/astralpath-v2/graph_pack.json` | 34 节点 / 74 边，无环，三门课 |
-| **项目方案（可复刻）** | `docs/03-知债星穹学途-合并版(TDS+最终版技术方案).md` | 含 §2.0 算法 v2 + 零基础导读 |
-| **四人分工** | `docs/知债星穹学途-四人团队分工方案.md` | 含算法 v2 工作包 |
-| **Vibe 提示词** | `docs/vibe-prompts/` | P1–P4 可直接粘贴给 AI 开发 |
+| **Android APK** | `src/AstralPath.Native/dist/AstralPath-Android-2.2.0-Store.apk` | WebView 同构 + 离线核心 |
+| **100 题库** | `eval/question_bank.json` | 覆盖 34 个知识点（难度 1:21 / 2:51 / 3:28） |
+| **34 点图包** | `graph-packs/astralpath-v2/graph_pack.json` | 34 节点 / 74 边（先修 50 + 迁移缺口 24），无环，三门课 |
+| **13 本教材思维导图** | `kg-deep-test/*.mindmap.{json,md}` | 6,720 页 / 2,519 节点 / 2,662 边 |
+| **图谱 + OCR 工具链** | `tools/*.py`（8 个脚本，4,291 行） | OCR → 章节 → 构图 → 思维导图 |
+| **项目方案（可复刻）** | `docs/03-知债星穹学途-合并版(TDS+最终版技术方案).md` | 含 §2.0 算法 v2 + **§29–§33 工程现状与完美复刻篇** |
+| **四人分工** | `docs/知债星穹学途-四人团队分工方案.md` | v3.0.0 零基础通俗版 |
+| **分工详细附录** | `docs/附录-四人分工详细矩阵(RACI-模块-风险)-v2.1.0.md` | RACI / 模块治理 / 风险应急 |
+| **Vibe 提示词** | `docs/vibe-prompts/提示词-P{1,2,3,4}-*.md` | v3，可直接粘贴给 AI 开发 |
 
 ---
 
@@ -66,7 +69,7 @@
 deploy\monolith-web\index.html
 
 # Windows：运行安装包后桌面图标启动
-deploy\win-install\dist\AstralPath-Monolith-Setup-2.0.0.exe
+deploy\win-install\dist\AstralPath-Monolith-Setup-2.2.0.exe
 ```
 
 功能：起点/藏书阁/识网/知债/今日/智能体/画像/账户 全部在本机计算，数据存 localStorage，可导出 JSON。
@@ -79,7 +82,7 @@ deploy\win-install\dist\AstralPath-Setup-1.5.0-Desktop.exe
 
 ### 3.3 Android
 
-安装 `src/AstralPath.Native/dist/AstralPath-WebUI-1.5.0.apk`（商店签名）。无电脑、无 adb 亦可离线使用核心功能。
+安装 `src/AstralPath.Native/dist/AstralPath-Android-2.2.0-Store.apk`（商店签名）。无电脑、无 adb 亦可离线使用核心功能。
 
 ### 3.4 源码构建
 
@@ -133,7 +136,7 @@ AstralPath.Core/          纯函数：公式 / 图 / OCR / 画像 / 销账 / 计
 AstralPath.Api/           ASP.NET Core（Web/Windows 共用）+ wwwroot/index.html
 AstralPath.Desktop/       WebView2 壳
 AstralPath.Native/        Android WebView 壳（~2.8MB）
-AstralPath.Monolith/      无微服务 Windows 壳（Setup-2.0.0）
+AstralPath.Monolith/      无微服务 Windows 壳（Setup-2.2.0）
 AstralPath.Mobile.Offline/Avalonia 11 + SQLite 离线单体
 AstralPath.Persistence/  Postgres（默认）+ memory 回退
 tests/                    Core 11 · Persistence 8 · Desktop 47 · API 53 · Eval 2
@@ -187,14 +190,16 @@ dotnet publish src/AstralPath.Monolith -c Release -r win-x64 --self-contained -o
 
 ## 9. 四人 Vibe Coding 提示词
 
-零基础队友可直接把提示词粘贴给 Cursor / Claude Code：
+零基础队友可直接把提示词（v3）粘贴给 Cursor / Claude Code：
 
 | 角色 | 文件 | 负责 |
 |------|------|------|
-| P1 | `docs/vibe-prompts/提示词-P1-产品与教育伦理.md` | 文案、禁词、隐私、演示脚本 |
-| P2 | `docs/vibe-prompts/提示词-P2-算法与后端.md` | 公式、Core、金样 |
-| P3 | `docs/vibe-prompts/提示词-P3-数据与评测.md` | 图包、题库、验收脚本 |
-| P4 | `docs/vibe-prompts/提示词-P4-客户端与体验.md` | UI、壳、安装包 |
+| P1 | `docs/vibe-prompts/提示词-P1-产品与教育伦理.md` | 文案、禁词、危机词、隐私、演示脚本 |
+| P2 | `docs/vibe-prompts/提示词-P2-算法与后端.md` | 公式、Core、API、金样 |
+| P3 | `docs/vibe-prompts/提示词-P3-数据与评测.md` | 图包、题库、金样、工具链、验收脚本 |
+| P4 | `docs/vibe-prompts/提示词-P4-客户端与体验.md` | 单文件 UI、安卓壳、Windows 安装包 |
+
+分工边界与交接见 `docs/知债星穹学途-四人团队分工方案.md`（v3.0.0）。
 
 ---
 
@@ -208,6 +213,17 @@ dotnet publish src/AstralPath.Monolith -c Release -r win-x64 --self-contained -o
 ---
 
 ## 11. 变更日志
+
+### 2.2.0（2026-09-25）
+- **知识图谱 + OCR 工具链**：`tools/` 8 个脚本（4,291 行），OCR → 章节 → 构图 → 思维导图全链路
+- **13 本教材全量验证**：6,720 页 / 4,015,232 字符 / 2,519 节点 / 2,662 边，**13/13 全部 ready**
+- **13 份思维导图产物**：`kg-deep-test/*.mindmap.{json,md}` + `kg_report.json`
+- **修复 2.2.0**：解析 → 构图 → 识网全链路、藏书阁/智能体回归、稳健性与三端包
+- 三端安装包同步至 2.2.0（Web HTML / Windows Setup / Android Store APK）
+- 文档：主方案新增 **§29–§33 工程现状与完美复刻篇**；分工方案重写为 v3.0.0 零基础通俗版；四份提示词升级 v3
+
+### 2.1.0（2026-09-24）
+- 发布无微服务三端安装包（Web HTML + Windows Setup + Android APK）
 
 ### 2.0.0-algo-v2（2026-09-24）
 - 算法 v2：score-v2 / impact-v2 / sale-v2 / PlannerBuilder / QuestionScheduler

@@ -109,6 +109,15 @@ def read_text(p: Path) -> str | None:
 # （本工具开发期已复现该误报）。
 POLICY_CONTEXT = ("禁止", "旧名", "不得", "不再", "废弃", "停用", "已统一替换", "禁用", "残留", "legacy", "Legacy")
 
+# 「检测/清单」语境标记：验收清单与扫描命令本身必须原样引用旧名字面量作为**检测依据**，
+# 属于自指引用。缺这层判断，"- [ ] 全仓搜 知债图|ZhiZhaiTu → 零命中" 这类清单会被误报。
+DETECTION_CONTEXT = (
+    "全仓搜", "零命中", "全仓无", "无残留", "为 0",
+    "Select-String", "-Pattern", "grep", "Grep",
+    "扫描", "检测", "命中", "搜索", "校验", "check", "Check",
+    "→", "替换为", "规范前缀", "迁移",
+)
+
 def scan() -> dict[str, list[tuple[str, int, str]]]:
     found: dict[str, list[tuple[str, int, str]]] = {name: [] for name, _ in RESIDUAL_PATTERNS}
     for p in iter_files():
@@ -122,6 +131,8 @@ def scan() -> dict[str, list[tuple[str, int, str]]]:
                 content = lines[ln - 1].strip() if ln - 1 < len(lines) else ""
                 if any(k in content for k in POLICY_CONTEXT):
                     continue          # 政策声明语境 → 不计为残留
+                if any(k in content for k in DETECTION_CONTEXT):
+                    continue          # 验收清单/扫描命令的自指引用 → 不计为残留
                 found[name].append((str(p.relative_to(ROOT)), ln, content[:160]))
     return found
 

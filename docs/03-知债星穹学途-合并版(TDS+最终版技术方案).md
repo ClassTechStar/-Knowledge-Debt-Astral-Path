@@ -6,10 +6,12 @@
 > - 英文标识：**AstralPath**——用于代码命名空间、解决方案名、包名、镜像名、数据库名与域名（如 `AstralPath.sln` / `AstralPath.Core` / `api.astralpath.example`）。
 > - 禁止再使用旧名「知债图」「ZhiZhaiTu」「zhizhaitu」，全文已统一替换。
 
-> 版本：`contract-v1.3.0-algo-v2`（基线 `tds-contract-v1.0.0` + `client-arch-v1.0.0` + `ext-ms-v1.0.0`）
-> 状态：`BASELINE + SKILLS-ENHANCED` / 主链路与 consent 伦理闸门已冻结；Skills 方法论章节与工程附录已扩写
+> 版本：`contract-v2.2.0-algo-v2`（基线 `tds-contract-v1.0.0` + `client-arch-v1.0.0` + `ext-ms-v1.0.0` + `algo-v2` + `kg-ocr-toolchain`）
+> 状态：`BASELINE + SKILLS-ENHANCED + IMPLEMENTED` / 主链路与 consent 伦理闸门已冻结；Skills 方法论章节与工程附录已扩写；**算法 v2 / 图谱 v2 / OCR v2 / 画像 v2 已全量落地并通过 121 项测试**
 > 团队分工（四人）：PM / 教育伦理 `@P1` · 技术 / 智能体 / 平台 `@P2` · 数据 / 评测 `@P3` · 客户端 / 体验 / 演示 `@P4`
-> 更新时间：2026-08-17（…§44：2026-09-20）· **算法/OCR/画像/图谱 v2 深度更新：2026-09-24**
+> 更新时间：2026-08-17（…§44：2026-09-20）· **算法/OCR/画像/图谱 v2 深度更新：2026-09-24** · **工程现状对齐与完美复刻篇（§29–§33）：2026-09-25**
+> **当前交付版本**：`2.2.0`（单体 HTML 2.2 · Windows Setup 2.2.0 · Android WebUI 2.2.0）
+> **复刻入口**：零基础读者请直接跳到 §29「工程现状快照」与 §30「逐文件复刻清单」，按 §33 的验收清单逐步还原。
 > 依据：《知债：星穹学途·TDS-C 技术设计说明书》+《知债：星穹学途·最终版技术方案》+《知债：星穹学途·跨端客户端架构》+ Skills 方法论增强 + 《受约束智能体体系设计》
 > 参考规范：GALREVIEW 契约级工程规范（只读参考）· OWASP MASVS L1/L2 · 《个人信息保护法》教育场景要点
 > Skills：markdown-mermaid-writing · what-if-oracle · consciousness-council · supervisor-tech-paper-template · market-research-reports · scientific-brainstorming
@@ -10583,7 +10585,7 @@ attempt.recorded.v1
 #### 22.1 Subject 设计
 
 ```text
-zz.event.>                          # 根
+astralpath.event.>                          # 根
 zz.event.ingest.completed.v1
 zz.event.mastery.updated.v1
 zz.event.debt.detected.v1
@@ -10605,8 +10607,8 @@ zz.cmd.diffusion.simulate
 
 ```yaml
 streams:
-  ZZ_EVENTS:
-    subjects: ["zz.event.>"]
+  ASTRALPATH_EVENTS:
+    subjects: ["astralpath.event.>"]
     retention: limits
     max_age: 168h          # 7 天
     max_msgs: 5_000_000
@@ -12376,44 +12378,44 @@ public sealed class PagePerfProbe
 
 ```bash
 # concept-diffusion
-ZZ_DIFF_ALPHA=0.55
-ZZ_DIFF_MAX_DEPTH=6
-ZZ_DIFF_MAX_NODES=400
+ASTRALPATH_DIFF_ALPHA=0.55
+ASTRALPATH_DIFF_MAX_DEPTH=6
+ASTRALPATH_DIFF_MAX_NODES=400
 
 # peer-cohort
-ZZ_PEER_K=5
-ZZ_PEER_MIN_BUCKET=5
-ZZ_PEER_EPSILON=1.0
-ZZ_PEER_NOISE=false
+ASTRALPATH_PEER_K=5
+ASTRALPATH_PEER_MIN_BUCKET=5
+ASTRALPATH_PEER_EPSILON=1.0
+ASTRALPATH_PEER_NOISE=false
 
 # study-group
-ZZ_GROUP_MIN=3
-ZZ_GROUP_MAX=6
-ZZ_GROUP_EXPOSE_SCORE=false
+ASTRALPATH_GROUP_MIN=3
+ASTRALPATH_GROUP_MAX=6
+ASTRALPATH_GROUP_EXPOSE_SCORE=false
 
 # micro-lesson
-ZZ_MICRO_REQUIRE_SLOTS=true
-ZZ_MICRO_WHITELIST_PATH=/app/assets/link_whitelist.json
+ASTRALPATH_MICRO_REQUIRE_SLOTS=true
+ASTRALPATH_MICRO_WHITELIST_PATH=/app/assets/link_whitelist.json
 
 # learning-velocity
-ZZ_VEL_FORGET_DEFAULT=0.03
-ZZ_VEL_HORIZON_CAP=28
+ASTRALPATH_VEL_FORGET_DEFAULT=0.03
+ASTRALPATH_VEL_HORIZON_CAP=28
 
 # spaced-review
-ZZ_REVIEW_ALGO=fixed-curve-v1
-ZZ_REVIEW_SUGGEST_ONLY=true
+ASTRALPATH_REVIEW_ALGO=fixed-curve-v1
+ASTRALPATH_REVIEW_SUGGEST_ONLY=true
 
 # simulator
-ZZ_SIM_BUDGET_MS=100
-ZZ_SIM_MAX_OVERRIDES=50
+ASTRALPATH_SIM_BUDGET_MS=100
+ASTRALPATH_SIM_MAX_OVERRIDES=50
 
 # forecast
-ZZ_FC_MODEL=logit-v1
-ZZ_FC_REQUIRE_CONSENT_TEACHER=true
-ZZ_FC_ECE_MAX=0.08
+ASTRALPATH_FC_MODEL=logit-v1
+ASTRALPATH_FC_REQUIRE_CONSENT_TEACHER=true
+ASTRALPATH_FC_ECE_MAX=0.08
 
 # lab
-ZZ_LAB_INTERNAL=true
+ASTRALPATH_LAB_INTERNAL=true
 ```
 
 ### K.9 link_whitelist.json 示例
@@ -19350,32 +19352,32 @@ public partial class PeerCardViewModel : ViewModelBase
 
 | 键 | local | dev | staging | prod | 说明 |
 |---|---|---|---|---|---|
-| `ZZ_ENV` | local | dev | staging | prod | 环境标识 |
-| `ZZ_PG_CONN` | localhost | compose-pg | staging-pg | prod-pg (secret) | 主库 |
-| `ZZ_REDIS_CONN` | localhost | compose-redis | staging-redis | prod-redis (secret) | 缓存 |
-| `ZZ_NATS_URL` | nats://localhost:4222 | compose-nats | staging-nats | prod-nats | 总线 |
-| `ZZ_LLM_MODE` | template | mock | live | live | 模型模式 |
-| `ZZ_LLM_ENDPOINT` | — | mock-url | staging-llm | prod-llm | 推理网关 |
-| `ZZ_CONSENT_FAIL_MODE` | closed | closed | closed | closed | 禁止 open |
-| `ZZ_PEER_ENABLED` | false | false | false | false | §31 决议 |
-| `ZZ_FORECAST_SHOW_PROB` | false | false | false | false | 不展示概率 |
-| `ZZ_FORMULA_VERSION` | formula-v1.2.0 | 同左 | 同左 | 同左 | 金样绑定 |
-| `ZZ_TOPN_DEFAULT` | 10 | 10 | 10 | 10 | 债边展示 |
-| `ZZ_K_ANONYMITY` | 10 | 10 | 10 | 10 | 同辈抑制 |
-| `ZZ_SALE_STREAK` | 3 | 3 | 3 | 3 | 销账连胜 |
-| `ZZ_SALE_FLOOR` | 0.70 | 0.70 | 0.70 | 0.70 | 销账掌握度下限 |
-| `ZZ_PLAN_DAILY_CORE_MAX` | 25 | 25 | 25 | 25 | K3 核心层 |
-| `ZZ_DIFFUSION_MAX_DEPTH` | 3 | 3 | 3 | 3 | 传播深度 |
-| `ZZ_DIFFUSION_BUDGET_MS` | 100 | 100 | 150 | 150 | 模拟预算 |
-| `ZZ_SIM_BUDGET_MS` | 200 | 200 | 300 | 300 | What-if 预算 |
-| `ZZ_OTEL_ENDPOINT` | — | jaeger:4317 | otel-collector | otel-collector | 遥测 |
-| `ZZ_LOG_LEVEL` | Debug | Information | Information | Warning | 日志级别 |
-| `ZZ_RATE_LIMIT_RPS` | 1000 | 200 | 100 | 50 | 限流 |
-| `ZZ_PACK_BUCKET` | ./packs | minio-dev | minio-stg | minio-prod | 图包 |
-| `ZZ_QDRANT_URL` | 可空 | qdrant-dev | qdrant-stg | qdrant-prod | 向量 |
-| `ZZ_FEATURE_MICRO_LESSON` | true | true | true | true | 微课开关 |
-| `ZZ_FEATURE_SPACED_REVIEW` | true | true | true | true | 复习开关 |
-| `ZZ_FEATURE_LAB` | true | true | false | false | 实验台仅非生产 |
+| `ASTRALPATH_ENV` | local | dev | staging | prod | 环境标识 |
+| `ASTRALPATH_PG_CONN` | localhost | compose-pg | staging-pg | prod-pg (secret) | 主库 |
+| `ASTRALPATH_REDIS_CONN` | localhost | compose-redis | staging-redis | prod-redis (secret) | 缓存 |
+| `ASTRALPATH_NATS_URL` | nats://localhost:4222 | compose-nats | staging-nats | prod-nats | 总线 |
+| `ASTRALPATH_LLM_MODE` | template | mock | live | live | 模型模式 |
+| `ASTRALPATH_LLM_ENDPOINT` | — | mock-url | staging-llm | prod-llm | 推理网关 |
+| `ASTRALPATH_CONSENT_FAIL_MODE` | closed | closed | closed | closed | 禁止 open |
+| `ASTRALPATH_PEER_ENABLED` | false | false | false | false | §31 决议 |
+| `ASTRALPATH_FORECAST_SHOW_PROB` | false | false | false | false | 不展示概率 |
+| `ASTRALPATH_FORMULA_VERSION` | formula-v1.2.0 | 同左 | 同左 | 同左 | 金样绑定 |
+| `ASTRALPATH_TOPN_DEFAULT` | 10 | 10 | 10 | 10 | 债边展示 |
+| `ASTRALPATH_K_ANONYMITY` | 10 | 10 | 10 | 10 | 同辈抑制 |
+| `ASTRALPATH_SALE_STREAK` | 3 | 3 | 3 | 3 | 销账连胜 |
+| `ASTRALPATH_SALE_FLOOR` | 0.70 | 0.70 | 0.70 | 0.70 | 销账掌握度下限 |
+| `ASTRALPATH_PLAN_DAILY_CORE_MAX` | 25 | 25 | 25 | 25 | K3 核心层 |
+| `ASTRALPATH_DIFFUSION_MAX_DEPTH` | 3 | 3 | 3 | 3 | 传播深度 |
+| `ASTRALPATH_DIFFUSION_BUDGET_MS` | 100 | 100 | 150 | 150 | 模拟预算 |
+| `ASTRALPATH_SIM_BUDGET_MS` | 200 | 200 | 300 | 300 | What-if 预算 |
+| `ASTRALPATH_OTEL_ENDPOINT` | — | jaeger:4317 | otel-collector | otel-collector | 遥测 |
+| `ASTRALPATH_LOG_LEVEL` | Debug | Information | Information | Warning | 日志级别 |
+| `ASTRALPATH_RATE_LIMIT_RPS` | 1000 | 200 | 100 | 50 | 限流 |
+| `ASTRALPATH_PACK_BUCKET` | ./packs | minio-dev | minio-stg | minio-prod | 图包 |
+| `ASTRALPATH_QDRANT_URL` | 可空 | qdrant-dev | qdrant-stg | qdrant-prod | 向量 |
+| `ASTRALPATH_FEATURE_MICRO_LESSON` | true | true | true | true | 微课开关 |
+| `ASTRALPATH_FEATURE_SPACED_REVIEW` | true | true | true | true | 复习开关 |
+| `ASTRALPATH_FEATURE_LAB` | true | true | false | false | 实验台仅非生产 |
 
 ### §42.3 Helm values 摘录（staging/prod）
 
@@ -19463,10 +19465,10 @@ services:
   gateway:
     build: ./src/AstralPath.Gateway
     environment:
-      ZZ_ENV: local
-      ZZ_LLM_MODE: template
-      ZZ_CONSENT_FAIL_MODE: closed
-      ZZ_PEER_ENABLED: "false"
+      ASTRALPATH_ENV: local
+      ASTRALPATH_LLM_MODE: template
+      ASTRALPATH_CONSENT_FAIL_MODE: closed
+      ASTRALPATH_PEER_ENABLED: "false"
     ports: ["8080:8080"]
     depends_on: [postgres, redis, nats]
 ```
@@ -19486,9 +19488,9 @@ services:
 ### §42.6 环境差异检查单（发布前）
 
 ```text
-[ ] prod ZZ_PEER_ENABLED=false
-[ ] prod ZZ_FORECAST_SHOW_PROB=false
-[ ] prod ZZ_CONSENT_FAIL_MODE=closed
+[ ] prod ASTRALPATH_PEER_ENABLED=false
+[ ] prod ASTRALPATH_FORECAST_SHOW_PROB=false
+[ ] prod ASTRALPATH_CONSENT_FAIL_MODE=closed
 [ ] prod TLS 证书有效
 [ ] 备份任务最近成功时间 < 24h
 [ ] 金样 CI 在 staging 通过
@@ -28536,7 +28538,7 @@ $checks = @(
   @{ Name = 'runbook'; Test = { $content -match 'RB-CONSENT' } },
   @{ Name = 'stride'; Test = { $content -match 'STRIDE' } },
   @{ Name = 'xaml'; Test = { $content -match 'GraphPage.axaml' } },
-  @{ Name = 'config_matrix'; Test = { $content -match 'ZZ_CONSENT_FAIL_MODE' } },
+  @{ Name = 'config_matrix'; Test = { $content -match 'ASTRALPATH_CONSENT_FAIL_MODE' } },
   @{ Name = 'synth_v4'; Test = { $content -match 'synth-30-v4' } },
   @{ Name = 'version_stamp'; Test = { $content -match 'contract-v1.2.0-skills-enhanced' } },
   @{ Name = 'baseline_k1k5'; Test = { $content -match 'K1–K5' } },
@@ -30004,3 +30006,517 @@ Skills 落地复核：
     Ω.4 疑似补页章节清单（建议人工复核）  `L28642`
     Ω.5 全文标题速查（缩进大纲）  `L28646`
 
+---
+
+# 工程现状与完美复刻篇（§29–§33 · 2026-09-25 对齐版）
+
+> 本篇是**全项目的"还原说明书"**。前面 §0–§28 是契约与设计，本篇回答一个问题：
+> **"我手上什么都没有，怎么把它一模一样做出来？"**
+> 零基础读者建议按顺序读完 §29 → §30 → §33，再按自己岗位回到对应章节。
+
+---
+
+## §29 工程现状快照（复刻前必读）
+
+### 29.1 基线事实（已实测，可核验）
+
+| 项 | 实测值 | 核验方式 |
+|---|---|---|
+| 当前版本 | **2.2.0** | `git log --oneline -1` → `知识图谱+OCR 工具链与 13 本 PDF 思维导图产物` |
+| 分支 | `main`（另有 `chore/naming-and-agent-kb-profile`） | `git branch -a` |
+| 工作区状态 | 干净 | `git status --short` |
+| .NET SDK | **10.0.401** | `dotnet --version` |
+| 解决方案 | `AstralPath.slnx` | 根目录 |
+| 测试总数 | **121 项全绿** | 见 29.4 |
+| 知识图包 | **34 节点 / 74 边**（会计 12 / Python 10 / DL 12；prerequisite 50 + transfer_gap 24） | `python -c "import json;g=json.load(open('graph-packs/astralpath-v2/graph_pack.json',encoding='utf-8'));print(len(g['nodes']),len(g['edges']))"` |
+| 题库 | **100 题**（choice 4 选 1；难度 1:21 / 2:51 / 3:28；覆盖 34 个 kp） | `python -c "..."` |
+| 单体版 HTML | `deploy/monolith-web/index.html`，**73,504 字节**，标题「单体版 2.2（无微服务）」 | `ls -la` |
+
+### 29.2 提交历史主线（复刻顺序参考）
+
+```text
+e6fec3e Initial commit
+efa9425 统一项目命名并补齐 §44/§45/§46 接口
+772cd41 补齐 §19 十个扩展服务与 §20 数据库 DDL
+e698c7a 实现 Avalonia 双端客户端 UI（§11–§17）
+09e7321 契约调整：统一响应封装下沉到 Contracts
+a798924 新增持久化层：PostgreSQL + pgvector + RRF 混合检索
+f74cf8d 微服务拆分（§19.11）：十个扩展服务拆为独立进程/容器
+1ab89fd K8s 部署清单、混沌演练与可观测性（§23–§25）
+5f63054 深度解析：OCR 入图、章节出题、智能体/画像 UI
+61d96a0 v1.3.0 全量同步 + Web 同构桌面安装包
+bc3b5c3 Android APK 与滚动性能优化
+bff43e7 Android 发布版签名 APK
+319b653 修复真机「API 不可用」根因（服务器地址可配置）
+7d164f3 补齐工作区剩余源码，阻止构建产物入库
+c4aabd8 v1.4.0：智能体接真学情、OCR/图谱增强
+384b198 启动预热 + 修复多文件上传 500（1.4.1）
+0cf043a 稳定性加固 + 手机版独立运行 + 应用图标（1.5.0）
+c340e6e 深度优化核心算法 + 移动端离线工程（score/impact/图谱/OCR/画像 v2）
+5a6f1dd 无微服务单体版（Web HTML + Windows EXE）
+0efc118 更新 README 至 2.0.0-algo-v2
+bc7f933 发布 2.1.0 无微服务三端安装包
+e8f74d7 修复 2.2.0：解析→构图→识网全链路、藏书阁/智能体回归、三端包
+ed74f8c 知识图谱+OCR 工具链与 13 本 PDF 思维导图产物   ← HEAD
+```
+
+### 29.3 三端 HTML 现状（**重要：当前并非全部同源**）
+
+| 文件 | 大小 | md5 | 说明 |
+|---|---:|---|---|
+| `deploy/monolith-web/index.html` | 73,504 | `8e368b1ebd0aa11fa1a32094cbb38277` | ★ 单体版事实源（无微服务，2.2） |
+| `src/AstralPath.Native/app/src/main/assets/www/index.html` | 73,504 | `8e368b1ebd0aa11fa1a32094cbb38277` | ✅ 与单体版同源（安卓壳） |
+| `src/AstralPath.Api/wwwroot/index.html` | 163,153 | `e01934a8a6a4a236c69077ef5d999435` | 全功能 Web 版（依赖 API，2.0 系） |
+| `src/AstralPath.Mobile.Offline/index.html` | 163,292 | `74cb174638838665c967fa0f0b5be3b7` | 移动端离线版（2.0 系） |
+| `src/AstralPath.Android/app/src/main/assets/www/index.html` | 150,825 | — | 旧安卓工程（1.3 系，已由 Native 取代） |
+
+> ⚠️ **已知待办 #1**：`src/AstralPath.Monolith/Resources/index.html` 需与单体版同源。
+> 发布流程（见 §32.3）必须先复制再打包。
+
+### 29.4 测试现状（**121 项全绿**，2026-09-25 实测）
+
+| 测试项目 | 通过 | 耗时 | 命令 |
+|---|---:|---|---|
+| `AstralPath.Core.Tests` | **11** | ~31 s | `dotnet test tests/AstralPath.Core.Tests -c Release` |
+| `AstralPath.Persistence.Tests` | **8** | ~52 ms | `dotnet test tests/AstralPath.Persistence.Tests -c Release` |
+| `AstralPath.Desktop.Tests` | **47** | ~1 s | `dotnet test tests/AstralPath.Desktop.Tests -c Release` |
+| `AstralPath.Api.Tests` | **53** | ~10 s | `dotnet test tests/AstralPath.Api.Tests -c Release` |
+| `AstralPath.Eval.Tests` | **2** | ~72 ms | `dotnet test tests/AstralPath.Eval.Tests -c Release` |
+
+> ⚠️ **注意**：`dotnet test` 一次只能接**一个**项目。写成一条命令接五个会报 `MSB1008: 只能指定一个项目`。
+
+### 29.5 一致性核查清单（2026-09-25 已逐项处理）
+
+| # | 问题 | 状态 | 处理方式 |
+|---:|---|:--:|---|
+| 1 | README 版本号写 `2.0.0-algo-v2`，实际 `2.2.0` | ✅ 已修 | README 第 5 行改为 `2.2.0`（contract-v2.2.0-algo-v2） |
+| 2 | 单体壳 HTML 是否同步 | ✅ 无需修 | 实测 `deploy/monolith-web/index.html` 与 `src/AstralPath.Monolith/Resources/index.html` **md5 已一致**；且 HTML 内零 `fetch`，完全自包含，无需额外 json 副本 |
+| 3 | badge 出现黄色 | ✅ 已修 | `renderMats()` 中 `const cls=st==="error"?"err":""`，ready / partial 均走默认绿，仅 error 用红。已同步三端并复验 md5 |
+| 4 | 金样为 v1 口径 | ⚠️ 有意保留 | `eval/golden/*.json` 用 0–100 制（v1 契约）；产品用 v2（0–1 制）。**勿用 v2 覆盖金样**，新增 v2 金样另开文件 |
+| 5 | README 测试数表述 | ✅ 正确 | Core 11 · Persistence 8 · Desktop 47 · API 53 · Eval 2 = 121 |
+| 6 | 旧安卓工程残留 | ⚠️ 保留 | `src/AstralPath.Android/`（1.3 系）作历史参考，新包走 `AstralPath.Native` |
+| 7 | 主方案版本口径 | ✅ 已修 | 改为 `contract-v2.2.0-algo-v2` |
+| 8 | JS `K` 常量与 C# 常量需人工签字 | ✅ 自动化 | 新增 `scripts/verify_constants.py`，26 项自动比对（21 项直映射 + 3 项语义 + 2 项附加），已 **ALL GREEN**；并接入 `scripts/verify_all.ps1` |
+| 9 | 命名扫描误报 26 处 | ✅ 已修 | 验收清单里"全仓搜 知债图 → 零命中"这类**自指引用**被误判为残留。给 `naming_consistency.py` 增加 `DETECTION_CONTEXT` 判定层，82 → 56 |
+| 10 | §K.8 / §22.2 仍用旧环境变量前缀 `ZZ_*` | ✅ 已修 | 实测 **源码零使用 `ZZ_`**（代码已用 `ASTRALPATH_*`），属文档滞后。纯文档替换 57 处 `ZZ_` → `ASTRALPATH_`、2 处 `zz.event.>` → `astralpath.event.>`。残留 **82 → 0** |
+
+> **当前门禁状态**：`powershell -File scripts\verify_all.ps1` → **ALL GREEN**（退出码 0）
+> 覆盖：常量对齐 26 项 · 5 个测试项目 121 项 · 三端 md5 同源 · 命名残留 0 · （图包/题库校验待 P3 交付 `verify_graph.py` / `verify_bank.py`，当前 `[SKIP]`）
+
+### 29.6 常量对齐校验（替代人工签字）
+
+```powershell
+python scripts/verify_constants.py
+# ALL GREEN · 26 项全部对齐（容差 1e-09）
+```
+
+校验内容（JS `K` 对象 ↔ `FormulaConstants.cs`）：
+
+| 类别 | 项数 | 内容 |
+|---|---:|---|
+| 直映射 | 21 | `W.e/W.r/W.p`、`floor`、`stab0`、`a`、`b`、`mix`、`impactBase`、`crossTg`、`pg`、`cg`、`steep`、`hit`、`cas`、`vol`、`saleBar`、`saleAcc`、`saleConf`、`saleStreak`、`saleMinAtt` |
+| 语义映射 | 3 | `ConfScale=5`（JS `clamp01(conf/5)`）、`PriorSuccess=0.5`（JS `(s+0.5)/(n+1)`）、`DefaultHorizonDays=14`（JS `Math.min(14, day+1)`） |
+| 附加 | 2 | `SpacingOffsets=[0,2,6]`（JS `const offs=[0,2,6]`）、公式版本 `score-v2`（JS `scoreV2`） |
+
+> 新版 `index.html` 发布后**必须先跑这条命令**，再执行 §32.3 的三端同步。
+
+---
+
+## §30 逐文件复刻清单
+
+> **用法**：从上到下逐项还原。标 ★ 的是"少了项目就跑不起来"的必需项。
+
+### 30.1 根目录
+
+| 文件 | 作用 | 必需 |
+|---|---|:--:|
+| `AstralPath.slnx` | 解决方案入口 | ★ |
+| `Directory.Build.props` | 统一编译属性（net10.0、Nullable、中文注释） | ★ |
+| `NuGet.Config` | 包源配置 | ★ |
+| `.gitignore` | 排除 `bin/` `obj/` 与构建产物 | ★ |
+| `.gitattributes` | 换行与编码 | |
+| `LICENSE` | 开源许可 | |
+| `README.md` | 项目门面（**版本号需同步为 2.2.0**） | ★ |
+
+### 30.2 `src/AstralPath.Core/`（纯函数库 · 2,432 行）
+
+| 文件 | 行数 | 作用 | 必需 |
+|---|---:|---|:--:|
+| `Formula/FormulaConstants.cs` | 72 | v2 常量唯一事实源（冻结） | ★ |
+| `Formula/FormulaWeights.cs` | 36 | v1 权重（金样契约用） | ★ |
+| `Models/Primitives.cs` | 77 | 基础记录类型 | ★ |
+| `Algorithms/MasteryCalculator.cs` | 104 | score-v2 | ★ |
+| `Algorithms/DebtScanner.cs` | 140 | impact-v2 + v1 兼容 | ★ |
+| `Algorithms/SaleStateMachine.cs` | 89 | sale-v2（唯一可写 Cleared） | ★ |
+| `Algorithms/PlannerBuilder.cs` | 64 | 14 天计划（0/2/6 间隔） | ★ |
+| `Algorithms/QuestionScheduler.cs` | 44 | 自适应选题 | ★ |
+| `Algorithms/GraphTopology.cs` | 169 | 拓扑/分层/关键路径/瓶颈 | ★ |
+| `Algorithms/ScoreCalculator.cs` | 45 | v1 score（金样） | ★ |
+| `Algorithms/WeightProjector.cs` | 26 | W_debt 投影 | |
+| `Algorithms/CoachRules.cs` | 40 | 教练自适应 | |
+| `Algorithms/IngestHealth.cs` | 65 | 接入体检 | |
+| `Graph/WeightedKg.cs` | 37 | 加权图容器 | ★ |
+| `Graph/GraphInference.cs` | 170 | TextRank + PMI + 依赖句式 | ★ |
+| `Graph/GraphLayout.cs` | 86 | 分层布局 + 交叉计数 | ★ |
+| `Graph/GraphMetrics.cs` | 53 | PageRank / 度 / 密度 / Hub | |
+| `Graph/LearningPath.cs` | 42 | 学习路径排序 | |
+| `Graph/AstralPathModules.cs` | 188 | 图模块装配 | |
+| `Ocr/OcrTextEngine.cs` | 236 | OCR v2 清洗 | ★ |
+| `Ocr/ReadingOrder.cs` | 75 | XY-cut 两栏阅读顺序 | ★ |
+| `Profiling/UserProfiler.cs` | 195 | Brier / 五轴 / k-匿名 | ★ |
+| `Agent/AgentRouter.cs` | 285 | 意图路由 + 危机优先 | ★ |
+| `Narrative/NarrativeGuard.cs` | 94 | 禁词门禁 + 槽位校验 | ★ |
+| `Extensions/ExtensionServices.cs` | — | 扩展服务装配 | |
+
+### 30.3 `src/AstralPath.Api/`（服务端）
+
+| 文件 | 作用 | 必需 |
+|---|---|:--:|
+| `Program.cs` / `ApiBootstrapper.cs` | 启动与预热（启动时预热全部服务） | ★ |
+| `Controllers/StudentsController.cs` | 接入成绩 / 诊断 / graph-view / mastery | ★ |
+| `Controllers/MaterialsController.cs` | 上传 / 解析 / 建图 / 章节 / 真题（26 个路由） | ★ |
+| `Controllers/PlansController.cs` | 计划生成 / 查询 / rebalance | ★ |
+| `Controllers/CoachProgressController.cs` | 今日任务 / 答题 / 销账检查 / demo 推进 | ★ |
+| `Controllers/AuthController.cs` | 注册 / 登录 / 资料今日 | ★ |
+| `Controllers/TeacherConsentGraphController.cs` | 教师热点 / 授权 | ★ |
+| `Controllers/AgentKbProfileController.cs` | 智能体 + 知识库 + 画像（30 个路由） | ★ |
+| `wwwroot/index.html` | 全功能 Web UI（163 KB） | ★ |
+| `wwwroot/graph_pack.json` / `question_bank.json` | 数据副本 | ★ |
+
+### 30.4 客户端工程
+
+| 工程 | 作用 | 关键文件 |
+|---|---|---|
+| `src/AstralPath.Desktop/` | Avalonia/WinForms 桌面端 | `App.axaml.cs`、`Views/MainWindow.axaml.cs`、`Demo/DemoRunner.cs` |
+| `src/AstralPath.Monolith/` | 无微服务 Windows 壳 | `Program.cs`（WebView2，1280×840）、`setup-monolith.iss` |
+| `src/AstralPath.Native/` | 安卓 WebView 壳（Kotlin） | `MainActivity.kt`、`app/build.gradle.kts`、`assets/www/index.html` |
+| `src/AstralPath.AndroidApp/` | .NET for Android 形态 | `MainActivity.cs`、`EmbeddedWebApi.cs` |
+| `src/AstralPath.Mobile.Offline/` | Avalonia + SQLite 离线单体 | `Views/RootView.cs`、`Services/LocalServices.cs`、`Assets/` |
+| `src/AstralPath.Shared/` | 12 个 axaml 页 + ViewModel | `Views/*.axaml`、`ViewModels/*.cs`、`Controls/GraphCanvas.cs` |
+
+### 30.5 `services/`（10 个微服务，微服务形态可选）
+
+`concept-diffusion-svc` · `exam-impact-svc` · `knowledge-forecast-svc` · `lab-bench-svc` · `learning-velocity-svc` · `micro-lesson-svc` · `peer-cohort-svc` · `prerequisite-simulator-svc` · `spaced-review-svc` · `study-group-svc`
+每个均为：`Program.cs` + `appsettings.json` + `*.csproj`（独立进程/容器）。
+
+### 30.6 数据与评测
+
+| 路径 | 内容 | 必需 |
+|---|---|:--:|
+| `graph-packs/astralpath-v2/graph_pack.json` | 34 / 74 | ★ |
+| `graph-packs/accounting-v1/{meta,nodes,edges}.json` | 旧版会计图包 | 保留 |
+| `eval/question_bank.json` | 100 题 | ★ |
+| `eval/golden/{score,impact,plan_k,sale,narrative}.json` | 5 个金样 | ★ |
+| `eval/textbook-questions.json` | 教材题 | |
+| `eval/README.md`、`eval/naming-residual-scan.md` | 说明与扫描结果 | |
+
+### 30.7 工具链 `tools/` 与 `scripts/`（4,291 行）
+
+| 文件 | 行数 | 作用 |
+|---|---:|---|
+| `tools/ocr_pipeline.py` | 1027 | OCR 主流程 |
+| `tools/ocr_pipeline_umi.py` | 589 | UMI-OCR 适配 |
+| `tools/kg_algorithm.py` | 837 | 章节层级 + 术语加权 + 五种边 + DAG 收尾 |
+| `tools/kg_builder.py` | 396 | AC 自动机 + 并查集 + TextRank/PMI + 思维导图导出 |
+| `tools/deep_chapters.py` | 446 | 深度章节切分 |
+| `tools/deep_test_13pdfs.py` | 127 | 13 本 PDF 端到端 |
+| `tools/kg_deep_test_13.py` | 77 | 13 本批量构图 |
+| `tools/ocr_scanned_batch.py` | 72 | 扫描版批量 OCR |
+| `scripts/deep_test_all_pdfs.py` | 235 | 全量 PDF 测试（Windows 推荐） |
+| `scripts/verify_constants.py` | — | **常量对齐校验**：JS `K` ↔ C# `FormulaConstants`，26 项，替代人工签字 |
+| `scripts/verify_all.ps1` | — | **一键验收**：常量 → 图包 → 题库 → 5 个测试项目 → 三端 md5 → 命名扫描，末行 ALL GREEN |
+| `scripts/naming_consistency.py` | 217 | 命名规范扫描 |
+| `scripts/test_microservices.py` | 143 | 微服务冒烟 |
+| `scripts/materials_upload.py` | 125 | 大文件上传器（绕过 curl 限制） |
+| `scripts/smoke_all_endpoints.sh` | — | 全端点冒烟 |
+| `scripts/build-microservices.sh` / `test-microservices.ps1` | — | 构建与测试 |
+| `scripts/materials-13pdf-test.sh` | — | 13 本 PDF 测试（Shell 版） |
+
+### 30.8 部署 `deploy/`
+
+| 路径 | 内容 |
+|---|---|
+| `monolith-web/` | `index.html` + `graph_pack.json` + `question_bank.json` + `启动-知债单体版.bat` |
+| `win-install/` | `AstralPath-Setup/`（全功能 API 包）、`setup.iss`、`setup-desktop.iss`、`publish-api/`、`publish-desktop/` |
+| `win-install/dist/` | `AstralPath-Monolith-Setup-{2.0.0,2.1.0,2.2.0}.exe`、`AstralPath-Setup-1.{3,4,4.1,5}.0-Desktop.exe` |
+| `k8s/` | 00-namespace-and-config / 05-api / 10-postgres / 20-*-svc ×10 / 90-ingress / 95-autoscaling |
+| `docker-compose.microservices.yml` | 微服务一键起 |
+| `sql/001_init.sql` | PostgreSQL 全量 DDL |
+| `observability/` | otel-collector.yaml、prometheus-rules.yaml |
+| `chaos/` | db-outage.sh、pod-kill.sh |
+| `icons/` | 全套图标（16→1024 + .ico + 安卓 mipmap） |
+| `RUNBOOK.md` | 运维手册 |
+
+### 30.9 文档 `docs/`
+
+| 文件 | 说明 |
+|---|---|
+| `03-知债星穹学途-合并版(TDS+最终版技术方案).md` | 本文件（§0–§33） |
+| `知债星穹学途-四人团队分工方案.md` | **v3.0.0 零基础通俗版** |
+| `附录-四人分工详细矩阵(RACI-模块-风险)-v2.1.0.md` | RACI / 模块治理 / 风险（详细附录） |
+| `vibe-prompts/提示词-P{1,2,3,4}-*.md` | 四人 vibe coding 提示词（v3） |
+| `新手使用指南与功能介绍.{md,html}` | 给评委/新人的操作指南 |
+| `项目方案-v4-可复刻.html` | 网页版方案 |
+| `Android-构建与签名说明.md` / `Android-测试报告.md` | 安卓侧 |
+| `materials-13pdf-测试报告.md` / `-results.tsv` | 13 本 PDF 报告 |
+| `kg-deep-test/`（仓库根） | 13 份 `.mindmap.json` + `.mindmap.md` + `kg_report.json` |
+
+---
+
+## §31 知识图谱与 OCR 工具链
+
+### 31.1 流水线
+
+```text
+PDF/图片
+  │
+  ├─ 文本层可用 → 直接抽取（优先，快）
+  └─ 扫描版     → ocr_pipeline.py（预处理 → 三 PSM 投票 → TSV 置信度 → 阅读顺序）→ .ocr.txt
+  │
+  ▼
+deep_chapters.py / kg_algorithm.py
+  ① 章节层级解析：第N章 / N.x.x 小节 → parent-child
+  ② 术语抽取：TF × 位置加权，过滤 STOP_TERMS（英文停用词 + ptpress/com.cn/isbn/copyright 等出版噪声）
+  ③ 五种边生成：
+     - 章节时序链（顺序先修）
+     - 小节 → 所属章节（前缀匹配）
+     - 术语 → 首次出现的章节/小节（仅单向，防环）
+     - 同章术语共现（窗口共现，边权=共现强度，仅早期→后期，防环）
+     - transfer_gap（跨章节迁移缺口）
+  ④ DAG 收尾：拓扑排序，删除会造成环的边
+  ⑤ 输出 level / layer 元数据（前端分层布局用）
+  │
+  ▼
+kg_builder.py
+  ① AC 自动机实体抽取（对齐 kg_opt.AhoCorasick）
+  ② 实体链接 / 并查集融合（bounded_levenshtein）
+  ③ TextRank + PMI 构图（对齐 AstralPath.Core.GraphInference）
+  ④ 思维导图树 + Markdown 导出（simple-mind-map 兼容）
+```
+
+### 31.2 关键算法参数（复刻必须一致）
+
+| 参数 | 值 | 位置 |
+|---|---|---|
+| TextRank 窗口 | 5（构图时共现窗口 8） | `GraphInference.TextRank(window=5)` / `BuildFromText` 内 `window=8` |
+| TextRank 迭代 / 阻尼 | 30 / 0.85 | `GraphInference` |
+| 共现权重 | `1/(j-i)`（近距更高） | `GraphInference.TextRank` |
+| PMI 阈值 | 1.0 | `BuildFromText(pmiThreshold=1.0)` |
+| PMI 公式 | `max(0, log2(co×total/(a×b)))` | `GraphInference.Pmi` |
+| 最大概念数 | 24 | `BuildFromText(maxConcepts=24)` |
+| 依赖句式正则 | `(基于\|先学\|掌握\|了解)?X(后\|之后\|再\|然后\|才能\|才能理解)Y` | `DependencyPatterns` |
+| 边权（PMI 转） | `min(pmi/6, 2.0)`，confidence `min(pmi/8, 1.0)` | `BuildFromText` |
+| 依赖句式边 | `weight=1.3, confidence=0.9` | `BuildFromText` |
+| 章节 backbone | `weight=0.8, confidence=0.7` | `BuildFromText` |
+| 学习路径排序 | `2.5×block + 1.5×critical + layer + pagerank` | `LearningPath.Order` |
+
+### 31.3 13 本教材基线（复刻目标值）
+
+| # | 书名 | 体积(MB) | 页数 | 字符数 | 节点 | 边 | 耗时(s) | OCR |
+|---:|---|---:|---:|---:|---:|---:|---:|---|
+| 1 | 深度学习入门4：强化学习 | 87.1 | 333 | 51,996 | 46 | 52 | 32 | false |
+| 2 | C#从入门到精通（第7版） | 32.2 | 868 | 269,709 | 253 | 272 | 27 | false |
+| 3 | 深度学习进阶：自然语言处理 | 7.9 | 427 | 279,277 | 200 | 219 | 23 | false |
+| 4 | 黄仁勋：英伟达之芯 | 8.3 | 201 | 224,004 | 58 | 64 | 26 | false |
+| 5 | Java从入门到精通（第6版） | 51.3 | 775 | 270,715 | 251 | 270 | 52 | false |
+| 6 | DeepLearning-Goodfellow-花书 | 30.8 | 738 | 782,261 | 248 | 251 | 36 | false |
+| 7 | 深度学习（花书中译） | 30.8 | 738 | 782,261 | 248 | 251 | 36 | false |
+| 8 | Python编程：从入门到实践（第3版） | 5.8 | 732 | 467,326 | 248 | 255 | 20 | false |
+| 9 | 深度学习入门：基于Python的理论与实现 | 10.7 | 314 | 209,515 | 213 | 222 | 22 | false |
+| 10 | Kotlin编程实践：Kotlin从入门到实战 | 13.9 | 294 | 177,556 | 124 | 134 | 29 | false |
+| 11 | Go语言从入门到精通 | 120.4 | 506 | 140,004 | 247 | 258 | 23 | false |
+| 12 | 大模型应用开发：动手做 AI Agent | 63.7 | 290 | 22,179 | 154 | 173 | 161 | **true** |
+| 13 | 深度学习入门2：自制框架（扫描版） | 77.1 | 504 | 338,429 | 229 | 241 | 71 | false |
+
+**合计**：6,720 页 / 4,015,232 字符 / 2,519 节点 / 2,662 边 / 78 任务 / 96 真题 / 558 秒 / **13 本全部 status=ready**
+
+### 31.4 思维导图产物格式
+
+```json
+{
+  "data": { "text": "Kotlin编程实践", "expand": true },
+  "children": [
+    { "data": { "text": "安装并运行Kotlin", "expand": true },
+      "children": [ { "data": { "text": "Kotlin", "expand": true }, "children": [] } ] }
+  ]
+}
+```
+`kg_report.json` 为 13 条数组：
+```json
+{ "name": "Kotlin编程实践", "file": "…pdf.txt", "exists": true,
+  "nodes": 40, "edges": 135, "chapters": 13, "terms": 27, "ok": true,
+  "sample_nodes": ["安装并运行Kotlin", "Kotlin基础", "…"] }
+```
+
+---
+
+## §32 三端构建与发布（可直接照抄的命令）
+
+### 32.1 单体版 Web（零依赖）
+
+```powershell
+# 直接双击
+start "" deploy\monolith-web\index.html
+# 或用启动脚本
+deploy\monolith-web\启动-知债单体版.bat
+```
+
+### 32.2 Android APK
+
+```powershell
+$env:JAVA_HOME = "C:\Temp\jdk-17"                      # 路径必须纯 ASCII
+& "C:\Gradle\bin\gradle.bat" -p src\AstralPath.Native assembleRelease
+# → src/AstralPath.Native/app/build/outputs/apk/release/app-release.apk
+# → 重命名 dist/AstralPath-WebUI-2.2.0.apk
+```
+- `applicationId = com.astralpath.app.v22`，`minSdk 26`，`targetSdk 35`，`versionCode 32`，`versionName 2.2.0`
+- 签名：`astralpath-release.keystore`（alias `astralpath`）
+- 依赖：`androidx.core:core-ktx:1.15.0`、`androidx.appcompat:appcompat:1.7.0`、`androidx.webkit:webkit:1.12.1`
+
+### 32.3 Windows 单体安装包（**先同步 HTML 再打包**）
+
+```powershell
+# 步骤 1：同步（必须）
+Copy-Item deploy\monolith-web\index.html src\AstralPath.Monolith\Resources\index.html -Force
+Copy-Item deploy\monolith-web\graph_pack.json src\AstralPath.Monolith\Resources\ -Force
+Copy-Item deploy\monolith-web\question_bank.json src\AstralPath.Monolith\Resources\ -Force
+
+# 步骤 2：发布
+dotnet publish src\AstralPath.Monolith -c Release -r win-x64 --self-contained -o src\AstralPath.Monolith\publish
+
+# 步骤 3：打包
+& "C:\Program Files\Inno Setup 7\ISCC.exe" src\AstralPath.Monolith\setup-monolith.iss
+# → deploy\win-install\dist\AstralPath-Monolith-Setup-2.2.0.exe
+```
+
+### 32.4 全功能 API 版（可选）
+
+```powershell
+dotnet run --project src\AstralPath.Api --urls http://127.0.0.1:5190
+# 持久化默认 PostgreSQL；连接串用 Persistence__ConnectionString 覆盖
+# 连不上且 AllowMemoryFallback=true 时降级 memory
+```
+
+### 32.5 三端同源校验（**每次发布必做**）
+
+```powershell
+md5sum deploy\monolith-web\index.html `
+       src\AstralPath.Native\app\src\main\assets\www\index.html `
+       src\AstralPath.Monolith\Resources\index.html
+# 三个 md5 必须完全相同
+```
+
+---
+
+## §33 完美复刻验收清单
+
+> **按顺序做完这 9 步，才算"还原成功"。** 每一步都有可执行的核验命令。
+
+### 步骤 1 · 代码可编译
+
+```powershell
+dotnet build AstralPath.slnx -c Release
+```
+- [ ] 零 error、零 warning（或 warning 已在基线内）
+
+### 步骤 2 · 121 项测试全绿
+
+```powershell
+dotnet test tests/AstralPath.Core.Tests -c Release          # 11
+dotnet test tests/AstralPath.Persistence.Tests -c Release    # 8
+dotnet test tests/AstralPath.Desktop.Tests -c Release        # 47
+dotnet test tests/AstralPath.Api.Tests -c Release            # 53
+dotnet test tests/AstralPath.Eval.Tests -c Release           # 2
+```
+- [ ] 五项合计 **121/121**，零失败零跳过
+
+### 步骤 3 · 数据资产到位
+
+```powershell
+python -c "import json;g=json.load(open('graph-packs/astralpath-v2/graph_pack.json',encoding='utf-8'));print(len(g['nodes']),len(g['edges']))"
+python -c "import json;q=json.load(open('eval/question_bank.json',encoding='utf-8'));print(len(q),len({x['kp_id'] for x in q}))"
+```
+- [ ] 图包 34 / 74 且无环
+- [ ] 题库 100 题且覆盖 34 个 kp
+- [ ] `eval/golden/` 五个 JSON 均可被 C# 加载
+
+### 步骤 4 · 常量三处一致（**有自动门禁**）
+
+```powershell
+python scripts/verify_constants.py     # 期望：ALL GREEN · 26 项全部对齐
+```
+
+| 位置 | 内容 |
+|---|---|
+| `src/AstralPath.Core/Formula/FormulaConstants.cs` | C# 常量（事实源） |
+| `deploy/monolith-web/index.html` 的 `const K={...}` | JS 常量（21 项直映射 + 3 项字面量） |
+| `src/AstralPath.Core/Formula/FormulaWeights.cs` 的 `BannedWords` | 禁词 |
+| `docs/copy/banned_words.json`（P1） | 禁词 |
+| `eval/golden/narrative.json` 的 `banned` | 禁词 |
+
+- [ ] `verify_constants.py` 输出 `ALL GREEN`（脚本已覆盖 21 项直映射，无需人工比对）
+- [ ] 三处禁词表内容一致（此项仍需人工核对）
+
+### 步骤 5 · 三端同源
+
+- [ ] `md5sum` 三个 HTML 一致
+- [ ] 安卓真机安装不闪退
+- [ ] Windows 安装包装上可启动
+
+### 步骤 6 · 功能走查（八个页面）
+
+| 页面 | 验收动作 | 期望 |
+|---|---|---|
+| 起点 | 打开即见四格统计 | 资料数/图谱数/任务数/债边数非零 |
+| 藏书阁 | 上传一份 PDF 或点「导入示例资料」 | status=ready，badge 绿 |
+| 识网 | 点图谱节点 | 显示节点详情；章节侧栏可翻 |
+| 知债 | 点「重新诊断」 | 出现红边列表，impact 6 位小数 |
+| 知债 | 点「生成 14 天计划」 | 出现 ≤14 天计划，每日 ≤40 分钟 |
+| 今日 | 点「开始练习」→ 拖信心 → 提交 | 记录一次 attempt |
+| 今日 | 连续两次达标 | 状态变「修复中」，累计 3 次后「已销账」 |
+| 智能体 | 输入危机词 | 只返回安抚句，零评价 |
+| 画像 | 点「关闭个性化画像」 | 立即停用 |
+| 账户 | 同意授权 / 导出数据 | 下载 JSON |
+
+### 步骤 7 · 离线可用
+
+- [ ] 断网后打开单体版，八个页面全部可用
+- [ ] 断网后安卓 APK 核心功能可用
+
+### 步骤 8 · 命名与伦理扫描
+
+```powershell
+python scripts/naming_consistency.py
+```
+- [ ] `知债图|ZhiZhaiTu|zhizhaitu|zz_` 零命中
+- [ ] `笨|废物|退学|处分|通报批评|留校察看|没救` 零命中（禁词表与金样反面样例除外）
+- [ ] `SaleStatus.Cleared` 的写入点只有 `SaleStateMachine`
+
+### 步骤 9 · 交付物齐备
+
+- [ ] `deploy/monolith-web/index.html`
+- [ ] `deploy/win-install/dist/AstralPath-Monolith-Setup-2.2.0.exe`
+- [ ] `src/AstralPath.Native/dist/AstralPath-WebUI-2.2.0.apk`
+- [ ] `graph-packs/astralpath-v2/graph_pack.json`
+- [ ] `eval/question_bank.json`
+- [ ] `kg-deep-test/` 13 份思维导图
+- [ ] `docs/` 四份提示词 + 分工方案 + 测试报告
+- [ ] README 版本号 = 2.2.0
+
+---
+
+## §33.10 复刻时的四个人分工（速查）
+
+| 角色 | 照着哪份文档做 | 主要产出 |
+|---|---|---|
+| P1 产品/伦理 | `docs/vibe-prompts/提示词-P1-产品与教育伦理.md` | 文案表、禁词表、隐私口径、演示稿 |
+| P2 算法/后端 | `docs/vibe-prompts/提示词-P2-算法与后端.md` | `AstralPath.Core`、`AstralPath.Api`、金样测试 |
+| P3 数据/评测 | `docs/vibe-prompts/提示词-P3-数据与评测.md` | 图包、题库、金样、`tools/`、验收脚本 |
+| P4 客户端/体验 | `docs/vibe-prompts/提示词-P4-客户端与体验.md` | `index.html`、安卓壳、Windows 安装包 |
+
+边界与交接详见 `docs/知债星穹学途-四人团队分工方案.md`（v3.0.0）；
+RACI 与模块治理详见 `docs/附录-四人分工详细矩阵(RACI-模块-风险)-v2.1.0.md`。
+
+---
+
+**本篇结束 · 复刻篇版本 `replication-v1.0`（2026-09-25）**

@@ -757,7 +757,7 @@ function renderMats(){
   const list=S.books||[];
   $("matList").innerHTML=list.length?list.map(m=>{
     const st=m.status==="ready"?"ready":m.status==="error"?"error":"partial";
-    const cls=st==="ready"?"":st==="error"?"err":"warn";
+    const cls=st==="error"?"err":""; // badge 全绿：ready / partial / parsing 均绿，仅 error 用红
     return '<div class="card '+(m.id===S.activeBookId?"active":"")+'" data-book="'+esc(m.id)+'"><div class="row" style="justify-content:space-between"><strong>'+esc(m.name)+'</strong><span class="badge '+cls+'">'+st+'</span></div><div class="hint">'+(m.chars||0)+' 字 · '+(m.nodes||[]).length+' 节点 · '+(m.edges||[]).length+' 边 · '+(m.chapters||[]).length+' 章 · '+esc(m.parseMode||"-")+'</div><div class="row" style="margin-top:8px"><button class="btn" data-view="'+esc(m.id)+'">查看详情</button><button class="btn primary" data-use="'+esc(m.id)+'">用此书识网</button><button class="btn danger" data-del="'+esc(m.id)+'">删除</button></div></div>';
   }).join(""):'<div class="empty">暂无资料。点「导入示例资料」，或上传 TXT/MD；PDF 请确保含文本层。</div>';
   $("matList").querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>showDetail(b.dataset.view));

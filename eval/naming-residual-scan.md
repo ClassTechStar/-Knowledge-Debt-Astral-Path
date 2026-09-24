@@ -3,7 +3,7 @@
 > 规范全称：**知债：星穹学途（Knowledge Debt: Astral Path）**
 > 规范中文简称：**知债：星穹学途**
 > 规范英文标识：**AstralPath**
-> 扫描根目录：`C:\Users\18948\XiaomiMiMoProjects\Knowledge Debt Astral Path`
+> 扫描根目录：`C:\Users\18948\Documents\GitHub\-Knowledge-Debt-Astral-Path`
 > 扫描范围：文本类文件（跳过 bin/obj/.git/ocr-venv/tessdata/node_modules）
 > **结论：残留总数 = 0**（验收标准：0）
 
