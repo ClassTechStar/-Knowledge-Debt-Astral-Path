@@ -53,6 +53,12 @@ public sealed class MaterialsController : ControllerBase
             object payload = list.Count == 1 ? list[0] : list;
             return HttpResults.Created(payload);
         }
+        catch (Exception ex) when (ex is BadHttpRequestException or InvalidDataException or IOException)
+        {
+            return HttpResults.Fail(400, ErrorCodes.ValidationError,
+                string.IsNullOrWhiteSpace(ex.Message) ? "表单无效或文件读取失败" : ex.Message,
+                new { hint = "请检查 multipart 字段名 file/files 与文件是否为空" });
+        }
         catch (Exception ex)
         {
             return HttpResults.Fail(500, ErrorCodes.InternalError, $"保存上传失败：{ex.Message}",
@@ -74,6 +80,12 @@ public sealed class MaterialsController : ControllerBase
             if (list == null || list.Count == 0)
                 return HttpResults.Fail(400, ErrorCodes.ValidationError, "请至少上传一个资料文件（字段名 files）");
             return HttpResults.Created(new { count = list.Count, items = list });
+        }
+        catch (Exception ex) when (ex is BadHttpRequestException or InvalidDataException or IOException)
+        {
+            return HttpResults.Fail(400, ErrorCodes.ValidationError,
+                string.IsNullOrWhiteSpace(ex.Message) ? "表单无效或文件读取失败" : ex.Message,
+                new { hint = "请检查 multipart 字段名 files 与文件是否为空" });
         }
         catch (Exception ex)
         {
@@ -372,7 +384,7 @@ public sealed class MaterialsController : ControllerBase
             inputs.Add((edge.From, edge.To, fromName, toName, Math.Round(scoreP, 1), Math.Round(scoreC, 1), freq, 0, edge.Weight));
         }
 
-        var scanned = Core.Algorithms.DebtScanner.Scan(inputs, 8);
+        var scanned = Core.Algorithms.DebtScannerV1.Scan(inputs, 8);
         return HttpResults.Success(new
         {
             studentId,

@@ -1,28 +1,22 @@
-using AstralPath.Core.Formula;
+using AstralPath.Core.Planner;
 
 namespace AstralPath.Core.Algorithms;
 
 /// <summary>
-/// 计划生成 v2：拓扑约束 + 间隔重复（0/2/6 天三遍）+ 影响优先背包。
-/// 输出仍满足 K1–K5，供 PlannerConstraintChecker 校验。
+/// 计划生成 v2：拓扑约束 + 间隔重复（0/2/6 天三遍）+ 影响优先。
+/// 输出满足 PlannerConstraintChecker（K1–K5）。
 /// </summary>
 public static class PlannerBuilder
 {
-    public sealed record DebtGoal(string FromKp, string ToKp, double Impact);
+    public sealed record DebtGoal(string FromKp, string ToKp, double Impact, string? FromName = null, string? ToName = null);
 
-    /// <summary>
-    /// 1) 按 impact 降序取债边；
-    /// 2) 先修 From 必须出现在 To 之前（K2）；
-    /// 3) 同一 KP 按 SpacingOffsets 在 horizon 内打三遍（K4 间隔≥1）；
-    /// 4) 每日预算内优先高 impact 的 core，再 challenge。
-    /// </summary>
-    public static IReadOnlyList<PlanItem> Build(
+    /// <summary>layer：core ≤25 分，challenge ≤15 分；同一 KP 间隔 ≥1 天。</summary>
+    public static IReadOnlyList<PlanItemInput> Build(
         IReadOnlyList<DebtGoal> debts,
-        IReadOnlyDictionary<string, string> titles,
-        int horizonDays = FormulaConstants.DefaultHorizonDays,
-        int dayBudget = PlannerConstraintChecker.DefaultDayBudgetMin)
+        int horizonDays = 14,
+        int dayBudget = 40)
     {
-        var items = new List<PlanItem>();
+        var items = new List<PlanItemInput>();
         var id = 1;
         var dayLoad = new int[horizonDays + 2];
         var lastDay = new Dictionary<string, int>(StringComparer.Ordinal);
@@ -30,39 +24,41 @@ public static class PlannerBuilder
         bool Fits(int day, int minutes)
             => day >= 1 && day <= horizonDays && dayLoad[day] + minutes <= dayBudget;
 
-        void Place(string kp, string layer, int minutes, int preferDay)
+        void Place(string kp, string name, string layer, int minutes, int preferDay, string? debtFrom, string? debtTo)
         {
-            var cap = layer == "core" ? PlannerConstraintChecker.CoreMinutesMax : PlannerConstraintChecker.ChallengeMinutesMax;
+            var cap = layer == "core" ? 25 : 15;
             minutes = Math.Min(minutes, cap);
-            // 在 preferDay 附近找最近合法日（满足 K4 ≥1 天间隔）
             for (var d = preferDay; d <= horizonDays; d++)
             {
                 if (lastDay.TryGetValue(kp, out var prev) && d - prev < 1) continue;
                 if (!Fits(d, minutes)) continue;
-                items.Add(new PlanItem(id++, d, kp, layer, minutes, "todo"));
+                var debtRef = debtFrom is null || debtTo is null
+                    ? Array.Empty<string>()
+                    : new[] { debtFrom, debtTo };
+                items.Add(new PlanItemInput(
+                    id.ToString(), kp, name, layer == "core" ? "drill" : "challenge",
+                    layer == "core" ? 2 : 3, minutes,
+                    $"巩固「{name}」", debtRef, debtFrom, "pending"));
                 dayLoad[d] += minutes;
                 lastDay[kp] = d;
+                id++;
                 return;
             }
         }
 
-        var ordered = debts.OrderByDescending(x => x.Impact).ToList();
-        foreach (var goal in ordered)
+        foreach (var goal in debts.OrderByDescending(x => x.Impact))
         {
-            // 三遍间隔：先修 / 目标 按 From→To 拓扑
-            var passes = FormulaConstants.SpacingOffsets;
-            for (var p = 0; p < passes.Length; p++)
+            var fromName = goal.FromName ?? goal.FromKp;
+            var toName = goal.ToName ?? goal.ToKp;
+            var offsets = new[] { 0, 2, 6 };
+            for (var p = 0; p < offsets.Length; p++)
             {
-                var day = 1 + passes[p];
-                var layerFrom = p == 0 ? "core" : "core";
-                var layerTo = p == 0 ? "challenge" : (p == 1 ? "core" : "challenge");
-                var minFrom = p == 0 ? 20 : 12;
-                var minTo = p == 0 ? 15 : 10;
-                Place(goal.FromKp, layerFrom, minFrom, day);
-                Place(goal.ToKp, layerTo, minTo, day + 1);
+                var day = 1 + offsets[p];
+                // 先修先练（K2）
+                Place(goal.FromKp, fromName, "core", p == 0 ? 20 : 12, day, goal.FromKp, goal.ToKp);
+                Place(goal.ToKp, toName, p == 0 ? "challenge" : "core", p == 0 ? 15 : 10, day + 1, goal.FromKp, goal.ToKp);
             }
         }
-
         return items;
     }
 }

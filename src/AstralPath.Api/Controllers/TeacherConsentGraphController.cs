@@ -164,7 +164,7 @@ public sealed class TeacherConsentGraphController : ControllerBase
             var days = request.OverrideDays ?? edge?.DaysSinceLastError ?? 0;
             var weight = edge?.Weight ?? 1.0;
 
-            var impact = DebtScanner.ComputeImpact(new ImpactInput(scoreFrom, scoreTo, freq, days, weight));
+            var impact = DebtScannerCompat.ComputeImpactV1(new ImpactInput(scoreFrom, scoreTo, freq, days, weight));
             var response = new WhatIfResponse(
                 Math.Round(scoreFrom, 6), Math.Round(scoreTo, 6), freq, days,
                 impact.Impact, impact.Detected, impact.Recency);

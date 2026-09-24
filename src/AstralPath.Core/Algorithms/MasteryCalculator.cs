@@ -19,6 +19,10 @@ public static class MasteryCalculator
 {
     public static double Clamp01(double v) => v < 0 ? 0 : (v > 1 ? 1 : v);
 
+    /// <summary>v1 兼容：recency = 0.75 + 0.25*exp(-ln2*age/21)</summary>
+    public static double Recency(double ageDays)
+        => 0.75 + 0.25 * Math.Exp(-Math.Log(2.0) * ageDays / FormulaConstants.RecencyHalfLifeDays);
+
     /// <summary>Sigmoid 用于平滑门限，避免 v1 的悬崖。</summary>
     public static double Sigmoid(double x) => 1.0 / (1.0 + Math.Exp(-x));
 

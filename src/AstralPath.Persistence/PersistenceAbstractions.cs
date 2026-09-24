@@ -18,11 +18,17 @@ public sealed class PersistenceOptions
 {
     public const string SectionName = "Persistence";
 
-    /// <summary>memory | postgres</summary>
-    public string Mode { get; set; } = "memory";
+    /// <summary>memory | postgres（生产默认 postgres）</summary>
+    public string Mode { get; set; } = "postgres";
 
-    /// <summary>PostgreSQL 连接串（postgres 模式必填）。</summary>
-    public string ConnectionString { get; set; } = "";
+    /// <summary>
+    /// PostgreSQL 连接串。默认本机库；可用环境变量 Persistence__ConnectionString 或
+    /// ASTRLPATH_CONN 覆盖。未配置时工厂自动回退 memory，保证演示/CI 可跑。
+    /// </summary>
+    public string ConnectionString { get; set; } =
+        Environment.GetEnvironmentVariable("ASTRLPATH_CONN")
+        ?? Environment.GetEnvironmentVariable("Persistence__ConnectionString")
+        ?? "Host=localhost;Port=5432;Database=astralpath;Username=astralpath;Password=astralpath";
 
     /// <summary>向量维度（须与 pgvector 列定义一致）。</summary>
     public int VectorDimensions { get; set; } = 1024;
@@ -37,6 +43,9 @@ public sealed class PersistenceOptions
     public int CommandTimeoutSeconds { get; set; } = 30;
 
     public bool IsPostgres => string.Equals(Mode, "postgres", StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>允许在无法连接时回退 memory（默认 true，演示友好；生产可关）。</summary>
+    public bool AllowMemoryFallback { get; set; } = true;
 }
 
 /// <summary>

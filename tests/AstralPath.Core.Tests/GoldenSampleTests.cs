@@ -58,7 +58,7 @@ public class GoldenSampleTests
         {
             var input = c.GetProperty("input");
             var expect = c.GetProperty("expect");
-            var actual = DebtScanner.ComputeImpact(new ImpactInput(
+            var actual = DebtScannerCompat.ComputeImpactV1(new ImpactInput(
                 input.GetProperty("score_p").GetDouble(),
                 input.GetProperty("score_c").GetDouble(),
                 input.GetProperty("freq").GetInt32(),
@@ -144,7 +144,7 @@ public class GoldenSampleTests
             {
                 history.Add(new SaleProbe(h.GetProperty("acc").GetDouble(), h.GetProperty("conf").GetInt32()));
             }
-            var actual = SaleStateMachine.IsSaleable(history);
+            var actual = SaleCompat.IsSaleable(history);
             var expect = c.GetProperty("expect");
             var id = c.GetProperty("id").GetString();
             Assert.Equal(expect.GetProperty("saleable").GetBoolean(), actual.Saleable);
@@ -182,9 +182,9 @@ public class GoldenSampleTests
     [Fact]
     public void SaleStateMachine_OnlyProgressCanWriteCleared()
     {
-        Assert.True(SaleStateMachine.CanWriteCleared("progress-svc"));
-        Assert.False(SaleStateMachine.CanWriteCleared("coach-svc"));
-        Assert.False(SaleStateMachine.CanWriteCleared("assessment-svc"));
-        Assert.False(SaleStateMachine.CanWriteCleared("narrative-svc"));
+        Assert.True(SaleCompat.CanWriteCleared("progress-svc"));
+        Assert.False(SaleCompat.CanWriteCleared("coach-svc"));
+        Assert.False(SaleCompat.CanWriteCleared("assessment-svc"));
+        Assert.False(SaleCompat.CanWriteCleared("narrative-svc"));
     }
 }

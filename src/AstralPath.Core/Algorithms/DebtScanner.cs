@@ -68,3 +68,73 @@ public static class DebtScanner
     public static double ComputeImpact(double scoreFrom, double scoreTo, double weight, EdgeType edgeType, int freq)
         => ComputeImpact(new DebtInput(scoreFrom, scoreTo, weight, edgeType, freq));
 }
+
+/// <summary>v1 兼容输入（BASELINE impact）。</summary>
+public readonly record struct ImpactInput(
+    double ScoreP,
+    double ScoreC,
+    int Freq,
+    int DaysSinceLastError,
+    double Weight);
+
+public readonly record struct ImpactResult(bool Detected, double Impact, double Recency);
+
+public static class DebtScannerCompat
+{
+    public static ImpactResult ComputeImpactV1(ImpactInput input)
+    {
+        var rec = 1.0 / (1.0 + input.DaysSinceLastError / 7.0); // v1 金样口径
+        // v1 BASELINE 门限（score 为 0–100）：sp<40 ∧ sc<50 ∧ freq>0
+        var detected = input.ScoreP < 40.0 && input.ScoreC < 50.0 && input.Freq > 0;
+        var impact = detected ? input.Freq * (50.0 - input.ScoreC) * rec * input.Weight : 0.0;
+        return new ImpactResult(detected, impact, rec);
+    }
+
+    public static IReadOnlyList<(string FromKp, string ToKp, double Impact)> Scan(
+        IEnumerable<(string FromKp, string ToKp, string FromName, string ToName,
+            double ScoreP, double ScoreC, int Freq, int Days, double Weight)> edges,
+        int topN = 5)
+    {
+        var list = new List<(string, string, double)>();
+        foreach (var e in edges)
+        {
+            var r = ComputeImpactV1(new ImpactInput(e.ScoreP, e.ScoreC, e.Freq, e.Days, e.Weight));
+            if (r.Detected) list.Add((e.FromKp, e.ToKp, r.Impact));
+        }
+        return list.OrderByDescending(x => x.Item3).Take(topN).ToList();
+    }
+}
+
+/// <summary>v1 扫描结果（AstralPathStore 消费）。</summary>
+public sealed record ScannedDebtEdge(
+    string FromKp,
+    string ToKp,
+    string FromKpName,
+    string ToKpName,
+    double ScoreFrom,
+    double ScoreTo,
+    int Freq,
+    int DaysSinceLastError,
+    double Recency,
+    double Weight,
+    double Impact,
+    string Status = "open");
+
+public static partial class DebtScannerV1
+{
+    public static IReadOnlyList<ScannedDebtEdge> Scan(
+        IEnumerable<(string FromKp, string ToKp, string FromName, string ToName,
+            double ScoreP, double ScoreC, int Freq, int Days, double Weight)> edges,
+        int topN = 5)
+    {
+        var list = new List<ScannedDebtEdge>();
+        foreach (var e in edges)
+        {
+            var r = DebtScannerCompat.ComputeImpactV1(new ImpactInput(e.ScoreP, e.ScoreC, e.Freq, e.Days, e.Weight));
+            if (!r.Detected) continue;
+            list.Add(new ScannedDebtEdge(e.FromKp, e.ToKp, e.FromName, e.ToName,
+                e.ScoreP, e.ScoreC, e.Freq, e.Days, r.Recency, e.Weight, r.Impact));
+        }
+        return list.OrderByDescending(x => x.Impact).Take(topN).ToList();
+    }
+}

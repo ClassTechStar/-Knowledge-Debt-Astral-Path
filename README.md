@@ -2,30 +2,25 @@
 
 跨课程**知识债**诊断与修复智能体：用确定性公式找出你「欠」了哪门课的先修债，用约束满足生成可完成的还债计划，用受约束智能体陪伴销账，并守住教育伦理底线。
 
-> **2026 iCAN AI / DuMate 竞赛实现** · 版本 **1.3.0** · Windows 10/11
-
-> **项目名称规范（全文唯一口径）**
+> **2026 iCAN AI / DuMate 竞赛实现** · 版本 **2.0.0-algo-v2** · Windows 10/11 · Android 8.0+
 >
-> - 全称：**知债：星穹学途（Knowledge Debt: Astral Path）** — 文档标题、封面、申报书、答辩与对外介绍  
-> - 中文简称：**知债：星穹学途** — 正文叙述、章节标题与图表标签  
-> - 英文标识：**AstralPath** — 命名空间、解决方案名、包名、镜像名、数据库名与域名  
+> **项目名称规范**：全称「知债：星穹学途（Knowledge Debt: Astral Path）」；中文简称「知债：星穹学途」；代码标识 **AstralPath**。禁止旧名「知债图 / ZhiZhaiTu」。
 
 ---
 
 ## 目录
 
-1. [产品简介](#1-产品简介)  
-2. [快速开始](#2-快速开始)  
-3. [新手五分钟上手](#3-新手五分钟上手)  
-4. [功能模块](#4-功能模块)  
-5. [核心公式（BASELINE）](#5-核心公式baseline)  
-6. [系统架构](#6-系统架构)  
-7. [API 一览](#7-api-一览)  
-8. [演示账号](#8-演示账号)  
-9. [开发者与测试](#9-开发者与测试)  
-10. [常见问题](#10-常见问题)  
-11. [伦理与合规](#11-伦理与合规)  
-12. [未完成范围](#12-未完成范围诚实标注)
+1. [产品简介](#1-产品简介)
+2. [交付物一览](#2-交付物一览)
+3. [快速开始](#3-快速开始)
+4. [功能模块](#4-功能模块)
+5. [核心公式（v2）](#5-核心公式v2)
+6. [系统架构](#6-系统架构)
+7. [测试与金样](#7-测试与金样)
+8. [开发者指南](#8-开发者指南)
+9. [四人 Vibe Coding 提示词](#9-四人-vibe-coding-提示词)
+10. [演示账号与伦理](#10-演示账号与伦理)
+11. [变更日志](#11-变更日志)
 
 ---
 
@@ -35,294 +30,199 @@
 
 知债：星穹学途会：
 
-| 模块 | 做什么 |
-|------|--------|
-| **藏书阁** | 教材 PDF → 全文抽取 / OCR → 完整目录与章节正文 |
-| **识网** | 自动生成知识图谱（思维导图），侧栏可读各章正文并**按章自动出题** |
-| **知债** | BASELINE 红边诊断 + 14 天还债计划 + What-if 模拟 |
-| **今日** | 约 35 分钟教材真题与练习（可轮换题库） |
-| **智能体** | 意图路由；危机转人工；敏感词脱敏 |
-| **画像** | 能力雷达、掌握度、学习时间线、CSR 图索引 |
+| 步骤 | 说明 | 类比 |
+|------|------|------|
+| **诊断** | 找出「会计等式 → 借贷记账法」这类红边 | 体检找病灶 |
+| **计划** | 14 天补课表（每日 ≤40 分钟，0/2/6 间隔） | 开药方 |
+| **练习** | 真题 + 信心校准 + 自适应选题 | 吃药复查 |
+| **销账** | 连续 2 次达标且累计 ≥3 次 → 已还清 | 痊愈出院 |
 
-**桌面端与 Web 端功能、界面布局、交互与数据处理逻辑完全一致**（桌面使用 WebView2 内嵌同一套 Web 页面与本地 API）。
+**三端 UI 同源**：Web / Windows / Android 共用同一套设计令牌与业务语义；**无微服务单体版**可完全离线运行。
 
 ---
 
-## 2. 快速开始
+## 2. 交付物一览
 
-### 2.1 Windows 安装版（推荐）
+| 产物 | 路径 | 说明 |
+|------|------|------|
+| **Web 单体版** | `deploy/monolith-web/index.html` | 全功能、无服务器、浏览器直接打开 |
+| **Windows 单体安装包** | `deploy/win-install/dist/AstralPath-Monolith-Setup-2.0.0.exe` | WebView2 壳 + 同一 HTML；与旧版并存 |
+| **Windows 桌面安装包** | `deploy/win-install/dist/AstralPath-Setup-1.5.0-Desktop.exe` | 全功能桌面端（可选本地 API） |
+| **Android APK** | `src/AstralPath.Native/dist/AstralPath-WebUI-1.5.0.apk` | WebView 同构 + 离线核心 |
+| **100 题库** | `eval/question_bank.db` / `question_bank.json` | 会计 34 / Python 33 / DL 33 |
+| **34 点图包** | `graph-packs/astralpath-v2/graph_pack.json` | 34 节点 / 74 边，无环，三门课 |
+| **项目方案（可复刻）** | `docs/03-知债星穹学途-合并版(TDS+最终版技术方案).md` | 含 §2.0 算法 v2 + 零基础导读 |
+| **四人分工** | `docs/知债星穹学途-四人团队分工方案.md` | 含算法 v2 工作包 |
+| **Vibe 提示词** | `docs/vibe-prompts/` | P1–P4 可直接粘贴给 AI 开发 |
 
-1. 运行安装包：`deploy/win-install/dist/AstralPath-Setup-1.3.0-Desktop.exe`  
-2. 按向导安装（默认 `C:\Program Files\AstralPath`）  
-3. 可选安装 **Microsoft Edge WebView2 运行时**（Win10 必需，Win11 通常已自带）  
-4. 启动桌面图标「知债：星穹学途」，状态栏显示 **「已就绪」** 即可使用  
+---
 
-也可使用 Web 演示台：安装后启动本地服务，浏览器打开 `http://127.0.0.1:5190/`（或安装包内「启动 Web 演示台」）。
+## 3. 快速开始
 
-### 2.2 源码运行（开发者）
+### 3.1 无微服务单体版（推荐 · 零依赖）
 
 ```powershell
-cd <仓库根目录>          # 例如 C:\Users\18948\Documents\GitHub\-Knowledge-Debt-Astral-Path
-dotnet build AstralPath.slnx -c Release
-dotnet test  AstralPath.slnx -c Release --no-build
+# Web：双击打开
+deploy\monolith-web\index.html
 
-# 启动 API + Web UI
-dotnet run --project src/AstralPath.Api -c Release -- --urls http://127.0.0.1:5190
+# Windows：运行安装包后桌面图标启动
+deploy\win-install\dist\AstralPath-Monolith-Setup-2.0.0.exe
 ```
 
-- 演示台：<http://127.0.0.1:5190/>  
-- Swagger：<http://127.0.0.1:5190/swagger>  
-- 离线演示页：`materials/demo-ui/index.html`（无服务时可预览界面）
+功能：起点/藏书阁/识网/知债/今日/智能体/画像/账户 全部在本机计算，数据存 localStorage，可导出 JSON。
 
-> **注意**：不要在 `appsettings.json` 中写死 `"urls"`，否则会覆盖命令行 / 环境变量指定的端口，导致桌面壳「本地服务启动失败」。
+### 3.2 全功能桌面版（可选本地 API）
 
-### 2.3 自检脚本
-
-```bash
-bash scripts/smoke_all_endpoints.sh              # 需先启动 API；覆盖 100+ 路由
-python scripts/naming_consistency.py --check     # 命名一致性（CI 门禁）
+```powershell
+deploy\win-install\dist\AstralPath-Setup-1.5.0-Desktop.exe
 ```
 
----
+### 3.3 Android
 
-## 3. 新手五分钟上手
+安装 `src/AstralPath.Native/dist/AstralPath-WebUI-1.5.0.apk`（商店签名）。无电脑、无 adb 亦可离线使用核心功能。
 
-**步骤 1 · 启动**  
-安装版点桌面图标；源码版见上文命令。状态「已就绪」后继续。
+### 3.4 源码构建
 
-**步骤 2 · 藏书阁导入教材**  
-点顶部 **「藏书阁」** → **「导入示例资料」**（约 12 本），或 **「上传并解析」** 选择自己的 PDF。  
-状态出现绿色 `ready` 即解析完成（大书需数十秒）。
-
-**步骤 3 · 识网看图谱与章节**  
-点 **「识网」** → 切换教材卡片 → 画布为**完整目录**思维导图。  
-右侧**章节侧栏**点击任一章：查看正文摘要，并完成 **本章自动出题**（含选项与答案）。
-
-**步骤 4 · 知债看红边与计划**  
-点 **「知债」**：课程包 BASELINE 红边 + 诊断叙事；教材识网红边；右侧 **What-if** 拖滑块；点 **「生成/刷新 14 天计划」**（任一天 ≤35 分钟）。
-
-**步骤 5 · 今日做题**  
-点 **「今日」** → **「加载教材真题」** → 答题并调信心条 → **「换一批题」** 轮换。
-
-**步骤 6 · 问智能体**  
-点 **「智能体」**，试试：
-
-| 输入 | 系统行为 |
-|------|----------|
-| 帮我诊断知识债 | 诊断意图 + 还债建议 |
-| 生成14天计划 | 生成修复计划 |
-| 我这周学不完 | 压力支持话术 |
-| 危机相关表述 | **自动转人工（crisis.handoff）** |
+```powershell
+# 环境：.NET 10 · Android workload · JDK17 · Gradle 9.7.1
+dotnet test tests/AstralPath.Core.Tests -c Release      # 金样 11
+dotnet test tests/AstralPath.Persistence.Tests -c Release
+dotnet test tests/AstralPath.Desktop.Tests -c Release   # Avalonia 47
+dotnet test tests/AstralPath.Api.Tests -c Release       # 53
+dotnet test tests/AstralPath.Eval.Tests -c Release
+```
 
 ---
 
 ## 4. 功能模块
 
-### 4.1 藏书阁（资料库）
-
-| 能力 | 说明 |
-|------|------|
-| 上传 PDF | 支持多选；文本层优先**全书抽取** |
-| 扫描版 OCR | 可选 Tesseract（`chi_sim+eng`）；有文本层则不依赖 OCR |
-| 深度解析 | 全文字符 · 完整目录 · 章节正文 · **按章自动出题** |
-| 示例教材 | Kotlin / Python / Java / Go / C# / 深度学习系列 / AI Agent / 传记等 |
-
-状态：`parsing` → `ready` / `failed`。
-
-### 4.2 识网（知识图谱）
-
-| 能力 | 说明 |
-|------|------|
-| 思维导图 | 章 / 节 / 小节完整入图，DAG 无环 |
-| 章节侧栏 | 点章看正文 + 自动出题 |
-| 教材真题 | 每书约 12 题，支持轮换 |
-| 导出 | Markdown 大纲 / RDF 三元组 |
-| 布局 | 分层图谱 / 逻辑结构图；节点拖拽、画布缩放平移 |
-
-### 4.3 知债诊断
-
-| 能力 | 说明 |
-|------|------|
-| 红边列表 | BASELINE impact + 诊断叙事 |
-| 教材债边 | 识网 preview-debts（如「神经网络→反向传播」） |
-| 14 天计划 | K1–K5 约束检查；任一天 ≤35 分钟 |
-| What-if | 实时模拟 score / freq / days → impact |
-| 教师热点 | consent fail-closed，未授权不进热点 |
-
-### 4.4 今日任务
-
-教材真题优先；选项 + 信心滑条；支持换一批、重置题序、Demo +1 天。教练节奏：概念卡 → 桥接题 → 小测。
-
-### 4.5 智能体（受约束）
-
-意图路由 · 危机转人工 · 敏感词脱敏 · 按角色工具白名单 · 会话状态（响应 / 澄清 / 人工）。
-
-### 4.6 学习画像
-
-能力雷达（掌握度 / 正确率 / 练习量 / 还债进度 / 信心）· 掌握度表 · 时间线 · Opt-out · CSR 图索引。
+| 模块 | 做什么 |
+|------|--------|
+| **藏书阁** | PDF/文本本机解析 → 章节 + 关键词 + 出题 |
+| **识网** | 知识图谱 DAG（TextRank/PMI/依赖句式）、瓶颈/关键路径、分层布局 |
+| **知债** | impact-v2 红边 · What-if · 14 天计划（K1–K5） |
+| **今日** | ≤3 任务 + 真题 + 信心 1–5 + 判分 |
+| **智能体** | 意图路由 · 危机转人工 · 敏感词脱敏 · 读真实学情 |
+| **画像** | Brier 信心校准 · 风格五轴 · k-匿名 · opt-out |
+| **账户** | 登录 · consent · 导出/重置 |
 
 ---
 
-## 5. 核心公式（BASELINE）
-
-金样精度 **1e-6**，实现为确定性纯函数：
+## 5. 核心公式（v2）
 
 ```text
-score  = 100 × (0.6×recent_acc + 0.3×sev_norm + 0.1×(self_conf/5))
-sev_norm = 1 − min(sev, 1)
+score = min( 0.50·know + 0.30·retention + 0.20·prereqSupport , 0.55+0.45·min(prereq) )
+know   = 0.85·Beta(成功,失败) + 0.15·(conf/5)
+retention = exp(-age/S);  S = 2.5·(1+0.45·streak)·(1+0.25·ln(1+reps))
 
-impact = freq × (50 − score_c) × recency × edge.weight
-recency = 1 / (1 + days_since_last_error / 7)
-触发：score_p < 40 ∧ score_c < 50 ∧ freq > 0
+impact = 0.55 · σ((sf-0.55)·8) · σ((0.50-st)·8) · w · cross · (1+0.12·ln(1+下游)) · (1+0.08·ln(1+freq))
+cross  = 1.0 | 1.15 (transfer_gap)；命中 freq>0 ∧ impact≥0.08
 
-销账：cleared ⟺ 连续 2 次 quiz acc≥0.7 ∧ conf≥3
-仅 progress 路径可写 cleared
+销账 ⇔ 近期连续 2 次达标 ∧ 累计 ≥3 次；Weighted=0.7·acc+0.3·(conf/5)≥0.65
 ```
 
-§19.1 传播模型（`ConceptDiffusion`）：α=0.55、D_max=6、N≤400，结果必带  
-`truncationBound = ‖b⁰‖·α^(D+1)/(1−α)`。
+- 实现：`src/AstralPath.Core/`（纯函数，1e-6 金样）
+- **禁止 LLM 改数字**；`cleared` 只能由 `SaleStateMachine` 写入
 
 ---
 
 ## 6. 系统架构
 
-| 层 | 项目 | 职责 |
-|----|------|------|
-| Core | `src/AstralPath.Core` | BASELINE 纯函数；扩展服务算法；受约束智能体路由 |
-| Graph | `src/AstralPath.Graph` | 图包加载、无环校验、版本化 |
-| Contracts | `src/AstralPath.Contracts` | DTO 与错误码（唯一契约出口） |
-| Infrastructure | `src/AstralPath.Infrastructure` | 材料 OCR 流水线、题库、演示仓库、consent、模块仓库 |
-| Api | `src/AstralPath.Api` | REST API + Web UI（`wwwroot/index.html`） |
-| Desktop | `src/AstralPath.Desktop` | WebView2 桌面壳（与 Web **同构**） |
-| Mobile | `src/AstralPath.Mobile` | 移动端项目骨架 |
-| Shared | `src/AstralPath.Shared` | 双端共享演示元数据 |
-| Tests | `tests/*` | 金样例 + 召回 + 端到端 |
-| Tools | `tools/*.py` | OCR 全文、深度章节、图谱算法 |
-
-数据与部署：
-
-- PostgreSQL DDL：`deploy/sql/001_init.sql`  
-- 运维手册：`deploy/RUNBOOK.md`  
-- 环境变量统一前缀 `ASTRALPATH_*`（旧 `ZZ_*` 已废弃，启动时告警）  
-- Windows 安装包：`deploy/win-install/dist/AstralPath-Setup-1.3.0-Desktop.exe`
-
----
-
-## 7. API 一览
-
-### 主链路
-
-| 方法 | 路由 |
-|------|------|
-| POST | `/v1/students/{id}/ingest/scores` |
-| POST·GET | `/v1/students/{id}/diagnose?graph_ver=` |
-| GET | `/v1/students/{id}/graph-view` · `/mastery` |
-| POST | `/v1/students/{id}/plans` · GET `/v1/plans/{id}` · POST `/v1/plans/{id}/rebalance` |
-| POST | `/v1/students/{id}/today` · `/v1/attempts` · `/v1/debt-edges/sale-check` |
-| GET | `/v1/teachers/{id}/hotspots` |
-| POST·GET | `/v1/consents/{studentId}` |
-| POST | `/v1/graphs/{packId}/validate` · `/v1/what-if` · `/v1/demo/advance` |
-| GET | `/v1/question-banks` · `/v1/questions/{id}` |
-| GET·POST | `/v1/materials`（upload / parse / chapters / textbook-questions / seed-samples / parse-all / today-from-books 等） |
-| GET | `/v1/knowledge-graphs` · `/{graphId}` · `/{id}/csr` |
-| POST·GET | `/api/v1/auth/*`（register / sessions / me / profile） |
-
-### 受约束智能体（§44）
-
-`POST /v1/agent/turns` · `GET|DELETE /v1/agent/sessions/{id}` · `GET /v1/agent/tools?role=` · `GET /v1/agent/goldens/{id}`
-
-### 知识库（§45）
-
-`/v1/kb/documents`（CRUD / tags / versions / publish / rollback / archive）· `/v1/kb/search` · `/v1/kb/uploads` · `/v1/kb/chunks/{id}` · `/internal/v1/kb/import`
-
-### 用户画像（§46）
-
-`/v1/profile/{id}` · `/features` · `/tags` · `/radar` · `/timeline` · `POST .../tags` · `POST .../opt-out`
-
-### 扩展服务（§19）
-
-concept-diffusion · exam-impact · peer-cohort · study-group · micro-lesson · learning-velocity · spaced-review · prerequisite-simulator · knowledge-forecast · lab-bench（路由见实现）
-
-### 模块自检
-
-`GET /health/ready` · `/api/meta` · `/api/demo/students` · `/v1/modules/status`
-
----
-
-## 8. 演示账号
-
-| 账号 / ID | 说明 |
-|-----------|------|
-| `demo@astralpath.local` / `demo123456` | 学生登录 |
-| `teacher@astralpath.local` / `teacher123` | 教师登录 |
-| `demo-student-a` | 王小明 · 有债预埋（≥3 红边），推荐演示 |
-| `demo-student-b` | 李华 · 无债对照 |
-| `demo-teacher` | 教师端 · 默认仅可见已授权学生 |
-
----
-
-## 9. 开发者与测试
-
 ```text
-Core.Tests   11  金样 score/impact/K/sale/narrative + 图包无环 + 召回 ≥0.80 + OCR 流水线
-Eval.Tests    2  合成学生画像 + 公式纯函数守护
-Api.Tests    53  端到端：诊断/计划/今日/consent/销账/what-if/材料与题库/账户
-               §44 智能体 · §45 知识库 · §46 画像 · §19 扩展服务
-合计         66  全部通过（dotnet test AstralPath.slnx -c Release）
+AstralPath.Core/          纯函数：公式 / 图 / OCR / 画像 / 销账 / 计划
+AstralPath.Api/           ASP.NET Core（Web/Windows 共用）+ wwwroot/index.html
+AstralPath.Desktop/       WebView2 壳
+AstralPath.Native/        Android WebView 壳（~2.8MB）
+AstralPath.Monolith/      无微服务 Windows 壳（Setup-2.0.0）
+AstralPath.Mobile.Offline/Avalonia 11 + SQLite 离线单体
+AstralPath.Persistence/  Postgres（默认）+ memory 回退
+tests/                    Core 11 · Persistence 8 · Desktop 47 · API 53 · Eval 2
 ```
 
-架构铁律：
-
-- **C1** score/impact/K/销账 = 确定性代码，金样 CI 阻断  
-- **C2** LLM 不改数字（模板叙事 + 禁词门禁）  
-- **C3** 图包 publish 前无环校验，边必须有 source  
-- **C4** 计划 `constraints_checked=true` 才返回 201  
-- **C6/C9** 教师端 fail-closed + 禁词扫描  
-- **C8** cleared 仅 progress 路径写入  
-- **§19.3/§19.4/§19.9** 强伦理：k-匿名、不排名、不用明文分数、外推 >30 天抑制；越权一律 404  
+**持久化**：默认 **PostgreSQL + pgvector**（`Persistence:Mode=postgres`）；连接串可用 `Persistence__ConnectionString` 覆盖；连不上且 `AllowMemoryFallback=true` 时降级 memory。
 
 ---
 
-## 10. 常见问题
+## 7. 测试与金样
 
-**Q：桌面窗口空白或提示「本地服务启动失败」？**  
-A：请使用端口修复后的安装包（`appsettings.json` 不得写死 `urls`）。日志：`%LOCALAPPDATA%\AstralPath\api-stdout.log`。
+| 套件 | 通过 | 说明 |
+|------|------|------|
+| Core.Tests | **11/11** | score/impact/sale/计划/图/走读金样（1e-6） |
+| Persistence.Tests | **8/8** | Postgres/InMemory 双模式 |
+| Desktop.Tests | **47/47** | Avalonia 原生 UI 绑定与导航 |
+| Api.Tests | **53/53** | 上传/解析/诊断/计划/agent |
+| Eval.Tests | **2/2** | 合成数据回归 |
+| 单体 HTML 自测 | **41 项** | 结构/算法/页面流转 |
 
-**Q：扫描版 PDF 解析内容很少？**  
-A：安装 [Tesseract](https://github.com/UB-Mannheim/tesseract) 与 `chi_sim+eng` 语言包，`traineddata` 放到 `api/tools/tessdata/`。带文本层的 PDF 无需 OCR 即可完整解析。
-
-**Q：教师看不到学生？**  
-A：故意设计：consent fail-closed，需学生授权后教师才可见。
-
-**Q：销账（cleared）条件？**  
-A：连续 2 次小测 正确率 ≥0.7 且信心 ≥3；仅 progress 路径可写入。
-
-**Q：桌面与 Web 是否一致？**  
-A：一致。桌面为 WebView2 内嵌同一 `wwwroot/index.html` 与同一本地 API。
-
----
-
-## 11. 伦理与合规
-
-本系统**仅用于教学辅助与学习规划，不构成处分依据**。
-
-- 教师可见性 **consent fail-closed**  
-- 敏感词脱敏；危机内容自动转人工  
-- 同伴 / 预测类能力不排名、不用明文分数、k-匿名  
-- 演示数据均为合成数据  
+```powershell
+dotnet test tests/AstralPath.Core.Tests tests/AstralPath.Persistence.Tests `
+  tests/AstralPath.Desktop.Tests tests/AstralPath.Api.Tests tests/AstralPath.Eval.Tests -c Release
+```
 
 ---
 
-## 12. 未完成范围（诚实标注）
+## 8. 开发者指南
 
-以下为方案中的长期项，非本次交付覆盖范围：
+```powershell
+# 环境
+dotnet --version        # ≥ 10
+dotnet workload list    # android
+java -version           # 17（打包 APK）
 
-1. **Avalonia 双端完整 UI**（§11–§17）：当前桌面端为 **WebView2 与 Web 同构壳**；Avalonia 原生 `.axaml` 界面仍为骨架。    
-2. **生产级持久化**：已提供 DDL，默认仍为内存演示仓库。  
-3. **K8s / 混沌 / 可观测性**：已有 Runbook 与部分清单，未在真实集群完成演练。
+# 跑 API（可选全功能模式）
+dotnet run --project src/AstralPath.Api --urls http://127.0.0.1:5190
 
-以上不影响当前演示链路完整性（构建通过 · 测试全绿 · 端到端自检可跑）。
+# 打 Android APK（纯 ASCII 路径，否则 AAPT2265）
+$env:JAVA_HOME="C:\Temp\jdk-17"
+& "C:\Gradle\bin\gradle.bat" -p src/AstralPath.Native assembleRelease
+
+# 打 Windows 单体安装包
+dotnet publish src/AstralPath.Monolith -c Release -r win-x64 --self-contained -o src/AstralPath.Monolith/publish
+& "C:\Program Files\Inno Setup 7\ISCC.exe" src/AstralPath.Monolith/setup-monolith.iss
+```
+
+**NuGet 排障**：若报 `path1=null`，补齐 `PROGRAMDATA` / `PROGRAMFILES(X86)` / `ALLUSERSPROFILE`，并设 `CheckEolWorkloads=false`。
 
 ---
 
-**知债：星穹学途四人团队** · © 2026 · [仓库](https://github.com/ClassTechStar/-Knowledge-Debt-Astral-Path)
+## 9. 四人 Vibe Coding 提示词
+
+零基础队友可直接把提示词粘贴给 Cursor / Claude Code：
+
+| 角色 | 文件 | 负责 |
+|------|------|------|
+| P1 | `docs/vibe-prompts/提示词-P1-产品与教育伦理.md` | 文案、禁词、隐私、演示脚本 |
+| P2 | `docs/vibe-prompts/提示词-P2-算法与后端.md` | 公式、Core、金样 |
+| P3 | `docs/vibe-prompts/提示词-P3-数据与评测.md` | 图包、题库、验收脚本 |
+| P4 | `docs/vibe-prompts/提示词-P4-客户端与体验.md` | UI、壳、安装包 |
+
+---
+
+## 10. 演示账号与伦理
+
+- 账号：`demo@astralpath.local` / `demo123456`（或 `demo-student-a`）
+- **红线**：数字只能算出来；AI 不许改分；不发明先修边；`cleared` 只由状态机写
+- **隐私**：教师侧 k-匿名（&lt;3 抑制）；危机/敏感域禁入画像；可随时 opt-out
+- **危机词**：只安抚 + 转人工，不评价学生
+
+---
+
+## 11. 变更日志
+
+### 2.0.0-algo-v2（2026-09-24）
+- 算法 v2：score-v2 / impact-v2 / sale-v2 / PlannerBuilder / QuestionScheduler
+- 知识图谱 v2：TextRank/PMI/依赖句式、瓶颈/关键路径、Sugiyama 布局
+- OCR v2：预处理、三 PSM 投票、TSV 置信度、阅读顺序
+- 画像 v2：Brier、风格五轴、k-匿名、Laplace 轻量噪声
+- **100 题 question_bank.db** + **34/74 无环图包**
+- **Postgres 默认持久化**（可回退 memory）
+- **Avalonia 原生 UI**（12 axaml + VM）
+- **无微服务单体版**：index.html + Setup-2.0.0.exe
+- 121 项测试全绿
+
+### 1.4.x–1.5.0
+- 智能体接真学情；启动预热；上传 2GB/分片；WebView 同构壳；badge 全绿；商店签名
+
+---
+
+© 2026 知债：星穹学途四人团队

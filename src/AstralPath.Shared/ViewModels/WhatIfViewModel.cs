@@ -267,7 +267,7 @@ public sealed partial class WhatIfViewModel : ViewModelBase
         Recency = response.Recency;
 
         // 端上复算直接调用 Core 纯函数（与 API、离线数据源同一份实现），因此差值必然在 1e-6 内。
-        var client = DebtScanner.ComputeImpact(
+        var client = DebtScannerCompat.ComputeImpactV1(
             new ImpactInput(ScoreFromSlider, ScoreToSlider, Freq, Days, SelectedEdge.Weight));
 
         RecomputeText =

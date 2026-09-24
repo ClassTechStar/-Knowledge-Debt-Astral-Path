@@ -43,7 +43,7 @@ public class SynthEvalTests
                 return (e.From, e.To, e.From, e.To, scoreP, scoreC, freq, 0, e.Weight);
             }).ToList();
 
-            var scanned = DebtScanner.Scan(inputs, 20);
+            var scanned = DebtScannerV1.Scan(inputs, 20);
             students.Add(($"synth-{i:D2}", hasDebt, scanned.Count));
         }
 

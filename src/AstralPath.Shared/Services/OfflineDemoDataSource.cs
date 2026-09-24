@@ -340,7 +340,7 @@ public sealed partial class OfflineDemoDataSource : IAppDataSource
                 }
                 probes.Add(new SaleProbe(request.Correct ? 0.85 : 0.4, request.SelfConf));
 
-                var sale = SaleStateMachine.IsSaleable(probes);
+                var sale = SaleCompat.IsSaleable(probes);
                 student.SaleStreak[key] = sale.Streak;
                 if (sale.Saleable)
                 {
@@ -372,11 +372,11 @@ public sealed partial class OfflineDemoDataSource : IAppDataSource
                 .ToList();
         }
 
-        var sale = SaleStateMachine.IsSaleable(probes);
+        var sale = SaleCompat.IsSaleable(probes);
         var edge = student.DebtEdges.FirstOrDefault(d => d.FromKp == fromKp && d.ToKp == toKp);
         var impact = edge is null
             ? new ImpactResult(false, 0, 0)
-            : DebtScanner.ComputeImpact(new ImpactInput(edge.ScoreFrom, edge.ScoreTo, edge.Freq,
+            : DebtScannerCompat.ComputeImpactV1(new ImpactInput(edge.ScoreFrom, edge.ScoreTo, edge.Freq,
                 edge.DaysSinceLastError, edge.Weight));
 
         if (sale.Saleable && edge is not null && edge.Status is "open" or "repairing")
@@ -408,7 +408,7 @@ public sealed partial class OfflineDemoDataSource : IAppDataSource
         var days = request.OverrideDays ?? edge?.DaysSinceLastError ?? 0;
         var weight = edge?.Weight ?? 1.0;
 
-        var impact = DebtScanner.ComputeImpact(new ImpactInput(scoreFrom, scoreTo, freq, days, weight));
+        var impact = DebtScannerCompat.ComputeImpactV1(new ImpactInput(scoreFrom, scoreTo, freq, days, weight));
         return new WhatIfResponse(
             Math.Round(scoreFrom, 6), Math.Round(scoreTo, 6), freq, days,
             impact.Impact, impact.Detected, impact.Recency);

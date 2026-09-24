@@ -54,3 +54,36 @@ public static class SaleStateMachine
         return new SaleState(status, streak, attempts, pct);
     }
 }
+
+/// <summary>v1 兼容：按 acc/conf 历史判定是否可销账。</summary>
+public sealed record SaleProbe(double Acc, int Conf);
+
+public sealed record SaleResult(bool Saleable, int Streak, string? Need);
+
+public static class SaleCompat
+{
+    public static SaleResult IsSaleable(IReadOnlyList<SaleProbe> history)
+    {
+        var streak = 0;
+        var attempts = 0;
+        foreach (var h in history)
+        {
+            attempts++;
+            var meets = h.Acc >= FormulaConstants.SaleAccMin && h.Conf >= FormulaConstants.SaleConfMin;
+            streak = meets ? streak + 1 : 0;
+        }
+        var saleable = streak >= FormulaConstants.SaleStreakRequired; // 金样口径：仅看连续达标
+        string? need = null;
+        if (!saleable)
+        {
+            var n = Math.Max(1, FormulaConstants.SaleStreakRequired - streak);
+            need = n <= 1 ? "再完成 1 次达标小测（acc≥0.7 且 conf≥3）"
+                          : $"再完成 {n} 次达标小测（acc≥0.7 且 conf≥3）";
+        }
+        return new SaleResult(saleable, streak, need);
+    }
+
+    /// <summary>仅 progress-svc 可写 cleared（§6.3）。</summary>
+    public static bool CanWriteCleared(string serviceId)
+        => string.Equals(serviceId, "progress-svc", StringComparison.OrdinalIgnoreCase);
+}

@@ -210,13 +210,13 @@ public sealed class CoachProgressController : ControllerBase
                 history.Add(new SaleProbe(request.Correct ? 0.85 : 0.4, request.SelfConf));
                 student.SaleHistory[key] = history;
 
-                var sale = SaleStateMachine.IsSaleable(history);
+                var sale = SaleCompat.IsSaleable(history);
                 var edgeIdx = student.DebtEdges.FindIndex(d => d.FromKp == relatedFrom && d.ToKp == relatedTo);
                 if (edgeIdx >= 0)
                 {
                     var edge = student.DebtEdges[edgeIdx];
                     // ONLY progress-svc writes cleared (C8)
-                    if (sale.Saleable && SaleStateMachine.CanWriteCleared("progress-svc"))
+                    if (sale.Saleable && SaleCompat.CanWriteCleared("progress-svc"))
                     {
                         student.DebtEdges[edgeIdx] = edge with
                         {
@@ -261,8 +261,8 @@ public sealed class CoachProgressController : ControllerBase
                     .ToList();
             }
 
-            var sale = SaleStateMachine.IsSaleable(history);
-            var impact = DebtScanner.ComputeImpact(new ImpactInput(edge.ScoreFrom, edge.ScoreTo, edge.Freq, edge.DaysSinceLastError, edge.Weight));
+            var sale = SaleCompat.IsSaleable(history);
+            var impact = DebtScannerCompat.ComputeImpactV1(new ImpactInput(edge.ScoreFrom, edge.ScoreTo, edge.Freq, edge.DaysSinceLastError, edge.Weight));
 
             var status = edge.Status;
             if (sale.Saleable && status is "open" or "repairing")

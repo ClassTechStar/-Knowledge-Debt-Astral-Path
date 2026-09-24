@@ -133,7 +133,7 @@ public sealed class AstralPathStore
                 fromM.Score, toM.Score, freq, days, edge.Weight));
         }
 
-        var scanned = DebtScanner.Scan(inputs, topN);
+        var scanned = DebtScannerV1.Scan(inputs, topN);
         // persist
         var now = DateTime.UtcNow;
         foreach (var s in scanned)

@@ -6,6 +6,7 @@ namespace AstralPath.Core.Tests;
 
 public class GraphAndRecallTests
 {
+
     private static string PackDir
     {
         get
@@ -77,7 +78,7 @@ public class GraphAndRecallTests
         }
 
         // evaluate recall on full scan (no aggressive topN cut for the metric)
-        var scanned = DebtScanner.Scan(inputs, topN: 50);
+        var scanned = DebtScannerCompat.Scan(inputs, topN: 50);
         var predicted = scanned.Select(s => (s.FromKp, s.ToKp)).ToHashSet();
         var hits = groundTruth.Count(gt => predicted.Contains(gt));
         var recall = hits / (double)groundTruth.Count;
@@ -102,8 +103,8 @@ public class GraphAndRecallTests
         var inputsB = graph.Edges.Select(e => (
             e.From, e.To, e.From, e.To, 85.0, 80.0, 0, 0, e.Weight)).ToList();
 
-        var scanA = DebtScanner.Scan(inputsA);
-        var scanB = DebtScanner.Scan(inputsB);
+        var scanA = DebtScannerCompat.Scan(inputsA);
+        var scanB = DebtScannerCompat.Scan(inputsB);
         Assert.True(scanA.Count >= 3, $"A debts={scanA.Count}");
         Assert.Empty(scanB);
     }
