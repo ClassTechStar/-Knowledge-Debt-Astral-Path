@@ -1,0 +1,417 @@
+{
+ "data": {
+  "text": "Kotlin编程实践",
+  "expand": true
+ },
+ "children": [
+  {
+   "data": {
+    "text": "安装并运行Kotlin",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "Kotlin",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "is",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Android",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "函数",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "例如",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Java",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "使用",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "示例",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "以及",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Gradle",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "DSL",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "to",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Int",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "list",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "参见示例",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "fun",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "println",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "class",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "val",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "name",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Test",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "Kotlin基础",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "Pair",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "String",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "null",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "Kotlin中的面向对象编程",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "函数式编程",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "集合",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "序列",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "作用域函数",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "Kotlin委托",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "测试",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "输入/输出",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "其他",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "Spring框架",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "协程与结构化并发",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "核心概念",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "Kotlin",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "is",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Android",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "函数",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "例如",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Java",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "使用",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "示例",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "以及",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Gradle",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "DSL",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Pair",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "to",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Int",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "list",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "参见示例",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "fun",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "println",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "class",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "val",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  }
+ ]
+}

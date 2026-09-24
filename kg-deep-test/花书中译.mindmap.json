@@ -1,0 +1,617 @@
+{
+ "data": {
+  "text": "花书中译",
+  "expand": true
+ },
+ "children": [
+  {
+   "data": {
+    "text": "段落 1",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "深度学习 2017 年9 月4 日",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "ii",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 4",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "目录",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "向量",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "矩阵",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "范数",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 5",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "分布",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Multinoulli",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 6",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "Hessian",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 7",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "max",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "log",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 8",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "L2",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "表示",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 9",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 10",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 11",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 12",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 13",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 14",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 15",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 16",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 17",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "因此",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "min",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "然而",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 18",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 19",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 20",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "and",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "其中",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Tr",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 21",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "et",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "arg",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 22",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "Hinton",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 23",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "learning",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 24",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 25",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 26",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "Rn",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 27",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "KL",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 28",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "exp",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "目录 xxviii",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 30",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 31",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 32",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 33",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 34",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 35",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 36",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 37",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 38",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 39",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 40",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "核心概念",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "目录",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "向量",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "矩阵",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "范数",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "分布",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Multinoulli",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Hessian",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "max",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "log",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "L2",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "表示",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "因此",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "min",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "然而",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "and",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "其中",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Tr",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "et",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "arg",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Hinton",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  }
+ ]
+}

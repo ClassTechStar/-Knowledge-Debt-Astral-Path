@@ -1,0 +1,262 @@
+[
+  {
+    "name": "Kotlin编程实践",
+    "file": "Kotlin编程实践：Kotlin从入门到实战.pdf.txt",
+    "exists": true,
+    "nodes": 40,
+    "edges": 135,
+    "chapters": 13,
+    "terms": 27,
+    "ok": true,
+    "sample_nodes": [
+      "安装并运行Kotlin",
+      "Kotlin基础",
+      "Kotlin中的面向对象编程",
+      "函数式编程",
+      "集合",
+      "序列",
+      "作用域函数",
+      "Kotlin委托"
+    ]
+  },
+  {
+    "name": "Go语言从入门到精通",
+    "file": "Go语言从入门到精通.pdf.txt",
+    "exists": true,
+    "nodes": 64,
+    "edges": 130,
+    "chapters": 40,
+    "terms": 24,
+    "ok": true,
+    "sample_nodes": [
+      "段落 1",
+      "段落 2",
+      "段落 3",
+      "段落 4",
+      "段落 5",
+      "段落 6",
+      "段落 7",
+      "段落 8"
+    ]
+  },
+  {
+    "name": "大模型应用开发·AI Agent",
+    "file": "大模型应用开发：动手做 AI Agent (黄佳) .pdf.ocr.txt",
+    "exists": true,
+    "nodes": 64,
+    "edges": 144,
+    "chapters": 40,
+    "terms": 24,
+    "ok": true,
+    "sample_nodes": [
+      "段落 1",
+      "段落 2",
+      "段落 3",
+      "段落 4",
+      "段落 5",
+      "段落 6",
+      "段落 7",
+      "段落 8"
+    ]
+  },
+  {
+    "name": "深度学习入门2·自制框架",
+    "file": "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF.txt",
+    "exists": true,
+    "nodes": 64,
+    "edges": 173,
+    "chapters": 40,
+    "terms": 24,
+    "ok": true,
+    "sample_nodes": [
+      "段落 1",
+      "段落 2",
+      "段落 3",
+      "段落 4",
+      "段落 5",
+      "段落 6",
+      "段落 7",
+      "段落 8"
+    ]
+  },
+  {
+    "name": "深度学习入门4·强化学习",
+    "file": "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf.txt",
+    "exists": true,
+    "nodes": 64,
+    "edges": 112,
+    "chapters": 40,
+    "terms": 24,
+    "ok": true,
+    "sample_nodes": [
+      "段落 1",
+      "段落 2",
+      "段落 3",
+      "段落 4",
+      "段落 5",
+      "段落 6",
+      "段落 7",
+      "段落 8"
+    ]
+  },
+  {
+    "name": "C#从入门到精通",
+    "file": "C#从入门到精通（第7版）+(明日科技)+.pdf.txt",
+    "exists": true,
+    "nodes": 64,
+    "edges": 151,
+    "chapters": 40,
+    "terms": 24,
+    "ok": true,
+    "sample_nodes": [
+      "段落 1",
+      "段落 2",
+      "段落 3",
+      "段落 4",
+      "段落 5",
+      "段落 6",
+      "段落 7",
+      "段落 8"
+    ]
+  },
+  {
+    "name": "深度学习进阶·NLP",
+    "file": "深度学习进阶：自然语言处理 (斋藤康毅) .pdf.txt",
+    "exists": true,
+    "nodes": 64,
+    "edges": 124,
+    "chapters": 40,
+    "terms": 24,
+    "ok": true,
+    "sample_nodes": [
+      "段落 1",
+      "段落 2",
+      "段落 3",
+      "段落 4",
+      "段落 5",
+      "段落 6",
+      "段落 7",
+      "段落 8"
+    ]
+  },
+  {
+    "name": "黄仁勋：英伟达之芯",
+    "file": "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf.txt",
+    "exists": true,
+    "nodes": 54,
+    "edges": 70,
+    "chapters": 23,
+    "terms": 31,
+    "ok": true,
+    "sample_nodes": [
+      "求学生涯：从被霸凌的小学生到优秀的大学毕业生",
+      "职涯早期：AMD、LSI和太阳微系统公司",
+      "从餐厅里起步的Nvidia：我们做出的每一个决定都是错误的",
+      "英伟达遭遇绝境：我们公司离破产只有30天",
+      "咸鱼翻身：完美的显卡TNT，承载着一个改变世界的惊天秘密",
+      "新机器时代曙光初现：首个在游戏中超越人类的神经网络“水母”",
+      "死亡竞赛：迭代，迭代，再迭代！执行，执行，再执行！",
+      "游戏玩家拯救英伟达：爸爸，你得再加把劲儿"
+    ]
+  },
+  {
+    "name": "Java从入门到精通",
+    "file": "Java从入门到精通（第6版） (明日科技) .pdf.txt",
+    "exists": true,
+    "nodes": 26,
+    "edges": 73,
+    "chapters": 2,
+    "terms": 24,
+    "ok": true,
+    "sample_nodes": [
+      "访问Annotation信息",
+      "服务类设计",
+      "Java",
+      "使用",
+      "Eclipse",
+      "对象",
+      "资源包",
+      "如图"
+    ]
+  },
+  {
+    "name": "花书 DeepLearning",
+    "file": "DeepLearning-Goodfellow-花书.pdf.txt",
+    "exists": true,
+    "nodes": 65,
+    "edges": 108,
+    "chapters": 40,
+    "terms": 25,
+    "ok": true,
+    "sample_nodes": [
+      "段落 1",
+      "深度学习 2017 年9 月4 日",
+      "ii",
+      "段落 4",
+      "段落 5",
+      "段落 6",
+      "段落 7",
+      "段落 8"
+    ]
+  },
+  {
+    "name": "花书中译",
+    "file": "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf.txt",
+    "exists": true,
+    "nodes": 65,
+    "edges": 108,
+    "chapters": 40,
+    "terms": 25,
+    "ok": true,
+    "sample_nodes": [
+      "段落 1",
+      "深度学习 2017 年9 月4 日",
+      "ii",
+      "段落 4",
+      "段落 5",
+      "段落 6",
+      "段落 7",
+      "段落 8"
+    ]
+  },
+  {
+    "name": "Python从入门到实践",
+    "file": "Python编程：从入门到实践（第3版）.pdf.txt",
+    "exists": true,
+    "nodes": 64,
+    "edges": 143,
+    "chapters": 40,
+    "terms": 24,
+    "ok": true,
+    "sample_nodes": [
+      "段落 1",
+      "段落 2",
+      "段落 3",
+      "段落 4",
+      "段落 5",
+      "段落 6",
+      "段落 7",
+      "段落 8"
+    ]
+  },
+  {
+    "name": "深度学习入门·Python实现",
+    "file": "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf.txt",
+    "exists": true,
+    "nodes": 64,
+    "edges": 109,
+    "chapters": 40,
+    "terms": 24,
+    "ok": true,
+    "sample_nodes": [
+      "段落 1",
+      "段落 2",
+      "段落 3",
+      "段落 4",
+      "段落 5",
+      "段落 6",
+      "段落 7",
+      "段落 8"
+    ]
+  }
+]

@@ -1,0 +1,616 @@
+{
+ "data": {
+  "text": "深度学习入门4·强化学习",
+  "expand": true
+ },
+ "children": [
+  {
+   "data": {
+    "text": "段落 1",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 2",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "in",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "for",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 3",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "方法",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "TD",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "策略",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 4",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 5",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 6",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 7",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "MDP",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "状态",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "函数",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "行动",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 8",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "GridWorld",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "defaultdict",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 9",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "greedy",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "MC",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 10",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 11",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 12",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 13",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 14",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "例如",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "因此",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 15",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "另外",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 16",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "所示",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 17",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 18",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 19",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 20",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 21",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "如图",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 22",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 23",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 24",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 25",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "env",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "action",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "reward",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "rd",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 26",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "state",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 27",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 28",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 29",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 30",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 31",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "range",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 32",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 33",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 34",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 35",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 36",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 37",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 38",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 39",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 40",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "核心概念",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "in",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "for",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "方法",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "TD",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "策略",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "MDP",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "状态",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "函数",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "行动",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "GridWorld",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "defaultdict",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "greedy",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "MC",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "例如",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "因此",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "另外",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "所示",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "如图",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "env",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "action",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  }
+ ]
+}

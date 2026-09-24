@@ -1,0 +1,620 @@
+{
+ "data": {
+  "text": "深度学习入门·Python实现",
+  "expand": true
+ },
+ "children": [
+  {
+   "data": {
+    "text": "段落 1",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 2",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "使用",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 3",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "Python",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 4",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "此外",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 5",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 6",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 7",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "函数",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 8",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "NumPy",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "数组",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 9",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "sigmoid",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "softmax",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 10",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "MNIST",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "mini",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "batch",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 11",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 12",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 13",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 14",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 15",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 16",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "表示",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 17",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "实际上",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "因此",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "另外",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 18",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "这里",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "也就是说",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 19",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 20",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 21",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 22",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 23",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 24",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 25",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "比如",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 26",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 27",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "def",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 28",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "print",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 29",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 30",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "True",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "False",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 31",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 32",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 33",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "self",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 34",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "array",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 35",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 36",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 37",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 38",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 39",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 40",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "核心概念",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "使用",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Python",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "此外",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "函数",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "NumPy",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "数组",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "sigmoid",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "softmax",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "MNIST",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "mini",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "batch",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "表示",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "实际上",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "因此",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "另外",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "这里",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "也就是说",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "比如",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "def",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "print",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  }
+ ]
+}

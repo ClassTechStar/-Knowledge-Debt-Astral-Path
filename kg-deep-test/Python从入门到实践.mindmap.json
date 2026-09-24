@@ -1,0 +1,616 @@
+{
+ "data": {
+  "text": "Python从入门到实践",
+  "expand": true
+ },
+ "children": [
+  {
+   "data": {
+    "text": "段落 1",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "print",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "例如",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "message",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "name",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "was",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 2",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "Python",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "the",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "使用",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 3",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "to",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "is",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 4",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "VS",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Code",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Hello",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "hello_world.py",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 5",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 6",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "for",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 7",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "range",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "语句",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 8",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "else",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "elif",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 9",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "while",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 10",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 11",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 12",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 13",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 14",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 15",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 16",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 17",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 18",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 19",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 20",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 21",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "python",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 22",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 23",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "E.4　其他部署方法",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 25",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "age",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 26",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "练习",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 27",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 28",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 29",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 30",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 31",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 32",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 33",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 34",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 35",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 36",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "you",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 37",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 38",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 39",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 40",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "核心概念",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "Python",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "the",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "使用",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "to",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "is",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "VS",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Code",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Hello",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "hello_world.py",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "for",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "range",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "语句",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "else",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "elif",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "while",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "python",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "age",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "练习",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "you",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "print",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  }
+ ]
+}

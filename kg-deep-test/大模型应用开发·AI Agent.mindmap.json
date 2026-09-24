@@ -1,0 +1,609 @@
+{
+ "data": {
+  "text": "大模型应用开发·AI Agent",
+  "expand": true
+ },
+ "children": [
+  {
+   "data": {
+    "text": "段落 1",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 2",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "咖哥",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "AI",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "大模型应用开发动",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "手做",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Agent",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "OpenAl",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Assistants",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "LangChain",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Llamalndex",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "GPT",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Al",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 3",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "通过",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 4",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "AIAgent",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "工具",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "小雪",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "AssistantsAPI",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "RAG",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "API",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 5",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 6",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "ChatGPT",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "见图",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "所示",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 7",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "to",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "例如",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "OpenAIAPI",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "段落 8",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 9",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 10",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 11",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 12",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 13",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 14",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 15",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 16",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 17",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 18",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 19",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 20",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 21",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 22",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 23",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 24",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 25",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 26",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 27",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 28",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 29",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 30",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 31",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 32",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 33",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 34",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 35",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 36",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 37",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 38",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 39",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "段落 40",
+    "expand": true
+   },
+   "children": []
+  },
+  {
+   "data": {
+    "text": "核心概念",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "咖哥",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "AI",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "大模型应用开发动",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "手做",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Agent",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "OpenAl",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Assistants",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "LangChain",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Llamalndex",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "GPT",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "通过",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "AIAgent",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "工具",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "小雪",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "AssistantsAPI",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "RAG",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "ChatGPT",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Al",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "见图",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "所示",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  }
+ ]
+}

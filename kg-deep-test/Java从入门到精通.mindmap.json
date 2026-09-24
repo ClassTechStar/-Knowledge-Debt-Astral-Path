@@ -1,0 +1,340 @@
+{
+ "data": {
+  "text": "Java从入门到精通",
+  "expand": true
+ },
+ "children": [
+  {
+   "data": {
+    "text": "访问Annotation信息",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "Java",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "使用",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Eclipse",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "对象",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "资源包",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "如图",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "所示",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "创建",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "训练",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "综合练习",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "编程训练",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "JDK",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "语句",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "if",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "while",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "for",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "方法",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Object",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "String",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "例如",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "其中",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "public",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "static",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "服务类设计",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "final",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  },
+  {
+   "data": {
+    "text": "核心概念",
+    "expand": true
+   },
+   "children": [
+    {
+     "data": {
+      "text": "Java",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "使用",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Eclipse",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "对象",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "资源包",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "如图",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "所示",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "创建",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "训练",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "综合练习",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "编程训练",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "JDK",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "语句",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "if",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "while",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "for",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "方法",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "Object",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "final",
+      "expand": true
+     },
+     "children": []
+    },
+    {
+     "data": {
+      "text": "String",
+      "expand": true
+     },
+     "children": []
+    }
+   ]
+  }
+ ]
+}
