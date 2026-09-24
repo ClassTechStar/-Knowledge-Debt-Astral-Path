@@ -43,6 +43,8 @@ Step "test-Persistence" { dotnet test tests/AstralPath.Persistence.Tests -c Rele
 Step "test-Desktop"     { dotnet test tests/AstralPath.Desktop.Tests -c Release }
 Step "test-Api"         { dotnet test tests/AstralPath.Api.Tests -c Release }
 Step "test-Eval"        { dotnet test tests/AstralPath.Eval.Tests -c Release }
+# 图谱 / OCR 算法回归（AstralPath.Core 在离线方案里也有副本，一并验证）
+Step "test-MobileCore"  { dotnet test src/AstralPath.Mobile.Offline/AstralPath.Mobile.Tests -c Release }
 
 # 5) 三端 HTML 同源
 Write-Host "`n=== monolith-html-sync ===" -ForegroundColor Cyan

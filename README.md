@@ -139,7 +139,7 @@ AstralPath.Native/        Android WebView 壳（~2.8MB）
 AstralPath.Monolith/      无微服务 Windows 壳（Setup-2.2.0）
 AstralPath.Mobile.Offline/Avalonia 11 + SQLite 离线单体
 AstralPath.Persistence/  Postgres（默认）+ memory 回退
-tests/                    Core 11 · Persistence 8 · Desktop 47 · API 53 · Eval 2
+tests/                    Core 28 · Persistence 8 · Desktop 47 · API 53 · Eval 2 · **MobileCore 84（图谱/OCR）**
 ```
 
 **持久化**：默认 **PostgreSQL + pgvector**（`Persistence:Mode=postgres`）；连接串可用 `Persistence__ConnectionString` 覆盖；连不上且 `AllowMemoryFallback=true` 时降级 memory。
@@ -150,17 +150,19 @@ tests/                    Core 11 · Persistence 8 · Desktop 47 · API 53 · Ev
 
 | 套件 | 通过 | 说明 |
 |------|------|------|
-| Core.Tests | **11/11** | score/impact/sale/计划/图/走读金样（1e-6） |
+| Core.Tests | **28/28** | score/impact/sale/计划/图/走读金样（1e-6）+ 画像/智能体 v3 回归 |
 | Persistence.Tests | **8/8** | Postgres/InMemory 双模式 |
 | Desktop.Tests | **47/47** | Avalonia 原生 UI 绑定与导航 |
 | Api.Tests | **53/53** | 上传/解析/诊断/计划/agent |
 | Eval.Tests | **2/2** | 合成数据回归 |
+| MobileCore.Tests | **84/84** | 图谱构图/布局/学习路径 + OCR 全流程（v3 算法回归） |
 | 单体 HTML 自测 | **41 项** | 结构/算法/页面流转 |
 
-```powershell
-dotnet test tests/AstralPath.Core.Tests tests/AstralPath.Persistence.Tests `
-  tests/AstralPath.Desktop.Tests tests/AstralPath.Api.Tests tests/AstralPath.Eval.Tests -c Release
-```
+> `dotnet test` 一次只能接一个项目。全量请用一键脚本：
+>
+> ```powershell
+> powershell -File scripts\verify_all.ps1     # 222 项 → ALL GREEN
+> ```
 
 ---
 
@@ -235,6 +237,19 @@ dotnet publish src/AstralPath.Monolith -c Release -r win-x64 --self-contained -o
 - **Avalonia 原生 UI**（12 axaml + VM）
 - **无微服务单体版**：index.html + Setup-2.0.0.exe
 - 121 项测试全绿
+
+### 2.2.0 · 算法 v3（2026-09-25）
+- **知识图谱 v3**：TextRank 稀疏化（O(V²)→O(V+E)，词表上限）；修复「所有术语挂同一章」的锚定 bug；
+  依赖句式正则一次编译；PMI → 平滑 + 归一化 NPMI；子词去重；DAG 收尾；布局改多趟重心 + 交叉数择优
+- **OCR v3**：混淆修复增加标识符保护（不再把 `Win10` 改成 `WinlO`）；新增跨页页眉页脚去除、
+  英文断字还原、断行合并的列表/标题保护；TSV 行聚类改间隙聚类（抗基线漂移）；投票改模糊匹配
+- 新增 **39 项** v3 回归测试（图谱/OCR 22 + 画像/智能体 17）→ **222 项全绿**
+  （Core 28 + Persistence 8 + Desktop 47 + API 53 + Eval 2 + MobileCore 84），已纳入 `verify_all.ps1`
+- **画像 v3**：波动率按正确率归一（超额波动，不再误判 acc≈0.5 的学生）、新增 ECE 校准曲线、
+  兴趣时间衰减、真 k-匿名（逐个标签判样本量）、修复伪 Laplace（噪声不再由 value 驱动）
+- **智能体 v3**：启用三个从未使用的常量（TauExec/TauClarify/MaxClarify）、多锚点饱和累加 + 覆盖率、
+  修复"好的"二字吞掉整句请求、槽位填充可收敛、支持话题切换与省略指代
+- 详见 `docs/算法v3-图谱与OCR优化说明.md`、`docs/算法v3-画像与智能体优化说明.md`
 
 ### 1.4.x–1.5.0
 - 智能体接真学情；启动预热；上传 2GB/分片；WebView 同构壳；badge 全绿；商店签名

@@ -1,53 +1,54 @@
+using System.Text.RegularExpressions;
+
 namespace AstralPath.Core.Ocr;
 
 /// <summary>
-/// OCR v2 文本引擎：置信度加权、多配置投票、中文断行、常见误识修复、噪声过滤、质量评分。
+/// OCR v3 文本引擎：混淆修复（带标识符保护）/ 页眉页脚去除 / 英文断字还原 /
+/// 中文软断行合并（带分栏与列表保护）/ TSV 置信度重建 / 多配置模糊投票 / 质量评分。
 /// 纯函数，可单测；不依赖 IO / 网络。
+///
+/// 相对 v2 的关键修复：
+/// ① FixConfusions 的 0→O / 1→l / 5→S / 8→B 是「无差别替换」，
+///    "Win10"→"WinlO"、"ISO9001"→"ISO9OOl"，把真实标识符直接腐蚀。
+///    v3 先做「标识符/版本号/代码」识别，命中就跳过替换。
+/// ② 新增 RemoveRepeatedBoilerplate：跨页重复的页眉页脚自动去除（教材 OCR 最大噪声源）
+/// ③ 新增 Dehyphenate：英文行末断字还原（inter-national → international）
+/// ④ ReconstructCjkLines 增加保护：不合并列表项 / 编号行 / 疑似标题
+/// ⑤ ReconstructFromTsvWords：v2 拿「本行第一个词的 Y」做聚类基准，
+///    遇到基线漂移（扫描歪斜）就串行；v3 改为按 Y 排序后的「间隙聚类」
+/// ⑥ VotePasses：v2 用整行精确匹配投票，三路 PSM 稍有差异就全部投不中；
+///    v3 先归一化（去空白/全角）再分组投票，并用 HashSet 修掉 O(n²) 的 Contains
 /// </summary>
 public static class OcrTextEngine
 {
-    // ── 1. 常见误识修复 ─────────────────────────────────
-    /// <summary>字符级混淆表（OCR 经典）。</summary>
-    private static readonly (string Bad, string Good)[] CharConfusions =
+    // ── 1. 混淆修复（带保护）────────────────────────────
+    private static readonly (string Bad, string Good)[] FullWidthPairs =
     {
-        ("0O", "OO"), // 上下文里再判
-        ("l1", "11"),
-        ("｜", "|"),
-        ("【", "["),
-        ("】", "]"),
-        ("（", "("),
-        ("）", ")"),
-        ("，", ","),
-        ("。", "."),
-        ("：", ":"),
-        ("；", ";"),
+        ("（", "("), ("）", ")"), ("［", "["), ("］", "]"),
+        ("，", ","), ("；", ";"), ("：", ":"), ("？", "?"), ("！", "!"),
+        ("“", "\""), ("”", "\""), ("＝", "="), ("＋", "+"), ("－", "-"), ("×", "*")
     };
 
-    /// <summary>词内数字/字母混淆：治「会计等式」变「会计等式」类破损。</summary>
-    private static readonly (string Pattern, string Repl)[] WordFixes =
+    /// <summary>标识符/版本号/代码类 token：数字是真实语义，禁止替换为字母。</summary>
+    private static bool IsIdentifierLike(string w)
     {
-        ("0", "O"), // 在纯字母词内由 FixAlphaNumeric 处理
-    };
+        if (w.Contains('_')) return true;                              // 代码标识符
+        if (Regex.IsMatch(w, @"^[A-Za-z]{1,4}\d{1,3}$")) return true;  // C02 / GPT4 / H2
+        if (Regex.IsMatch(w, @"^\d{2,}")) return true;                 // 2024 开头
+        if (Regex.IsMatch(w, @"\d{2,}")) return true;                  // 含连续数字（版本/编号）
+        if (Regex.IsMatch(w, @"[a-z][A-Z]")) return true;              // camelCase → 代码
+        if (Regex.IsMatch(w, @"^[A-Z]{2,}\d")) return true;            // ISO9001 / UTF8
+        return false;
+    }
 
-    /// <summary>
-    /// 英数混淆：字母包围的 0/O、1/l/I 仅在「明显词长≥3」时启发式替换。
-    /// 保守：只在 pattern 命中时改。
-    /// </summary>
     public static string FixConfusions(string text)
     {
         if (string.IsNullOrEmpty(text)) return "";
-        var s = text;
-        // 全角标点归一
-        s = s.Replace('　', ' ').Replace('\x00', ' ');
-        s = s.Replace("（", "(").Replace("）", ")")
-             .Replace("［", "[").Replace("］", "]")
-             .Replace("，", ",").Replace("；", ";")
-             .Replace("：", ":").Replace("？", "?")
-             .Replace("！", "!").Replace("“", "\"").Replace("”", "\"")
-             .Replace("＝", "=").Replace("＋", "+").Replace("－", "-").Replace("×", "*");
+        var s = text.Replace('　', ' ').Replace('\x00', ' ');
+        foreach (var (bad, good) in FullWidthPairs) s = s.Replace(bad, good);
 
-        // 字母串中的 0 → O，1 → l（仅当串为纯字母数字且含字母）
-        s = System.Text.RegularExpressions.Regex.Replace(
+        // 数字→字母：仅对「非标识符 + 长度≥4」的普通词生效，且只改单个数位
+        s = Regex.Replace(
             s,
             @"\b[A-Za-z][A-Za-z0-9]{2,}\b",
             m =>
@@ -56,29 +57,130 @@ public static class OcrTextEngine
                 var hasAlpha = w.Any(char.IsLetter);
                 var hasDigit = w.Any(char.IsDigit);
                 if (!hasAlpha || !hasDigit) return w;
-                // 技术词保留数字（C02、N1）
-                if (System.Text.RegularExpressions.Regex.IsMatch(w, @"^[A-Z]\d+$")) return w;
+                if (IsIdentifierLike(w)) return w;          // ★ v3：保护真实标识符
+                if (w.Length < 4) return w;                 // 短词证据不足，不动
                 return w.Replace('0', 'O').Replace('1', 'l').Replace('5', 'S').Replace('8', 'B');
             });
 
-        // 中文里常见：未/末、日/曰 不做全文替换（过险）
-        // 断词粘连修复：汉字与字母数字粘连加空格
-        s = System.Text.RegularExpressions.Regex.Replace(s, @"([一-鿿])([A-Za-z])", "$1 $2");
-        s = System.Text.RegularExpressions.Regex.Replace(s, @"([A-Za-z])([一-鿿])", "$1 $2");
+        // 汉字与字母数字粘连处插空格
+        s = Regex.Replace(s, @"([一-鿿])([A-Za-z0-9])", "$1 $2");
+        s = Regex.Replace(s, @"([A-Za-z0-9])([一-鿿])", "$1 $2");
         return s;
     }
 
-    // ── 2. 中文断行 / 页眉页脚 ─────────────────────────
+    // ── 2. 页眉页脚（跨页重复行）────────────────────────
+    private static readonly string[] PageSeparators = { "\f", "\u000c" };
+
     /// <summary>
-    /// 中文软断行合并：行尾无标点且下一行是汉字 → 去掉断字符合并。
+    /// 去页眉页脚：把文本按分页符切成页，统计每行出现页数占比，
+    /// 超过 threshold（默认 30%）的短行判为页眉/页脚并删除。
+    /// 页数 &lt; 3 时不做（样本不足）。
     /// </summary>
-    public static string ReconstructCjkLines(string text)
+    public static string RemoveRepeatedBoilerplate(string text, double threshold = 0.3, int maxLineLen = 40)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return text ?? "";
+        var pages = text.Split(PageSeparators, StringSplitOptions.None).ToList();
+        if (pages.Count < 3)
+        {
+            // 没有分页符时，退而求其次：按固定行数（40 行/页）估算
+            var lines0 = text.Replace("\r", "").Split('\n');
+            if (lines0.Length < 120) return text;
+            pages = Chunk(lines0, 40).Select(c => string.Join("\n", c)).ToList();
+        }
+
+        var pageOf = new Dictionary<string, HashSet<int>>(StringComparer.Ordinal);
+        for (var i = 0; i < pages.Count; i++)
+        {
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var raw in pages[i].Replace("\r", "").Split('\n'))
+            {
+                var l = raw.Trim();
+                if (l.Length == 0 || l.Length > maxLineLen) continue;
+                if (Regex.IsMatch(l, @"^\d{1,4}$")) continue; // 纯页码：单页出现很正常
+                if (!seen.Add(l)) continue;
+                if (!pageOf.TryGetValue(l, out var set)) pageOf[l] = set = new HashSet<int>();
+                set.Add(i);
+            }
+        }
+
+        var boilerplate = new HashSet<string>(StringComparer.Ordinal);
+        var need = Math.Ceiling(pages.Count * threshold);
+        foreach (var kv in pageOf)
+            if (kv.Value.Count >= need && kv.Value.Count >= 3) boilerplate.Add(kv.Key);
+
+        if (boilerplate.Count == 0) return text;
+
+        // 逐页过滤后重新拼接：分页符不是换行符，
+        // 若直接把整篇按 '\n' 切开过滤，跨页粘连的行会漏掉页眉（v3 修掉这个坑）
+        var sep = text.Contains('\f') ? "\f" : null;
+        var keptPages = pages.Select(p =>
+            string.Join("\n", p.Replace("\r", "").Split('\n')
+                               .Where(l => !boilerplate.Contains(l.Trim()))));
+        return string.Join(sep ?? "\n", keptPages);
+    }
+
+    private static IEnumerable<string[]> Chunk(string[] src, int size)
+    {
+        for (var i = 0; i < src.Length; i += size)
+            yield return src.Skip(i).Take(size).ToArray();
+    }
+
+    // ── 3. 英文断字还原 ─────────────────────────────────
+    /// <summary>行末连字符 + 下一行小写开头 → 合并并去掉连字符（inter-/national）。</summary>
+    public static string Dehyphenate(string text)
     {
         if (string.IsNullOrEmpty(text)) return "";
-        var lines = text.Split('\n')
+        var lines = text.Replace("\r", "").Split('\n').ToList();
+        var outLines = new List<string>();
+        for (var i = 0; i < lines.Count; i++)
+        {
+            var cur = lines[i].TrimEnd();
+            if (i + 1 < lines.Count
+                && (cur.EndsWith('-') || cur.EndsWith('‐') || cur.EndsWith('‑'))
+                && cur.Length > 1)
+            {
+                var next = lines[i + 1].TrimStart();
+                if (next.Length > 0 && char.IsLower(next[0]))
+                {
+                    outLines.Add(cur[..^1] + next);
+                    i++;
+                    continue;
+                }
+            }
+            outLines.Add(cur);
+        }
+        return string.Join("\n", outLines);
+    }
+
+    // ── 4. 中文软断行合并（带保护）──────────────────────
+    private static bool IsMostlyCjk(string s)
+    {
+        if (s.Length == 0) return false;
+        var cjk = s.Count(c => c >= 0x4E00 && c <= 0x9FFF);
+        return cjk * 2 >= s.Length;
+    }
+
+    private static readonly Regex ListStartRe = new(
+        @"^\s*(?:[•·●○▪]|[（(]?\d{1,2}[)）.、]|第[一二三四五六七八九十百\d]+[章节条]|[一二三四五六七八九十]+[、．.]|[a-zA-Z][)）.、])",
+        RegexOptions.Compiled);
+
+    private static bool EndsSentence(string s)
+        => s.Length > 0 && "。！？.!?:：;；".Contains(s[^1]);
+
+    /// <summary>
+    /// 中文段落软断行合并。v3 增加三道保护：
+    ///   · 下行是列表项/编号/章节开头 → 不合并
+    ///   · 上段很短（≤15 字）且下行明显更长 → 判为标题，不合并
+    ///   · 合并后长度上限 120 字（v2 是 80 且判断用的是合并前长度）
+    /// </summary>
+    public static string ReconstructCjkLines(string text, int maxLine = 120)
+    {
+        if (string.IsNullOrEmpty(text)) return "";
+        var lines = text.Replace("\r", "").Split('\n')
             .Select(l => l.Trim())
             .Where(l => l.Length > 0)
             .ToList();
+
         var outLines = new List<string>();
         var buf = "";
         foreach (var line in lines)
@@ -87,19 +189,24 @@ public static class OcrTextEngine
 
             var bufIsCjk = IsMostlyCjk(buf);
             var lineIsCjk = IsMostlyCjk(line);
-            var endsSoft = !buf.EndsWith('。') && !buf.EndsWith('！') && !buf.EndsWith('？')
-                           && !buf.EndsWith('.') && !buf.EndsWith(':') && !buf.EndsWith('：')
-                           && !buf.EndsWith(';') && !buf.EndsWith('；');
-            var startsLower = line.Length > 0 && char.IsLower(line[0]);
-            // 中文段落软断 → 合并；英文词中断 → 加连字或空格
-            if (bufIsCjk && lineIsCjk && endsSoft && buf.Length < 80)
+
+            // 保护 1：列表项/编号不并入上段
+            if (ListStartRe.IsMatch(line)) { outLines.Add(buf); buf = line; continue; }
+
+            // 保护 2：疑似标题（短行 + 无句末标点 + 下行明显更长）
+            if (buf.Length <= 15 && !EndsSentence(buf) && line.Length > buf.Length * 2)
+            { outLines.Add(buf); buf = line; continue; }
+
+            // 合并 1：中文段落软断
+            if (bufIsCjk && lineIsCjk && !EndsSentence(buf) && buf.Length < maxLine)
             {
                 buf += line.TrimStart();
                 continue;
             }
-            if (bufIsCjk && !lineIsCjk && endsSoft && !startsLower && line.Length < 24)
+            // 合并 2：短的英文小尾巴（公式/题号）并入
+            if (bufIsCjk && !lineIsCjk && !EndsSentence(buf)
+                && !(line.Length > 0 && char.IsLower(line[0])) && line.Length < 24)
             {
-                // 短的英文小尾巴（公式/题号）并入
                 buf += " " + line;
                 continue;
             }
@@ -110,14 +217,7 @@ public static class OcrTextEngine
         return string.Join("\n", outLines);
     }
 
-    private static bool IsMostlyCjk(string s)
-    {
-        if (s.Length == 0) return false;
-        var cjk = s.Count(c => c >= 0x4E00 && c <= 0x9FFF);
-        return cjk * 2 >= s.Length;
-    }
-
-    // ── 3. 噪声过滤 ─────────────────────────────────────
+    // ── 5. 噪声过滤 ─────────────────────────────────────
     private static readonly HashSet<string> NoiseExact = new(StringComparer.OrdinalIgnoreCase)
     {
         "page", "ocr", "tesseract", "scanned by", "copyrighted material",
@@ -128,85 +228,145 @@ public static class OcrTextEngine
     public static string FilterNoise(string text)
     {
         if (string.IsNullOrEmpty(text)) return "";
-        var lines = text.Replace("\r", "").Split('\n');
         var kept = new List<string>();
-        foreach (var raw in lines)
+        foreach (var raw in text.Replace("\r", "").Split('\n'))
         {
             var s = raw.Trim();
             if (s.Length == 0) continue;
             if (s.Length == 1 && !char.IsDigit(s[0])) continue;
-            if (s.Length <= 8 && System.Text.RegularExpressions.Regex.IsMatch(s, @"^[\W_]+$")) continue;
+            if (s.Length <= 8 && Regex.IsMatch(s, @"^[\W_]+$")) continue;
             if (NoiseExact.Contains(s)) continue;
-            if (System.Text.RegularExpressions.Regex.IsMatch(s, @"^scanned by .{0,24}$", System.Text.RegularExpressions.RegexOptions.IgnoreCase)) continue;
+            if (Regex.IsMatch(s, @"^scanned by .{0,24}$", RegexOptions.IgnoreCase)) continue;
+            // v3：装饰性页码 "- 37 -" / "·37·" / "第 37 页"
+            // 注意：纯数字行（"37"）必须保留——它可能是公式或题号（金样 OC03）
+            if (Regex.IsMatch(s, @"^[-–—~·*|]{1,3}\s*\d{1,4}\s*[-–—~·*|]{1,3}$")) continue;
+            if (Regex.IsMatch(s, @"^第\s*\d{1,4}\s*页$")) continue;
             // 全大写长页眉
-            if (s.Length > 20 && s.All(c => !char.IsLetter(c) || char.IsUpper(c)) && s.Count(char.IsLetter) > 4)
-            {
-                // 标题允许：含有空格分词的短标题更可能是章节
-                if (s.Count(char.IsLetter) > 30) continue;
-            }
+            if (s.Length > 20 && s.All(c => !char.IsLetter(c) || char.IsUpper(c)) && s.Count(char.IsLetter) > 30)
+                continue;
             kept.Add(s);
         }
         return string.Join("\n", kept);
     }
 
-    // ── 4. 置信度加权 ───────────────────────────────────
+    // ── 6. 置信度加权重建 ───────────────────────────────
     public sealed record WordTok(string Text, double Confidence, double X, double Y);
 
     /// <summary>
-    /// 按 TSV 词置信度过滤：conf&lt;minConf 丢弃；行内按 X 排序，行按 Y 聚类。
+    /// 按 TSV 词框重建文本：conf&lt;minConf 丢弃；行内按 X 排序，行按 Y 聚类。
+    /// v3：聚类改为「按 Y 排序后的间隙聚类」，不再拿行内第一个词的 Y 当基准
+    /// （v2 的做法在扫描歪斜 / 基线漂移时会把整页串成一行）。
     /// </summary>
-    public static string ReconstructFromTsvWords(IReadOnlyList<WordTok> words, double minConf = 40)
+    public static string ReconstructFromTsvWords(IReadOnlyList<WordTok> words, double minConf = 40, double rowTolerance = 8)
     {
         var kept = words
             .Where(w => w.Text.Length > 0 && w.Confidence >= minConf)
+            .OrderBy(w => w.Y)
+            .ThenBy(w => w.X)
             .ToList();
         if (kept.Count == 0) return "";
 
-        // Y 聚类（行高容差 8px）
+        var tol = Math.Clamp(rowTolerance, 1, 40);
         var rows = new List<List<WordTok>>();
-        foreach (var w in kept.OrderBy(w => w.Y).ThenBy(w => w.X))
+        var cur = new List<WordTok> { kept[0] };
+        var prevY = kept[0].Y;
+        for (var i = 1; i < kept.Count; i++)
         {
-            var row = rows.FirstOrDefault(r => Math.Abs(r[0].Y - w.Y) <= 8);
-            if (row is null) { row = new List<WordTok>(); rows.Add(row); }
-            row.Add(w);
+            if (kept[i].Y - prevY > tol)
+            {
+                rows.Add(cur);
+                cur = new List<WordTok>();
+            }
+            cur.Add(kept[i]);
+            prevY = kept[i].Y;
         }
-        var lines = rows
-            .OrderBy(r => r.Average(w => w.Y))
-            .Select(r => string.Join(" ", r.OrderBy(w => w.X).Select(w => w.Text)));
+        rows.Add(cur);
+
+        var lines = rows.Select(r => string.Join(" ", r.OrderBy(w => w.X).Select(w => w.Text)));
         return string.Join("\n", lines);
     }
 
-    /// <summary>多配置投票：同一 token 在 n 路出现 ≥⌈n/2⌉ 才保留；位置邻近合并。</summary>
+    // ── 7. 多配置投票（模糊）────────────────────────────
+    /// <summary>投票用的归一化键：去空白、全角转半角、小写化。</summary>
+    internal static string VoteKey(string line)
+    {
+        var sb = new System.Text.StringBuilder(line.Length);
+        foreach (var ch in line)
+        {
+            if (char.IsWhiteSpace(ch)) continue;
+            var c = ch;
+            if (c >= 0xFF01 && c <= 0xFF5E) c = (char)(c - 0xFEE0);
+            sb.Append(char.ToLowerInvariant(c));
+        }
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// 多配置投票：同一行（归一化后）在 ≥⌈n×keepRatio⌉ 路中出现才保留。
+    /// v3 用归一化键分组，容忍三路 PSM 的细微差异；保留首次出现顺序。
+    /// </summary>
     public static string VotePasses(IReadOnlyList<string> passes, double keepRatio = 0.5)
     {
-        var lists = passes.Select(p => p.Split('\n')).ToList();
-        if (lists.Count == 0) return "";
-        if (lists.Count == 1) return lists[0][0] is null ? "" : string.Join("\n", lists[0]);
+        if (passes.Count == 0) return "";
+        var lists = passes.Select(p => (p ?? "").Replace("\r", "").Split('\n')
+                                        .Select(l => l.Trim())
+                                        .Where(l => l.Length > 1)
+                                        .ToList())
+                           .ToList();
+        if (lists.Count == 1) return string.Join("\n", lists[0]);
 
-        // 用二元组（行文本）做多数票——行级投票更稳
-        var counts = new Dictionary<string, int>(StringComparer.Ordinal);
+        // 组 → 支持它的「路数」
+        var support = new Dictionary<string, int>(StringComparer.Ordinal);
+        var variantCount = new Dictionary<string, Dictionary<string, int>>(StringComparer.Ordinal);
         foreach (var lines in lists)
         {
-            foreach (var distinct in lines.Select(l => l.Trim()).Where(l => l.Length > 1).Distinct())
-                counts[distinct] = counts.GetValueOrDefault(distinct) + 1;
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var l in lines)
+            {
+                var k = VoteKey(l);
+                if (k.Length == 0 || !seen.Add(k)) continue;
+                support[k] = support.GetValueOrDefault(k) + 1;
+                if (!variantCount.TryGetValue(k, out var vc)) variantCount[k] = vc = new Dictionary<string, int>(StringComparer.Ordinal);
+                vc[l] = vc.GetValueOrDefault(l) + 1;
+            }
         }
+
         var need = Math.Ceiling(lists.Count * keepRatio);
-        var order = new List<string>();
-        // 保留首次出现顺序
-        foreach (var lines in lists[0])
+        bool Keep(string line)
         {
-            var s = lines.Trim();
-            if (s.Length > 1 && counts.GetValueOrDefault(s) >= need) order.Add(s);
+            var k = VoteKey(line);
+            return k.Length > 0 && support.GetValueOrDefault(k) >= need;
         }
-        // 补上其它 pass 中多数但 pass0 缺的
-        foreach (var kv in counts.Where(kv => kv.Value >= need))
+        // 组内选出现最多的原文形态
+        string Best(string line)
         {
-            if (!order.Contains(kv.Key)) order.Add(kv.Key);
+            var k = VoteKey(line);
+            if (!variantCount.TryGetValue(k, out var vc)) return line;
+            return vc.OrderByDescending(kv => kv.Value).ThenBy(kv => kv.Key, StringComparer.Ordinal).First().Key;
+        }
+
+        var order = new List<string>();
+        var emitted = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var line in lists[0])
+        {
+            if (!Keep(line)) continue;
+            var k = VoteKey(line);
+            if (!emitted.Add(k)) continue;
+            order.Add(Best(line));
+        }
+        // 补上其它路中达标但首路缺失的行
+        foreach (var lines in lists.Skip(1))
+        foreach (var line in lines)
+        {
+            if (!Keep(line)) continue;
+            var k = VoteKey(line);
+            if (!emitted.Add(k)) continue;
+            order.Add(Best(line));
         }
         return string.Join("\n", order);
     }
 
-    // ── 5. 质量评分 ─────────────────────────────────────
+    // ── 8. 质量评分 ─────────────────────────────────────
     public sealed record QualityReport(
         double MeanConf,
         double CjkRatio,
@@ -221,8 +381,7 @@ public static class OcrTextEngine
         var cjk = text.Count(c => c >= 0x4E00 && c <= 0x9FFF);
         var letters = text.Count(char.IsLetter);
         var cjkRatio = letters == 0 ? 0 : (double)cjk / letters;
-        var noise = lines.Count(l =>
-            l.Length <= 8 && System.Text.RegularExpressions.Regex.IsMatch(l, @"^[\W_]+$"));
+        var noise = lines.Count(l => l.Length <= 8 && Regex.IsMatch(l, @"^[\W_]+$"));
         var noiseRatio = lines.Length == 0 ? 0 : (double)noise / lines.Length;
         var score = 0.5 * meanConf + 0.3 * Math.Min(cjkRatio / 0.6, 1.0) + 0.2 * (1 - noiseRatio);
         var grade = score >= 0.845 ? "A" : score >= 0.7 ? "B" : score >= 0.5 ? "C" : "D";
@@ -230,7 +389,18 @@ public static class OcrTextEngine
             Math.Round(noiseRatio, 4), lines.Length, grade);
     }
 
-    /// <summary>一站式：混淆修复 → 噪声过滤 → 中文断行合并。</summary>
+    // ── 9. 一站式 ───────────────────────────────────────
+    /// <summary>
+    /// 一站式清洗：混淆修复 → 噪声过滤 → 页眉页脚去除 → 断字还原 → 中文断行合并。
+    /// </summary>
     public static string Refine(string raw)
-        => ReconstructCjkLines(FilterNoise(FixConfusions(raw)));
+    {
+        if (string.IsNullOrEmpty(raw)) return "";
+        var s = FixConfusions(raw);
+        s = FilterNoise(s);
+        s = RemoveRepeatedBoilerplate(s);
+        s = Dehyphenate(s);
+        s = ReconstructCjkLines(s);
+        return s;
+    }
 }
