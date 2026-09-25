@@ -23,6 +23,13 @@ public sealed class MaterialsController : ControllerBase
     /// <summary>宿主启动时调用，指定资料落盘根目录。</summary>
     public static void ConfigureStorage(string? dataRoot) => _storageRootOverride = dataRoot;
 
+    /// <summary>
+    /// 当前生效的资料落盘目录。
+    /// 启动预热也必须用它 —— 原先预热硬编码 AppContext.BaseDirectory\materials-uploads，
+    /// 导致注册表里塞满了 bin 目录的条目，而上传/列表用的是数据目录，两者不一致。
+    /// </summary>
+    public static string CurrentMaterialsDir => MaterialsDir;
+
     private static string MaterialsDir
     {
         get
@@ -504,14 +511,30 @@ public sealed class MaterialsController : ControllerBase
         };
 
         var created = new List<string>();
+        var skipped = new List<string>();
+        // P3-10：去重必须以**磁盘现状**为唯一权威。
+        // 原先只比对内存注册表：① 重启后注册表为空，去重形同虚设（冒烟反复调用把目录撑到 17GB）；
+        // ② 注册表还可能指向其他目录（预热曾硬编码 bin 目录），单看注册表会产生幽灵条目——
+        //    磁盘上明明没有文件也报"已存在"，导致永远补不上。
+        // 现规则：激活目录里存在「同名（净化后）+ 同字节数」的文件才视为已存在。
+        Directory.CreateDirectory(MaterialsDir);
         foreach (var src in samples)
         {
             if (!System.IO.File.Exists(src)) continue;
             var name = Path.GetFileName(src);
-            if (MaterialRegistry.ListMaterials().Any(m => string.Equals(m.Name, name, StringComparison.OrdinalIgnoreCase)))
+            var sourceSize = new FileInfo(src).Length;
+            var sanitized = SanitizeFileName(name);
+
+            var duplicate = Directory.GetFiles(MaterialsDir, $"*_{sanitized}")
+                .Any(f => new FileInfo(f).Length == sourceSize);
+            if (duplicate)
+            {
+                skipped.Add(name);
                 continue;
+            }
+
             var id = Guid.NewGuid().ToString("N");
-            var dest = Path.Combine(MaterialsDir, $"{id}_{SanitizeFileName(name)}");
+            var dest = Path.Combine(MaterialsDir, $"{id}_{sanitized}");
             try { System.IO.File.Copy(src, dest, true); } catch { continue; }
             var doc = new MaterialDoc(id, name, dest, new FileInfo(dest).Length, "uploaded",
                 "standard", false, 0, 0, 0, 0, null, "seeded", DateTime.UtcNow, DateTime.UtcNow, null);
@@ -533,7 +556,14 @@ public sealed class MaterialsController : ControllerBase
             });
         }
 
-        return HttpResults.Success(new { seeded = created.Count, ids = created, parseStarted = parse && created.Count > 0 });
+        return HttpResults.Success(new
+        {
+            seeded = created.Count,
+            ids = created,
+            skippedCount = skipped.Count,
+            skipped = skipped,
+            parseStarted = parse && created.Count > 0
+        });
     }
 
     /// <summary>一键解析全部已上传资料并生成今日任务（用于根据示例教材出题）。</summary>

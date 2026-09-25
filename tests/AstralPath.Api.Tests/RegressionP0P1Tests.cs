@@ -217,4 +217,33 @@ public class RegressionP0P1Tests : IClassFixture<WebApplicationFactory<Program>>
             try { Directory.Delete(dir, recursive: true); } catch { /* ignore */ }
         }
     }
+
+    // ── P3-10：seed-samples 不得重复复制 ─────────────────
+    [Fact]
+    public async Task P310_SeedSamples_Is_Idempotent()
+    {
+        // 背景：去重原先只比对内存注册表，重启后注册表为空 → 反复调用把上传目录撑到 17GB
+        //（同一本书多 GUID 副本）。修复后以「磁盘同名 + 同字节数」判定。
+        //
+        // 幂等不变量（与目录初始状态无关）：
+        //   ① 连续两次调用，第二次必须零新增；
+        //   ② 两次调用之间，落盘目录的文件数不得增长。
+        // 注意不能断言 skipped == 第一次的 seeded：目录里可能早有历史副本。
+        var client = _factory.CreateClient();
+        var dir = AstralPath.Api.Controllers.MaterialsController.CurrentMaterialsDir;
+        var countBefore = Directory.Exists(dir) ? Directory.GetFiles(dir).Length : 0;
+
+        var resp1 = await client.PostAsync("/v1/materials/seed-samples", null);
+        resp1.EnsureSuccessStatusCode();
+        var doc1 = JsonDocument.Parse(await resp1.Content.ReadAsStringAsync()).RootElement.GetProperty("data");
+
+        var resp2 = await client.PostAsync("/v1/materials/seed-samples", null);
+        resp2.EnsureSuccessStatusCode();
+        var doc2 = JsonDocument.Parse(await resp2.Content.ReadAsStringAsync()).RootElement.GetProperty("data");
+        var seeded2 = doc2.GetProperty("seeded").GetInt32();
+
+        var countAfter = Directory.GetFiles(dir).Length;
+        Assert.Equal(0, seeded2);            // 第二次调用不得再复制任何文件
+        Assert.Equal(countBefore, countAfter); // 目录文件数不得增长
+    }
 }

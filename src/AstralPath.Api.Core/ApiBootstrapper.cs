@@ -596,7 +596,9 @@ public sealed class ApiBootstrapper
             // 启动即预热：资料热加载 + OCR 运行时探测，保证上传/解析开箱可用
             try
             {
-                var materialsDir = Path.Combine(AppContext.BaseDirectory, "materials-uploads");
+                // 必须用与上传/列表一致的目录（P2-7 修复后不再是 bin 目录），
+                // 否则注册表里全是 bin 里的旧条目，与真实数据目录脱节。
+                var materialsDir = AstralPath.Api.Controllers.MaterialsController.CurrentMaterialsDir;
                 var n = MaterialRegistry.HydrateFromDirectory(materialsDir);
                 var tess = MaterialPipeline.ResolveTesseract();
                 var py = MaterialPipeline.ResolvePython();
