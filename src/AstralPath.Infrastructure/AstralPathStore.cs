@@ -74,15 +74,98 @@ public sealed class AstralPathStore
         throw new DirectoryNotFoundException("graph-packs/accounting-v1 not found");
     }
 
+    /// <summary>
+    /// 每次 <see cref="Lock(Action)"/> / <see cref="Lock{T}(Func{T})"/> 退出后回调（在锁**外**执行）。
+    /// 宿主用它挂上「状态已变更 → 安排快照保存」，从而不必改任何控制器的写路径。
+    /// </summary>
+    public Action? AfterLock { get; set; }
+
     public void Lock(Action action)
     {
         lock (_gate) action();
+        AfterLock?.Invoke();
     }
 
     public T Lock<T>(Func<T> fn)
     {
-        lock (_gate) return fn();
+        T result;
+        lock (_gate) result = fn();
+        AfterLock?.Invoke();
+        return result;
     }
+
+    // ── 运行时状态快照（P1：重启不丢）────────────────────
+    /// <summary>
+    /// 导出可变业务状态。刻意只包含**需要持久化**的部分：
+    /// 图与题库来自图包/种子（可重建），教师热点缓存是派生数据。
+    /// </summary>
+    public StoreStateDto ExportState() => Lock(() => new StoreStateDto
+    {
+        Students = Students.Values.Select(s => new StudentStateDto
+        {
+            StudentId = s.StudentId,
+            DisplayName = s.DisplayName,
+            DemoGroup = s.DemoGroup,
+            MasteryInputs = new Dictionary<string, IngestRow>(s.MasteryInputs, StringComparer.Ordinal),
+            Mastery = new Dictionary<string, MasteryRecord>(s.Mastery, StringComparer.Ordinal),
+            DebtEdges = s.DebtEdges.ToList(),
+            Attempts = s.Attempts.ToList(),
+            ActivePlan = s.ActivePlan,
+            CurrentDay = s.CurrentDay,
+            SaleStreak = new Dictionary<string, int>(s.SaleStreak, StringComparer.Ordinal),
+            SaleHistory = s.SaleHistory.ToDictionary(
+                kv => kv.Key, kv => kv.Value.ToList(), StringComparer.Ordinal)
+        }).ToList(),
+        Consents = Consents.Values.ToList(),
+        ConsentAudits = ConsentAudits.ToList()
+    });
+
+    /// <summary>
+    /// 合并导入（upsert，不清空现有数据）：这样 seed 出来的演示学生与演示账号
+    /// 不会因为「快照里没有」而被删掉。
+    /// </summary>
+    public void ImportState(StoreStateDto? state)
+    {
+        if (state is null) return;
+        Lock(() =>
+        {
+            foreach (var dto in state.Students)
+            {
+                if (string.IsNullOrWhiteSpace(dto.StudentId)) continue;
+                var target = EnsureStudent(dto.StudentId);
+                // 注意：DisplayName / DemoGroup 是 init-only（构造后不可改），
+                // 演示学生的取值由 SeedDemoStudents 决定；这里只回填可变的学习状态。
+
+                target.MasteryInputs.Clear();
+                foreach (var kv in dto.MasteryInputs) target.MasteryInputs[kv.Key] = kv.Value;
+                target.Mastery.Clear();
+                foreach (var kv in dto.Mastery) target.Mastery[kv.Key] = kv.Value;
+
+                target.DebtEdges.Clear();
+                target.DebtEdges.AddRange(dto.DebtEdges);
+                target.Attempts.Clear();
+                target.Attempts.AddRange(dto.Attempts);
+
+                target.ActivePlan = dto.ActivePlan;
+                target.CurrentDay = dto.CurrentDay > 0 ? dto.CurrentDay : target.CurrentDay;
+
+                target.SaleStreak.Clear();
+                foreach (var kv in dto.SaleStreak) target.SaleStreak[kv.Key] = kv.Value;
+                target.SaleHistory.Clear();
+                foreach (var kv in dto.SaleHistory) target.SaleHistory[kv.Key] = kv.Value.ToList();
+            }
+
+            foreach (var c in state.Consents)
+                Consents[ConsentKey(c.StudentId, c.TeacherId, c.Purpose)] = c;
+
+            ConsentAudits.Clear();
+            ConsentAudits.AddRange(state.ConsentAudits);
+        });
+    }
+
+    /// <summary>与控制器既有约定保持一致：{studentId}:{teacherId}:{purpose}</summary>
+    private static string ConsentKey(string studentId, string teacherId, string purpose)
+        => $"{studentId}:{teacherId}:{purpose}";
 
     public void RecomputeMastery(string studentId)
     {

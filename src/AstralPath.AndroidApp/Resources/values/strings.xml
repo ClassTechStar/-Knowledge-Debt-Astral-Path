@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="app_name">知债：星穹学途</string>
+  <string name="boot_status_starting">正在启动本地服务…（首次启动需要解包资源，约 3–10 秒）</string>
 </resources>

@@ -21,8 +21,10 @@ public sealed class StudentsController : ControllerBase
     }
 
     [HttpPost("/v1/students/{id}/ingest/scores")]
-    public IResult Ingest(string id, [FromBody] IngestScoresRequest request)
+    public IResult Ingest(string id, [FromBody] IngestScoresRequest? request)
     {
+        if (request is null)
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "请求体必须是合法的 JSON 对象");
         return _store.Lock(() =>
         {
             if (request.Rows is null || request.Rows.Count == 0)

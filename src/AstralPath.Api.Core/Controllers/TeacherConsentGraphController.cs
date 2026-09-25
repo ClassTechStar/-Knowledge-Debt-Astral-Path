@@ -13,6 +13,21 @@ public sealed class TeacherConsentGraphController : ControllerBase
 
     public TeacherConsentGraphController(AstralPathStore store) => _store = store;
 
+    /// <summary>
+    /// 解析「谁在操作」（P2-1）。
+    /// 已登录时**以令牌主体为准，忽略请求体里的 ActorId**——否则任何人都能替他人授予/撤销 consent。
+    /// 未登录（演示模式）时退回请求体 ActorId，仍要求其等于路由上的 studentId。
+    /// </summary>
+    private string ResolveActor(string routeStudentId, string? bodyActorId)
+    {
+        if (HttpContext.Items[ApiBootstrapper.AuthUserKey] is AuthUser user
+            && !string.IsNullOrWhiteSpace(user.DemoStudentId))
+        {
+            return user.DemoStudentId;
+        }
+        return string.IsNullOrWhiteSpace(bodyActorId) ? routeStudentId : bodyActorId!;
+    }
+
     [HttpGet("/v1/teachers/{id}/hotspots")]
     public IResult Hotspots(string id, [FromQuery(Name = "only_consent")] bool onlyConsent = true)
     {
@@ -49,11 +64,13 @@ public sealed class TeacherConsentGraphController : ControllerBase
     }
 
     [HttpPost("/v1/consents/{studentId}/grant")]
-    public IResult Grant(string studentId, [FromBody] ConsentGrantRequest request)
+    public IResult Grant(string studentId, [FromBody] ConsentGrantRequest? request)
     {
+        if (request is null)
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "请求体必须是合法的 JSON 对象");
         return _store.Lock(() =>
         {
-            var actor = string.IsNullOrWhiteSpace(request.ActorId) ? studentId : request.ActorId!;
+            var actor = ResolveActor(studentId, request.ActorId);
             if (!string.Equals(actor, studentId, StringComparison.OrdinalIgnoreCase))
                 return HttpResults.Fail(403, ErrorCodes.Forbidden, "仅学生本人可授权");
 
@@ -72,11 +89,13 @@ public sealed class TeacherConsentGraphController : ControllerBase
     }
 
     [HttpPost("/v1/consents/{studentId}/revoke")]
-    public IResult Revoke(string studentId, [FromBody] ConsentRevokeRequest request)
+    public IResult Revoke(string studentId, [FromBody] ConsentRevokeRequest? request)
     {
+        if (request is null)
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "请求体必须是合法的 JSON 对象");
         return _store.Lock(() =>
         {
-            var actor = string.IsNullOrWhiteSpace(request.ActorId) ? studentId : request.ActorId!;
+            var actor = ResolveActor(studentId, request.ActorId);
             if (!string.Equals(actor, studentId, StringComparison.OrdinalIgnoreCase))
                 return HttpResults.Fail(403, ErrorCodes.Forbidden, "仅学生本人可撤销授权");
 

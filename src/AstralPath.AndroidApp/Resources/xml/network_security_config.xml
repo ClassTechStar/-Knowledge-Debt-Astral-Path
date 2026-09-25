@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  网络安全配置。
-
-  本应用的 API 跑在**设备自身**的 127.0.0.1 上（内嵌 Kestrel），因此只需为回环放行明文 HTTP；
-  公网域名一律保持默认（禁止明文），不会因为演示而降低整体安全性。
+  网络安全配置（最小放行原则）：
+  仅对设备自身的回环地址放行明文 HTTP——内嵌 API 就跑在 127.0.0.1 上。
+  其余域名一律保持平台默认（禁止明文），不为演示降低整体安全性。
 -->
 <network-security-config>
   <domain-config cleartextTrafficPermitted="true">
@@ -11,7 +10,4 @@
     <domain includeSubdomains="true">localhost</domain>
     <domain includeSubdomains="true">10.0.2.2</domain>
   </domain-config>
-  <base-config cleartextTrafficPermitted="false">
-    <pin-set expiration="2027-01-01" />
-  </base-config>
 </network-security-config>

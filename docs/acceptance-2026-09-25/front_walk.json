@@ -1,0 +1,185 @@
+{
+  "steps": [
+    {
+      "id": "F1-1",
+      "desc": "页面加载",
+      "ok": true,
+      "detail": "31ms title=「知债：星穹学途 · 单体版 2.2（无微服务）」main容器=8"
+    },
+    {
+      "id": "F1-2",
+      "desc": "顶栏导航项数",
+      "ok": true,
+      "detail": "8 个（期望 8）"
+    },
+    {
+      "id": "F1-3",
+      "desc": "核心 JS 函数存在性",
+      "ok": true,
+      "detail": "全部就绪"
+    },
+    {
+      "id": "F1-4",
+      "desc": "localStorage 状态键",
+      "ok": false,
+      "detail": "键大小 0 字节"
+    },
+    {
+      "id": "F2-home",
+      "desc": "切换到「起点」",
+      "ok": true,
+      "detail": "可见=true 隐藏页数=7(期望7) 文本长度=277"
+    },
+    {
+      "id": "F2-materials",
+      "desc": "切换到「藏书阁」",
+      "ok": true,
+      "detail": "可见=true 隐藏页数=7(期望7) 文本长度=302"
+    },
+    {
+      "id": "F2-graph",
+      "desc": "切换到「识网」",
+      "ok": true,
+      "detail": "可见=true 隐藏页数=7(期望7) 文本长度=1026"
+    },
+    {
+      "id": "F2-debt",
+      "desc": "切换到「知债」",
+      "ok": true,
+      "detail": "可见=true 隐藏页数=7(期望7) 文本长度=4828"
+    },
+    {
+      "id": "F2-today",
+      "desc": "切换到「今日」",
+      "ok": true,
+      "detail": "可见=true 隐藏页数=7(期望7) 文本长度=214"
+    },
+    {
+      "id": "F2-agent",
+      "desc": "切换到「智能体」",
+      "ok": true,
+      "detail": "可见=true 隐藏页数=7(期望7) 文本长度=277"
+    },
+    {
+      "id": "F2-profile",
+      "desc": "切换到「画像」",
+      "ok": true,
+      "detail": "可见=true 隐藏页数=7(期望7) 文本长度=586"
+    },
+    {
+      "id": "F2-account",
+      "desc": "切换到「账户」",
+      "ok": true,
+      "detail": "可见=true 隐藏页数=7(期望7) 文本长度=82"
+    },
+    {
+      "id": "F3-1",
+      "desc": "重新诊断产出红边",
+      "ok": true,
+      "detail": "红边 74 条 · 首行「凭证填制 → 账簿登记」"
+    },
+    {
+      "id": "F3-2",
+      "desc": "生成 14 天计划",
+      "ok": true,
+      "detail": "计划条目 48 条（文本长度 1325）"
+    },
+    {
+      "id": "F3-3",
+      "desc": "销账检查有反馈",
+      "ok": true,
+      "detail": "选择一项后提交"
+    },
+    {
+      "id": "F4-1",
+      "desc": "加载今日任务并提交作答",
+      "ok": true,
+      "detail": "todayBar=「」 提交反馈=「请先选择一项」"
+    },
+    {
+      "id": "F5-1",
+      "desc": "危机词 → 转介话术",
+      "ok": true,
+      "detail": "你好，我是知债学习助手（单体·无微服务）。可问「诊断」「计划」「今日」「图谱」「销账」。\n我不想活了\n你并不孤单。请立即联系身边信任的人或当地心理援助热线。系统不会把这里当作处分依据。"
+    },
+    {
+      "id": "F5-2",
+      "desc": "常规意图路由",
+      "ok": true,
+      "detail": "典→文件读写 impact=0.258077\n3. 试算平衡→财务报表 impact=0.255691\n4. 账户结构→会计分录 impact=0.249691\n5. 账户结构→借贷记账法 impact=0.249410\n6. 借贷记账法→会计分录 impact=0.249117"
+    },
+    {
+      "id": "F5-3",
+      "desc": "「好的，帮我生成计划」不被误判为闲聊",
+      "ok": true,
+      "detail": "t=0.249410\n6. 借贷记账法→会计分录 impact=0.249117\n好的，帮我生成计划\n我可以帮你：诊断知识债、解释红边、14 天计划、今日任务、识网摘要、章节检索、销账检查、资料解析引导、What-if。数字只来自本地公式。"
+    },
+    {
+      "id": "F6-1",
+      "desc": "一键 opt-out 个性化画像",
+      "ok": true,
+      "detail": "画像\n\n掌握度与学习风格五轴 · 可随时 opt-out\n\n掌握度\n会计对象\n0.776\n会计要素\n0.831\n会计等式\n0.842\n会计科目\n0.845\n账户结构\n0.843\n借贷记账法\n0.617\n会计分录\n0.579\n试算平衡\n0.792\n凭证填制\n0.801\n账簿登记\n0.578\n财产清查\n0.799\n财务报表"
+    },
+    {
+      "id": "F7-1",
+      "desc": "同意/撤销授权状态切换",
+      "ok": true,
+      "detail": "grant后=「已同意教师可见」 revoke后=「未授权」"
+    },
+    {
+      "id": "F7-2",
+      "desc": "导出数据触发下载",
+      "ok": true,
+      "detail": "文件名 astralpath-monolith.json"
+    },
+    {
+      "id": "F8-1",
+      "desc": "空文本解析给出提示",
+      "ok": true,
+      "detail": "提示=「粘贴内容过少（可读字符≥20）」 新增错误=0"
+    },
+    {
+      "id": "F8-2",
+      "desc": "过短文本解析给出提示",
+      "ok": true,
+      "detail": "提示=「粘贴内容过少（可读字符≥20）」"
+    },
+    {
+      "id": "F8-3",
+      "desc": "大文本解析（332KB）",
+      "ok": true,
+      "detail": "1955ms 提示=「已从粘贴文本生成图谱：8 节点 / 28 边 / 1 章」 新增错误=0"
+    },
+    {
+      "id": "F8-4",
+      "desc": "localStorage 损坏后自愈",
+      "ok": true,
+      "detail": "标题=「知债：星穹学途 · 单体版 2.2（无微服务）」 首屏可见=true 新键长=9 新增错误=0"
+    },
+    {
+      "id": "F8-5",
+      "desc": "localStorage 配额耗尽行为",
+      "ok": true,
+      "detail": "QuotaExceeded: QuotaExceededError"
+    },
+    {
+      "id": "F8-6",
+      "desc": "断网后核心功能仍可用",
+      "ok": true,
+      "detail": "诊断页仍有内容=true 新增错误=0"
+    },
+    {
+      "id": "F9-1",
+      "desc": "控制台错误总数",
+      "ok": true,
+      "detail": "总 0 条，其中 favicon 404 0 条，其它 0 条"
+    },
+    {
+      "id": "F9-2",
+      "desc": "页面性能指标",
+      "ok": true,
+      "detail": "DOMInteractive=19ms loadEventEnd=20ms"
+    }
+  ],
+  "consoleErrors": []
+}

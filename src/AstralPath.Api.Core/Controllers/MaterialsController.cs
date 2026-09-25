@@ -13,14 +13,59 @@ public sealed class MaterialsController : ControllerBase
 
     public MaterialsController(AstralPathStore store) => _store = store;
 
+    // ── 资料落盘目录（P2-7）────────────────────────────────────────────
+    // 原先写死在 AppContext.BaseDirectory（= bin 输出目录）下，实测该处已积累 576MB 用户上传；
+    // 一次 `dotnet clean` / 重新 publish 就会**静默清空用户教材**。
+    // 现改为可配置的数据目录，并把旧目录内容一次性迁移过来。
+    private static string? _storageRootOverride;
+    private static bool _legacyMigrated;
+
+    /// <summary>宿主启动时调用，指定资料落盘根目录。</summary>
+    public static void ConfigureStorage(string? dataRoot) => _storageRootOverride = dataRoot;
+
     private static string MaterialsDir
     {
         get
         {
-            var dir = Path.Combine(AppContext.BaseDirectory, "materials-uploads");
+            var root = _storageRootOverride;
+            if (string.IsNullOrWhiteSpace(root))
+                root = Environment.GetEnvironmentVariable("ASTRALPATH_UPLOAD_DIR");
+            if (string.IsNullOrWhiteSpace(root))
+            {
+                // 移动壳：BaseDirectory 即应用私有目录，本身持久，沿用原行为
+                root = OperatingSystem.IsAndroid()
+                    ? AppContext.BaseDirectory
+                    : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "AstralPath");
+            }
+
+            var dir = Path.Combine(root, "materials-uploads");
             Directory.CreateDirectory(dir);
+            MigrateLegacyUploads(dir);
             return dir;
         }
+    }
+
+    /// <summary>把旧 bin 目录里的上传搬到新目录，避免既有资料变孤儿。</summary>
+    private static void MigrateLegacyUploads(string newDir)
+    {
+        if (_legacyMigrated) return;
+        _legacyMigrated = true;
+        try
+        {
+            var legacy = Path.Combine(AppContext.BaseDirectory, "materials-uploads");
+            if (!Directory.Exists(legacy)) return;
+            if (string.Equals(Path.GetFullPath(legacy), Path.GetFullPath(newDir), StringComparison.OrdinalIgnoreCase)) return;
+
+            foreach (var f in Directory.EnumerateFiles(legacy))
+            {
+                var target = Path.Combine(newDir, Path.GetFileName(f));
+                // 注意：控制器继承自 ControllerBase，裸写 File 会解析到 File(...) 方法而非 System.IO.File
+                if (System.IO.File.Exists(target)) continue;
+                try { System.IO.File.Copy(f, target); } catch { /* 单个失败跳过 */ }
+            }
+            MaterialRegistry.HydrateFromDirectory(newDir);
+        }
+        catch { /* 迁移是尽力而为，不得影响新上传 */ }
     }
 
     [HttpGet("/v1/materials")]
@@ -34,11 +79,16 @@ public sealed class MaterialsController : ControllerBase
     [Consumes("multipart/form-data")]
     [RequestSizeLimit(2L * 1024 * 1024 * 1024)]
     [RequestFormLimits(MultipartBodyLengthLimit = 2L * 1024 * 1024 * 1024)]
-    public async Task<IResult> Upload([FromForm(Name = "file")] IFormFile? file, [FromQuery] string ocr = "standard")
+    // 注意：这里**不能**给 IFormFile 加 [FromForm]，否则 Swashbuckle 生成 swagger.json 时会抛
+    // SwaggerGeneratorException（"Error reading parameter(s) ... as [FromForm] attribute used with IFormFile"），
+    // 导致整个 API 文档 500 不可用（P2-2）。参数名与表单字段名一致，ASP.NET Core 会自动按名绑定。
+    public async Task<IResult> Upload(IFormFile? file, [FromQuery] string ocr = "standard")
     {
         try
         {
-            var list = await SaveUploadedFilesAsync(file, null, ocr);
+            var outcome = await SaveUploadedFilesAsync(file, null, ocr);
+            var list = outcome.Saved;
+            var rejected = outcome.Rejected;
             if (list == null)
             {
                 return HttpResults.Fail(400, ErrorCodes.ValidationError,
@@ -50,8 +100,16 @@ public sealed class MaterialsController : ControllerBase
                         formKeys = Request.HasFormContentType ? Request.Form.Keys.ToArray() : Array.Empty<string>()
                     });
             }
+            if (list.Count == 0 && rejected.Count > 0)
+            {
+                // 全部被准入校验拦下：如实回报每一条原因（P2-6）
+                return HttpResults.Fail(400, ErrorCodes.ValidationError, rejected[0],
+                    new { rejected, allowed = UploadGuard.AllowedDisplay });
+            }
             object payload = list.Count == 1 ? list[0] : list;
-            return HttpResults.Created(payload);
+            return rejected.Count == 0
+                ? HttpResults.Created(payload)
+                : HttpResults.Created(new { saved = payload, rejected });
         }
         catch (Exception ex) when (ex is BadHttpRequestException or InvalidDataException or IOException)
         {
@@ -71,15 +129,21 @@ public sealed class MaterialsController : ControllerBase
     [Consumes("multipart/form-data")]
     [RequestSizeLimit(2L * 1024 * 1024 * 1024)]
     [RequestFormLimits(MultipartBodyLengthLimit = 2L * 1024 * 1024 * 1024)]
-    public async Task<IResult> UploadBatch([FromForm(Name = "files")] List<IFormFile>? files, [FromQuery] string ocr = "standard")
+    public async Task<IResult> UploadBatch(List<IFormFile>? files, [FromQuery] string ocr = "standard")
     {
         try
         {
             var first = files?.FirstOrDefault(f => f is { Length: > 0 });
-            var list = await SaveUploadedFilesAsync(first, files, ocr);
-            if (list == null || list.Count == 0)
+            var outcome = await SaveUploadedFilesAsync(first, files, ocr);
+            var list = outcome.Saved;
+            var rejected = outcome.Rejected;
+            if (list == null || (list.Count == 0 && rejected.Count > 0))
+                return HttpResults.Fail(400, ErrorCodes.ValidationError,
+                    rejected.Count > 0 ? rejected[0] : "请至少上传一个资料文件（字段名 files）",
+                    new { rejected, allowed = UploadGuard.AllowedDisplay });
+            if (list.Count == 0)
                 return HttpResults.Fail(400, ErrorCodes.ValidationError, "请至少上传一个资料文件（字段名 files）");
-            return HttpResults.Created(new { count = list.Count, items = list });
+            return HttpResults.Created(new { count = list.Count, items = list, rejected });
         }
         catch (Exception ex) when (ex is BadHttpRequestException or InvalidDataException or IOException)
         {
@@ -94,8 +158,12 @@ public sealed class MaterialsController : ControllerBase
         }
     }
 
-    private async Task<List<MaterialDoc>?> SaveUploadedFilesAsync(IFormFile? single, List<IFormFile>? multi, string ocr)
+    /// <summary>上传结果：保存成功的资料 + 被准入校验拒绝的条目（含原因）。</summary>
+    public sealed record UploadOutcome(List<MaterialDoc>? Saved, List<string> Rejected);
+
+    private async Task<UploadOutcome> SaveUploadedFilesAsync(IFormFile? single, List<IFormFile>? multi, string ocr)
     {
+        var rejected = new List<string>();
         var candidates = new List<IFormFile>();
         if (multi != null)
             candidates.AddRange(multi.Where(f => f is { Length: > 0 }));
@@ -115,7 +183,7 @@ public sealed class MaterialsController : ControllerBase
         }
 
         if (candidates.Count == 0)
-            return null;
+            return new UploadOutcome(null, rejected);
 
         if (ocr is not ("none" or "quick" or "standard"))
             ocr = "standard";
@@ -124,11 +192,31 @@ public sealed class MaterialsController : ControllerBase
         foreach (var file in candidates)
         {
             var id = Guid.NewGuid().ToString("N");
-            // 显示标题保留用户原始文件名（仅剥离路径成分）；磁盘文件名另做安全净化。
-            // 修复：原实现把净化后的名字同时用作显示标题，导致教材名中的 [ ] ( ) , + 等
-            // 被替换为 _（如「…(明日科技)…」显示成「…_明日科技_…」），用户看到会误以为是缺陷。
             var displayName = Path.GetFileName((file.FileName ?? string.Empty).Trim());
             if (string.IsNullOrWhiteSpace(displayName)) displayName = "material.pdf";
+
+            // ── 准入校验（P2-6）：扩展名 + 魔数 + 文本可读率 ──────────────
+            // 原先任意扩展名都收（.exe 也返回 201 且解析报 ready），脏数据会进图谱与题库。
+            try
+            {
+                byte[] head;
+                await using (var probe = file.OpenReadStream())
+                {
+                    head = UploadGuard.ReadHead(probe);
+                }
+                var verdict = UploadGuard.Validate(displayName, head);
+                if (!verdict.Ok)
+                {
+                    rejected.Add($"{displayName}：{verdict.Error}");
+                    continue;
+                }
+            }
+            catch (Exception ex)
+            {
+                rejected.Add($"{displayName}：读取文件头失败（{ex.GetType().Name}）");
+                continue;
+            }
+
             var safeName = SanitizeFileName(displayName);
             var dest = Path.Combine(MaterialsDir, $"{id}_{safeName}");
             Directory.CreateDirectory(MaterialsDir);
@@ -161,7 +249,7 @@ public sealed class MaterialsController : ControllerBase
             });
         }
 
-        return created;
+        return new UploadOutcome(created, rejected);
     }
 
     [HttpPost("/v1/materials/{id}/parse")]

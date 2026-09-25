@@ -8,7 +8,7 @@
       跑在 APK 内的本地回环端口上，再用系统 WebView 打开它。
       界面、交互、数据逻辑因此与 Web / Windows 端逐字节一致，且**不依赖电脑**。
 
-      版本下限：minSdk 26 = Android 8.0（用户要求「Android 8.0 及以上」）。
+      版本下限：minSdk 26 = Android 8.0（目标设备要求）。
     -->
     <TargetFramework>net10.0-android</TargetFramework>
     <OutputType>Exe</OutputType>
@@ -21,36 +21,91 @@
     <ApplicationDisplayVersion>1.3.0</ApplicationDisplayVersion>
     <ApplicationVersion>13</ApplicationVersion>
     <SupportedOSPlatformVersion>26</SupportedOSPlatformVersion>
-    <TargetSdkVersion>34</TargetSdkVersion>
-    <AndroidPackageFormat>apk</AndroidPackageFormat>
     <AndroidManifest>AndroidManifest.xml</AndroidManifest>
 
     <!--
-      单个 APK 覆盖主流 ABI：arm64-v8a（新机）/ armeabi-v7a（旧机）/ x86_64（模拟器）。
-      构建时按 <AndroidSupportedAbis> 全部打包，产物仍是一个文件。
+      单一通用 APK：同时覆盖 arm64-v8a（新机）、armeabi-v7a（旧机）、x86_64（模拟器）。
+      生成多 ABI 拆分包时改用 -p:AndroidCreatePackagePerAbi=true。
     -->
-    <AndroidSupportedAbis>armeabi-v7a;arm64-v8a;x86_64</AndroidSupportedAbis>
     <RuntimeIdentifiers>android-arm64;android-arm;android-x64</RuntimeIdentifiers>
 
     <!--
-      不使用 NativeAOT：解释器模式启动更快、体积更小，且与 Debug/Release 行为一致。
-      如需启用 AOT（启动更快、体积更大）再单独评估。
+      不启用裁剪与 AOT（解释器模式）：ASP.NET Core 大量使用反射（控制器模型绑定、
+      Swashbuckle、JSON 兜底路径），裁剪器需要逐类型排除清单，演示版先保证行为与桌面
+      完全一致。XA1030 的触发条件是「AOT 开而裁剪关」，因此两者都显式关闭。
+      体积代价约 +20MB；后续可在 trimmer root 清单里安全收紧。
     -->
     <PublishTrimmed>false</PublishTrimmed>
-    <AndroidEnableProfiler>false</AndroidEnableProfiler>
+    <RunAOTCompilation>false</RunAOTCompilation>
+    <AndroidLinkSkip>AstralPath.Api;AstralPath.Services</AndroidLinkSkip>
+
+    <!-- 打包为 APK（而不是 AAB），便于直接 adb install / 浏览器下载侧载 -->
+    <AndroidPackageFormat>apk</AndroidPackageFormat>
+
+    <!--
+      NETSDK1150 豁免（官方开关）：本工程是自包含（Android），而引用的 AstralPath.Api
+      对 CLI 是框架依赖可执行。APK 只把 Api 当**类库**用——入口点与 runtimeconfig 均
+      由本工程提供，Api 的不会被使用；此检查在这里是误报。
+    -->
+    <ValidateExecutableReferencesMatchSelfContained>false</ValidateExecutableReferencesMatchSelfContained>
   </PropertyGroup>
 
-  <!-- ASP.NET Core 主机能力：与 AstralPath.Api 共用 Microsoft.AspNetCore.App -->
+  <!--
+    发布签名（Release）。密钥库与口令见 docs/Android构建与测试报告.md：
+    口令是**演示专用**并随仓库提交，正式上架前必须替换为私有密钥库。
+    Debug 构建仍走 .NET Android 自动生成的调试密钥库，互不影响。
+  -->
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <AndroidSigningKeyStore>astralpath-release.keystore</AndroidSigningKeyStore>
+    <AndroidSigningKeyAlias>astralpath</AndroidSigningKeyAlias>
+    <AndroidSigningStorePass>astralpath-demo-2026</AndroidSigningStorePass>
+    <AndroidSigningKeyPass>astralpath-demo-2026</AndroidSigningKeyPass>
+  </PropertyGroup>
+
+  <!--
+    ASP.NET Core 主机能力（android 特殊处理）：
+    Api 工程会把 FrameworkReference(Microsoft.AspNetCore.App) 传递进来，而 android
+    RID 不存在 AspNetCore 运行时包（NETSDK1082）。两步解决：
+    ① 重定义 KnownFrameworkReference，声明「该框架无运行时包」——引用仍可解析、
+       编译仍用官方 ref pack，但不再寻找 android 运行时包；
+    ② 用下面的直接 <Reference> 把本机共享框架的托管 DLL 作为普通程序集打进 APK
+       （纯 IL，android 可运行）。运行时由 APK 自带，不需要设备上存在该共享框架。
+  -->
   <ItemGroup>
-    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <KnownFrameworkReference Remove="Microsoft.AspNetCore.App" />
+    <KnownFrameworkReference Include="Microsoft.AspNetCore.App">
+      <TargetFramework>net10.0</TargetFramework>
+      <TargetingPackName>Microsoft.AspNetCore.App.Ref</TargetingPackName>
+      <TargetingPackVersion>10.0.0</TargetingPackVersion>
+      <DefaultRuntimeFrameworkVersion>10.0.0</DefaultRuntimeFrameworkVersion>
+      <LatestRuntimeFrameworkVersion>10.0.0</LatestRuntimeFrameworkVersion>
+      <RuntimePackNamePatterns />
+      <RuntimePackRuntimeIdentifiers />
+      <IsTrimmable>true</IsTrimmable>
+    </KnownFrameworkReference>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <AspNetCoreSharedGlob Condition="'$(AspNetCoreSharedGlob)' == ''">C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\10.*\</AspNetCoreSharedGlob>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="$(AspNetCoreSharedGlob)Microsoft.AspNetCore*.dll" />
+    <Reference Include="$(AspNetCoreSharedGlob)Microsoft.Extensions*.dll" />
+    <Reference Include="$(AspNetCoreSharedGlob)Microsoft.Net.Http.Headers.dll" />
+    <Reference Include="$(AspNetCoreSharedGlob)Microsoft.JSInterop.dll" />
   </ItemGroup>
 
   <!--
-    单一事实源：不复制第二份 wwwroot / 图包，直接引用 Api 工程与仓库根的产物。
-    改动只会在一个地方发生，Android 端不可能「落后一版」。
+    单一事实源：不复制第二份 wwwroot / 图包，直接引用可复用 HTTP 层工程（编译期即校验一致）。
+    静态资源与数据文件以 AndroidAsset 打包，改动只会发生在一个地方。
+
+    注意引用的是 AstralPath.Api.Core（普通类库）而不是 AstralPath.Api（Sdk.Web 可执行）：
+    Sdk.Web 会向引用方流动 FrameworkReference(Microsoft.AspNetCore.App)，
+    而 android 没有对应运行时包（NETSDK1082），一旦引用就无法打包 APK。
+    Api.Core 对 ASP.NET Core 走 Private=false 的直接 DLL 引用，不产生该流动。
   -->
   <ItemGroup>
-    <ProjectReference Include="..\AstralPath.Api\AstralPath.Api.csproj" />
+    <ProjectReference Include="..\AstralPath.Api.Core\AstralPath.Api.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -80,3 +80,9 @@ src/AstralPath.Android/dist/test-shots/
 **/build/
 *.dex
 .gradle/
+
+# 运行时状态快照（Persistence:DataDir 指到仓库内时）
+runtime-state.json
+runtime-state.json.bak
+runtime-state.json.tmp
+**/.astralpath-state/

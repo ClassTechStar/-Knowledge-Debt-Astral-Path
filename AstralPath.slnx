@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/AstralPath.Api/AstralPath.Api.csproj" />
+    <Project Path="src/AstralPath.Api.Core/AstralPath.Api.Core.csproj" />
     <Project Path="src/AstralPath.Contracts/AstralPath.Contracts.csproj" />
     <Project Path="src/AstralPath.Core/AstralPath.Core.csproj" />
     <Project Path="src/AstralPath.Desktop/AstralPath.Desktop.csproj" />

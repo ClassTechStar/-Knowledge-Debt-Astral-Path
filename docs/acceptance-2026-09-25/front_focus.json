@@ -1,0 +1,75 @@
+{
+  "out": [
+    {
+      "id": "G1-1",
+      "d": "加载今日任务渲染任务卡",
+      "ok": true,
+      "detail": "卡片 3 张 · 文本「巩固「凭证填制」core 20min\n开始练习\n巩固「列表与字典」core 20min\n开始练习\n巩固「试算平衡」core 20min\n开始练习」"
+    },
+    {
+      "id": "G1-2",
+      "d": "练习题目自动加载",
+      "ok": true,
+      "detail": "题目区「捕获异常用？\n\nA. try/except\nB. if/else\nC. for/range\nD. def/return\n提交\n选择一项后提交」"
+    },
+    {
+      "id": "G1-3",
+      "d": "选择选项后提交并给出判定",
+      "ok": false,
+      "detail": "选项按钮 1 个 · 反馈「请先选择一项」"
+    },
+    {
+      "id": "G1-4",
+      "d": "作答后销账状态被记录",
+      "ok": false,
+      "detail": "sale 条目 0 个"
+    },
+    {
+      "id": "G2-1",
+      "d": "销账检查使用原生 alert 弹窗",
+      "ok": false,
+      "detail": "确认为 alert()：「销账检查未通过：需连续 2 次达标且累计≥3 次」——与整站面板式 UI 不一致，且会阻塞页面"
+    },
+    {
+      "id": "G3-1",
+      "d": "opt-out 切换并持久化",
+      "ok": true,
+      "detail": "切换序列 false → true → false"
+    },
+    {
+      "id": "G3-2",
+      "d": "opt-out 后个性化推荐应停用",
+      "ok": false,
+      "detail": "推荐内容完全一致 —— opt-out 只改了开关，未影响推荐与画像展示"
+    },
+    {
+      "id": "G4-1",
+      "d": "占用 localStorage 配额",
+      "ok": true,
+      "detail": "占位写入中断: QuotaExceededError"
+    },
+    {
+      "id": "G4-2",
+      "d": "配额不足时 save() 失败是否有用户可见提示",
+      "ok": true,
+      "detail": "界面=「已同意教师可见」 存储 consent=true（未复现静默丢失）"
+    },
+    {
+      "id": "G5-1",
+      "d": "「重置」是否有二次确认",
+      "ok": true,
+      "detail": "已确认弹窗：「清空本机数据？」"
+    }
+  ],
+  "dialogs": [
+    {
+      "type": "alert",
+      "msg": "销账检查未通过：需连续 2 次达标且累计≥3 次"
+    },
+    {
+      "type": "confirm",
+      "msg": "清空本机数据？"
+    }
+  ],
+  "errs": []
+}

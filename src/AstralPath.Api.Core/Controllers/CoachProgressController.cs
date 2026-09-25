@@ -128,8 +128,10 @@ public sealed class CoachProgressController : ControllerBase
     }
 
     [HttpPost("/v1/attempts")]
-    public IResult CreateAttempt([FromBody] CreateAttemptRequest request)
+    public IResult CreateAttempt([FromBody] CreateAttemptRequest? request)
     {
+        if (request is null)
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "请求体必须是合法的 JSON 对象");
         return _store.Lock(() =>
         {
             if (string.IsNullOrWhiteSpace(request.StudentId))
@@ -137,7 +139,22 @@ public sealed class CoachProgressController : ControllerBase
             if (request.SelfConf is < 1 or > 5)
                 return HttpResults.Fail(400, ErrorCodes.ValidationError, "selfConf 必须为 1..5");
 
-            var student = _store.EnsureStudent(request.StudentId);
+            // P3-4：长度上限（原实现 10 万字符的 kpId 也会被 201 收下）
+            var tooLong = RequestLimits.FirstViolation(
+                ("studentId", request.StudentId, RequestLimits.Id),
+                ("kpId", request.KpId, RequestLimits.Id),
+                ("questionId", request.QuestionId, RequestLimits.ShortText),
+                ("planItemId", request.PlanItemId, RequestLimits.Id));
+            if (tooLong is not null)
+                return HttpResults.Fail(400, ErrorCodes.ValidationError, tooLong);
+
+            // P3-5：学生必须已存在，禁止静默创建孤儿数据
+            // （原先对不存在的 studentId 返回 201，会污染学生数与统计口径）
+            if (!_store.Students.ContainsKey(request.StudentId))
+                return HttpResults.Fail(404, ErrorCodes.ResourceNotFound,
+                    $"学生不存在：{request.StudentId}。请先用 /v1/students/{request.StudentId}/ingest/scores 建档。");
+
+            var student = _store.Students[request.StudentId];
             var qid = string.IsNullOrWhiteSpace(request.QuestionId) ? $"q-auto-{Guid.NewGuid():N}"[..20] : request.QuestionId;
             var question = _store.Questions.GetValueOrDefault(qid);
             var stem = question?.Stem
@@ -239,8 +256,10 @@ public sealed class CoachProgressController : ControllerBase
     }
 
     [HttpPost("/v1/debt-edges/sale-check")]
-    public IResult SaleCheck([FromBody] SaleCheckRequest request)
+    public IResult SaleCheck([FromBody] SaleCheckRequest? request)
     {
+        if (request is null)
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "请求体必须是合法的 JSON 对象");
         return _store.Lock(() =>
         {
             if (!_store.Students.TryGetValue(request.StudentId, out var student))

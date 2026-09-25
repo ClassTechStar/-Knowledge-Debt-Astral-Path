@@ -1,6 +1,6 @@
 # 知债：星穹学途 · 扩展服务镜像（§19.11）
 # 用法（在仓库根目录）：
-#   docker build -f services/concept-diffusion-svc/Dockerfile -t astralpath/concept-diffusion-svc:1.3.0 .
+#   docker build -f services/concept-diffusion-svc/Dockerfile -t astralpath/concept-diffusion-svc:${ASTRALPATH_VERSION:-2.2.0} .
 # 构建上下文必须是仓库根，以便引用共享库 src/AstralPath.* 与 services/*
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build

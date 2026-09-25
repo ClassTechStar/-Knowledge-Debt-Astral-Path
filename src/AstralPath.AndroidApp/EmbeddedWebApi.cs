@@ -164,8 +164,9 @@ public static class EmbeddedWebApi
             if (_app is null) return;
             try
             {
-                _app.StopAsync(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
-                _app.Dispose();
+                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+                _app.StopAsync(cts.Token).GetAwaiter().GetResult();
+                _app.DisposeAsync().AsTask().GetAwaiter().GetResult();
             }
             catch
             {
@@ -205,7 +206,7 @@ public static class EmbeddedWebApi
     /// AssetManager 不区分「空目录」与「空文件」：用能否打开流来判定。
     /// 这是 Android 资源遍历的标准做法。
     /// </summary>
-    private static bool IsDirectory(Android.Content.Res.AssetManager assets, string path)
+    private static bool IsDirectory(AssetManager assets, string path)
     {
         try
         {

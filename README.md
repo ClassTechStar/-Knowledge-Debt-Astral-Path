@@ -139,7 +139,7 @@ AstralPath.Native/        Android WebView 壳（~2.8MB）
 AstralPath.Monolith/      无微服务 Windows 壳（Setup-2.2.0）
 AstralPath.Mobile.Offline/Avalonia 11 + SQLite 离线单体
 AstralPath.Persistence/  Postgres（默认）+ memory 回退
-tests/                    Core 28 · Persistence 8 · Desktop 47 · API 53 · Eval 2 · **MobileCore 84（图谱/OCR）**
+tests/                    Core 28 · Persistence 8 · Desktop 47 · API 66 · Eval 2 · **MobileCore 84（图谱/OCR）**
 ```
 
 **持久化**：默认 **PostgreSQL + pgvector**（`Persistence:Mode=postgres`）；连接串可用 `Persistence__ConnectionString` 覆盖；连不上且 `AllowMemoryFallback=true` 时降级 memory。
@@ -153,7 +153,7 @@ tests/                    Core 28 · Persistence 8 · Desktop 47 · API 53 · Ev
 | Core.Tests | **28/28** | score/impact/sale/计划/图/走读金样（1e-6）+ 画像/智能体 v3 回归 |
 | Persistence.Tests | **8/8** | Postgres/InMemory 双模式 |
 | Desktop.Tests | **47/47** | Avalonia 原生 UI 绑定与导航 |
-| Api.Tests | **53/53** | 上传/解析/诊断/计划/agent |
+| Api.Tests | **66/66** | 上传/解析/诊断/计划/agent + P0/P1 回归 |
 | Eval.Tests | **2/2** | 合成数据回归 |
 | MobileCore.Tests | **84/84** | 图谱构图/布局/学习路径 + OCR 全流程（v3 算法回归） |
 | 单体 HTML 自测 | **41 项** | 结构/算法/页面流转 |
@@ -161,7 +161,7 @@ tests/                    Core 28 · Persistence 8 · Desktop 47 · API 53 · Ev
 > `dotnet test` 一次只能接一个项目。全量请用一键脚本：
 >
 > ```powershell
-> powershell -File scripts\verify_all.ps1     # 222 项 → ALL GREEN
+> powershell -File scripts\verify_all.ps1     # 235 项 → ALL GREEN
 > ```
 
 ---
@@ -245,6 +245,30 @@ dotnet publish src/AstralPath.Monolith -c Release -r win-x64 --self-contained -o
   英文断字还原、断行合并的列表/标题保护；TSV 行聚类改间隙聚类（抗基线漂移）；投票改模糊匹配
 - 新增 **39 项** v3 回归测试（图谱/OCR 22 + 画像/智能体 17）→ **222 项全绿**
   （Core 28 + Persistence 8 + Desktop 47 + API 53 + Eval 2 + MobileCore 84），已纳入 `verify_all.ps1`
+
+### 2.2.0 · 验收修复（2026-09-25）
+- **P0 修复**：补完 `Api → Api.Core` 重构（引用链 + slnx 登记 + 隐式 using + Android 引用指向 Api.Core）→ 全量编译 0 错误
+- **P1 修复 · 畸形输入不再 500**：`InvalidModelStateResponseFactory` 统一 400 + 9 个 `[FromBody]` 接口补判空
+  （修复前 4 个接口含登录接口收到畸形 JSON 直接 `NullReferenceException`）
+- **P1 修复 · 运行时状态可持久化**：接入 `AddAstralPathPersistence`；
+  新增 `RuntimeSnapshot`（学生/作答/掌握度/计划/consent/知识库/画像/智能体轮次 JSON 快照，
+  原子写 + 防抖 + 周期兜底 + 优雅关闭 Flush + 版本与图包校验，**测试宿主自动关闭**）
+- **P1 修复 · 降级可见性**：启动显式 WARN；`/health/ready` 报告持久化模式与快照状态
+- 新增 13 项回归测试 → **235 项全绿**；详见 `docs/验收报告-全面功能与稳定性-2026-09-25.md` 第十节
+
+### 2.2.0 · P2/P3 修复（2026-09-25）
+- **P2-1 鉴权与越权**：新增访问控制中间件（Bearer 解析 + 学生维路由归属校验 403 + consent 主体以令牌为准，
+  杜绝「替他人授权」）；`Security:RequireAuth` 可开启强制登录
+- **P2-2 Swagger**：去掉 `[FromForm] IFormFile` 触发的问题，`swagger.json` 500 → **200**
+- **P2-3 错误形状统一**：415/405/404 框架级错误改写为统一 `{data,error,traceId}`
+- **P2-4 前端负例对齐 v3**：「好的，帮我生成计划」不再被吞成兜底话术；纯客套仍正确兜底（三端同步）
+- **P2-5 opt-out 生效**：关闭后今日改按章节顺序、隐藏推断风格轴（原只翻转布尔值）
+- **P2-6 上传白名单**：扩展名 + 魔数 + 可读率三级校验（原 `.exe` 也收且解析报 ready）
+- **P2-7 上传目录**：移出 `bin/` 到 `%LOCALAPPDATA%\AstralPath\uploads`，旧内容自动迁移
+- **P2-8 CORS**：`AllowAnyOrigin` → 回环任意端口 + 安卓壳白名单
+- **P3**：练习选项可键盘操作（radio 语义）/ 销账检查改内联反馈 / `save()` 失败顶栏提示 /
+  入参长度上限 / 不存在学生 404 / 注册冲突 409 / 镜像 tag 参数化 / 内联 favicon / 首访示例数据引导
+- 详见 `docs/验收报告-全面功能与稳定性-2026-09-25.md` 第十一节
 - **画像 v3**：波动率按正确率归一（超额波动，不再误判 acc≈0.5 的学生）、新增 ECE 校准曲线、
   兴趣时间衰减、真 k-匿名（逐个标签判样本量）、修复伪 Laplace（噪声不再由 value 驱动）
 - **智能体 v3**：启用三个从未使用的常量（TauExec/TauClarify/MaxClarify）、多锚点饱和累加 + 覆盖率、

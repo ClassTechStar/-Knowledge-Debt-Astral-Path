@@ -5,6 +5,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>知债：星穹学途 · 单体版 2.2（无微服务）</title>
+<!-- P3-8：内联 favicon，避免每次加载在控制台留下一条 404 -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='8'%20fill='%23e8eaec'/%3E%3Ctext%20x='16'%20y='23'%20font-size='19'%20text-anchor='middle'%20fill='%23303236'%20font-family='sans-serif'%3E%E5%80%BA%3C/text%3E%3C/svg%3E" />
 <style>
 :root{
   --canvas:#f3f4f5;--surface:#fbfbfc;--soft:#e8eaec;--strong:#858a90;
@@ -191,6 +193,7 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
       <button class="btn" id="btnSale">销账检查</button>
     </div>
   </div>
+  <div class="status" id="debtMsg">点「重新诊断」查看红边；点「销账检查」查看是否满足销账条件。</div>
   <div class="panel"><h2>红边（按 impact）</h2><div id="debtList"></div></div>
   <div class="panel">
     <h2>What-if 模拟</h2>
@@ -690,13 +693,23 @@ function migrate(raw){
   Object.assign(d,raw);return d;
 }
 function load(){try{return migrate(JSON.parse(localStorage.getItem(LS)));}catch(e){return defaultState();}}
+// P3-3：配额耗尽时 save() 会返回 false，但原先所有调用方都忽略返回值 →
+// 界面照常显示"已保存"，数据实际没落盘（静默丢失）。这里统一上报到顶栏状态位。
+function setStoreWarn(msg){
+  const el=$("mode");if(!el)return;
+  if(msg){el.textContent="⚠ "+msg;el.style.color="var(--danger)";}
+  else{el.textContent="单体 · 本机数据";el.style.color="";}
+}
 function save(s){
-  try{localStorage.setItem(LS,JSON.stringify(s));return true;}
+  try{localStorage.setItem(LS,JSON.stringify(s));setStoreWarn("");return true;}
   catch(e){
     try{
       s.books.forEach(function(b){if(b.sourceText&&b.sourceText.length>2000)b.sourceText=b.sourceText.slice(0,2000);(b.chapters||[]).forEach(function(c){if(c.body&&c.body.length>800)c.body=c.body.slice(0,800);});});
-      localStorage.setItem(LS,JSON.stringify(s));return true;
-    }catch(e2){return false;}
+      localStorage.setItem(LS,JSON.stringify(s));setStoreWarn("本机存储将满，已自动精简教材正文后保存");return true;
+    }catch(e2){
+      setStoreWarn("本机存储已满，本次改动未保存。请到「账户」导出数据后重置");
+      return false;
+    }
   }
 }
 let S=load();
@@ -865,12 +878,13 @@ function loadQuiz(kp){window._q=pickQuestion(kp);paintQuiz(window._q);}
 function paintQuiz(q){
   if(!q){$("quizBox").innerHTML='<div class="empty">当前教材没有题目。请解析资料或导入示例。</div>';return;}
   $("quizKp").textContent=title(q.kp);
-  $("quizBox").innerHTML="<p><strong>"+esc(q.stem)+"</strong></p>"+q.opts.map((o,i)=>'<div class="card" style="cursor:pointer" data-oi="'+i+'">'+String.fromCharCode(65+i)+". "+esc(o)+"</div>").join("")+'<div class="row"><button class="btn primary" id="btnSub">提交</button></div><div class="status" id="fb">选择一项后提交</div>';
+  $("quizBox").innerHTML="<p><strong>"+esc(q.stem)+"</strong></p>"+q.opts.map((o,i)=>'<button type="button" role="radio" aria-checked="false" class="card" style="display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-c);padding:10px 12px;margin:6px 0" data-oi="'+i+'">'+String.fromCharCode(65+i)+". "+esc(o)+"</button>").join("")+'<div class="row"><button class="btn primary" id="btnSub">提交</button></div><div class="status" id="fb">选择一项后提交</div>';
   let pick=-1;
   $("quizBox").querySelectorAll("[data-oi]").forEach(el=>el.onclick=()=>{
     pick=+el.dataset.oi;
-    $("quizBox").querySelectorAll("[data-oi]").forEach(x=>x.style.borderColor="var(--rule)");
+    $("quizBox").querySelectorAll("[data-oi]").forEach(x=>{x.style.borderColor="var(--rule)";x.setAttribute("aria-checked","false");});
     el.style.borderColor="var(--primary)";
+    el.setAttribute("aria-checked","true");
   });
   const btn=$("btnSub");if(!btn)return;
   btn.onclick=()=>{
@@ -890,6 +904,17 @@ function paintQuiz(q){
   };
 }
 function renderToday(){
+  // P2-5：opt-out 必须真正生效——原先只翻转一个布尔值，今日推荐逐字不变，
+  // 与「关闭后立即停用个性化推荐与标签」的承诺不符。
+  if(S.optOut){
+    const chs=(activeBook().chapters||[]).slice(0,3);
+    $("todayBar").style.width=Math.min(100,(S.day/14)*100)+"%";
+    $("todayList").innerHTML='<div class="status warn">已关闭个性化：以下按教材章节顺序安排，不依据你的知识债推断。</div>'
+      +(chs.length?chs.map(c=>'<div class="card"><strong>'+esc(c.title)+'</strong><div class="hint">按目录顺序学习</div></div>').join("")
+                :'<div class="empty">当前教材没有章节，可到藏书阁上传资料。</div>');
+    if(!window._q)loadQuiz(null);else paintQuiz(window._q);
+    return;
+  }
   if(!S.plan)buildPlan();
   const items=(S.plan||[]).filter(i=>i.day===S.day).slice(0,3);
   $("todayBar").style.width=Math.min(100,(S.day/14)*100)+"%";
@@ -906,7 +931,13 @@ function normalize(s){
 function intentRoute(t){
   const norm=normalize(t);
   if(CRISIS.some(c=>norm.includes(normalize(c))))return {id:"crisis.handoff",score:1,decision:"crisis.handoff",trace:"R0:crisis"};
-  if(NEGATIVE.some(c=>norm===normalize(c)||norm.includes(normalize(c))))return {id:"meta.help",score:0,decision:"fallback",trace:"R2.5:negative"};
+  // P2-4：负例判定与后端 AgentRouter v3 对齐。
+  // 原实现 includes 命中即整句判死 →「好的，帮我生成计划」会被吞成兜底话术（实测复现）。
+  // 现要求负例占整句 ≥60% 才算客套话。
+  const negHit=NEGATIVE.map(normalize).filter(c=>c&&norm.indexOf(c)>=0)
+                      .reduce((a,b)=>b.length>a.length?b:a,"");
+  if(negHit&&norm.length>0&&negHit.length/norm.length>=0.6)
+    return {id:"meta.help",score:0,decision:"fallback",trace:"R2.5:negative;ratio="+(negHit.length/norm.length).toFixed(2)};
   const intents=[
     ["debt.diagnose",["知识债","债边","诊断","红边","薄弱"]],
     ["debt.explain",["解释","为什么","怎么来的","公式"]],
@@ -1024,7 +1055,10 @@ function renderProfile(){
   const acc=logs.length?logs.filter(x=>x.ok).length/logs.length:0.5;
   const brier=logs.length?logs.reduce((a,b)=>a+Math.pow(b.conf/5-(b.ok?1:0),2),0)/logs.length:.25;
   const style=[["AccuracyFirst",(0.55*acc+0.45*0.6)],["Calibrated",clamp01(1-brier/0.5)],["Steady",logs.length>5?0.7:0.5],["Independent",0.8],["DeepDive",0.55]];
-  $("styleList").innerHTML=style.map(kv=>'<div class="card"><div class="row" style="justify-content:space-between"><span>'+kv[0]+'</span><b>'+kv[1].toFixed(3)+'</b></div><div class="bar"><i style="width:'+(kv[1]*100).toFixed(0)+'%"></i></div></div>').join("");
+  // P2-5：opt-out 后不再展示推断出的风格轴（掌握度是作答的直接结果，仍保留）
+  $("styleList").innerHTML=S.optOut
+    ?'<div class="empty">个性化已关闭（opt-out）：不再展示由行为推断的风格轴与标签。</div>'
+    :style.map(kv=>'<div class="card"><div class="row" style="justify-content:space-between"><span>'+kv[0]+'</span><b>'+kv[1].toFixed(3)+'</b></div><div class="bar"><i style="width:'+(kv[1]*100).toFixed(0)+'%"></i></div></div>').join("");
   $("optLine").textContent=S.optOut?"已关闭个性化画像":"个性化开启中";
 }
 function renderAccount(){
@@ -1090,8 +1124,17 @@ $("btnGRefresh").onclick=()=>{try{renderGraph();$("gSwitch").className="status o
 $("btnDiag").onclick=renderDebt;
 $("btnPlan").onclick=()=>{try{buildPlan();renderDebt();}catch(e){$("planBox").innerHTML='<div class="status err">计划生成失败：'+esc(e.message||e)+'</div>';}};
 $("btnSale").onclick=()=>{
+  // P3-2：原先用原生 alert() 弹结果——与整站面板式 UI 割裂、会阻塞页面，
+  // 且三端表现不一致（安卓壳被改造成 Toast、Windows 壳是原生对话框）。改为页内内联反馈。
   const c=Object.values(S.sale||{}).filter(x=>x&&x.status==="cleared").length;
-  alert(c?("已销账 "+c+" 条"):("销账检查未通过：需连续 "+K.saleStreak+" 次达标且累计≥"+K.saleMinAtt+" 次"));
+  const msg=c
+    ?("已销账 "+c+" 条 · 条件：连续 "+K.saleStreak+" 次达标且累计作答≥"+K.saleMinAtt+" 次")
+    :("暂无可销账债边。销账条件：连续 "+K.saleStreak+" 次达标、累计作答≥"+K.saleMinAtt+" 次，且正确率≥"
+      +Math.round(K.saleAcc*100)+"%、信心≥"+K.saleConf+"。");
+  const el=$("debtMsg");
+  if(el){el.className="status "+(c?"ok":"warn");el.textContent=msg;}
+  const fb=$("fb");
+  if(fb){fb.className="status "+(c?"ok":"warn");fb.textContent=msg;}
 };
 $("btnLoadToday").onclick=renderToday;
 $("btnShuffle").onclick=()=>{window._q=null;loadQuiz(null);};
@@ -1115,7 +1158,18 @@ $("btnExport").onclick=()=>{
 };
 $("btnWipe").onclick=()=>{if(confirm("清空本机数据？")){S=defaultState();save(S);go("home");}};
 (function init(){
-  try{ensureMastery(activeBook());go("home");whatif();ensureChat();}
+  try{
+    ensureMastery(activeBook());go("home");whatif();ensureChat();
+    // P3-9：首次访问（本机尚无任何数据）时明确说明「这是示例数据」并给出下一步，
+    // 避免新用户一进来就看到「开放债边 30」而误以为系统在指控自己。
+    if(!localStorage.getItem(LS)){
+      const host=$("homeBook");
+      if(host) host.insertAdjacentHTML("beforebegin",
+        '<div class="status warn" id="firstRun">首次使用：当前显示的是内置示例教材（会计 / Python / 深度学习）及其示例诊断结果，'
+        +'并非你的真实学习数据。可以点「导入示例教材」直接体验，或到「藏书阁」上传自己的 PDF/文本；'
+        +'全部计算都在本机完成，随时可在「账户」导出数据或一键重置。</div>');
+    }
+  }
   catch(e){console.error(e);document.body.insertAdjacentHTML("beforeend",'<div class="status err">初始化失败：'+esc(e.message||e)+'</div>');}
 })();
 </script>

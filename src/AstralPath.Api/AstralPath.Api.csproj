@@ -8,6 +8,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
   </ItemGroup>
   <ItemGroup>
+    <!-- 可复用 HTTP 层（ApiBootstrapper + 全部控制器）。抽成普通类库的目的是让
+         Android 壳也能复用同一份管线，而不会被 Sdk.Web 的 FrameworkReference 流动卡住；
+         详见 AstralPath.Api.Core.csproj 内的说明。-->
+    <ProjectReference Include="..\AstralPath.Api.Core\AstralPath.Api.Core.csproj" />
     <ProjectReference Include="..\AstralPath.Core\AstralPath.Core.csproj" />
     <ProjectReference Include="..\AstralPath.Graph\AstralPath.Graph.csproj" />
     <ProjectReference Include="..\AstralPath.Contracts\AstralPath.Contracts.csproj" />

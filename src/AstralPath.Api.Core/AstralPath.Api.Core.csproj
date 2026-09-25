@@ -1,0 +1,69 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- 命名空间沿用 AstralPath.Api：控制器/启动器的代码与文档均不需要改动 -->
+    <RootNamespace>AstralPath.Api</RootNamespace>
+    <AssemblyName>AstralPath.Api.Core</AssemblyName>
+
+    <!--
+      为什么存在这个类库（方案 §14 / §16）：
+
+      ApiBootstrapper + 全部控制器需要被**三种宿主**复用——
+        · AstralPath.Api（CLI/容器/测试，Sdk.Web 可执行）
+        · AstralPath.AndroidApp（APK 内嵌宿主，net10.0-android）
+        · 未来其它壳（MAUI / 自托管服务）
+      而 Sdk.Web 工程会向引用方流动 FrameworkReference(Microsoft.AspNetCore.App)，
+      android 没有对应的运行时包（NETSDK1082），AndroidApp 一旦引用它就无法打包。
+
+      因此把「可复用的 HTTP 层」抽成普通类库：对 ASP.NET Core 的引用走
+      **直接 DLL 引用**（Private=false，仅编译期），不产生 FrameworkReference 流动；
+      各宿主按需自带运行时——CLI/容器来自设备共享框架，APK 来自下面 AndroidApp
+      打包进来的同一批 DLL。类型与版本严格一致（同一台 .NET 10 安装），不存在漂移。
+    -->
+    <AspNetCoreSharedGlob Condition="'$(AspNetCoreSharedGlob)' == ''">C:\Program Files\dotnet\shared\Microsoft.AspNetCore.App\10.*\</AspNetCoreSharedGlob>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!--
+      隐式 using：原来这些控制器活在 Sdk.Web 工程里，靠 Web SDK 自带的 ASP.NET Core
+      隐式 using 才编译得过；换成普通类库后必须显式补回，否则 IResult / IFormFile /
+      HttpContext / ControllerBase 全部找不到（CS0246）。
+    -->
+    <Using Include="Microsoft.AspNetCore.Builder" />
+    <Using Include="Microsoft.AspNetCore.Http" />
+    <Using Include="Microsoft.AspNetCore.Mvc" />
+    <Using Include="Microsoft.AspNetCore.Routing" />
+    <Using Include="Microsoft.Extensions.Configuration" />
+    <Using Include="Microsoft.Extensions.DependencyInjection" />
+    <Using Include="Microsoft.Extensions.Hosting" />
+    <Using Include="Microsoft.Extensions.Logging" />
+    <Using Include="Microsoft.Extensions.Options" />
+    <Using Include="Microsoft.Extensions.Primitives" />
+    <Using Include="Microsoft.Net.Http.Headers" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="$(AspNetCoreSharedGlob)Microsoft.AspNetCore*.dll" Private="false" />
+    <Reference Include="$(AspNetCoreSharedGlob)Microsoft.Extensions*.dll" Private="false" />
+    <Reference Include="$(AspNetCoreSharedGlob)Microsoft.Net.Http.Headers.dll" Private="false" />
+    <Reference Include="$(AspNetCoreSharedGlob)Microsoft.JSInterop.dll" Private="false" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AstralPath.Contracts\AstralPath.Contracts.csproj" />
+    <ProjectReference Include="..\AstralPath.Core\AstralPath.Core.csproj" />
+    <ProjectReference Include="..\AstralPath.Graph\AstralPath.Graph.csproj" />
+    <ProjectReference Include="..\AstralPath.Infrastructure\AstralPath.Infrastructure.csproj" />
+    <ProjectReference Include="..\AstralPath.Persistence\AstralPath.Persistence.csproj" />
+    <ProjectReference Include="..\AstralPath.Services\AstralPath.Services.csproj" />
+    <ProjectReference Include="..\AstralPath.Shared\AstralPath.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

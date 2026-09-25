@@ -998,6 +998,53 @@ public sealed class AstralPathModules
             };
         }
     }
+
+    // ══════════════════════════════════════════════════════════════════════
+    //  运行时状态快照（P1：重启不丢）
+    //  只导出「用户创造的数据」：知识库文档与正文、画像、智能体轮次、版本/发布/归档。
+    //  分片（_kbChunks）、上传票据（_kbUploads）、会话句柄（_sessions）、CSR 缓存
+    //  属瞬态或可重建数据，不落盘。
+    // ══════════════════════════════════════════════════════════════════════
+
+    /// <summary>导出可持久化的模块状态。</summary>
+    public ModuleStateDto ExportState()
+    {
+        lock (_gate)
+        {
+            return new ModuleStateDto
+            {
+                KbDocs = new Dictionary<string, KbDocument>(_kbDocs, StringComparer.OrdinalIgnoreCase),
+                KbTexts = new Dictionary<string, string>(_kbTexts, StringComparer.OrdinalIgnoreCase),
+                Profiles = new Dictionary<string, LearningProfile>(_profiles, StringComparer.OrdinalIgnoreCase),
+                KbVersions = _kbVersions.ToDictionary(
+                    kv => kv.Key, kv => kv.Value.ToList(), StringComparer.OrdinalIgnoreCase),
+                KbPublished = new Dictionary<string, string>(_kbPublished, StringComparer.OrdinalIgnoreCase),
+                KbArchived = _kbArchived.ToList(),
+                AgentTurns = _agentTurns.ToList()
+            };
+        }
+    }
+
+    /// <summary>合并导入（upsert，不清空现有数据）。</summary>
+    public void ImportState(ModuleStateDto? state)
+    {
+        if (state is null) return;
+        lock (_gate)
+        {
+            foreach (var kv in state.KbDocs) _kbDocs[kv.Key] = kv.Value;
+            foreach (var kv in state.KbTexts) _kbTexts[kv.Key] = kv.Value;
+            foreach (var kv in state.Profiles) _profiles[kv.Key] = kv.Value;
+            foreach (var kv in state.KbVersions) _kbVersions[kv.Key] = kv.Value.ToList();
+            foreach (var kv in state.KbPublished) _kbPublished[kv.Key] = kv.Value;
+            foreach (var id in state.KbArchived) _kbArchived.Add(id);
+
+            if (state.AgentTurns.Count > 0)
+            {
+                _agentTurns.Clear();
+                _agentTurns.AddRange(state.AgentTurns);
+            }
+        }
+    }
 }
 
 /// <summary>知识库文档版本（§45.5 不可变版本控制）。</summary>

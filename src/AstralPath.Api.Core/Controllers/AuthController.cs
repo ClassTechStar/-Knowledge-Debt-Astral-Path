@@ -32,8 +32,10 @@ public sealed class AuthController : ControllerBase
     private AuthUser? CurrentUser() => _auth.FindByAccessToken(Bearer(HttpContext));
 
     [HttpPost("/api/v1/auth/register")]
-    public IResult Register([FromBody] RegisterRequest request)
+    public IResult Register([FromBody] RegisterRequest? request)
     {
+        if (request is null)
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "请求体必须是合法的 JSON 对象");
         try
         {
             if (request.DemoStudentId is not (null or "demo-student-a" or "demo-student-b"))
@@ -63,15 +65,23 @@ public sealed class AuthController : ControllerBase
                 traceId = Guid.NewGuid().ToString("N")
             }, statusCode: 201);
         }
-        catch (Exception ex) when (ex is ArgumentException or InvalidOperationException)
+        catch (InvalidOperationException ex)
+        {
+            // 邮箱已注册等「状态冲突」→ 409（P3-6）。
+            // 原先与参数错误一起映射成 400，前端无法区分「填错了」与「已被占用」。
+            return HttpResults.Fail(409, ErrorCodes.StateConflict, ex.Message);
+        }
+        catch (ArgumentException ex)
         {
             return HttpResults.Fail(400, ErrorCodes.ValidationError, ex.Message);
         }
     }
 
     [HttpPost("/api/v1/auth/sessions")]
-    public IResult Login([FromBody] LoginRequest request)
+    public IResult Login([FromBody] LoginRequest? request)
     {
+        if (request is null)
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "请求体必须是合法的 JSON 对象");
         try
         {
             var session = _auth.Login(request.Email, request.Password ?? "", request.DeviceName);
@@ -114,8 +124,10 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPut("/api/v1/auth/profile")]
-    public IResult UpdateProfile([FromBody] ProfileUpdateRequest request)
+    public IResult UpdateProfile([FromBody] ProfileUpdateRequest? request)
     {
+        if (request is null)
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "请求体必须是合法的 JSON 对象");
         var user = CurrentUser();
         if (user == null)
             return HttpResults.Fail(401, ErrorCodes.AuthRequired, "登录状态已失效，请重新登录");
@@ -129,8 +141,10 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("/api/v1/auth/password-changes")]
-    public IResult ChangePassword([FromBody] PasswordChangeRequest request)
+    public IResult ChangePassword([FromBody] PasswordChangeRequest? request)
     {
+        if (request is null)
+            return HttpResults.Fail(400, ErrorCodes.ValidationError, "请求体必须是合法的 JSON 对象");
         var user = CurrentUser();
         if (user == null)
             return HttpResults.Fail(401, ErrorCodes.AuthRequired, "登录状态已失效，请重新登录");
