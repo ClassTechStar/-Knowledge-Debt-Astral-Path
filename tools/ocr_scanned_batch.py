@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 import time
@@ -12,9 +13,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ocr_pipeline_umi import extract_page  # noqa: E402
 import pymupdf  # noqa: E402
 
-PDF = Path(r"C:\Users\18948\Downloads\大模型应用开发：动手做 AI Agent (黄佳) .pdf")
+PDF = Path(os.environ.get("ASTRALPATH_PDF", str(Path.home() / "Downloads" / "大模型应用开发：动手做 AI Agent (黄佳) .pdf")))
 OUT = Path(
-    r"C:\Users\18948\XiaomiMiMoProjects\.mimo-sessions\2026-09-19\按照项目方案要求，对整个项目进行完整开发。开发过程中需持续推进，不得中途停顿，直\ocr-deep-test"
+    os.environ.get("ASTRALPATH_OCR_OUT", str(Path(__file__).resolve().parent.parent / "ocr-deep-test"))
 )
 OUT.mkdir(parents=True, exist_ok=True)
 TXT = OUT / "大模型应用开发：动手做 AI Agent (黄佳) .pdf.ocr.txt"
@@ -49,8 +50,17 @@ def main():
         try:
             text, blocks, stats = extract_page(doc[pno - 1], mode="fullPage", pno=pno)
         except Exception as e:
-            text, stats = "", {"error": str(e)}
+            # 失败不记 done，允许续跑重试
+            msg = f"p{pno}/{end} ERROR {e}"
+            print(msg, flush=True)
+            log.write(msg + "\n")
+            continue
         chars = len(re.sub(r"\s", "", text))
+        if chars < 5 and not stats.get("ocr_chars"):
+            msg = f"p{pno}/{end} EMPTY skip"
+            print(msg, flush=True)
+            log.write(msg + "\n")
+            continue
         st["done"][key] = {"chars": chars, "blocks": stats.get("ocr_chars", 0)}
         st["order"].append(pno)
         # 追加写全文
@@ -59,8 +69,7 @@ def main():
         msg = f"p{pno}/{end} chars={chars} elapsed={time.time()-t0:.0f}s"
         print(msg, flush=True)
         log.write(msg + "\n")
-        if pno % 5 == 0:
-            save_state(st)
+        save_state(st)
     save_state(st)
     log.close()
     doc.close()

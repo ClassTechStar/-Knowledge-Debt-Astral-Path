@@ -39,6 +39,12 @@ Name: "desktopicon"; Description: "创建桌面快捷方式"; GroupDescription: 
 
 [Files]
 Source: "publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+; ★ OCR 兜底：页面文本层乱码/扫描件时，宿主桥调用本目录 tools 下的管线（零网络）
+Source: "..\..\tools\ocr_pipeline.py"; DestDir: "{app}\tools"; Flags: ignoreversion
+Source: "..\..\tools\deep_chapters.py"; DestDir: "{app}\tools"; Flags: ignoreversion
+Source: "..\..\tools\kg_builder.py"; DestDir: "{app}\tools"; Flags: ignoreversion
+Source: "..\..\tools\tessdata\chi_sim.traineddata"; DestDir: "{app}\tools\tessdata"; Flags: ignoreversion
+Source: "..\..\tools\tessdata\eng.traineddata"; DestDir: "{app}\tools\tessdata"; Flags: ignoreversion
 
 [Icons]
 Name: "{group}\{#MyAppName} 单体版 2.2"; Filename: "{app}\{#MyAppExeName}"; WorkingDir: "{app}"

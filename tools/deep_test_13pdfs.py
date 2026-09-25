@@ -17,8 +17,8 @@ from ocr_pipeline_umi import (  # noqa: E402
     extract_page,
 )
 
-PDF_DIR = Path(r"C:\Users\18948\Downloads")
-OUT_DIR = Path(r"C:\Users\18948\XiaomiMiMoProjects\.mimo-sessions\2026-09-19\按照项目方案要求，对整个项目进行完整开发。开发过程中需持续推进，不得中途停顿，直\ocr-deep-test")
+PDF_DIR = Path(os.environ.get("ASTRALPATH_PDF_DIR", str(Path.home() / "Downloads")))
+OUT_DIR = Path(os.environ.get("ASTRALPATH_OCR_OUT", str(Path(__file__).resolve().parent.parent / "ocr-deep-test")))
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
 PDFS = [

@@ -92,7 +92,7 @@ public static class PlannerConstraintChecker
             var groups = day.Items.GroupBy(x => x.KpId);
             foreach (var g in groups)
             {
-                var conceptIdx = g.Select((x, idx) => (x, idx)).Where(t => t.x.Type == "concept").Select(t => t.idx).DefaultIfEmpty(-1).Max();
+                var conceptIdx = g.Select((x, idx) => (x, idx)).Where(t => t.x.Type == "concept").Select(t => t.idx).DefaultIfEmpty(-1).Min();
                 var drillIdx = g.Select((x, idx) => (x, idx)).Where(t => t.x.Type is "drill" or "quiz").Select(t => t.idx).DefaultIfEmpty(-1).Min();
                 if (conceptIdx >= 0 && drillIdx >= 0 && drillIdx < conceptIdx)
                 {

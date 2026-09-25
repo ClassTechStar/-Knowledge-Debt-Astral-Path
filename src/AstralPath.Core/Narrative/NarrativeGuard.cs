@@ -73,22 +73,21 @@ public static class NarrativeGuard
     private static bool ContainsNumber(string text, double value)
     {
         var rounded = Math.Round(value, 6, MidpointRounding.AwayFromZero);
+        // 禁止整数变体：|v|<1.5 时 Round 变成 "0"/"1"，会被任意数字子串命中
         var variants = new[]
         {
-            rounded.ToString("0.######"),
-            rounded.ToString("0.0######"),
-            rounded.ToString("F6").TrimEnd('0').TrimEnd('.'),
-            ((int)Math.Round(rounded)).ToString()
+            rounded.ToString("0.######", System.Globalization.CultureInfo.InvariantCulture),
+            rounded.ToString("0.0######", System.Globalization.CultureInfo.InvariantCulture),
+            rounded.ToString("F6", System.Globalization.CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.')
         };
         foreach (var v in variants)
         {
-            if (string.IsNullOrEmpty(v)) continue;
+            if (string.IsNullOrEmpty(v) || v == "0" || v == "1") continue;
             if (text.Contains(v, StringComparison.Ordinal)) return true;
         }
-        // also accept "28.0" style
-        return text.Contains(rounded.ToString("0.0######"), StringComparison.Ordinal);
+        return text.Contains(rounded.ToString("0.0######", System.Globalization.CultureInfo.InvariantCulture), StringComparison.Ordinal);
     }
 
     private static string FormatNum(double v)
-        => Math.Round(v, 6, MidpointRounding.AwayFromZero).ToString("0.######");
+        => Math.Round(v, 6, MidpointRounding.AwayFromZero).ToString("0.######", System.Globalization.CultureInfo.InvariantCulture);
 }

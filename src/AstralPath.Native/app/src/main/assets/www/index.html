@@ -122,7 +122,7 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
 </main>
 <main id="p-materials" hidden>
   <div class="page-h">
-    <div><h1>藏书阁</h1><p>支持 PDF/TXT/MD。解析后自动构图并写入识网；扫描件可粘贴正文兜底。</p></div>
+    <div><h1>藏书阁</h1><p>支持 PDF/TXT/MD。解析后自动构图并写入识网；乱码或扫描版 PDF 自动转 OCR 识别。</p></div>
     <div class="actions">
       <button class="btn" id="btnSeed2">导入示例资料</button>
       <button class="btn" id="btnParseAll">解析全部</button>
@@ -145,7 +145,7 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
       <div class="progress" id="parseProg" hidden><i id="parseProgBar"></i></div>
       <div class="status" id="matStatus">尚未上传</div>
       <div class="field" style="margin-top:14px">
-        <label>粘贴正文（PDF 抽不出文本层时的兜底）</label>
+        <label>粘贴正文（OCR 也不可用时的最终兜底）</label>
         <textarea id="pasteText" placeholder="把教材正文粘贴到这里，点下方「从粘贴文本解析」也会生成知识图谱"></textarea>
         <div class="actions"><button class="btn" id="btnPasteParse">从粘贴文本解析</button></div>
       </div>
@@ -370,8 +370,10 @@ async function readFileAsText(file){
     }catch(e){text="";}
     text=sanitizeText(text).trim();
     const readable=countReadable(text);
-    if(readable<40)return {text:text,ok:false,reason:"PDF 文本层不足（扫描件或 CID 字体），请用「粘贴正文」或改用 TXT/MD",chars:readable};
-    return {text:text,ok:true,chars:readable};
+    const ratio=textGoodRatio(text);
+    if(readable<40)return {text:text,ok:false,reason:"PDF 文本层不足（扫描件或无 Unicode 映射的内嵌字体）",chars:readable,ratio:ratio,needOcr:true};
+    if(ratio<0.70)return {text:text,ok:false,reason:"PDF 文本层疑似乱码（可读率 "+Math.round(ratio*100)+"%，多为内嵌字体缺少 ToUnicode 映射）",chars:readable,ratio:ratio,needOcr:true};
+    return {text:text,ok:true,chars:readable,ratio:ratio};
   }
   let text="";
   try{text=new TextDecoder("utf-8",{fatal:false}).decode(u8);}catch(e){text=latin1(u8);}
@@ -383,6 +385,41 @@ async function readFileAsText(file){
   return {text:text,ok:true,chars:readable};
 }
 
+function textGoodRatio(t){
+  const s=String(t||"").replace(/\s+/g,"");
+  if(!s.length)return 1;
+  const good=(s.match(/[一-鿿A-Za-z0-9]/g)||[]).length;
+  return good/s.length;
+}
+// ── 宿主 OCR 桥：Windows 单体壳（WebView2 postMessage）提供；浏览器/安卓壳无此能力时返回 null ──
+const OCR_BRIDGE_TIMEOUT_MS=10*60*1000;
+function hostBridge(){return (window.chrome&&window.chrome.webview&&typeof window.chrome.webview.postMessage==="function")?window.chrome.webview:null;}
+const _ocrPending={};let _ocrSeq=0;
+window.addEventListener("message",function(ev){
+  const d=ev&&ev.data;
+  if(!d||typeof d!=="object")return;
+  if(d.type==="astralpath.ocr.result"&&d.id&&Object.prototype.hasOwnProperty.call(_ocrPending,d.id)){
+    const slot=_ocrPending[d.id];delete _ocrPending[d.id];
+    clearTimeout(slot.timer);
+    if(d.ok&&d.text)slot.resolve({ok:true,text:String(d.text)});
+    else slot.reject(new Error(d.error||"宿主 OCR 未返回文本"));
+  }
+});
+async function ocrViaHost(file,mode){
+  const bridge=hostBridge();
+  if(!bridge)return null;
+  const id="ocr"+(++_ocrSeq)+"_"+Date.now();
+  const buf=new Uint8Array(await file.arrayBuffer());
+  let bin="";const CH=32768;
+  for(let i=0;i<buf.length;i+=CH)bin+=String.fromCharCode.apply(null,buf.subarray(i,Math.min(buf.length,i+CH)));
+  const data=btoa(bin);
+  return new Promise(function(resolve,reject){
+    const timer=setTimeout(function(){delete _ocrPending[id];reject(new Error("OCR 超时（10 分钟）；可改用 quick 模式或拆分文件"));},OCR_BRIDGE_TIMEOUT_MS);
+    _ocrPending[id]={resolve:resolve,reject:reject,timer:timer};
+    try{bridge.postMessage({type:"astralpath.ocr",id:id,name:String(file.name||"material.pdf"),mode:mode||"standard",data:data});}
+    catch(e){clearTimeout(timer);delete _ocrPending[id];reject(e);}
+  });
+}
 function extractChapters(text,maxCh){
   maxCh=maxCh||40;
   const lines=String(text).split("\n");const marks=[];
@@ -539,17 +576,21 @@ function buildGraphFromText(text,chapters,opts){
 }
 function generateQuestions(book){
   const qs=[];let n=1;const nodes=book.nodes||[];
+  // 第一轮：每个节点至少 1 题，保证任务 kp 有题可练
   for(let i=0;i<nodes.length;i++){
+    const node=nodes[i];
+    const stem=node.kind==="chapter"?("「"+node.title+"」这一章最核心要掌握的是？"):("关于「"+node.title+"」的说法，正确的是理解其在本教材中的作用。下列哪项更合适作为自测切入点？");
+    const opts=node.kind==="chapter"?["掌握本章核心概念与前后衔接","只背标题","跳过练习","只看结论"]:["能解释「"+node.title+"」并关联先修点","只记住名词","忽略上下文","不做练习"];
+    qs.push({id:"A"+String(n++).padStart(3,"0"),kp:node.id,stem:stem,opts:opts,ci:0,diff:node.diff||2,src:"auto"});
+  }
+  // 第二轮：正文延伸题（有上限）
+  for(let i=0;i<nodes.length&&qs.length<160;i++){
     const node=nodes[i];
     let body=(node.body||"");
     const chs=book.chapters||[];
     for(let k=0;k<chs.length;k++){if(chs[k].id===node.id&&chs[k].body)body=chs[k].body;}
     body=String(body).replace(/\s+/g," ").slice(0,180);
-    const stem=node.kind==="chapter"?("「"+node.title+"」这一章最核心要掌握的是？"):("关于「"+node.title+"」的说法，正确的是理解其在本教材中的作用。下列哪项更合适作为自测切入点？");
-    const opts=node.kind==="chapter"?["掌握本章核心概念与前后衔接","只背标题","跳过练习","只看结论"]:["能解释「"+node.title+"」并关联先修点","只记住名词","忽略上下文","不做练习"];
-    qs.push({id:"A"+String(n++).padStart(3,"0"),kp:node.id,stem:stem,opts:opts,ci:0,diff:node.diff||2,src:"auto"});
     if(body&&body.length>40)qs.push({id:"A"+String(n++).padStart(3,"0"),kp:node.id,stem:"根据解析正文，「"+node.title+"」附近的关键内容更接近：",opts:[body.slice(0,60)+"…","与正文无关的闲聊","空白页","纯广告"],ci:0,diff:Math.min(5,(node.diff||2)+1),src:"auto"});
-    if(qs.length>=80)break;
   }
   return qs;
 }
@@ -570,12 +611,29 @@ async function parseFiles(fileList,mode){
     const f=files[i];
     $("parseProgBar").style.width=Math.round(i/files.length*100)+"%";
     try{
-      if(f.size>8*1024*1024)throw new Error("文件超过 8MB，请拆分或粘贴正文");
-      const r=await readFileAsText(f);
-      if(!r.ok){errors.push({name:f.name,reason:r.reason||"解析失败"});continue;}
+      let r=await readFileAsText(f);
+      if(!r.ok&&r.needOcr){
+        // 文本层乱码/缺失：自动降级走宿主 OCR（PDF 渲染成图后 tesseract 识别），结果同样进入清洗与章节切分
+        setMatStatus("","「"+f.name+"」"+(r.reason||"文本层不可用")+"，自动转 OCR 识别（大文件可能需要几分钟）…");
+        let o=null,ocrErr=null;
+        try{o=await ocrViaHost(f,mode);}
+        catch(e){ocrErr=(e&&e.message)||String(e);}
+        if(o&&o.ok){
+          const t=sanitizeText(String(o.text||"")).replace(/\r\n/g,"\n").trim();
+          const good=countReadable(t);
+          if(good>=40){r={text:t,ok:true,chars:good,ocr:true};}
+          else ocrErr="OCR 结果可读文本过少";
+        }
+        if(!r.ok){
+          const hint=(o===null&&!ocrErr)?"（当前环境无 OCR 引擎，请用「粘贴正文」兜底）":(ocrErr?"（OCR 兜底失败："+ocrErr+"）":"");
+          throw new Error((r.reason||"解析失败")+hint);
+        }
+      }else if(!r.ok){throw new Error(r.reason||"解析失败");}
       const text=r.text||"";
       if(countReadable(text)<20)throw new Error("可读文本过少");
-      results.push(makeBookFromFile(f.name,text,mode,"user"));
+      const book=makeBookFromFile(f.name,text,mode,"user");
+      if(r.ocr)book.ocr=true;
+      results.push(book);
     }catch(e){errors.push({name:f.name,reason:e.message||String(e)});}
     $("parseProgBar").style.width=Math.round((i+1)/files.length*100)+"%";
   }
@@ -730,13 +788,22 @@ function downMass(id){
   return Object.keys(seen).length;
 }
 function scoreOf(id){
+  return scoreOfMemo(id,{});
+}
+function scoreOfMemo(id,visiting){
+  if(visiting[id]!=null)return visiting[id];
+  visiting[id]=0.5;
   const m=S.mastery[id]||{n:0,s:0,c:3,age:0,st:0};
-  return scoreV2(m.n,m.s,m.c,m.age,m.st,prereqs(id).map(scoreOf));
+  const pre=prereqs(id).map(function(p){return scoreOfMemo(p,visiting);});
+  const v=scoreV2(m.n,m.s,m.c,m.age,m.st,pre);
+  visiting[id]=v;
+  return v;
 }
 function scanDebts(){
   return activeEdges().map(function(e){
     const sf=scoreOf(e.from),st=scoreOf(e.to);
-    const fr=(S.logs.filter(function(l){return l.kp===e.to&&!l.ok;}).length)||(sf>0.6?5:2);
+    const wrong=(S.logs||[]).filter(function(l){return l.kp===e.to&&!l.ok;}).length;
+    const fr=wrong>0?wrong:0;
     const imp=impactV2(sf,st,e.w,e.tg,fr,downMass(e.to));
     return {from:e.from,to:e.to,fromName:title(e.from),toName:title(e.to),sf:sf,st:st,imp:imp,freq:fr,status:imp>=K.hit?"open":"cleared"};
   }).filter(function(d){return d.imp>0;}).sort(function(a,b){return b.imp-a.imp;});
@@ -771,8 +838,8 @@ function renderMats(){
   $("matList").innerHTML=list.length?list.map(m=>{
     const st=m.status==="ready"?"ready":m.status==="error"?"error":"partial";
     const cls=st==="error"?"err":""; // badge 全绿：ready / partial / parsing 均绿，仅 error 用红
-    return '<div class="card '+(m.id===S.activeBookId?"active":"")+'" data-book="'+esc(m.id)+'"><div class="row" style="justify-content:space-between"><strong>'+esc(m.name)+'</strong><span class="badge '+cls+'">'+st+'</span></div><div class="hint">'+(m.chars||0)+' 字 · '+(m.nodes||[]).length+' 节点 · '+(m.edges||[]).length+' 边 · '+(m.chapters||[]).length+' 章 · '+esc(m.parseMode||"-")+'</div><div class="row" style="margin-top:8px"><button class="btn" data-view="'+esc(m.id)+'">查看详情</button><button class="btn primary" data-use="'+esc(m.id)+'">用此书识网</button><button class="btn danger" data-del="'+esc(m.id)+'">删除</button></div></div>';
-  }).join(""):'<div class="empty">暂无资料。点「导入示例资料」，或上传 TXT/MD；PDF 请确保含文本层。</div>';
+    return '<div class="card '+(m.id===S.activeBookId?"active":"")+'" data-book="'+esc(m.id)+'"><div class="row" style="justify-content:space-between"><strong>'+esc(m.name)+'</strong><span class="badge '+cls+'">'+st+'</span></div><div class="hint">'+(m.chars||0)+' 字 · '+(m.nodes||[]).length+' 节点 · '+(m.edges||[]).length+' 边 · '+(m.chapters||[]).length+' 章 · '+esc(m.parseMode||"-")+(m.ocr?' · OCR':'')+'</div><div class="row" style="margin-top:8px"><button class="btn" data-view="'+esc(m.id)+'">查看详情</button><button class="btn primary" data-use="'+esc(m.id)+'">用此书识网</button><button class="btn danger" data-del="'+esc(m.id)+'">删除</button></div></div>';
+  }).join(""):'<div class="empty">暂无资料。点「导入示例资料」，或上传 PDF/TXT/MD（乱码/扫描版自动转 OCR）。</div>';
   $("matList").querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>showDetail(b.dataset.view));
   $("matList").querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{setActive(b.dataset.use);go("graph");});
   $("matList").querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{
@@ -827,7 +894,8 @@ function renderGraph(){
     el.innerHTML="<span>"+esc(p.node.title)+"</span><small>"+(d?"impact="+d.imp.toFixed(3):"diff "+(p.node.diff||2))+"</small>";
     el.onclick=()=>{
       const body=(book.chapters||[]).find(c=>c.id===p.node.id);
-      $("nodeInfo").innerHTML="<strong>"+esc(p.node.title)+"</strong><br/><span class=\"hint\">score="+scoreOf(p.node.id).toFixed(6)+" · 先修："+prereqs(p.node.id).map(title).join("、")||"无"+" · 下游 "+downMass(p.node.id)+" 个"+(body?"<br/>"+esc((body.body||"").slice(0,160)):"")+"</span>";
+      const preList=prereqs(p.node.id).map(title).join("、");
+      $("nodeInfo").innerHTML="<strong>"+esc(p.node.title)+"</strong><br/><span class=\"hint\">score="+scoreOf(p.node.id).toFixed(6)+" · 先修："+(preList||"无")+" · 下游 "+downMass(p.node.id)+" 个"+(body?"<br/>"+esc((body.body||"").slice(0,160)):"")+"</span>";
     };
     dag.appendChild(el);
   });
@@ -871,12 +939,16 @@ function buildPlan(){
 }
 function pickQuestion(kp){
   const qs=activeQs();if(!qs.length)return null;
-  if(kp){const hit=qs.filter(q=>q.kp===kp);if(hit.length)return hit[Math.floor(Math.random()*hit.length)];}
+  if(kp){
+    const hit=qs.filter(q=>q.kp===kp);
+    if(hit.length)return hit[Math.floor(Math.random()*hit.length)];
+    return null; // 该知识点无题：不回落到无关题，避免 mastery/销账记错
+  }
   return qs[Math.floor(Math.random()*qs.length)];
 }
 function loadQuiz(kp){window._q=pickQuestion(kp);paintQuiz(window._q);}
 function paintQuiz(q){
-  if(!q){$("quizBox").innerHTML='<div class="empty">当前教材没有题目。请解析资料或导入示例。</div>';return;}
+  if(!q){$("quizBox").innerHTML='<div class="empty">该知识点暂无题目。可点「换一题」抽其他知识点，或到藏书阁解析教材补题。</div>';return;}
   $("quizKp").textContent=title(q.kp);
   $("quizBox").innerHTML="<p><strong>"+esc(q.stem)+"</strong></p>"+q.opts.map((o,i)=>'<button type="button" role="radio" aria-checked="false" class="card" style="display:block;width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;background:var(--surface);border:1px solid var(--rule);border-radius:var(--r-c);padding:10px 12px;margin:6px 0" data-oi="'+i+'">'+String.fromCharCode(65+i)+". "+esc(o)+"</button>").join("")+'<div class="row"><button class="btn primary" id="btnSub">提交</button></div><div class="status" id="fb">选择一项后提交</div>';
   let pick=-1;
@@ -895,7 +967,10 @@ function paintQuiz(q){
       m.n++;if(ok)m.s++;m.st=ok?((m.st||0)+1):0;m.c=conf;m.age=0;S.mastery[q.kp]=m;
       S.logs.push({kp:q.kp,ok,conf,ts:Date.now()});
       if(S.logs.length>500)S.logs=S.logs.slice(-500);
-      S.sale[q.kp]=saleStep(S.sale[q.kp]||{streak:0,att:0},ok?1:0,conf);
+      // sale-v2：用该知识点近 10 次作答的正确率，而不是单题 0/1
+      const hist=(S.logs||[]).filter(l=>l.kp===q.kp).slice(-10);
+      const acc=hist.length?hist.filter(l=>l.ok).length/hist.length:(ok?1:0);
+      S.sale[q.kp]=saleStep(S.sale[q.kp]||{streak:0,att:0},acc,conf);
       save(S);
       const sv=S.sale[q.kp];
       $("fb").className="status "+(ok?"ok":"err");
@@ -1008,7 +1083,7 @@ function executeIntent(id,raw){
       return "销账进度（sale-v2）：已销账 "+c+" · 修复中 "+r+" · 条件=连续 "+K.saleStreak+" 次达标且累计≥"+K.saleMinAtt+" 次（acc≥"+K.saleAcc+"，conf≥"+K.saleConf+"）。";
     }
     case "graph.view":return graphSummary();
-    case "material.parse":return "到「藏书阁」上传 PDF/TXT/MD（PDF 需文本层），或粘贴正文后点「从粘贴文本解析」。解析完成会自动写入识网图谱。";
+    case "material.parse":return "到「藏书阁」上传 PDF/TXT/MD；乱码或扫描版 PDF 会自动转 OCR 识别，也可粘贴正文后点「从粘贴文本解析」。解析完成会自动写入识网图谱。";
     case "kb.search":{
       const hits=searchKb(raw);
       if(!hits.length)return "在当前《"+activeBook().name+"》中没找到直接匹配。可换个关键词，或到识网翻章节。";
@@ -1111,8 +1186,10 @@ $("btnParseAll").onclick=()=>{
   try{
     let n=0;
     for(const b of S.books){
-      if(b.kind==="sample"||!b.sourceText){n++;continue;}
-      const g=buildGraphFromText(b.sourceText,b.chapters,{course:b.name,maxConcepts:20});
+      if(b.kind==="sample"||!(b.chapters||[]).length){n++;continue;}
+      // 用章节正文全文重建，而不是被 save 截断的 sourceText
+      const full=(b.chapters||[]).map(c=>c.body||"").join("\n")||b.sourceText||"";
+      const g=buildGraphFromText(full,b.chapters,{course:b.name,maxConcepts:20});
       b.nodes=g.nodes;b.edges=g.edges;b.qs=generateQuestions(b);b.parsedAt=Date.now();n++;
     }
     ensureMastery(activeBook());save(S);renderMats();

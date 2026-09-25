@@ -129,10 +129,17 @@ public static class GraphInference
     public static double NormalizedPmi(int co, int a, int b, int total)
     {
         if (co <= 0 || a <= 0 || b <= 0 || total <= 0) return 0;
-        var pAb = (double)co / total;
+        // pAb 必须 < 1：窗口共现计数可超过 positions，故用 max(total, co+1) 作试验次数
+        var denom = (double)Math.Max(total, co + 1);
+        var pAb = co / denom;
         if (pAb <= 0 || pAb >= 1) return 0;
-        var pmi = Math.Log2(pAb / ((double)a / total * (b / (double)total)));
-        return Math.Clamp(pmi / -Math.Log2(pAb), -1.0, 1.0);
+        var pA = a / denom;
+        var pB = b / denom;
+        if (pA <= 0 || pB <= 0) return 0;
+        var pmi = Math.Log2(pAb / (pA * pB));
+        var norm = -Math.Log2(pAb);
+        if (norm <= 0) return 0;
+        return Math.Clamp(pmi / norm, -1.0, 1.0);
     }
 
     // ── 3. 依赖句式 ─────────────────────────────────────

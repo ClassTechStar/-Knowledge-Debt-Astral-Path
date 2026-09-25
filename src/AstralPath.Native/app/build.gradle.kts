@@ -13,11 +13,13 @@ android {
         versionName = "2.2.0"
     }
     signingConfigs {
+        // 口令一律来自环境变量/CI secret，禁止写入仓库
         create("release") {
-            storeFile = file("../astralpath-release.keystore")
-            storePassword = "astralpath2026"
-            keyAlias = "astralpath"
-            keyPassword = "astralpath2026"
+            val ks = System.getenv("ASTRALPATH_KEYSTORE") ?: "../astralpath-release.keystore"
+            storeFile = file(ks)
+            storePassword = System.getenv("ASTRALPATH_STORE_PASSWORD") ?: ""
+            keyAlias = System.getenv("ASTRALPATH_KEY_ALIAS") ?: "astralpath"
+            keyPassword = System.getenv("ASTRALPATH_KEY_PASSWORD") ?: ""
         }
     }
     buildTypes {

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 from pathlib import Path
@@ -10,12 +11,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from kg_builder import build_graph, graph_stats, to_markdown, to_mindmap_tree  # noqa: E402
 
-TXT_DIR = Path(
-    r"C:\Users\18948\XiaomiMiMoProjects\.mimo-sessions\2026-09-19\按照项目方案要求，对整个项目进行完整开发。开发过程中需持续推进，不得中途停顿，直\ocr-deep-test"
-)
-OUT = Path(
-    r"C:\Users\18948\XiaomiMiMoProjects\.mimo-sessions\2026-09-19\按照项目方案要求，对整个项目进行完整开发。开发过程中需持续推进，不得中途停顿，直\kg-deep-test"
-)
+_ROOT = Path(__file__).resolve().parent.parent
+TXT_DIR = Path(os.environ.get("ASTRALPATH_OCR_OUT", str(_ROOT / "ocr-deep-test")))
+OUT = Path(os.environ.get("ASTRALPATH_KG_OUT", str(_ROOT / "kg-deep-test")))
 OUT.mkdir(parents=True, exist_ok=True)
 
 # 书名 → 文本文件（扫描版优先用 OCR 全文）

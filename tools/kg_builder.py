@@ -360,7 +360,8 @@ def to_mindmap_tree(graph: dict) -> dict:
     root = {"data": {"text": graph["name"], "expand": True}, "children": []}
     ch_nodes = [n for n in graph["nodes"] if n["kind"] == "chapter"]
     terms = [n for n in graph["nodes"] if n["kind"] == "term"]
-    # 章节 → 挂术语
+    # 章节 → 挂术语（记录已挂术语，避免再进「核心概念」）
+    attached_terms = set()
     for ch in ch_nodes:
         child = {"data": {"text": ch["title"], "expand": True}, "children": []}
         for e in graph["edges"]:
@@ -368,10 +369,9 @@ def to_mindmap_tree(graph: dict) -> dict:
                 t = next((x for x in terms if x["id"] == e["to"]), None)
                 if t:
                     child["children"].append({"data": {"text": t["title"], "expand": True}, "children": []})
+                    attached_terms.add(t["title"])
         root["children"].append(child)
-    # 未归类术语
-    attached = {c["data"]["text"] for c in root["children"]}
-    leftover = [t for t in terms if t["title"] not in attached]
+    leftover = [t for t in terms if t["title"] not in attached_terms]
     if leftover:
         bucket = {"data": {"text": "核心概念", "expand": True}, "children": []}
         for t in leftover[:20]:

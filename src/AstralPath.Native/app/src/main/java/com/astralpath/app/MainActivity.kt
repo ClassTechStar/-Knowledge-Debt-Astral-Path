@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             setSupportZoom(false)
             builtInZoomControls = false
             displayZoomControls = false
-            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+            mixedContentMode = WebSettings.MIXED_CONTENT_NEVER_ALLOW
             cacheMode = WebSettings.LOAD_DEFAULT
             textZoom = 100
             mediaPlaybackRequiresUserGesture = false
@@ -59,6 +59,18 @@ class MainActivity : AppCompatActivity() {
             }
         }
         web.webViewClient = object : WebViewClient() {
+            // 导航白名单：只允许本地资产域，外链交给系统浏览器
+            override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+                val uri = request?.url ?: return false
+                val host = uri.host ?: ""
+                return if (host == "appassets.androidplatform.net") false
+                else {
+                    try {
+                        startActivity(android.content.Intent(android.content.Intent.ACTION_VIEW, uri))
+                    } catch (_: Exception) { /* 无浏览器时忽略 */ }
+                    true
+                }
+            }
             override fun shouldInterceptRequest(view: WebView?, request: WebResourceRequest?): WebResourceResponse? {
                 val uri = request?.url ?: return null
                 return if (uri.host == "appassets.androidplatform.net") assetLoader.shouldInterceptRequest(uri)

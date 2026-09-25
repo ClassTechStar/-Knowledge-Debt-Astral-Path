@@ -24,7 +24,7 @@ public static class PlannerBuilder
         bool Fits(int day, int minutes)
             => day >= 1 && day <= horizonDays && dayLoad[day] + minutes <= dayBudget;
 
-        void Place(string kp, string name, string layer, int minutes, int preferDay, string? debtFrom, string? debtTo)
+        void Place(string kp, string name, string layer, int minutes, int preferDay, string? debtFrom, string? debtTo, string? fromName)
         {
             var cap = layer == "core" ? 25 : 15;
             minutes = Math.Min(minutes, cap);
@@ -35,10 +35,13 @@ public static class PlannerBuilder
                 var debtRef = debtFrom is null || debtTo is null
                     ? Array.Empty<string>()
                     : new[] { debtFrom, debtTo };
+                // Type 必须落在 concept|drill|quiz|review；FromKpName 用名称（K3 要求 Why 含该名）
+                var type = layer == "core" ? "drill" : "review";
+                var why = fromName is null ? $"巩固「{name}」" : $"巩固「{name}」（先修：{fromName}）";
                 items.Add(new PlanItemInput(
-                    id.ToString(), kp, name, layer == "core" ? "drill" : "challenge",
+                    id.ToString(), kp, name, type,
                     layer == "core" ? 2 : 3, minutes,
-                    $"巩固「{name}」", debtRef, debtFrom, "pending"));
+                    why, debtRef, fromName, "pending"));
                 dayLoad[d] += minutes;
                 lastDay[kp] = d;
                 id++;
@@ -55,8 +58,8 @@ public static class PlannerBuilder
             {
                 var day = 1 + offsets[p];
                 // 先修先练（K2）
-                Place(goal.FromKp, fromName, "core", p == 0 ? 20 : 12, day, goal.FromKp, goal.ToKp);
-                Place(goal.ToKp, toName, p == 0 ? "challenge" : "core", p == 0 ? 15 : 10, day + 1, goal.FromKp, goal.ToKp);
+                Place(goal.FromKp, fromName, "core", p == 0 ? 20 : 12, day, goal.FromKp, goal.ToKp, fromName);
+                Place(goal.ToKp, toName, p == 0 ? "challenge" : "core", p == 0 ? 15 : 10, day + 1, goal.FromKp, goal.ToKp, fromName);
             }
         }
         return items;
