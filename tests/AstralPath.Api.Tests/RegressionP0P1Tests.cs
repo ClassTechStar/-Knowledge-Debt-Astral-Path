@@ -4,6 +4,7 @@ using System.Text;
 using System.Text.Json;
 using AstralPath.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace AstralPath.Api.Tests;
@@ -245,6 +246,15 @@ public class RegressionP0P1Tests : IClassFixture<WebApplicationFactory<Program>>
         var countAfter = Directory.GetFiles(dir).Length;
         Assert.Equal(0, seeded2);            // 第二次调用不得再复制任何文件
         Assert.Equal(countBefore, countAfter); // 目录文件数不得增长
+    }
+
+    // ── 2.3-②：IAstralPathStore 契约解析（控制器已面向仓储接口）──
+    [Fact]
+    public void P15_Controllers_Resolve_IAstralPathStore()
+    {
+        var store = _factory.Services.GetRequiredService<AstralPath.Infrastructure.IAstralPathStore>();
+        Assert.NotNull(store);
+        Assert.NotEmpty(store.ScanDebts("demo-student-a")); // 种子学生可走完整诊断路径
     }
 
     // ── P1-M3：快照介质 SQLite（WAL）──────────────────────

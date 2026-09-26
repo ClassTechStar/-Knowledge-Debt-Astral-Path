@@ -11,6 +11,16 @@ if (-not $env:ProgramFiles) { $env:ProgramFiles = 'C:\Program Files' }
 if (-not ${env:ProgramFiles(x86)}) { ${env:ProgramFiles(x86)} = 'C:\Program Files (x86)' }
 if (-not $env:ANDROID_HOME) { $env:ANDROID_HOME = "$env:LOCALAPPDATA\Android\Sdk" }
 
+# 0-1. 快速契约门禁（2.4-L4：常量/意图表/公式跨端对拍不过不打包）
+foreach ($gate in @("verify_constants.py", "verify_agent_intents.py", "verify_formulas.py")) {
+    $g = Join-Path $repo "scripts\$gate"
+    if (Test-Path $g) {
+        Write-Host ">>> gate: $gate" -ForegroundColor Cyan
+        python $g
+        if ($LASTEXITCODE -ne 0) { throw "$gate 未通过，终止打包" }
+    }
+}
+
 # 0. 三端同源：单体 HTML 分发到 Windows 壳与 Android assets
 Copy-Item "$repo\deploy\monolith-web\index.html" "$repo\src\AstralPath.Monolith\Resources\index.html" -Force
 Copy-Item "$repo\deploy\monolith-web\index.html" "$repo\src\AstralPath.Native\app\src\main\assets\www\index.html" -Force

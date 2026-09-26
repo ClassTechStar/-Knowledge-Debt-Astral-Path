@@ -9,9 +9,9 @@ namespace AstralPath.Api.Controllers;
 [ApiController]
 public sealed class PlansController : ControllerBase
 {
-    private readonly AstralPathStore _store;
+    private readonly IAstralPathStore _store;
 
-    public PlansController(AstralPathStore store) => _store = store;
+    public PlansController(IAstralPathStore store) => _store = store;
 
     [HttpPost("/v1/students/{id}/plans")]
     public IResult Create(string id, [FromBody] CreatePlanRequest? request)

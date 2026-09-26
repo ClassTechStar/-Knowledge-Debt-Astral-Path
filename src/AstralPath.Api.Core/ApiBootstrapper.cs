@@ -257,6 +257,7 @@ public sealed class ApiBootstrapper
             store.AfterLock = snapshot.MarkDirty; // 业务账本：写后触发防抖保存
             snapshot.StartPeriodicSweep();        // 模块状态：定时兜底（内容哈希去重）
         }
+        builder.Services.AddSingleton<IAstralPathStore>(store); // 2.3-②：控制器面向仓储契约
         builder.Services.AddSingleton(snapshot);
         builder.Services.AddSingleton(snapshotOptions);
 

@@ -8,10 +8,10 @@ namespace AstralPath.Api.Controllers;
 [ApiController]
 public sealed class MaterialsController : ControllerBase
 {
-    private readonly AstralPathStore _store;
+    private readonly IAstralPathStore _store;
     private static readonly SemaphoreSlim ParseGate = new(2, 2);
 
-    public MaterialsController(AstralPathStore store) => _store = store;
+    public MaterialsController(IAstralPathStore store) => _store = store;
 
     // ── 资料落盘目录（P2-7）────────────────────────────────────────────
     // 原先写死在 AppContext.BaseDirectory（= bin 输出目录）下，实测该处已积累 576MB 用户上传；

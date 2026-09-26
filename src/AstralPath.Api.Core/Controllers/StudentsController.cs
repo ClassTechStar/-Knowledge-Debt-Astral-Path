@@ -11,10 +11,10 @@ namespace AstralPath.Api.Controllers;
 [ApiController]
 public sealed class StudentsController : ControllerBase
 {
-    private readonly AstralPathStore _store;
+    private readonly IAstralPathStore _store;
     private readonly AppServices _services;
 
-    public StudentsController(AstralPathStore store, AppServices services)
+    public StudentsController(IAstralPathStore store, AppServices services)
     {
         _store = store;
         _services = services;

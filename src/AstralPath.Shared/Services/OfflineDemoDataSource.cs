@@ -289,7 +289,7 @@ public sealed partial class OfflineDemoDataSource : IAppDataSource
         return new TodayResponse(studentId, currentDay, DateTime.UtcNow.Date, total, message, tasks);
     });
 
-    private AstralPathStore.QuestionBankItem PickQuestion(string kpId, int index)
+    private QuestionBankItem PickQuestion(string kpId, int index)
     {
         var candidates = _store.Questions.Values.Where(q => q.KpId == kpId).ToList();
         if (candidates.Count == 0) candidates = _store.Questions.Values.ToList();

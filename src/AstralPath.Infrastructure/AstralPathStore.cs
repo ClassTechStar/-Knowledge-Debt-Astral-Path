@@ -35,7 +35,7 @@ public sealed record PlanDtoHolder
 }
 
 /// <summary>竞赛演示用内存仓库；单权威写入路径按服务职责划分。</summary>
-public sealed class AstralPathStore
+public sealed class AstralPathStore : IAstralPathStore
 {
     private readonly object _gate = new();
     public KnowledgeGraph Graph { get; private set; }
@@ -379,9 +379,11 @@ public sealed class AstralPathStore
             RebuildTeacherCache(key);
     }
 
-    public sealed record QuestionBankItem(
-        string Id, string KpId, string Stem, List<string> Options, int CorrectIndex, string StemHash);
 }
+
+/// <summary>题库条目（原 AstralPathStore 嵌套类型，2.3-② 接口化时提升到命名空间层）。</summary>
+public sealed record QuestionBankItem(
+    string Id, string KpId, string Stem, List<string> Options, int CorrectIndex, string StemHash);
 
 public sealed record HotspotDtoHolder(
     string FromKp,

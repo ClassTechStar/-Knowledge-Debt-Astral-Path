@@ -9,9 +9,9 @@ namespace AstralPath.Api.Controllers;
 [ApiController]
 public sealed class TeacherConsentGraphController : ControllerBase
 {
-    private readonly AstralPathStore _store;
+    private readonly IAstralPathStore _store;
 
-    public TeacherConsentGraphController(AstralPathStore store) => _store = store;
+    public TeacherConsentGraphController(IAstralPathStore store) => _store = store;
 
     /// <summary>
     /// 解析「谁在操作」（P2-1）。

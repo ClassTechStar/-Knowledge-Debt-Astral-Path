@@ -14,9 +14,9 @@ public sealed record TodayRequest(int? Day = null);
 [ApiController]
 public sealed class CoachProgressController : ControllerBase
 {
-    private readonly AstralPathStore _store;
+    private readonly IAstralPathStore _store;
 
-    public CoachProgressController(AstralPathStore store) => _store = store;
+    public CoachProgressController(IAstralPathStore store) => _store = store;
 
     [HttpPost("/v1/students/{id}/today")]
     public IResult Today(string id, [FromBody] TodayRequest? body = null)
@@ -119,7 +119,7 @@ public sealed class CoachProgressController : ControllerBase
         });
     }
 
-    private AstralPathStore.QuestionBankItem PickQuestion(string kpId, int index)
+    private QuestionBankItem PickQuestion(string kpId, int index)
     {
         var candidates = _store.Questions.Values.Where(q => q.KpId == kpId).ToList();
         if (candidates.Count == 0)

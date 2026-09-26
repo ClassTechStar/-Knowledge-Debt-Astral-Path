@@ -21,10 +21,10 @@ public sealed class AgentKbProfileController : ControllerBase
 {
     private const string DeferredReason = "该能力依赖对象存储/跨服务鉴权，演示版未实现；已登记为待办（方案 §48.7 / 分工方案 §8.5）。";
 
-    private readonly AstralPathStore _store;
+    private readonly IAstralPathStore _store;
     private readonly AstralPathModules _modules;
 
-    public AgentKbProfileController(AstralPathStore store, AstralPathModules modules)
+    public AgentKbProfileController(IAstralPathStore store, AstralPathModules modules)
     {
         _store = store;
         _modules = modules;

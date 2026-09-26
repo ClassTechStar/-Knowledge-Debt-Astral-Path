@@ -313,7 +313,7 @@ public sealed class AstralPathModules
     private static string Trunc(string s, int n) => s.Length <= n ? s : s[..n] + "…";
 
     /// <summary>可选学情库：智能体执行工具时读真实债边/学生。</summary>
-    private AstralPathStore? _store;
+    private IAstralPathStore? _store;
 
     public KbDocument IngestKb(string title, string ownerUserId, string visibility, string courseCode, string text, string[]? tags = null)
     {
@@ -337,7 +337,7 @@ public sealed class AstralPathModules
     }
 
     /// <summary>知识库检索：可见性前置过滤（§6.6 URGENT）。</summary>
-    public object SearchKb(AstralPathStore store, string userId, string role, string query)
+    public object SearchKb(IAstralPathStore store, string userId, string role, string query)
     {
         lock (_gate)
         {
@@ -390,7 +390,7 @@ public sealed class AstralPathModules
     ///   ② 首版修复按「该学生存在任意有效授权」判定，仍会放行**未获该请求者授权**的教师。
     /// 现要求：请求者本人（teacherId）对该文档所有者持有且仅有 granted 授权，撤销即时失效。
     /// </summary>
-    private static bool Visible(KbDocument doc, string userId, string role, AstralPathStore? store)
+    private static bool Visible(KbDocument doc, string userId, string role, IAstralPathStore? store)
     {
         if (role is "admin") return true;
         return doc.Visibility switch
@@ -403,7 +403,7 @@ public sealed class AstralPathModules
         };
     }
 
-    private static bool HasConsent(AstralPathStore? store, string ownerStudentId, string teacherId)
+    private static bool HasConsent(IAstralPathStore? store, string ownerStudentId, string teacherId)
     {
         if (store is null) return false;   // fail-closed：无授权源即不放开
         return store.Consents.Values.Any(c =>
@@ -491,7 +491,7 @@ public sealed class AstralPathModules
     private readonly Dictionary<string, Dictionary<string, object?>> _sessions = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>提交一轮对话：写入会话状态（§44.4 对话状态跟踪）。</summary>
-    public object AgentTurn(string sessionId, string userId, string role, string utterance, AstralPathStore? store = null)
+    public object AgentTurn(string sessionId, string userId, string role, string utterance, IAstralPathStore? store = null)
     {
         lock (_gate)
         {
@@ -584,7 +584,7 @@ public sealed class AstralPathModules
         lock (_gate) return _kbDocs.GetValueOrDefault(docId);
     }
 
-    public object? GetKbDocument(AstralPathStore store, string docId, string userId, string role)
+    public object? GetKbDocument(IAstralPathStore store, string docId, string userId, string role)
     {
         lock (_gate)
         {
@@ -600,7 +600,7 @@ public sealed class AstralPathModules
         }
     }
 
-    public object? PatchKbDocument(AstralPathStore store, string docId, string userId, string role,
+    public object? PatchKbDocument(IAstralPathStore store, string docId, string userId, string role,
         string? title, string? visibility, string? courseCode, string[]? tags)
     {
         lock (_gate)
@@ -624,14 +624,14 @@ public sealed class AstralPathModules
         }
     }
 
-    public object? SetKbTags(AstralPathStore store, string docId, string userId, string role, string[] tags)
+    public object? SetKbTags(IAstralPathStore store, string docId, string userId, string role, string[] tags)
     {
         var result = PatchKbDocument(store, docId, userId, role, null, null, null, tags);
         return result;
     }
 
     /// <summary>标签树：按 课程码 / 标签 两层聚合（§45.3 三层分类标签的对外投影）。</summary>
-    public object KbTagTree(string userId, string role, AstralPathStore store)
+    public object KbTagTree(string userId, string role, IAstralPathStore store)
     {
         lock (_gate)
         {
@@ -672,7 +672,7 @@ public sealed class AstralPathModules
         }
     }
 
-    public object? ListKbVersions(string docId, string userId, string role, AstralPathStore store)
+    public object? ListKbVersions(string docId, string userId, string role, IAstralPathStore store)
     {
         lock (_gate)
         {
@@ -838,7 +838,7 @@ public sealed class AstralPathModules
     //        完整版需按 §46.1 采集管道接入原始行为信号（见 §48 与分工方案 §8.6）。
     // ══════════════════════════════════════════════════════════════════════
 
-    public object? ProfileOverview(AstralPathStore store, string studentId, bool teacherSide)
+    public object? ProfileOverview(IAstralPathStore store, string studentId, bool teacherSide)
     {
         var features = ProfileFeatures(store, studentId, teacherSide);
         if (features is null) return null;
@@ -850,7 +850,7 @@ public sealed class AstralPathModules
         }
     }
 
-    public object? ProfileFeatures(AstralPathStore store, string studentId, bool teacherSide)
+    public object? ProfileFeatures(IAstralPathStore store, string studentId, bool teacherSide)
     {
         if (!store.Students.TryGetValue(studentId, out var student)) return null;
         var attempts = student.Attempts;
@@ -893,7 +893,7 @@ public sealed class AstralPathModules
     }
 
     /// <summary>六维雷达（§46.5.2）：各维归一到 [0,100]。</summary>
-    public object? ProfileRadar(AstralPathStore store, string studentId, bool teacherSide)
+    public object? ProfileRadar(IAstralPathStore store, string studentId, bool teacherSide)
     {
         if (!store.Students.TryGetValue(studentId, out var student)) return null;
         var attempts = student.Attempts;
@@ -917,7 +917,7 @@ public sealed class AstralPathModules
     }
 
     /// <summary>快照时间线：按日聚合尝试记录；无尝试时用掌握度/债边生成基线快照。</summary>
-    public object? ProfileTimeline(AstralPathStore store, string studentId, bool teacherSide)
+    public object? ProfileTimeline(IAstralPathStore store, string studentId, bool teacherSide)
     {
         if (!store.Students.TryGetValue(studentId, out var student)) return null;
         var byDay = student.Attempts
@@ -974,7 +974,7 @@ public sealed class AstralPathModules
         };
     }
 
-    public object ModuleStatus(AstralPathStore store)
+    public object ModuleStatus(IAstralPathStore store)
     {
         lock (_gate)
         {

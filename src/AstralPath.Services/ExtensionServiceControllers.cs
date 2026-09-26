@@ -14,9 +14,9 @@ namespace AstralPath.Services;
 /// </summary>
 public abstract class ExtensionServiceControllerBase : ControllerBase
 {
-    protected readonly AstralPathStore Store;
+    protected readonly IAstralPathStore Store;
 
-    protected ExtensionServiceControllerBase(AstralPathStore store) => Store = store;
+    protected ExtensionServiceControllerBase(IAstralPathStore store) => Store = store;
 
     protected static bool Prop(JsonElement el, string name, out JsonElement value)
     {
@@ -41,7 +41,7 @@ public abstract class ExtensionServiceControllerBase : ControllerBase
 [ApiController]
 public sealed class DiffusionController : ExtensionServiceControllerBase
 {
-    public DiffusionController(AstralPathStore store) : base(store) { }
+    public DiffusionController(IAstralPathStore store) : base(store) { }
 
     [HttpPost("/v1/diffusion/simulate")]
     public IResult Simulate([FromBody] JsonElement? body)
@@ -77,7 +77,7 @@ public sealed class DiffusionController : ExtensionServiceControllerBase
 [ApiController]
 public sealed class ExamImpactController : ExtensionServiceControllerBase
 {
-    public ExamImpactController(AstralPathStore store) : base(store) { }
+    public ExamImpactController(IAstralPathStore store) : base(store) { }
 
     // 显式给出 Lock<T> 的泛型实参：两个 return 的静态类型不同（Array.Empty vs List），
     // 不写实参时类型推断失败并误选 Lock(Action) 重载（CS8030）。
@@ -209,7 +209,7 @@ public sealed class StudyGroupController : ControllerBase
 [ApiController]
 public sealed class MicroLessonController : ExtensionServiceControllerBase
 {
-    public MicroLessonController(AstralPathStore store) : base(store) { }
+    public MicroLessonController(IAstralPathStore store) : base(store) { }
 
     [HttpPost("/v1/micro-lessons/assemble")]
     public IResult Assemble([FromBody] JsonElement? body)
@@ -236,7 +236,7 @@ public sealed class MicroLessonController : ExtensionServiceControllerBase
 [ApiController]
 public sealed class LearningVelocityController : ExtensionServiceControllerBase
 {
-    public LearningVelocityController(AstralPathStore store) : base(store) { }
+    public LearningVelocityController(IAstralPathStore store) : base(store) { }
 
     [HttpPost("/v1/velocity/fit")]
     public IResult Fit([FromBody] JsonElement? body)
@@ -268,7 +268,7 @@ public sealed class LearningVelocityController : ExtensionServiceControllerBase
 [ApiController]
 public sealed class SpacedReviewController : ExtensionServiceControllerBase
 {
-    public SpacedReviewController(AstralPathStore store) : base(store) { }
+    public SpacedReviewController(IAstralPathStore store) : base(store) { }
 
     [HttpPost("/v1/spaced-review/schedule")]
     public IResult Schedule([FromBody] JsonElement? body)
@@ -306,7 +306,7 @@ public sealed class SpacedReviewController : ExtensionServiceControllerBase
 [ApiController]
 public sealed class PrerequisiteSimulatorController : ExtensionServiceControllerBase
 {
-    public PrerequisiteSimulatorController(AstralPathStore store) : base(store) { }
+    public PrerequisiteSimulatorController(IAstralPathStore store) : base(store) { }
 
     [HttpPost("/v1/prereq-simulator/simulate")]
     public IResult Simulate([FromBody] JsonElement? body)
@@ -331,7 +331,7 @@ public sealed class PrerequisiteSimulatorController : ExtensionServiceController
 [ApiController]
 public sealed class KnowledgeForecastController : ExtensionServiceControllerBase
 {
-    public KnowledgeForecastController(AstralPathStore store) : base(store) { }
+    public KnowledgeForecastController(IAstralPathStore store) : base(store) { }
 
     [HttpPost("/v1/forecast/student")]
     public IResult Forecast([FromBody] JsonElement? body)

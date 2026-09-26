@@ -13,7 +13,7 @@ public sealed record PasswordChangeRequest(string OldPassword, string NewPasswor
 public sealed class AuthController : ControllerBase
 {
     private readonly AuthStore _auth;
-    private readonly AstralPathStore _store;
+    private readonly IAstralPathStore _store;
 
     public AuthController(AuthStore auth, AstralPathStore store)
     {
