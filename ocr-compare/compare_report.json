@@ -1,0 +1,1611 @@
+[
+  {
+    "pdf": "C#从入门到精通（第7版）+(明日科技)+.pdf",
+    "total_pages": 868,
+    "sample_pages": 8,
+    "chars_a": 2559,
+    "chars_b": 3013,
+    "delta": 454,
+    "avg_jaccard": 0.208,
+    "low_j_pages": [
+      {
+        "page": 1,
+        "chars_a": 100,
+        "chars_b": 107,
+        "delta": 7,
+        "jaccard": 0.059,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 26,
+        "only_b": 27
+      },
+      {
+        "page": 124,
+        "chars_a": 377,
+        "chars_b": 486,
+        "delta": 109,
+        "jaccard": 0.395,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 1,
+        "only_b": 129
+      },
+      {
+        "page": 248,
+        "chars_a": 298,
+        "chars_b": 360,
+        "delta": 62,
+        "jaccard": 0.107,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 8,
+        "only_b": 77
+      },
+      {
+        "page": 372,
+        "chars_a": 375,
+        "chars_b": 402,
+        "delta": 27,
+        "jaccard": 0.211,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 26,
+        "only_b": 52
+      },
+      {
+        "page": 496,
+        "chars_a": 554,
+        "chars_b": 554,
+        "delta": 0,
+        "jaccard": 0.469,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 11,
+        "only_b": 0
+      },
+      {
+        "page": 620,
+        "chars_a": 545,
+        "chars_b": 545,
+        "delta": 0,
+        "jaccard": 0.29,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 14,
+        "only_b": 0
+      }
+    ],
+    "worst": [
+      {
+        "page": 868,
+        "chars_a": 185,
+        "chars_b": 185,
+        "delta": 0,
+        "jaccard": 0.0,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 12,
+        "only_b": 0
+      },
+      {
+        "page": 1,
+        "chars_a": 100,
+        "chars_b": 107,
+        "delta": 7,
+        "jaccard": 0.059,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 26,
+        "only_b": 27
+      },
+      {
+        "page": 248,
+        "chars_a": 298,
+        "chars_b": 360,
+        "delta": 62,
+        "jaccard": 0.107,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 8,
+        "only_b": 77
+      },
+      {
+        "page": 744,
+        "chars_a": 125,
+        "chars_b": 374,
+        "delta": 249,
+        "jaccard": 0.132,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 311
+      },
+      {
+        "page": 372,
+        "chars_a": 375,
+        "chars_b": 402,
+        "delta": 27,
+        "jaccard": 0.211,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 26,
+        "only_b": 52
+      }
+    ],
+    "elapsed_s": 17.4
+  },
+  {
+    "pdf": "Go语言从入门到精通.pdf",
+    "total_pages": 506,
+    "sample_pages": 8,
+    "chars_a": 2935,
+    "chars_b": 3828,
+    "delta": 893,
+    "avg_jaccard": 0.266,
+    "low_j_pages": [
+      {
+        "page": 1,
+        "chars_a": 230,
+        "chars_b": 227,
+        "delta": -3,
+        "jaccard": 0.0,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 41,
+        "only_b": 13
+      },
+      {
+        "page": 73,
+        "chars_a": 186,
+        "chars_b": 251,
+        "delta": 65,
+        "jaccard": 0.208,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 83
+      },
+      {
+        "page": 145,
+        "chars_a": 243,
+        "chars_b": 360,
+        "delta": 117,
+        "jaccard": 0.06,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 207
+      },
+      {
+        "page": 217,
+        "chars_a": 363,
+        "chars_b": 673,
+        "delta": 310,
+        "jaccard": 0.091,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 415
+      },
+      {
+        "page": 289,
+        "chars_a": 289,
+        "chars_b": 601,
+        "delta": 312,
+        "jaccard": 0.02,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 429
+      },
+      {
+        "page": 361,
+        "chars_a": 19,
+        "chars_b": 19,
+        "delta": 0,
+        "jaccard": 0.25,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 2
+      }
+    ],
+    "worst": [
+      {
+        "page": 1,
+        "chars_a": 230,
+        "chars_b": 227,
+        "delta": -3,
+        "jaccard": 0.0,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 41,
+        "only_b": 13
+      },
+      {
+        "page": 289,
+        "chars_a": 289,
+        "chars_b": 601,
+        "delta": 312,
+        "jaccard": 0.02,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 429
+      },
+      {
+        "page": 145,
+        "chars_a": 243,
+        "chars_b": 360,
+        "delta": 117,
+        "jaccard": 0.06,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 207
+      },
+      {
+        "page": 217,
+        "chars_a": 363,
+        "chars_b": 673,
+        "delta": 310,
+        "jaccard": 0.091,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 415
+      },
+      {
+        "page": 73,
+        "chars_a": 186,
+        "chars_b": 251,
+        "delta": 65,
+        "jaccard": 0.208,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 83
+      }
+    ],
+    "elapsed_s": 14.1
+  },
+  {
+    "pdf": "Java从入门到精通（第6版） (明日科技) .pdf",
+    "total_pages": 775,
+    "sample_pages": 8,
+    "chars_a": 2925,
+    "chars_b": 4873,
+    "delta": 1948,
+    "avg_jaccard": 0.191,
+    "low_j_pages": [
+      {
+        "page": 1,
+        "chars_a": 235,
+        "chars_b": 238,
+        "delta": 3,
+        "jaccard": 0.0,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 20,
+        "only_b": 8
+      },
+      {
+        "page": 111,
+        "chars_a": 210,
+        "chars_b": 682,
+        "delta": 472,
+        "jaccard": 0.162,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 547
+      },
+      {
+        "page": 222,
+        "chars_a": 569,
+        "chars_b": 569,
+        "delta": 0,
+        "jaccard": 0.2,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 14,
+        "only_b": 0
+      },
+      {
+        "page": 332,
+        "chars_a": 295,
+        "chars_b": 683,
+        "delta": 388,
+        "jaccard": 0.2,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 475
+      },
+      {
+        "page": 443,
+        "chars_a": 652,
+        "chars_b": 652,
+        "delta": 0,
+        "jaccard": 0.333,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 16,
+        "only_b": 0
+      },
+      {
+        "page": 553,
+        "chars_a": 146,
+        "chars_b": 191,
+        "delta": 45,
+        "jaccard": 0.143,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 6,
+        "only_b": 45
+      }
+    ],
+    "worst": [
+      {
+        "page": 1,
+        "chars_a": 235,
+        "chars_b": 238,
+        "delta": 3,
+        "jaccard": 0.0,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 20,
+        "only_b": 8
+      },
+      {
+        "page": 775,
+        "chars_a": 171,
+        "chars_b": 1211,
+        "delta": 1040,
+        "jaccard": 0.06,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 1262
+      },
+      {
+        "page": 553,
+        "chars_a": 146,
+        "chars_b": 191,
+        "delta": 45,
+        "jaccard": 0.143,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 6,
+        "only_b": 45
+      },
+      {
+        "page": 111,
+        "chars_a": 210,
+        "chars_b": 682,
+        "delta": 472,
+        "jaccard": 0.162,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 547
+      },
+      {
+        "page": 222,
+        "chars_a": 569,
+        "chars_b": 569,
+        "delta": 0,
+        "jaccard": 0.2,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 14,
+        "only_b": 0
+      }
+    ],
+    "elapsed_s": 16.3
+  },
+  {
+    "pdf": "Kotlin编程实践：Kotlin从入门到实战.pdf",
+    "total_pages": 294,
+    "sample_pages": 8,
+    "chars_a": 4278,
+    "chars_b": 4286,
+    "delta": 8,
+    "avg_jaccard": 0.614,
+    "low_j_pages": [
+      {
+        "page": 1,
+        "chars_a": 96,
+        "chars_b": 104,
+        "delta": 8,
+        "jaccard": 0.421,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 2,
+        "only_b": 10
+      },
+      {
+        "page": 42,
+        "chars_a": 847,
+        "chars_b": 847,
+        "delta": 0,
+        "jaccard": 0.491,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 15,
+        "only_b": 0
+      },
+      {
+        "page": 126,
+        "chars_a": 618,
+        "chars_b": 618,
+        "delta": 0,
+        "jaccard": 0.452,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 13,
+        "only_b": 0
+      },
+      {
+        "page": 168,
+        "chars_a": 391,
+        "chars_b": 391,
+        "delta": 0,
+        "jaccard": 0.618,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 7,
+        "only_b": 0
+      },
+      {
+        "page": 252,
+        "chars_a": 575,
+        "chars_b": 575,
+        "delta": 0,
+        "jaccard": 0.357,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 14,
+        "only_b": 0
+      }
+    ],
+    "worst": [
+      {
+        "page": 252,
+        "chars_a": 575,
+        "chars_b": 575,
+        "delta": 0,
+        "jaccard": 0.357,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 14,
+        "only_b": 0
+      },
+      {
+        "page": 1,
+        "chars_a": 96,
+        "chars_b": 104,
+        "delta": 8,
+        "jaccard": 0.421,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 2,
+        "only_b": 10
+      },
+      {
+        "page": 126,
+        "chars_a": 618,
+        "chars_b": 618,
+        "delta": 0,
+        "jaccard": 0.452,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 13,
+        "only_b": 0
+      },
+      {
+        "page": 42,
+        "chars_a": 847,
+        "chars_b": 847,
+        "delta": 0,
+        "jaccard": 0.491,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 15,
+        "only_b": 0
+      },
+      {
+        "page": 168,
+        "chars_a": 391,
+        "chars_b": 391,
+        "delta": 0,
+        "jaccard": 0.618,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 7,
+        "only_b": 0
+      }
+    ],
+    "elapsed_s": 3.0
+  },
+  {
+    "pdf": "Python编程：从入门到实践（第3版）.pdf",
+    "total_pages": 732,
+    "sample_pages": 8,
+    "chars_a": 3591,
+    "chars_b": 3588,
+    "delta": -3,
+    "avg_jaccard": 0.533,
+    "low_j_pages": [
+      {
+        "page": 1,
+        "chars_a": 160,
+        "chars_b": 157,
+        "delta": -3,
+        "jaccard": 0.296,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 16,
+        "only_b": 6
+      },
+      {
+        "page": 105,
+        "chars_a": 363,
+        "chars_b": 363,
+        "delta": 0,
+        "jaccard": 0.667,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 8,
+        "only_b": 0
+      },
+      {
+        "page": 209,
+        "chars_a": 769,
+        "chars_b": 769,
+        "delta": 0,
+        "jaccard": 0.735,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 10,
+        "only_b": 0
+      },
+      {
+        "page": 418,
+        "chars_a": 441,
+        "chars_b": 441,
+        "delta": 0,
+        "jaccard": 0.661,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 7,
+        "only_b": 0
+      },
+      {
+        "page": 523,
+        "chars_a": 339,
+        "chars_b": 339,
+        "delta": 0,
+        "jaccard": 0.674,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 7,
+        "only_b": 0
+      },
+      {
+        "page": 627,
+        "chars_a": 653,
+        "chars_b": 653,
+        "delta": 0,
+        "jaccard": 0.458,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 18,
+        "only_b": 0
+      }
+    ],
+    "worst": [
+      {
+        "page": 732,
+        "chars_a": 211,
+        "chars_b": 211,
+        "delta": 0,
+        "jaccard": 0.0,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 12,
+        "only_b": 1
+      },
+      {
+        "page": 1,
+        "chars_a": 160,
+        "chars_b": 157,
+        "delta": -3,
+        "jaccard": 0.296,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 16,
+        "only_b": 6
+      },
+      {
+        "page": 627,
+        "chars_a": 653,
+        "chars_b": 653,
+        "delta": 0,
+        "jaccard": 0.458,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 18,
+        "only_b": 0
+      },
+      {
+        "page": 418,
+        "chars_a": 441,
+        "chars_b": 441,
+        "delta": 0,
+        "jaccard": 0.661,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 7,
+        "only_b": 0
+      },
+      {
+        "page": 105,
+        "chars_a": 363,
+        "chars_b": 363,
+        "delta": 0,
+        "jaccard": 0.667,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 8,
+        "only_b": 0
+      }
+    ],
+    "elapsed_s": 5.7
+  },
+  {
+    "pdf": "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf",
+    "total_pages": 333,
+    "sample_pages": 8,
+    "chars_a": 3025,
+    "chars_b": 6088,
+    "delta": 3063,
+    "avg_jaccard": 0.379,
+    "low_j_pages": [
+      {
+        "page": 1,
+        "chars_a": 93,
+        "chars_b": 93,
+        "delta": 0,
+        "jaccard": 0.158,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 8,
+        "only_b": 0
+      },
+      {
+        "page": 48,
+        "chars_a": 565,
+        "chars_b": 1131,
+        "delta": 566,
+        "jaccard": 0.577,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 695
+      },
+      {
+        "page": 95,
+        "chars_a": 523,
+        "chars_b": 1043,
+        "delta": 520,
+        "jaccard": 0.377,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 646
+      },
+      {
+        "page": 143,
+        "chars_a": 523,
+        "chars_b": 1046,
+        "delta": 523,
+        "jaccard": 0.298,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 611
+      },
+      {
+        "page": 190,
+        "chars_a": 445,
+        "chars_b": 955,
+        "delta": 510,
+        "jaccard": 0.185,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 629
+      },
+      {
+        "page": 238,
+        "chars_a": 513,
+        "chars_b": 1029,
+        "delta": 516,
+        "jaccard": 0.255,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 4,
+        "only_b": 575
+      }
+    ],
+    "worst": [
+      {
+        "page": 1,
+        "chars_a": 93,
+        "chars_b": 93,
+        "delta": 0,
+        "jaccard": 0.158,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 8,
+        "only_b": 0
+      },
+      {
+        "page": 285,
+        "chars_a": 363,
+        "chars_b": 791,
+        "delta": 428,
+        "jaccard": 0.179,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 474
+      },
+      {
+        "page": 190,
+        "chars_a": 445,
+        "chars_b": 955,
+        "delta": 510,
+        "jaccard": 0.185,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 629
+      },
+      {
+        "page": 238,
+        "chars_a": 513,
+        "chars_b": 1029,
+        "delta": 516,
+        "jaccard": 0.255,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 4,
+        "only_b": 575
+      },
+      {
+        "page": 143,
+        "chars_a": 523,
+        "chars_b": 1046,
+        "delta": 523,
+        "jaccard": 0.298,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 611
+      }
+    ],
+    "elapsed_s": 29.0
+  },
+  {
+    "pdf": "大模型应用开发：动手做 AI Agent (黄佳) .pdf",
+    "total_pages": 290,
+    "sample_pages": 8,
+    "chars_a": 6900,
+    "chars_b": 6233,
+    "delta": -667,
+    "avg_jaccard": 0.173,
+    "low_j_pages": [
+      {
+        "page": 1,
+        "chars_a": 174,
+        "chars_b": 171,
+        "delta": -3,
+        "jaccard": 0.12,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 15,
+        "only_b": 2
+      },
+      {
+        "page": 42,
+        "chars_a": 678,
+        "chars_b": 678,
+        "delta": 0,
+        "jaccard": 0.129,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 21,
+        "only_b": 1
+      },
+      {
+        "page": 83,
+        "chars_a": 956,
+        "chars_b": 962,
+        "delta": 6,
+        "jaccard": 0.026,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 34,
+        "only_b": 11
+      },
+      {
+        "page": 124,
+        "chars_a": 809,
+        "chars_b": 776,
+        "delta": -33,
+        "jaccard": 0.285,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 113,
+        "only_b": 45
+      },
+      {
+        "page": 166,
+        "chars_a": 1170,
+        "chars_b": 972,
+        "delta": -198,
+        "jaccard": 0.133,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 276,
+        "only_b": 44
+      },
+      {
+        "page": 207,
+        "chars_a": 854,
+        "chars_b": 856,
+        "delta": 2,
+        "jaccard": 0.246,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 26,
+        "only_b": 9
+      }
+    ],
+    "worst": [
+      {
+        "page": 83,
+        "chars_a": 956,
+        "chars_b": 962,
+        "delta": 6,
+        "jaccard": 0.026,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 34,
+        "only_b": 11
+      },
+      {
+        "page": 290,
+        "chars_a": 706,
+        "chars_b": 654,
+        "delta": -52,
+        "jaccard": 0.053,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 130,
+        "only_b": 50
+      },
+      {
+        "page": 1,
+        "chars_a": 174,
+        "chars_b": 171,
+        "delta": -3,
+        "jaccard": 0.12,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 15,
+        "only_b": 2
+      },
+      {
+        "page": 42,
+        "chars_a": 678,
+        "chars_b": 678,
+        "delta": 0,
+        "jaccard": 0.129,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 21,
+        "only_b": 1
+      },
+      {
+        "page": 166,
+        "chars_a": 1170,
+        "chars_b": 972,
+        "delta": -198,
+        "jaccard": 0.133,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 276,
+        "only_b": 44
+      }
+    ],
+    "elapsed_s": 63.9
+  },
+  {
+    "pdf": "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf",
+    "total_pages": 738,
+    "sample_pages": 8,
+    "chars_a": 5157,
+    "chars_b": 5157,
+    "delta": 0,
+    "avg_jaccard": 0.559,
+    "low_j_pages": [
+      {
+        "page": 106,
+        "chars_a": 602,
+        "chars_b": 602,
+        "delta": 0,
+        "jaccard": 0.352,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 16,
+        "only_b": 0
+      },
+      {
+        "page": 211,
+        "chars_a": 636,
+        "chars_b": 636,
+        "delta": 0,
+        "jaccard": 0.658,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 14,
+        "only_b": 0
+      },
+      {
+        "page": 316,
+        "chars_a": 637,
+        "chars_b": 637,
+        "delta": 0,
+        "jaccard": 0.31,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 17,
+        "only_b": 0
+      },
+      {
+        "page": 422,
+        "chars_a": 1029,
+        "chars_b": 1029,
+        "delta": 0,
+        "jaccard": 0.326,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 26,
+        "only_b": 0
+      },
+      {
+        "page": 527,
+        "chars_a": 987,
+        "chars_b": 987,
+        "delta": 0,
+        "jaccard": 0.261,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 29,
+        "only_b": 0
+      },
+      {
+        "page": 632,
+        "chars_a": 711,
+        "chars_b": 711,
+        "delta": 0,
+        "jaccard": 0.569,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 16,
+        "only_b": 0
+      }
+    ],
+    "worst": [
+      {
+        "page": 527,
+        "chars_a": 987,
+        "chars_b": 987,
+        "delta": 0,
+        "jaccard": 0.261,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 29,
+        "only_b": 0
+      },
+      {
+        "page": 316,
+        "chars_a": 637,
+        "chars_b": 637,
+        "delta": 0,
+        "jaccard": 0.31,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 17,
+        "only_b": 0
+      },
+      {
+        "page": 422,
+        "chars_a": 1029,
+        "chars_b": 1029,
+        "delta": 0,
+        "jaccard": 0.326,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 26,
+        "only_b": 0
+      },
+      {
+        "page": 106,
+        "chars_a": 602,
+        "chars_b": 602,
+        "delta": 0,
+        "jaccard": 0.352,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 16,
+        "only_b": 0
+      },
+      {
+        "page": 632,
+        "chars_a": 711,
+        "chars_b": 711,
+        "delta": 0,
+        "jaccard": 0.569,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 16,
+        "only_b": 0
+      }
+    ],
+    "elapsed_s": 0.6
+  },
+  {
+    "pdf": "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF",
+    "total_pages": 504,
+    "sample_pages": 8,
+    "chars_a": 3140,
+    "chars_b": 6122,
+    "delta": 2982,
+    "avg_jaccard": 0.524,
+    "low_j_pages": [
+      {
+        "page": 1,
+        "chars_a": 102,
+        "chars_b": 101,
+        "delta": -1,
+        "jaccard": 0.25,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 10,
+        "only_b": 0
+      },
+      {
+        "page": 72,
+        "chars_a": 505,
+        "chars_b": 1013,
+        "delta": 508,
+        "jaccard": 0.705,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 625
+      },
+      {
+        "page": 144,
+        "chars_a": 563,
+        "chars_b": 1133,
+        "delta": 570,
+        "jaccard": 0.525,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 652
+      },
+      {
+        "page": 216,
+        "chars_a": 213,
+        "chars_b": 422,
+        "delta": 209,
+        "jaccard": 0.608,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 258
+      },
+      {
+        "page": 288,
+        "chars_a": 169,
+        "chars_b": 379,
+        "delta": 210,
+        "jaccard": 0.413,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 241
+      },
+      {
+        "page": 360,
+        "chars_a": 716,
+        "chars_b": 1381,
+        "delta": 665,
+        "jaccard": 0.728,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 754
+      }
+    ],
+    "worst": [
+      {
+        "page": 1,
+        "chars_a": 102,
+        "chars_b": 101,
+        "delta": -1,
+        "jaccard": 0.25,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 10,
+        "only_b": 0
+      },
+      {
+        "page": 288,
+        "chars_a": 169,
+        "chars_b": 379,
+        "delta": 210,
+        "jaccard": 0.413,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 241
+      },
+      {
+        "page": 432,
+        "chars_a": 319,
+        "chars_b": 542,
+        "delta": 223,
+        "jaccard": 0.478,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 14,
+        "only_b": 251
+      },
+      {
+        "page": 504,
+        "chars_a": 553,
+        "chars_b": 1151,
+        "delta": 598,
+        "jaccard": 0.485,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 650
+      },
+      {
+        "page": 144,
+        "chars_a": 563,
+        "chars_b": 1133,
+        "delta": 570,
+        "jaccard": 0.525,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 652
+      }
+    ],
+    "elapsed_s": 24.5
+  },
+  {
+    "pdf": "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf",
+    "total_pages": 314,
+    "sample_pages": 8,
+    "chars_a": 3079,
+    "chars_b": 3214,
+    "delta": 135,
+    "avg_jaccard": 0.508,
+    "low_j_pages": [
+      {
+        "page": 1,
+        "chars_a": 106,
+        "chars_b": 107,
+        "delta": 1,
+        "jaccard": 0.391,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 7,
+        "only_b": 5
+      },
+      {
+        "page": 45,
+        "chars_a": 388,
+        "chars_b": 388,
+        "delta": 0,
+        "jaccard": 0.206,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 13,
+        "only_b": 0
+      },
+      {
+        "page": 90,
+        "chars_a": 447,
+        "chars_b": 447,
+        "delta": 0,
+        "jaccard": 0.698,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 7,
+        "only_b": 0
+      },
+      {
+        "page": 135,
+        "chars_a": 749,
+        "chars_b": 749,
+        "delta": 0,
+        "jaccard": 0.651,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 10,
+        "only_b": 0
+      },
+      {
+        "page": 179,
+        "chars_a": 369,
+        "chars_b": 369,
+        "delta": 0,
+        "jaccard": 0.179,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 19,
+        "only_b": 0
+      },
+      {
+        "page": 269,
+        "chars_a": 379,
+        "chars_b": 513,
+        "delta": 134,
+        "jaccard": 0.191,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 169
+      }
+    ],
+    "worst": [
+      {
+        "page": 179,
+        "chars_a": 369,
+        "chars_b": 369,
+        "delta": 0,
+        "jaccard": 0.179,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 19,
+        "only_b": 0
+      },
+      {
+        "page": 269,
+        "chars_a": 379,
+        "chars_b": 513,
+        "delta": 134,
+        "jaccard": 0.191,
+        "method_a": "pymupdf-text",
+        "ocr_b": true,
+        "only_a": 0,
+        "only_b": 169
+      },
+      {
+        "page": 45,
+        "chars_a": 388,
+        "chars_b": 388,
+        "delta": 0,
+        "jaccard": 0.206,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 13,
+        "only_b": 0
+      },
+      {
+        "page": 1,
+        "chars_a": 106,
+        "chars_b": 107,
+        "delta": 1,
+        "jaccard": 0.391,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 7,
+        "only_b": 5
+      },
+      {
+        "page": 135,
+        "chars_a": 749,
+        "chars_b": 749,
+        "delta": 0,
+        "jaccard": 0.651,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 10,
+        "only_b": 0
+      }
+    ],
+    "elapsed_s": 5.0
+  },
+  {
+    "pdf": "深度学习进阶：自然语言处理 (斋藤康毅) .pdf",
+    "total_pages": 427,
+    "sample_pages": 8,
+    "chars_a": 4164,
+    "chars_b": 4203,
+    "delta": 39,
+    "avg_jaccard": 0.602,
+    "low_j_pages": [
+      {
+        "page": 1,
+        "chars_a": 99,
+        "chars_b": 103,
+        "delta": 4,
+        "jaccard": 0.3,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 6,
+        "only_b": 5
+      },
+      {
+        "page": 61,
+        "chars_a": 442,
+        "chars_b": 442,
+        "delta": 0,
+        "jaccard": 0.587,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 10,
+        "only_b": 0
+      },
+      {
+        "page": 122,
+        "chars_a": 397,
+        "chars_b": 397,
+        "delta": 0,
+        "jaccard": 0.676,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 8,
+        "only_b": 0
+      },
+      {
+        "page": 244,
+        "chars_a": 410,
+        "chars_b": 410,
+        "delta": 0,
+        "jaccard": 0.695,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 6,
+        "only_b": 0
+      },
+      {
+        "page": 305,
+        "chars_a": 980,
+        "chars_b": 980,
+        "delta": 0,
+        "jaccard": 0.547,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 20,
+        "only_b": 0
+      },
+      {
+        "page": 427,
+        "chars_a": 538,
+        "chars_b": 573,
+        "delta": 35,
+        "jaccard": 0.345,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 29,
+        "only_b": 46
+      }
+    ],
+    "worst": [
+      {
+        "page": 1,
+        "chars_a": 99,
+        "chars_b": 103,
+        "delta": 4,
+        "jaccard": 0.3,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 6,
+        "only_b": 5
+      },
+      {
+        "page": 427,
+        "chars_a": 538,
+        "chars_b": 573,
+        "delta": 35,
+        "jaccard": 0.345,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 29,
+        "only_b": 46
+      },
+      {
+        "page": 305,
+        "chars_a": 980,
+        "chars_b": 980,
+        "delta": 0,
+        "jaccard": 0.547,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 20,
+        "only_b": 0
+      },
+      {
+        "page": 61,
+        "chars_a": 442,
+        "chars_b": 442,
+        "delta": 0,
+        "jaccard": 0.587,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 10,
+        "only_b": 0
+      },
+      {
+        "page": 122,
+        "chars_a": 397,
+        "chars_b": 397,
+        "delta": 0,
+        "jaccard": 0.676,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 8,
+        "only_b": 0
+      }
+    ],
+    "elapsed_s": 10.0
+  },
+  {
+    "pdf": "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf",
+    "total_pages": 201,
+    "sample_pages": 8,
+    "chars_a": 7118,
+    "chars_b": 7108,
+    "delta": -10,
+    "avg_jaccard": 0.084,
+    "low_j_pages": [
+      {
+        "page": 1,
+        "chars_a": 85,
+        "chars_b": 75,
+        "delta": -10,
+        "jaccard": 0.412,
+        "method_a": "rapidocr",
+        "ocr_b": true,
+        "only_a": 15,
+        "only_b": 2
+      },
+      {
+        "page": 29,
+        "chars_a": 1200,
+        "chars_b": 1200,
+        "delta": 0,
+        "jaccard": 0.045,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 32,
+        "only_b": 0
+      },
+      {
+        "page": 58,
+        "chars_a": 1136,
+        "chars_b": 1136,
+        "delta": 0,
+        "jaccard": 0.0,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 30,
+        "only_b": 0
+      },
+      {
+        "page": 86,
+        "chars_a": 35,
+        "chars_b": 35,
+        "delta": 0,
+        "jaccard": 0.0,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 1,
+        "only_b": 0
+      },
+      {
+        "page": 115,
+        "chars_a": 1449,
+        "chars_b": 1449,
+        "delta": 0,
+        "jaccard": 0.115,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 36,
+        "only_b": 0
+      },
+      {
+        "page": 143,
+        "chars_a": 1165,
+        "chars_b": 1165,
+        "delta": 0,
+        "jaccard": 0.047,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 29,
+        "only_b": 0
+      }
+    ],
+    "worst": [
+      {
+        "page": 58,
+        "chars_a": 1136,
+        "chars_b": 1136,
+        "delta": 0,
+        "jaccard": 0.0,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 30,
+        "only_b": 0
+      },
+      {
+        "page": 86,
+        "chars_a": 35,
+        "chars_b": 35,
+        "delta": 0,
+        "jaccard": 0.0,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 1,
+        "only_b": 0
+      },
+      {
+        "page": 201,
+        "chars_a": 1038,
+        "chars_b": 1038,
+        "delta": 0,
+        "jaccard": 0.0,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 34,
+        "only_b": 0
+      },
+      {
+        "page": 29,
+        "chars_a": 1200,
+        "chars_b": 1200,
+        "delta": 0,
+        "jaccard": 0.045,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 32,
+        "only_b": 0
+      },
+      {
+        "page": 143,
+        "chars_a": 1165,
+        "chars_b": 1165,
+        "delta": 0,
+        "jaccard": 0.047,
+        "method_a": "pymupdf-text",
+        "ocr_b": false,
+        "only_a": 29,
+        "only_b": 0
+      }
+    ],
+    "elapsed_s": 3.8
+  }
+]

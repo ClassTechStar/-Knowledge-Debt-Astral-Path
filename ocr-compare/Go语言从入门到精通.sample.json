@@ -1,0 +1,227 @@
+{
+ "meta": {
+  "pdf": "Go语言从入门到精通.pdf",
+  "total_pages": 506,
+  "sample_pages": 8,
+  "chars_a": 2935,
+  "chars_b": 3828,
+  "delta": 893,
+  "avg_jaccard": 0.266,
+  "low_j_pages": [
+   {
+    "page": 1,
+    "chars_a": 230,
+    "chars_b": 227,
+    "delta": -3,
+    "jaccard": 0.0,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 41,
+    "only_b": 13
+   },
+   {
+    "page": 73,
+    "chars_a": 186,
+    "chars_b": 251,
+    "delta": 65,
+    "jaccard": 0.208,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 83
+   },
+   {
+    "page": 145,
+    "chars_a": 243,
+    "chars_b": 360,
+    "delta": 117,
+    "jaccard": 0.06,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 207
+   },
+   {
+    "page": 217,
+    "chars_a": 363,
+    "chars_b": 673,
+    "delta": 310,
+    "jaccard": 0.091,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 415
+   },
+   {
+    "page": 289,
+    "chars_a": 289,
+    "chars_b": 601,
+    "delta": 312,
+    "jaccard": 0.02,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 429
+   },
+   {
+    "page": 361,
+    "chars_a": 19,
+    "chars_b": 19,
+    "delta": 0,
+    "jaccard": 0.25,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 2
+   }
+  ],
+  "worst": [
+   {
+    "page": 1,
+    "chars_a": 230,
+    "chars_b": 227,
+    "delta": -3,
+    "jaccard": 0.0,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 41,
+    "only_b": 13
+   },
+   {
+    "page": 289,
+    "chars_a": 289,
+    "chars_b": 601,
+    "delta": 312,
+    "jaccard": 0.02,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 429
+   },
+   {
+    "page": 145,
+    "chars_a": 243,
+    "chars_b": 360,
+    "delta": 117,
+    "jaccard": 0.06,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 207
+   },
+   {
+    "page": 217,
+    "chars_a": 363,
+    "chars_b": 673,
+    "delta": 310,
+    "jaccard": 0.091,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 415
+   },
+   {
+    "page": 73,
+    "chars_a": 186,
+    "chars_b": 251,
+    "delta": 65,
+    "jaccard": 0.208,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 83
+   }
+  ],
+  "elapsed_s": 14.1
+ },
+ "pages": [
+  {
+   "page": 1,
+   "chars_a": 230,
+   "chars_b": 227,
+   "delta": -3,
+   "jaccard": 0.0,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 41,
+   "only_b": 13
+  },
+  {
+   "page": 73,
+   "chars_a": 186,
+   "chars_b": 251,
+   "delta": 65,
+   "jaccard": 0.208,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 83
+  },
+  {
+   "page": 145,
+   "chars_a": 243,
+   "chars_b": 360,
+   "delta": 117,
+   "jaccard": 0.06,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 207
+  },
+  {
+   "page": 217,
+   "chars_a": 363,
+   "chars_b": 673,
+   "delta": 310,
+   "jaccard": 0.091,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 415
+  },
+  {
+   "page": 289,
+   "chars_a": 289,
+   "chars_b": 601,
+   "delta": 312,
+   "jaccard": 0.02,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 429
+  },
+  {
+   "page": 361,
+   "chars_a": 19,
+   "chars_b": 19,
+   "delta": 0,
+   "jaccard": 0.25,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 2
+  },
+  {
+   "page": 433,
+   "chars_a": 279,
+   "chars_b": 371,
+   "delta": 92,
+   "jaccard": 0.516,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 3,
+   "only_b": 98
+  },
+  {
+   "page": 506,
+   "chars_a": 1326,
+   "chars_b": 1326,
+   "delta": 0,
+   "jaccard": 0.982,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 1,
+   "only_b": 0
+  }
+ ]
+}

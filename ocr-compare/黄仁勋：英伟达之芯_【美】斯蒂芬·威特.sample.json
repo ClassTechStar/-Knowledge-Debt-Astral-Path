@@ -1,0 +1,227 @@
+{
+ "meta": {
+  "pdf": "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf",
+  "total_pages": 201,
+  "sample_pages": 8,
+  "chars_a": 7118,
+  "chars_b": 7108,
+  "delta": -10,
+  "avg_jaccard": 0.084,
+  "low_j_pages": [
+   {
+    "page": 1,
+    "chars_a": 85,
+    "chars_b": 75,
+    "delta": -10,
+    "jaccard": 0.412,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 15,
+    "only_b": 2
+   },
+   {
+    "page": 29,
+    "chars_a": 1200,
+    "chars_b": 1200,
+    "delta": 0,
+    "jaccard": 0.045,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 32,
+    "only_b": 0
+   },
+   {
+    "page": 58,
+    "chars_a": 1136,
+    "chars_b": 1136,
+    "delta": 0,
+    "jaccard": 0.0,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 30,
+    "only_b": 0
+   },
+   {
+    "page": 86,
+    "chars_a": 35,
+    "chars_b": 35,
+    "delta": 0,
+    "jaccard": 0.0,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 1,
+    "only_b": 0
+   },
+   {
+    "page": 115,
+    "chars_a": 1449,
+    "chars_b": 1449,
+    "delta": 0,
+    "jaccard": 0.115,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 36,
+    "only_b": 0
+   },
+   {
+    "page": 143,
+    "chars_a": 1165,
+    "chars_b": 1165,
+    "delta": 0,
+    "jaccard": 0.047,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 29,
+    "only_b": 0
+   }
+  ],
+  "worst": [
+   {
+    "page": 58,
+    "chars_a": 1136,
+    "chars_b": 1136,
+    "delta": 0,
+    "jaccard": 0.0,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 30,
+    "only_b": 0
+   },
+   {
+    "page": 86,
+    "chars_a": 35,
+    "chars_b": 35,
+    "delta": 0,
+    "jaccard": 0.0,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 1,
+    "only_b": 0
+   },
+   {
+    "page": 201,
+    "chars_a": 1038,
+    "chars_b": 1038,
+    "delta": 0,
+    "jaccard": 0.0,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 34,
+    "only_b": 0
+   },
+   {
+    "page": 29,
+    "chars_a": 1200,
+    "chars_b": 1200,
+    "delta": 0,
+    "jaccard": 0.045,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 32,
+    "only_b": 0
+   },
+   {
+    "page": 143,
+    "chars_a": 1165,
+    "chars_b": 1165,
+    "delta": 0,
+    "jaccard": 0.047,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 29,
+    "only_b": 0
+   }
+  ],
+  "elapsed_s": 3.8
+ },
+ "pages": [
+  {
+   "page": 1,
+   "chars_a": 85,
+   "chars_b": 75,
+   "delta": -10,
+   "jaccard": 0.412,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 15,
+   "only_b": 2
+  },
+  {
+   "page": 29,
+   "chars_a": 1200,
+   "chars_b": 1200,
+   "delta": 0,
+   "jaccard": 0.045,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 32,
+   "only_b": 0
+  },
+  {
+   "page": 58,
+   "chars_a": 1136,
+   "chars_b": 1136,
+   "delta": 0,
+   "jaccard": 0.0,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 30,
+   "only_b": 0
+  },
+  {
+   "page": 86,
+   "chars_a": 35,
+   "chars_b": 35,
+   "delta": 0,
+   "jaccard": 0.0,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 1,
+   "only_b": 0
+  },
+  {
+   "page": 115,
+   "chars_a": 1449,
+   "chars_b": 1449,
+   "delta": 0,
+   "jaccard": 0.115,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 36,
+   "only_b": 0
+  },
+  {
+   "page": 143,
+   "chars_a": 1165,
+   "chars_b": 1165,
+   "delta": 0,
+   "jaccard": 0.047,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 29,
+   "only_b": 0
+  },
+  {
+   "page": 172,
+   "chars_a": 1010,
+   "chars_b": 1010,
+   "delta": 0,
+   "jaccard": 0.054,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 29,
+   "only_b": 0
+  },
+  {
+   "page": 201,
+   "chars_a": 1038,
+   "chars_b": 1038,
+   "delta": 0,
+   "jaccard": 0.0,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 34,
+   "only_b": 0
+  }
+ ]
+}

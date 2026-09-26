@@ -1,0 +1,227 @@
+{
+ "meta": {
+  "pdf": "大模型应用开发：动手做 AI Agent (黄佳) .pdf",
+  "total_pages": 290,
+  "sample_pages": 8,
+  "chars_a": 6900,
+  "chars_b": 6233,
+  "delta": -667,
+  "avg_jaccard": 0.173,
+  "low_j_pages": [
+   {
+    "page": 1,
+    "chars_a": 174,
+    "chars_b": 171,
+    "delta": -3,
+    "jaccard": 0.12,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 15,
+    "only_b": 2
+   },
+   {
+    "page": 42,
+    "chars_a": 678,
+    "chars_b": 678,
+    "delta": 0,
+    "jaccard": 0.129,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 21,
+    "only_b": 1
+   },
+   {
+    "page": 83,
+    "chars_a": 956,
+    "chars_b": 962,
+    "delta": 6,
+    "jaccard": 0.026,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 34,
+    "only_b": 11
+   },
+   {
+    "page": 124,
+    "chars_a": 809,
+    "chars_b": 776,
+    "delta": -33,
+    "jaccard": 0.285,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 113,
+    "only_b": 45
+   },
+   {
+    "page": 166,
+    "chars_a": 1170,
+    "chars_b": 972,
+    "delta": -198,
+    "jaccard": 0.133,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 276,
+    "only_b": 44
+   },
+   {
+    "page": 207,
+    "chars_a": 854,
+    "chars_b": 856,
+    "delta": 2,
+    "jaccard": 0.246,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 26,
+    "only_b": 9
+   }
+  ],
+  "worst": [
+   {
+    "page": 83,
+    "chars_a": 956,
+    "chars_b": 962,
+    "delta": 6,
+    "jaccard": 0.026,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 34,
+    "only_b": 11
+   },
+   {
+    "page": 290,
+    "chars_a": 706,
+    "chars_b": 654,
+    "delta": -52,
+    "jaccard": 0.053,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 130,
+    "only_b": 50
+   },
+   {
+    "page": 1,
+    "chars_a": 174,
+    "chars_b": 171,
+    "delta": -3,
+    "jaccard": 0.12,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 15,
+    "only_b": 2
+   },
+   {
+    "page": 42,
+    "chars_a": 678,
+    "chars_b": 678,
+    "delta": 0,
+    "jaccard": 0.129,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 21,
+    "only_b": 1
+   },
+   {
+    "page": 166,
+    "chars_a": 1170,
+    "chars_b": 972,
+    "delta": -198,
+    "jaccard": 0.133,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 276,
+    "only_b": 44
+   }
+  ],
+  "elapsed_s": 63.9
+ },
+ "pages": [
+  {
+   "page": 1,
+   "chars_a": 174,
+   "chars_b": 171,
+   "delta": -3,
+   "jaccard": 0.12,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 15,
+   "only_b": 2
+  },
+  {
+   "page": 42,
+   "chars_a": 678,
+   "chars_b": 678,
+   "delta": 0,
+   "jaccard": 0.129,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 21,
+   "only_b": 1
+  },
+  {
+   "page": 83,
+   "chars_a": 956,
+   "chars_b": 962,
+   "delta": 6,
+   "jaccard": 0.026,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 34,
+   "only_b": 11
+  },
+  {
+   "page": 124,
+   "chars_a": 809,
+   "chars_b": 776,
+   "delta": -33,
+   "jaccard": 0.285,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 113,
+   "only_b": 45
+  },
+  {
+   "page": 166,
+   "chars_a": 1170,
+   "chars_b": 972,
+   "delta": -198,
+   "jaccard": 0.133,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 276,
+   "only_b": 44
+  },
+  {
+   "page": 207,
+   "chars_a": 854,
+   "chars_b": 856,
+   "delta": 2,
+   "jaccard": 0.246,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 26,
+   "only_b": 9
+  },
+  {
+   "page": 248,
+   "chars_a": 1553,
+   "chars_b": 1164,
+   "delta": -389,
+   "jaccard": 0.394,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 444,
+   "only_b": 7
+  },
+  {
+   "page": 290,
+   "chars_a": 706,
+   "chars_b": 654,
+   "delta": -52,
+   "jaccard": 0.053,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 130,
+   "only_b": 50
+  }
+ ]
+}

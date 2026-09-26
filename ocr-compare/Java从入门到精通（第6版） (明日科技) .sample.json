@@ -1,0 +1,227 @@
+{
+ "meta": {
+  "pdf": "Java从入门到精通（第6版） (明日科技) .pdf",
+  "total_pages": 775,
+  "sample_pages": 8,
+  "chars_a": 2925,
+  "chars_b": 4873,
+  "delta": 1948,
+  "avg_jaccard": 0.191,
+  "low_j_pages": [
+   {
+    "page": 1,
+    "chars_a": 235,
+    "chars_b": 238,
+    "delta": 3,
+    "jaccard": 0.0,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 20,
+    "only_b": 8
+   },
+   {
+    "page": 111,
+    "chars_a": 210,
+    "chars_b": 682,
+    "delta": 472,
+    "jaccard": 0.162,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 547
+   },
+   {
+    "page": 222,
+    "chars_a": 569,
+    "chars_b": 569,
+    "delta": 0,
+    "jaccard": 0.2,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 14,
+    "only_b": 0
+   },
+   {
+    "page": 332,
+    "chars_a": 295,
+    "chars_b": 683,
+    "delta": 388,
+    "jaccard": 0.2,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 475
+   },
+   {
+    "page": 443,
+    "chars_a": 652,
+    "chars_b": 652,
+    "delta": 0,
+    "jaccard": 0.333,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 16,
+    "only_b": 0
+   },
+   {
+    "page": 553,
+    "chars_a": 146,
+    "chars_b": 191,
+    "delta": 45,
+    "jaccard": 0.143,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 6,
+    "only_b": 45
+   }
+  ],
+  "worst": [
+   {
+    "page": 1,
+    "chars_a": 235,
+    "chars_b": 238,
+    "delta": 3,
+    "jaccard": 0.0,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 20,
+    "only_b": 8
+   },
+   {
+    "page": 775,
+    "chars_a": 171,
+    "chars_b": 1211,
+    "delta": 1040,
+    "jaccard": 0.06,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 1262
+   },
+   {
+    "page": 553,
+    "chars_a": 146,
+    "chars_b": 191,
+    "delta": 45,
+    "jaccard": 0.143,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 6,
+    "only_b": 45
+   },
+   {
+    "page": 111,
+    "chars_a": 210,
+    "chars_b": 682,
+    "delta": 472,
+    "jaccard": 0.162,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 547
+   },
+   {
+    "page": 222,
+    "chars_a": 569,
+    "chars_b": 569,
+    "delta": 0,
+    "jaccard": 0.2,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 14,
+    "only_b": 0
+   }
+  ],
+  "elapsed_s": 16.3
+ },
+ "pages": [
+  {
+   "page": 1,
+   "chars_a": 235,
+   "chars_b": 238,
+   "delta": 3,
+   "jaccard": 0.0,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 20,
+   "only_b": 8
+  },
+  {
+   "page": 111,
+   "chars_a": 210,
+   "chars_b": 682,
+   "delta": 472,
+   "jaccard": 0.162,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 547
+  },
+  {
+   "page": 222,
+   "chars_a": 569,
+   "chars_b": 569,
+   "delta": 0,
+   "jaccard": 0.2,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 14,
+   "only_b": 0
+  },
+  {
+   "page": 332,
+   "chars_a": 295,
+   "chars_b": 683,
+   "delta": 388,
+   "jaccard": 0.2,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 475
+  },
+  {
+   "page": 443,
+   "chars_a": 652,
+   "chars_b": 652,
+   "delta": 0,
+   "jaccard": 0.333,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 16,
+   "only_b": 0
+  },
+  {
+   "page": 553,
+   "chars_a": 146,
+   "chars_b": 191,
+   "delta": 45,
+   "jaccard": 0.143,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 6,
+   "only_b": 45
+  },
+  {
+   "page": 664,
+   "chars_a": 647,
+   "chars_b": 647,
+   "delta": 0,
+   "jaccard": 0.432,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 14,
+   "only_b": 0
+  },
+  {
+   "page": 775,
+   "chars_a": 171,
+   "chars_b": 1211,
+   "delta": 1040,
+   "jaccard": 0.06,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 1262
+  }
+ ]
+}

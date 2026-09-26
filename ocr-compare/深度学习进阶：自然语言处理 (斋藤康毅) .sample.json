@@ -1,0 +1,227 @@
+{
+ "meta": {
+  "pdf": "深度学习进阶：自然语言处理 (斋藤康毅) .pdf",
+  "total_pages": 427,
+  "sample_pages": 8,
+  "chars_a": 4164,
+  "chars_b": 4203,
+  "delta": 39,
+  "avg_jaccard": 0.602,
+  "low_j_pages": [
+   {
+    "page": 1,
+    "chars_a": 99,
+    "chars_b": 103,
+    "delta": 4,
+    "jaccard": 0.3,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 6,
+    "only_b": 5
+   },
+   {
+    "page": 61,
+    "chars_a": 442,
+    "chars_b": 442,
+    "delta": 0,
+    "jaccard": 0.587,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 10,
+    "only_b": 0
+   },
+   {
+    "page": 122,
+    "chars_a": 397,
+    "chars_b": 397,
+    "delta": 0,
+    "jaccard": 0.676,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 8,
+    "only_b": 0
+   },
+   {
+    "page": 244,
+    "chars_a": 410,
+    "chars_b": 410,
+    "delta": 0,
+    "jaccard": 0.695,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 6,
+    "only_b": 0
+   },
+   {
+    "page": 305,
+    "chars_a": 980,
+    "chars_b": 980,
+    "delta": 0,
+    "jaccard": 0.547,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 20,
+    "only_b": 0
+   },
+   {
+    "page": 427,
+    "chars_a": 538,
+    "chars_b": 573,
+    "delta": 35,
+    "jaccard": 0.345,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 29,
+    "only_b": 46
+   }
+  ],
+  "worst": [
+   {
+    "page": 1,
+    "chars_a": 99,
+    "chars_b": 103,
+    "delta": 4,
+    "jaccard": 0.3,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 6,
+    "only_b": 5
+   },
+   {
+    "page": 427,
+    "chars_a": 538,
+    "chars_b": 573,
+    "delta": 35,
+    "jaccard": 0.345,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 29,
+    "only_b": 46
+   },
+   {
+    "page": 305,
+    "chars_a": 980,
+    "chars_b": 980,
+    "delta": 0,
+    "jaccard": 0.547,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 20,
+    "only_b": 0
+   },
+   {
+    "page": 61,
+    "chars_a": 442,
+    "chars_b": 442,
+    "delta": 0,
+    "jaccard": 0.587,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 10,
+    "only_b": 0
+   },
+   {
+    "page": 122,
+    "chars_a": 397,
+    "chars_b": 397,
+    "delta": 0,
+    "jaccard": 0.676,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 8,
+    "only_b": 0
+   }
+  ],
+  "elapsed_s": 10.0
+ },
+ "pages": [
+  {
+   "page": 1,
+   "chars_a": 99,
+   "chars_b": 103,
+   "delta": 4,
+   "jaccard": 0.3,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 6,
+   "only_b": 5
+  },
+  {
+   "page": 61,
+   "chars_a": 442,
+   "chars_b": 442,
+   "delta": 0,
+   "jaccard": 0.587,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 10,
+   "only_b": 0
+  },
+  {
+   "page": 122,
+   "chars_a": 397,
+   "chars_b": 397,
+   "delta": 0,
+   "jaccard": 0.676,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 8,
+   "only_b": 0
+  },
+  {
+   "page": 183,
+   "chars_a": 686,
+   "chars_b": 686,
+   "delta": 0,
+   "jaccard": 0.792,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 7,
+   "only_b": 0
+  },
+  {
+   "page": 244,
+   "chars_a": 410,
+   "chars_b": 410,
+   "delta": 0,
+   "jaccard": 0.695,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 6,
+   "only_b": 0
+  },
+  {
+   "page": 305,
+   "chars_a": 980,
+   "chars_b": 980,
+   "delta": 0,
+   "jaccard": 0.547,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 20,
+   "only_b": 0
+  },
+  {
+   "page": 366,
+   "chars_a": 612,
+   "chars_b": 612,
+   "delta": 0,
+   "jaccard": 0.873,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 3,
+   "only_b": 0
+  },
+  {
+   "page": 427,
+   "chars_a": 538,
+   "chars_b": 573,
+   "delta": 35,
+   "jaccard": 0.345,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 29,
+   "only_b": 46
+  }
+ ]
+}

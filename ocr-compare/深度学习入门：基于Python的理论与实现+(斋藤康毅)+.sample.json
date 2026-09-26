@@ -1,0 +1,227 @@
+{
+ "meta": {
+  "pdf": "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf",
+  "total_pages": 314,
+  "sample_pages": 8,
+  "chars_a": 3079,
+  "chars_b": 3214,
+  "delta": 135,
+  "avg_jaccard": 0.508,
+  "low_j_pages": [
+   {
+    "page": 1,
+    "chars_a": 106,
+    "chars_b": 107,
+    "delta": 1,
+    "jaccard": 0.391,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 7,
+    "only_b": 5
+   },
+   {
+    "page": 45,
+    "chars_a": 388,
+    "chars_b": 388,
+    "delta": 0,
+    "jaccard": 0.206,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 13,
+    "only_b": 0
+   },
+   {
+    "page": 90,
+    "chars_a": 447,
+    "chars_b": 447,
+    "delta": 0,
+    "jaccard": 0.698,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 7,
+    "only_b": 0
+   },
+   {
+    "page": 135,
+    "chars_a": 749,
+    "chars_b": 749,
+    "delta": 0,
+    "jaccard": 0.651,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 10,
+    "only_b": 0
+   },
+   {
+    "page": 179,
+    "chars_a": 369,
+    "chars_b": 369,
+    "delta": 0,
+    "jaccard": 0.179,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 19,
+    "only_b": 0
+   },
+   {
+    "page": 269,
+    "chars_a": 379,
+    "chars_b": 513,
+    "delta": 134,
+    "jaccard": 0.191,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 169
+   }
+  ],
+  "worst": [
+   {
+    "page": 179,
+    "chars_a": 369,
+    "chars_b": 369,
+    "delta": 0,
+    "jaccard": 0.179,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 19,
+    "only_b": 0
+   },
+   {
+    "page": 269,
+    "chars_a": 379,
+    "chars_b": 513,
+    "delta": 134,
+    "jaccard": 0.191,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 169
+   },
+   {
+    "page": 45,
+    "chars_a": 388,
+    "chars_b": 388,
+    "delta": 0,
+    "jaccard": 0.206,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 13,
+    "only_b": 0
+   },
+   {
+    "page": 1,
+    "chars_a": 106,
+    "chars_b": 107,
+    "delta": 1,
+    "jaccard": 0.391,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 7,
+    "only_b": 5
+   },
+   {
+    "page": 135,
+    "chars_a": 749,
+    "chars_b": 749,
+    "delta": 0,
+    "jaccard": 0.651,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 10,
+    "only_b": 0
+   }
+  ],
+  "elapsed_s": 5.0
+ },
+ "pages": [
+  {
+   "page": 1,
+   "chars_a": 106,
+   "chars_b": 107,
+   "delta": 1,
+   "jaccard": 0.391,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 7,
+   "only_b": 5
+  },
+  {
+   "page": 45,
+   "chars_a": 388,
+   "chars_b": 388,
+   "delta": 0,
+   "jaccard": 0.206,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 13,
+   "only_b": 0
+  },
+  {
+   "page": 90,
+   "chars_a": 447,
+   "chars_b": 447,
+   "delta": 0,
+   "jaccard": 0.698,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 7,
+   "only_b": 0
+  },
+  {
+   "page": 135,
+   "chars_a": 749,
+   "chars_b": 749,
+   "delta": 0,
+   "jaccard": 0.651,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 10,
+   "only_b": 0
+  },
+  {
+   "page": 179,
+   "chars_a": 369,
+   "chars_b": 369,
+   "delta": 0,
+   "jaccard": 0.179,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 19,
+   "only_b": 0
+  },
+  {
+   "page": 224,
+   "chars_a": 575,
+   "chars_b": 575,
+   "delta": 0,
+   "jaccard": 0.836,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 5,
+   "only_b": 0
+  },
+  {
+   "page": 269,
+   "chars_a": 379,
+   "chars_b": 513,
+   "delta": 134,
+   "jaccard": 0.191,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 169
+  },
+  {
+   "page": 314,
+   "chars_a": 66,
+   "chars_b": 66,
+   "delta": 0,
+   "jaccard": 0.909,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 3,
+   "only_b": 0
+  }
+ ]
+}

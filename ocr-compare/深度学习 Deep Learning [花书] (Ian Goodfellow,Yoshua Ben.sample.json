@@ -1,0 +1,227 @@
+{
+ "meta": {
+  "pdf": "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf",
+  "total_pages": 738,
+  "sample_pages": 8,
+  "chars_a": 5157,
+  "chars_b": 5157,
+  "delta": 0,
+  "avg_jaccard": 0.559,
+  "low_j_pages": [
+   {
+    "page": 106,
+    "chars_a": 602,
+    "chars_b": 602,
+    "delta": 0,
+    "jaccard": 0.352,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 16,
+    "only_b": 0
+   },
+   {
+    "page": 211,
+    "chars_a": 636,
+    "chars_b": 636,
+    "delta": 0,
+    "jaccard": 0.658,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 14,
+    "only_b": 0
+   },
+   {
+    "page": 316,
+    "chars_a": 637,
+    "chars_b": 637,
+    "delta": 0,
+    "jaccard": 0.31,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 17,
+    "only_b": 0
+   },
+   {
+    "page": 422,
+    "chars_a": 1029,
+    "chars_b": 1029,
+    "delta": 0,
+    "jaccard": 0.326,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 26,
+    "only_b": 0
+   },
+   {
+    "page": 527,
+    "chars_a": 987,
+    "chars_b": 987,
+    "delta": 0,
+    "jaccard": 0.261,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 29,
+    "only_b": 0
+   },
+   {
+    "page": 632,
+    "chars_a": 711,
+    "chars_b": 711,
+    "delta": 0,
+    "jaccard": 0.569,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 16,
+    "only_b": 0
+   }
+  ],
+  "worst": [
+   {
+    "page": 527,
+    "chars_a": 987,
+    "chars_b": 987,
+    "delta": 0,
+    "jaccard": 0.261,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 29,
+    "only_b": 0
+   },
+   {
+    "page": 316,
+    "chars_a": 637,
+    "chars_b": 637,
+    "delta": 0,
+    "jaccard": 0.31,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 17,
+    "only_b": 0
+   },
+   {
+    "page": 422,
+    "chars_a": 1029,
+    "chars_b": 1029,
+    "delta": 0,
+    "jaccard": 0.326,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 26,
+    "only_b": 0
+   },
+   {
+    "page": 106,
+    "chars_a": 602,
+    "chars_b": 602,
+    "delta": 0,
+    "jaccard": 0.352,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 16,
+    "only_b": 0
+   },
+   {
+    "page": 632,
+    "chars_a": 711,
+    "chars_b": 711,
+    "delta": 0,
+    "jaccard": 0.569,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 16,
+    "only_b": 0
+   }
+  ],
+  "elapsed_s": 0.6
+ },
+ "pages": [
+  {
+   "page": 1,
+   "chars_a": 13,
+   "chars_b": 13,
+   "delta": 0,
+   "jaccard": 1.0,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 0,
+   "only_b": 0
+  },
+  {
+   "page": 106,
+   "chars_a": 602,
+   "chars_b": 602,
+   "delta": 0,
+   "jaccard": 0.352,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 16,
+   "only_b": 0
+  },
+  {
+   "page": 211,
+   "chars_a": 636,
+   "chars_b": 636,
+   "delta": 0,
+   "jaccard": 0.658,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 14,
+   "only_b": 0
+  },
+  {
+   "page": 316,
+   "chars_a": 637,
+   "chars_b": 637,
+   "delta": 0,
+   "jaccard": 0.31,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 17,
+   "only_b": 0
+  },
+  {
+   "page": 422,
+   "chars_a": 1029,
+   "chars_b": 1029,
+   "delta": 0,
+   "jaccard": 0.326,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 26,
+   "only_b": 0
+  },
+  {
+   "page": 527,
+   "chars_a": 987,
+   "chars_b": 987,
+   "delta": 0,
+   "jaccard": 0.261,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 29,
+   "only_b": 0
+  },
+  {
+   "page": 632,
+   "chars_a": 711,
+   "chars_b": 711,
+   "delta": 0,
+   "jaccard": 0.569,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 16,
+   "only_b": 0
+  },
+  {
+   "page": 738,
+   "chars_a": 542,
+   "chars_b": 542,
+   "delta": 0,
+   "jaccard": 1.0,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 0,
+   "only_b": 0
+  }
+ ]
+}

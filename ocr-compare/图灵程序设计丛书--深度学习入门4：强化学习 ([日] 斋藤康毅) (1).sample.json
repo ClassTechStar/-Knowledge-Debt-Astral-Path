@@ -1,0 +1,227 @@
+{
+ "meta": {
+  "pdf": "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf",
+  "total_pages": 333,
+  "sample_pages": 8,
+  "chars_a": 3025,
+  "chars_b": 6088,
+  "delta": 3063,
+  "avg_jaccard": 0.379,
+  "low_j_pages": [
+   {
+    "page": 1,
+    "chars_a": 93,
+    "chars_b": 93,
+    "delta": 0,
+    "jaccard": 0.158,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 8,
+    "only_b": 0
+   },
+   {
+    "page": 48,
+    "chars_a": 565,
+    "chars_b": 1131,
+    "delta": 566,
+    "jaccard": 0.577,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 695
+   },
+   {
+    "page": 95,
+    "chars_a": 523,
+    "chars_b": 1043,
+    "delta": 520,
+    "jaccard": 0.377,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 646
+   },
+   {
+    "page": 143,
+    "chars_a": 523,
+    "chars_b": 1046,
+    "delta": 523,
+    "jaccard": 0.298,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 611
+   },
+   {
+    "page": 190,
+    "chars_a": 445,
+    "chars_b": 955,
+    "delta": 510,
+    "jaccard": 0.185,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 629
+   },
+   {
+    "page": 238,
+    "chars_a": 513,
+    "chars_b": 1029,
+    "delta": 516,
+    "jaccard": 0.255,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 4,
+    "only_b": 575
+   }
+  ],
+  "worst": [
+   {
+    "page": 1,
+    "chars_a": 93,
+    "chars_b": 93,
+    "delta": 0,
+    "jaccard": 0.158,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 8,
+    "only_b": 0
+   },
+   {
+    "page": 285,
+    "chars_a": 363,
+    "chars_b": 791,
+    "delta": 428,
+    "jaccard": 0.179,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 474
+   },
+   {
+    "page": 190,
+    "chars_a": 445,
+    "chars_b": 955,
+    "delta": 510,
+    "jaccard": 0.185,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 629
+   },
+   {
+    "page": 238,
+    "chars_a": 513,
+    "chars_b": 1029,
+    "delta": 516,
+    "jaccard": 0.255,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 4,
+    "only_b": 575
+   },
+   {
+    "page": 143,
+    "chars_a": 523,
+    "chars_b": 1046,
+    "delta": 523,
+    "jaccard": 0.298,
+    "method_a": "pymupdf-text",
+    "ocr_b": true,
+    "only_a": 0,
+    "only_b": 611
+   }
+  ],
+  "elapsed_s": 29.0
+ },
+ "pages": [
+  {
+   "page": 1,
+   "chars_a": 93,
+   "chars_b": 93,
+   "delta": 0,
+   "jaccard": 0.158,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 8,
+   "only_b": 0
+  },
+  {
+   "page": 48,
+   "chars_a": 565,
+   "chars_b": 1131,
+   "delta": 566,
+   "jaccard": 0.577,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 695
+  },
+  {
+   "page": 95,
+   "chars_a": 523,
+   "chars_b": 1043,
+   "delta": 520,
+   "jaccard": 0.377,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 646
+  },
+  {
+   "page": 143,
+   "chars_a": 523,
+   "chars_b": 1046,
+   "delta": 523,
+   "jaccard": 0.298,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 611
+  },
+  {
+   "page": 190,
+   "chars_a": 445,
+   "chars_b": 955,
+   "delta": 510,
+   "jaccard": 0.185,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 629
+  },
+  {
+   "page": 238,
+   "chars_a": 513,
+   "chars_b": 1029,
+   "delta": 516,
+   "jaccard": 0.255,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 4,
+   "only_b": 575
+  },
+  {
+   "page": 285,
+   "chars_a": 363,
+   "chars_b": 791,
+   "delta": 428,
+   "jaccard": 0.179,
+   "method_a": "pymupdf-text",
+   "ocr_b": true,
+   "only_a": 0,
+   "only_b": 474
+  },
+  {
+   "page": 333,
+   "chars_a": 0,
+   "chars_b": 0,
+   "delta": 0,
+   "jaccard": 1.0,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 0,
+   "only_b": 0
+  }
+ ]
+}

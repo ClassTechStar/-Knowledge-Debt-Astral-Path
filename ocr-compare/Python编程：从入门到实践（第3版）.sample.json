@@ -1,0 +1,227 @@
+{
+ "meta": {
+  "pdf": "Python编程：从入门到实践（第3版）.pdf",
+  "total_pages": 732,
+  "sample_pages": 8,
+  "chars_a": 3591,
+  "chars_b": 3588,
+  "delta": -3,
+  "avg_jaccard": 0.533,
+  "low_j_pages": [
+   {
+    "page": 1,
+    "chars_a": 160,
+    "chars_b": 157,
+    "delta": -3,
+    "jaccard": 0.296,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 16,
+    "only_b": 6
+   },
+   {
+    "page": 105,
+    "chars_a": 363,
+    "chars_b": 363,
+    "delta": 0,
+    "jaccard": 0.667,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 8,
+    "only_b": 0
+   },
+   {
+    "page": 209,
+    "chars_a": 769,
+    "chars_b": 769,
+    "delta": 0,
+    "jaccard": 0.735,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 10,
+    "only_b": 0
+   },
+   {
+    "page": 418,
+    "chars_a": 441,
+    "chars_b": 441,
+    "delta": 0,
+    "jaccard": 0.661,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 7,
+    "only_b": 0
+   },
+   {
+    "page": 523,
+    "chars_a": 339,
+    "chars_b": 339,
+    "delta": 0,
+    "jaccard": 0.674,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 7,
+    "only_b": 0
+   },
+   {
+    "page": 627,
+    "chars_a": 653,
+    "chars_b": 653,
+    "delta": 0,
+    "jaccard": 0.458,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 18,
+    "only_b": 0
+   }
+  ],
+  "worst": [
+   {
+    "page": 732,
+    "chars_a": 211,
+    "chars_b": 211,
+    "delta": 0,
+    "jaccard": 0.0,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 12,
+    "only_b": 1
+   },
+   {
+    "page": 1,
+    "chars_a": 160,
+    "chars_b": 157,
+    "delta": -3,
+    "jaccard": 0.296,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 16,
+    "only_b": 6
+   },
+   {
+    "page": 627,
+    "chars_a": 653,
+    "chars_b": 653,
+    "delta": 0,
+    "jaccard": 0.458,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 18,
+    "only_b": 0
+   },
+   {
+    "page": 418,
+    "chars_a": 441,
+    "chars_b": 441,
+    "delta": 0,
+    "jaccard": 0.661,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 7,
+    "only_b": 0
+   },
+   {
+    "page": 105,
+    "chars_a": 363,
+    "chars_b": 363,
+    "delta": 0,
+    "jaccard": 0.667,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 8,
+    "only_b": 0
+   }
+  ],
+  "elapsed_s": 5.7
+ },
+ "pages": [
+  {
+   "page": 1,
+   "chars_a": 160,
+   "chars_b": 157,
+   "delta": -3,
+   "jaccard": 0.296,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 16,
+   "only_b": 6
+  },
+  {
+   "page": 105,
+   "chars_a": 363,
+   "chars_b": 363,
+   "delta": 0,
+   "jaccard": 0.667,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 8,
+   "only_b": 0
+  },
+  {
+   "page": 209,
+   "chars_a": 769,
+   "chars_b": 769,
+   "delta": 0,
+   "jaccard": 0.735,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 10,
+   "only_b": 0
+  },
+  {
+   "page": 314,
+   "chars_a": 655,
+   "chars_b": 655,
+   "delta": 0,
+   "jaccard": 0.77,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 6,
+   "only_b": 0
+  },
+  {
+   "page": 418,
+   "chars_a": 441,
+   "chars_b": 441,
+   "delta": 0,
+   "jaccard": 0.661,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 7,
+   "only_b": 0
+  },
+  {
+   "page": 523,
+   "chars_a": 339,
+   "chars_b": 339,
+   "delta": 0,
+   "jaccard": 0.674,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 7,
+   "only_b": 0
+  },
+  {
+   "page": 627,
+   "chars_a": 653,
+   "chars_b": 653,
+   "delta": 0,
+   "jaccard": 0.458,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 18,
+   "only_b": 0
+  },
+  {
+   "page": 732,
+   "chars_a": 211,
+   "chars_b": 211,
+   "delta": 0,
+   "jaccard": 0.0,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 12,
+   "only_b": 1
+  }
+ ]
+}

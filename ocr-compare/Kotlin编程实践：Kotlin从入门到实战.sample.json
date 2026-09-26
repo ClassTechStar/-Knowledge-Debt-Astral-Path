@@ -1,0 +1,216 @@
+{
+ "meta": {
+  "pdf": "Kotlin编程实践：Kotlin从入门到实战.pdf",
+  "total_pages": 294,
+  "sample_pages": 8,
+  "chars_a": 4278,
+  "chars_b": 4286,
+  "delta": 8,
+  "avg_jaccard": 0.614,
+  "low_j_pages": [
+   {
+    "page": 1,
+    "chars_a": 96,
+    "chars_b": 104,
+    "delta": 8,
+    "jaccard": 0.421,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 2,
+    "only_b": 10
+   },
+   {
+    "page": 42,
+    "chars_a": 847,
+    "chars_b": 847,
+    "delta": 0,
+    "jaccard": 0.491,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 15,
+    "only_b": 0
+   },
+   {
+    "page": 126,
+    "chars_a": 618,
+    "chars_b": 618,
+    "delta": 0,
+    "jaccard": 0.452,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 13,
+    "only_b": 0
+   },
+   {
+    "page": 168,
+    "chars_a": 391,
+    "chars_b": 391,
+    "delta": 0,
+    "jaccard": 0.618,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 7,
+    "only_b": 0
+   },
+   {
+    "page": 252,
+    "chars_a": 575,
+    "chars_b": 575,
+    "delta": 0,
+    "jaccard": 0.357,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 14,
+    "only_b": 0
+   }
+  ],
+  "worst": [
+   {
+    "page": 252,
+    "chars_a": 575,
+    "chars_b": 575,
+    "delta": 0,
+    "jaccard": 0.357,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 14,
+    "only_b": 0
+   },
+   {
+    "page": 1,
+    "chars_a": 96,
+    "chars_b": 104,
+    "delta": 8,
+    "jaccard": 0.421,
+    "method_a": "rapidocr",
+    "ocr_b": true,
+    "only_a": 2,
+    "only_b": 10
+   },
+   {
+    "page": 126,
+    "chars_a": 618,
+    "chars_b": 618,
+    "delta": 0,
+    "jaccard": 0.452,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 13,
+    "only_b": 0
+   },
+   {
+    "page": 42,
+    "chars_a": 847,
+    "chars_b": 847,
+    "delta": 0,
+    "jaccard": 0.491,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 15,
+    "only_b": 0
+   },
+   {
+    "page": 168,
+    "chars_a": 391,
+    "chars_b": 391,
+    "delta": 0,
+    "jaccard": 0.618,
+    "method_a": "pymupdf-text",
+    "ocr_b": false,
+    "only_a": 7,
+    "only_b": 0
+   }
+  ],
+  "elapsed_s": 3.0
+ },
+ "pages": [
+  {
+   "page": 1,
+   "chars_a": 96,
+   "chars_b": 104,
+   "delta": 8,
+   "jaccard": 0.421,
+   "method_a": "rapidocr",
+   "ocr_b": true,
+   "only_a": 2,
+   "only_b": 10
+  },
+  {
+   "page": 42,
+   "chars_a": 847,
+   "chars_b": 847,
+   "delta": 0,
+   "jaccard": 0.491,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 15,
+   "only_b": 0
+  },
+  {
+   "page": 84,
+   "chars_a": 420,
+   "chars_b": 420,
+   "delta": 0,
+   "jaccard": 0.821,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 8,
+   "only_b": 0
+  },
+  {
+   "page": 126,
+   "chars_a": 618,
+   "chars_b": 618,
+   "delta": 0,
+   "jaccard": 0.452,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 13,
+   "only_b": 0
+  },
+  {
+   "page": 168,
+   "chars_a": 391,
+   "chars_b": 391,
+   "delta": 0,
+   "jaccard": 0.618,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 7,
+   "only_b": 0
+  },
+  {
+   "page": 210,
+   "chars_a": 850,
+   "chars_b": 850,
+   "delta": 0,
+   "jaccard": 0.795,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 7,
+   "only_b": 0
+  },
+  {
+   "page": 252,
+   "chars_a": 575,
+   "chars_b": 575,
+   "delta": 0,
+   "jaccard": 0.357,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 14,
+   "only_b": 0
+  },
+  {
+   "page": 294,
+   "chars_a": 481,
+   "chars_b": 481,
+   "delta": 0,
+   "jaccard": 0.955,
+   "method_a": "pymupdf-text",
+   "ocr_b": false,
+   "only_a": 1,
+   "only_b": 0
+  }
+ ]
+}
