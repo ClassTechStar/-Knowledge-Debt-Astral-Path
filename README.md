@@ -216,6 +216,56 @@ dotnet publish src/AstralPath.Monolith -c Release -r win-x64 --self-contained -o
 
 ## 11. 变更日志
 
+### 2.2.0 · 审计修复与重构落地（2026-09-26）
+- **安全**：图谱先修链 XSS 转义（三端同源）；清除全部机器硬编码路径；鉴权默认开启 + 教师角色门禁；
+  CORS 去 `null`；上传限流 60/min、请求体 2GB→512MB
+- **持久化**：运行时快照换 SQLite（WAL）单行幂等 upsert，旧 JSON 自动迁移；教材正文迁 IndexedDB，
+  静默截断改显式报警
+- **架构**：离线 Core 链接主源码（副本漂移清零）；OcrHost / LocalApiHost 下沉（壳 277→128 行）；
+  `IAstralPathStore` 仓储契约，控制器/微服务/模块全部接口化；`tools/agent-intents.json` 意图词表单一事实源
+- **性能**：`scanDebts` 修订号缓存（7 处调用经 `save()` 统一失效）
+- **体验**：GalReview 半径/缓动/负字距对齐、对比度达 WCAG AA、触控 44px、方向路由动效、液态玻璃可选开关
+- **门禁**：三端 md5 + XSS 哨兵、agent-intents 三方对拍、公式三方行为对拍（Python/C#/JS，tol 1e-9）、
+  发布管线前置契约门禁
+- 测试 **277 项全绿**；详见 `docs/REFACTORING.md`、`docs/adr/ADR-0001-打包路线对齐.md`
+
+### 2.2.0 · P2/P3 修复（2026-09-25）
+- **P2-1 鉴权与越权**：新增访问控制中间件（Bearer 解析 + 学生维路由归属校验 403 + consent 主体以令牌为准，
+  杜绝「替他人授权」）；`Security:RequireAuth` 可开启强制登录
+- **P2-2 Swagger**：去掉 `[FromForm] IFormFile` 触发的问题，`swagger.json` 500 → **200**
+- **P2-3 错误形状统一**：415/405/404 框架级错误改写为统一 `{data,error,traceId}`
+- **P2-4 前端负例对齐 v3**：「好的，帮我生成计划」不再被吞成兜底话术；纯客套仍正确兜底（三端同步）
+- **P2-5 opt-out 生效**：关闭后今日改按章节顺序、隐藏推断风格轴（原只翻转布尔值）
+- **P2-6 上传白名单**：扩展名 + 魔数 + 可读率三级校验（原 `.exe` 也收且解析报 ready）
+- **P2-7 上传目录**：移出 `bin/` 到 `%LOCALAPPDATA%\AstralPath\uploads`，旧内容自动迁移
+- **P2-8 CORS**：`AllowAnyOrigin` → 回环任意端口 + 安卓壳白名单
+- **P3**：练习选项可键盘操作（radio 语义）/ 销账检查改内联反馈 / `save()` 失败顶栏提示 /
+  入参长度上限 / 不存在学生 404 / 注册冲突 409 / 镜像 tag 参数化 / 内联 favicon / 首访示例数据引导
+- 详见 `docs/验收报告-全面功能与稳定性-2026-09-25.md` 第十一节
+- **画像 v3**：波动率按正确率归一（超额波动，不再误判 acc≈0.5 的学生）、新增 ECE 校准曲线、
+  兴趣时间衰减、真 k-匿名（逐个标签判样本量）、修复伪 Laplace（噪声不再由 value 驱动）
+- **智能体 v3**：启用三个从未使用的常量（TauExec/TauClarify/MaxClarify）、多锚点饱和累加 + 覆盖率、
+  修复"好的"二字吞掉整句请求、槽位填充可收敛、支持话题切换与省略指代
+- 详见 `docs/算法v3-图谱与OCR优化说明.md`、`docs/算法v3-画像与智能体优化说明.md`
+
+### 2.2.0 · 算法 v3（2026-09-25）
+- **知识图谱 v3**：TextRank 稀疏化（O(V²)→O(V+E)，词表上限）；修复「所有术语挂同一章」的锚定 bug；
+  依赖句式正则一次编译；PMI → 平滑 + 归一化 NPMI；子词去重；DAG 收尾；布局改多趟重心 + 交叉数择优
+- **OCR v3**：混淆修复增加标识符保护（不再把 `Win10` 改成 `WinlO`）；新增跨页页眉页脚去除、
+  英文断字还原、断行合并的列表/标题保护；TSV 行聚类改间隙聚类（抗基线漂移）；投票改模糊匹配
+- 新增 **39 项** v3 回归测试（图谱/OCR 22 + 画像/智能体 17）→ **222 项全绿**
+  （Core 28 + Persistence 8 + Desktop 47 + API 53 + Eval 2 + MobileCore 84），已纳入 `verify_all.ps1`
+
+### 2.2.0 · 验收修复（2026-09-25）
+- **P0 修复**：补完 `Api → Api.Core` 重构（引用链 + slnx 登记 + 隐式 using + Android 引用指向 Api.Core）→ 全量编译 0 错误
+- **P1 修复 · 畸形输入不再 500**：`InvalidModelStateResponseFactory` 统一 400 + 9 个 `[FromBody]` 接口补判空
+  （修复前 4 个接口含登录接口收到畸形 JSON 直接 `NullReferenceException`）
+- **P1 修复 · 运行时状态可持久化**：接入 `AddAstralPathPersistence`；
+  新增 `RuntimeSnapshot`（学生/作答/掌握度/计划/consent/知识库/画像/智能体轮次 JSON 快照，
+  原子写 + 防抖 + 周期兜底 + 优雅关闭 Flush + 版本与图包校验，**测试宿主自动关闭**）
+- **P1 修复 · 降级可见性**：启动显式 WARN；`/health/ready` 报告持久化模式与快照状态
+- 新增 13 项回归测试 → **235 项全绿**；详见 `docs/验收报告-全面功能与稳定性-2026-09-25.md` 第十节
+
 ### 2.2.0（2026-09-25）
 - **知识图谱 + OCR 工具链**：`tools/` 8 个脚本（4,291 行），OCR → 章节 → 构图 → 思维导图全链路
 - **13 本教材全量验证**：6,720 页 / 4,015,232 字符 / 2,519 节点 / 2,662 边，**13/13 全部 ready**
@@ -237,43 +287,6 @@ dotnet publish src/AstralPath.Monolith -c Release -r win-x64 --self-contained -o
 - **Avalonia 原生 UI**（12 axaml + VM）
 - **无微服务单体版**：index.html + Setup-2.0.0.exe
 - 121 项测试全绿
-
-### 2.2.0 · 算法 v3（2026-09-25）
-- **知识图谱 v3**：TextRank 稀疏化（O(V²)→O(V+E)，词表上限）；修复「所有术语挂同一章」的锚定 bug；
-  依赖句式正则一次编译；PMI → 平滑 + 归一化 NPMI；子词去重；DAG 收尾；布局改多趟重心 + 交叉数择优
-- **OCR v3**：混淆修复增加标识符保护（不再把 `Win10` 改成 `WinlO`）；新增跨页页眉页脚去除、
-  英文断字还原、断行合并的列表/标题保护；TSV 行聚类改间隙聚类（抗基线漂移）；投票改模糊匹配
-- 新增 **39 项** v3 回归测试（图谱/OCR 22 + 画像/智能体 17）→ **222 项全绿**
-  （Core 28 + Persistence 8 + Desktop 47 + API 53 + Eval 2 + MobileCore 84），已纳入 `verify_all.ps1`
-
-### 2.2.0 · 验收修复（2026-09-25）
-- **P0 修复**：补完 `Api → Api.Core` 重构（引用链 + slnx 登记 + 隐式 using + Android 引用指向 Api.Core）→ 全量编译 0 错误
-- **P1 修复 · 畸形输入不再 500**：`InvalidModelStateResponseFactory` 统一 400 + 9 个 `[FromBody]` 接口补判空
-  （修复前 4 个接口含登录接口收到畸形 JSON 直接 `NullReferenceException`）
-- **P1 修复 · 运行时状态可持久化**：接入 `AddAstralPathPersistence`；
-  新增 `RuntimeSnapshot`（学生/作答/掌握度/计划/consent/知识库/画像/智能体轮次 JSON 快照，
-  原子写 + 防抖 + 周期兜底 + 优雅关闭 Flush + 版本与图包校验，**测试宿主自动关闭**）
-- **P1 修复 · 降级可见性**：启动显式 WARN；`/health/ready` 报告持久化模式与快照状态
-- 新增 13 项回归测试 → **235 项全绿**；详见 `docs/验收报告-全面功能与稳定性-2026-09-25.md` 第十节
-
-### 2.2.0 · P2/P3 修复（2026-09-25）
-- **P2-1 鉴权与越权**：新增访问控制中间件（Bearer 解析 + 学生维路由归属校验 403 + consent 主体以令牌为准，
-  杜绝「替他人授权」）；`Security:RequireAuth` 可开启强制登录
-- **P2-2 Swagger**：去掉 `[FromForm] IFormFile` 触发的问题，`swagger.json` 500 → **200**
-- **P2-3 错误形状统一**：415/405/404 框架级错误改写为统一 `{data,error,traceId}`
-- **P2-4 前端负例对齐 v3**：「好的，帮我生成计划」不再被吞成兜底话术；纯客套仍正确兜底（三端同步）
-- **P2-5 opt-out 生效**：关闭后今日改按章节顺序、隐藏推断风格轴（原只翻转布尔值）
-- **P2-6 上传白名单**：扩展名 + 魔数 + 可读率三级校验（原 `.exe` 也收且解析报 ready）
-- **P2-7 上传目录**：移出 `bin/` 到 `%LOCALAPPDATA%\AstralPath\uploads`，旧内容自动迁移
-- **P2-8 CORS**：`AllowAnyOrigin` → 回环任意端口 + 安卓壳白名单
-- **P3**：练习选项可键盘操作（radio 语义）/ 销账检查改内联反馈 / `save()` 失败顶栏提示 /
-  入参长度上限 / 不存在学生 404 / 注册冲突 409 / 镜像 tag 参数化 / 内联 favicon / 首访示例数据引导
-- 详见 `docs/验收报告-全面功能与稳定性-2026-09-25.md` 第十一节
-- **画像 v3**：波动率按正确率归一（超额波动，不再误判 acc≈0.5 的学生）、新增 ECE 校准曲线、
-  兴趣时间衰减、真 k-匿名（逐个标签判样本量）、修复伪 Laplace（噪声不再由 value 驱动）
-- **智能体 v3**：启用三个从未使用的常量（TauExec/TauClarify/MaxClarify）、多锚点饱和累加 + 覆盖率、
-  修复"好的"二字吞掉整句请求、槽位填充可收敛、支持话题切换与省略指代
-- 详见 `docs/算法v3-图谱与OCR优化说明.md`、`docs/算法v3-画像与智能体优化说明.md`
 
 ### 1.4.x–1.5.0
 - 智能体接真学情；启动预热；上传 2GB/分片；WebView 同构壳；badge 全绿；商店签名
