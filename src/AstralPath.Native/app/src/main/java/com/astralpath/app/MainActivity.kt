@@ -17,7 +17,6 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.webkit.WebViewAssetLoader
-import java.io.BufferedReader
 
 /**
  * 与 Windows（WebView2）/ Web 完全同构：
@@ -185,21 +184,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // 同一份前端：与 Web/Desktop 的 wwwroot/index.html 相同
-        val htmlRaw = assets.open("www/index.html").bufferedReader().use(BufferedReader::readText)
-        // 手机优先走离线核心；若连上电脑 API 则由前端自动切回
-        val html = injectOffline(htmlRaw)
-        web.loadDataWithBaseURL(
-            "https://appassets.androidplatform.net/assets/www/",
-            html, "text/html", "utf-8", null
-        )
-    }
-
-    private fun injectOffline(raw: String): String {
-        if (raw.contains("__ASTRALPATH_OFFLINE__=true")) return raw
-        val flag = "<script>window.__ASTRALPATH_OFFLINE__=true;window.__ASTRALPATH_FORCE_ONLINE__=false;</script>"
-        val i = raw.indexOf("<script>", ignoreCase = true)
-        return if (i >= 0) raw.substring(0, i) + flag + raw.substring(i) else flag + raw
+        // 同一份前端：与 Web/Desktop 的 index.html 逐字节一致（sync-monolith-html.ps1 md5 门禁）。
+        // P2 审计 M6：壳不再注入任何脚本改写前端语义（原 injectOffline 注入的
+        // __ASTRALPATH_OFFLINE__ 旗标当前页面早已不读取）——壳只做纯加载器。
+        web.loadUrl("https://appassets.androidplatform.net/assets/www/index.html")
     }
 
     override fun onPause() {

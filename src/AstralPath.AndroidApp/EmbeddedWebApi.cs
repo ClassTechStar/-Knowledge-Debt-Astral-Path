@@ -1,14 +1,13 @@
 using System.Globalization;
 using Android.Content;
 using Android.Content.Res;
-using AstralPath.Api;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
 
 namespace AstralPath.AndroidApp;
 
 /// <summary>
-/// 内嵌的 AstralPath.Api 宿主（方案 §13 / §14）。
+/// Android 壳的资源准备层（P2 审计 M6 瘦身：宿主生命周期已下沉到
+/// <see cref="AstralPath.Api.LocalApiHost"/>，本类只负责 Android 平台侧职责——
+/// 把 APK 资产解包到应用私有目录并设定 Core 的 CWD 探测根）。
 ///
 /// 与桌面壳的关系：Windows 版是「起一个 API 子进程 + WebView2 指向它」，
 /// Android 版做不到有独立可执行文件可起，因此改为「把同一份 API 跑在本进程内」，
@@ -23,8 +22,8 @@ namespace AstralPath.AndroidApp;
 ///   {FilesDir}/tools/ocr_pipeline.py        → OCR 脚本（仅在装有 Python 的宿主上有意义）
 /// </code>
 /// 之所以解包到文件系统而不是直接从 APK 资产读：ASP.NET 的静态文件与图包加载都基于
-/// <see cref="IFileProvider"/> / 文件路径，用 <c>PhysicalFileProvider</c> 指向真实目录
-/// 比自建 AssetFileProvider 更少代码、也更贴近 Web 端行为。
+/// 文件路径，用 <c>PhysicalFileProvider</c> 指向真实目录比自建 AssetFileProvider
+/// 更少代码、也更贴近 Web 端行为。
 /// </summary>
 public static class EmbeddedWebApi
 {
@@ -33,14 +32,13 @@ public static class EmbeddedWebApi
 
     private const string MarkerFile = ".astral-assets.version";
 
-    private static WebApplication? _app;
-    private static readonly object Gate = new();
+    /// <summary>已启动的 API 根地址（形如 <c>http://127.0.0.1:5190</c>）。委托给 LocalApiHost。</summary>
+    public static string BaseUrl => AstralPath.Api.LocalApiHost.BaseUrl;
 
-    /// <summary>已启动的 API 根地址（形如 <c>http://127.0.0.1:5190</c>）。</summary>
-    public static string BaseUrl { get; private set; } = string.Empty;
+    private static string? _shellError;
 
-    /// <summary>启动失败原因；null 表示启动成功。</summary>
-    public static string? Error { get; private set; }
+    /// <summary>启动失败原因；null 表示启动成功。壳层资源错误优先于宿主错误。</summary>
+    public static string? Error => _shellError ?? AstralPath.Api.LocalApiHost.Error;
 
     /// <summary>本次运行是否为首次解包（用于在状态栏展示「正在准备资源」）。</summary>
     public static bool ExtractedOnThisRun { get; private set; }
@@ -80,105 +78,37 @@ public static class EmbeddedWebApi
         Directory.SetCurrentDirectory(filesDir);
     }
 
-    /// <summary>启动内嵌 API（幂等；重复调用直接返回已启动的地址）。</summary>
+    /// <summary>启动内嵌 API（幂等）。webRoot/图包目录由解包布局决定，委托 LocalApiHost。</summary>
     public static string Start()
     {
-        lock (Gate)
+        _shellError = null;
+        var webRoot = FirstExistingDirectory(
+            Path.Combine(Directory.GetCurrentDirectory(), "webroot"),
+            Path.Combine(AppContext.BaseDirectory, "webroot"));
+        var graphPack = FirstExistingDirectory(
+            Path.Combine(Directory.GetCurrentDirectory(), "graph-packs", "accounting-v1"),
+            Path.Combine(AppContext.BaseDirectory, "graph-packs", "accounting-v1"));
+
+        if (webRoot is null)
         {
-            if (_app is not null && !string.IsNullOrEmpty(BaseUrl)) return BaseUrl;
-
-            var webRoot = FirstExistingDirectory(
-                Path.Combine(Directory.GetCurrentDirectory(), "webroot"),
-                Path.Combine(AppContext.BaseDirectory, "webroot"));
-            var graphPack = FirstExistingDirectory(
-                Path.Combine(Directory.GetCurrentDirectory(), "graph-packs", "accounting-v1"),
-                Path.Combine(AppContext.BaseDirectory, "graph-packs", "accounting-v1"));
-
-            if (webRoot is null)
-            {
-                Error = "资源解包失败：找不到 webroot（应用界面文件缺失，请重新安装）。";
-                return string.Empty;
-            }
-
-            if (graphPack is not null)
-                Environment.SetEnvironmentVariable("ASTRALPATH_GRAPH_PACK", graphPack);
-
-            var port = FreeLoopbackPort();
-            // 仅绑定 127.0.0.1 的内嵌壳：页面与 API 同机同进程链路，无网络暴露面，
-            // 显式关闭鉴权（生产 CLI/容器宿主保持 appsettings 的默认开启）。
-            var urls = new[] { "--urls", $"http://127.0.0.1:{port}", "Security:RequireAuth=false" };
-
-            try
-            {
-                _app = ApiBootstrapper.Build(
-                    args: urls,
-                    contentRoot: Directory.GetCurrentDirectory(),
-                    webRoot: webRoot);
-
-                // 前台同步启动：Kestrel 绑定回环是亚秒级操作，阻塞可换来更简单的错误处理
-                _app.StartAsync().GetAwaiter().GetResult();
-            }
-            catch (Exception ex)
-            {
-                Error = $"本地服务启动失败：{ex.Message}";
-                return string.Empty;
-            }
-
-            BaseUrl = $"http://127.0.0.1:{port}";
-            Error = null;
-            return BaseUrl;
+            _shellError = "资源解包失败：找不到 webroot（应用界面文件缺失，请重新安装）。";
+            return string.Empty;
         }
+
+        return AstralPath.Api.LocalApiHost.Start(
+            contentRoot: Directory.GetCurrentDirectory(),
+            webRoot: webRoot,
+            graphPackDir: graphPack);
     }
 
     /// <summary>等待 /health/ready 就绪（图包加载与首次编译需要一点时间）。</summary>
-    public static async Task<bool> WaitReadyAsync(TimeSpan timeout)
-    {
-        if (string.IsNullOrEmpty(BaseUrl)) return false;
-
-        using var http = new System.Net.Http.HttpClient
-        {
-            Timeout = TimeSpan.FromSeconds(3),
-            BaseAddress = new Uri(BaseUrl)
-        };
-
-        var deadline = DateTime.UtcNow + timeout;
-        while (DateTime.UtcNow < deadline)
-        {
-            try
-            {
-                var resp = await http.GetAsync("/health/ready");
-                if (resp.IsSuccessStatusCode) return true;
-            }
-            catch
-            {
-                // 服务可能还在绑定，继续等
-            }
-            await Task.Delay(300);
-        }
-        return false;
-    }
+    public static Task<bool> WaitReadyAsync(TimeSpan timeout)
+        => AstralPath.Api.LocalApiHost.WaitReadyAsync(timeout);
 
     /// <summary>释放内嵌宿主。</summary>
-    public static void Stop()
-    {
-        lock (Gate)
-        {
-            if (_app is null) return;
-            try
-            {
-                var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-                _app.StopAsync(cts.Token).GetAwaiter().GetResult();
-                _app.DisposeAsync().AsTask().GetAwaiter().GetResult();
-            }
-            catch
-            {
-                // 进程即将退出时失败也无所谓
-            }
-            _app = null;
-        }
-    }
+    public static void Stop() => AstralPath.Api.LocalApiHost.Stop();
 
-    // ── 内部工具 ───────────────────────────────────────────────
+    // ── Android 平台工具 ───────────────────────────────────────
 
     private static void ExtractAssetTree(AssetManager assets, string targetDir, string prefix)
     {
@@ -240,14 +170,4 @@ public static class EmbeddedWebApi
 
     private static string? FirstExistingDirectory(params string[] candidates)
         => candidates.FirstOrDefault(Directory.Exists);
-
-    private static int FreeLoopbackPort()
-    {
-        using var listener = new System.Net.Sockets.TcpListener(
-            System.Net.IPAddress.Loopback, 0);
-        listener.Start();
-        var port = ((System.Net.IPEndPoint)listener.LocalEndpoint).Port;
-        listener.Stop();
-        return port;
-    }
 }
