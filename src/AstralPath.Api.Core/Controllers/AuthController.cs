@@ -4,7 +4,7 @@ using AstralPath.Infrastructure;
 
 namespace AstralPath.Api.Controllers;
 
-public sealed record RegisterRequest(string Email, string Password, string? DisplayName = null, string? DemoStudentId = null);
+public sealed record RegisterRequest(string Email, string Password, string? DisplayName = null, string? DemoStudentId = null, string? Role = null);
 public sealed record LoginRequest(string Email, string? Password = null, string? DeviceName = null);
 public sealed record ProfileUpdateRequest(string? DisplayName = null, string? DemoStudentId = null);
 public sealed record PasswordChangeRequest(string OldPassword, string NewPassword);
@@ -41,7 +41,7 @@ public sealed class AuthController : ControllerBase
             if (request.DemoStudentId is not (null or "demo-student-a" or "demo-student-b"))
                 return HttpResults.Fail(400, ErrorCodes.ValidationError, "demoStudentId 仅支持 demo-student-a/b");
 
-            var user = _auth.Register(request.Email, request.Password, request.DisplayName, request.DemoStudentId);
+            var user = _auth.Register(request.Email, request.Password, request.DisplayName, request.DemoStudentId, request.Role ?? "student");
             _store.EnsureStudent(user.DemoStudentId);
             var session = _auth.Login(user.Email, request.Password, "web");
             return Results.Json(new

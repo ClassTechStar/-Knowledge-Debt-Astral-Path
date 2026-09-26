@@ -18,6 +18,7 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.20" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\AstralPath.Infrastructure\AstralPath.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\AstralPath.Mobile\AstralPath.Mobile.csproj" />
     <ProjectReference Include="..\..\src\AstralPath.Shared\AstralPath.Shared.csproj" />
   </ItemGroup>

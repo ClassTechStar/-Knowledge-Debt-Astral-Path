@@ -9,30 +9,37 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='8'%20fill='%23e8eaec'/%3E%3Ctext%20x='16'%20y='23'%20font-size='19'%20text-anchor='middle'%20fill='%23303236'%20font-family='sans-serif'%3E%E5%80%BA%3C/text%3E%3C/svg%3E" />
 <style>
 :root{
-  --canvas:#f3f4f5;--surface:#fbfbfc;--soft:#e8eaec;--strong:#858a90;
-  --ink:#303236;--muted:#70757a;--rule:#c7cacf;--field:#eff0f2;
+  /* P3 视觉对齐 GalReview：色板同源沿用；对比度修正 --muted 4.22→5.19:1、--strong 3.16→4.54:1（WCAG AA） */
+  --canvas:#f3f4f5;--surface:#fbfbfc;--soft:#e8eaec;--strong:#6b7075;
+  --ink:#303236;--muted:#62676c;--rule:#c7cacf;--field:#eff0f2;
   --danger:#b64a58;--primary:#0D72D9;--ok:#55a77b;--ok-bg:#dcf4e7;--ok-ink:#1e5d43;
   --warn:#b8860b;--warn-bg:#fff4d6;
-  --r-c:12px;--r-g:16px;
+  /* GalReview 半径阶梯：控件 18 / 卡组 28 / 外壳 36 */
+  --r-c:18px;--r-g:28px;--r-shell:36px;
+  /* GalReview 统一缓动 */
+  --ease:cubic-bezier(.22,1,.36,1);
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--canvas);color:var(--ink);font:15px/1.55 -apple-system,"PingFang SC","Segoe UI","Microsoft YaHei",sans-serif}
-.wrap{max-width:1080px;margin:0 auto;padding:18px 16px 40px}
+:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.wrap{max-width:1280px;margin:0 auto;padding:18px 16px 40px}
 header.rail{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 0 16px}
-.mark{width:40px;height:30px;display:grid;place-items:center;border-radius:10px;background:var(--soft);color:var(--strong);font-weight:800}
+.mark{width:40px;height:30px;display:grid;place-items:center;border-radius:12px;background:var(--soft);color:var(--strong);font-weight:800}
 .brand strong{display:block;font-size:16px}
 .brand small{color:var(--muted);font-size:11px}
 nav.pills{display:flex;flex-wrap:wrap;gap:4px;margin-left:auto;padding:5px;border-radius:999px;background:var(--soft)}
-nav.pills button{padding:8px 12px;border:0;border-radius:999px;background:transparent;color:var(--muted);cursor:pointer;min-height:36px}
+nav.pills button{padding:8px 14px;border:0;border-radius:999px;background:transparent;color:var(--muted);cursor:pointer;min-height:44px}
 nav.pills button.on{background:var(--surface);color:var(--ink);font-weight:700}
 .avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--strong);color:#fff;font-weight:700}
 .page-h{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:22px}
-.page-h h1{margin:0;font-size:clamp(26px,4vw,40px);letter-spacing:-.03em}
+.page-h h1{margin:0;font-size:clamp(26px,4vw,40px);letter-spacing:-.045em}
 .page-h p{margin:8px 0 0;color:var(--muted);max-width:720px}
 .actions{display:flex;flex-wrap:wrap;gap:8px}
-.btn{min-height:40px;padding:8px 14px;border:1px solid var(--rule);border-radius:var(--r-c);background:var(--surface);color:var(--ink);cursor:pointer;font-size:14px}
+.btn{min-height:44px;padding:8px 16px;border:1px solid var(--rule);border-radius:var(--r-c);background:var(--surface);color:var(--ink);cursor:pointer;font-size:14px;transition:transform .16s var(--ease),box-shadow .16s var(--ease)}
+.btn:hover{box-shadow:0 4px 14px rgba(48,50,54,.10)}
+.btn:active{transform:translateY(1px) scale(.99)}
 .btn.primary{background:var(--primary);border-color:var(--primary);color:#fff}
-.btn.quiet{border:0;background:transparent;color:#7a838e;font-size:12px}
+.btn.quiet{border:0;background:transparent;color:var(--muted);font-size:12px}
 .btn.danger{border-color:var(--danger);color:var(--danger)}
 .panel{padding:20px;border:1px solid var(--rule);border-radius:var(--r-g);background:var(--surface);margin-bottom:14px}
 .panel h2{margin:0 0 6px;font-size:20px}
@@ -40,7 +47,7 @@ nav.pills button.on{background:var(--surface);color:var(--ink);font-weight:700}
 .grid2{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(240px,.7fr);gap:14px;align-items:start}
 @media (max-width:800px){.grid2{grid-template-columns:1fr}}
 .field{display:grid;gap:6px;margin:8px 0;color:var(--muted);font-size:13px}
-.field input,.field select,.field textarea{min-height:42px;padding:8px 10px;border:1px solid var(--rule);border-radius:var(--r-c);background:var(--field);color:var(--ink);font-size:14px}
+.field input,.field select,.field textarea{min-height:44px;padding:8px 10px;border:1px solid var(--rule);border-radius:var(--r-c);background:var(--field);color:var(--ink);font-size:14px}
 .field textarea{min-height:100px;font-family:inherit;resize:vertical}
 .status{margin-top:12px;padding:12px 14px;border-left:3px solid var(--strong);background:var(--soft);color:var(--muted);line-height:1.5;word-break:break-word}
 .status.ok{border-left-color:var(--ok);color:#2f6b50}
@@ -51,6 +58,26 @@ nav.pills button.on{background:var(--surface);color:var(--ink);font-weight:700}
 .badge.warn{background:var(--warn-bg);color:#6a5010}
 .bar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden;margin:8px 0}
 .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--primary),#6aa8f0)}
+
+/* ── P3：页面切换方向动效（GalReview 路由过渡，prefers-reduced-motion 时关闭）── */
+@keyframes pageInL{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+@keyframes pageInR{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+main.anim-l{animation:pageInL .26s var(--ease) both}
+main.anim-r{animation:pageInR .26s var(--ease) both}
+@media (prefers-reduced-motion:reduce){main.anim-l,main.anim-r{animation:none}}
+
+/* ── P3：液态玻璃（可选增强，账户页开关；机制借鉴 liquid-glass-react：
+      backdrop blur + 饱和度提升 + 内侧高光描边；rgba 回退，无 color-mix 依赖）── */
+body.glass{
+  background:
+    radial-gradient(1100px 560px at 12% -6%, #dbe7f5 0%, rgba(219,231,245,0) 55%),
+    radial-gradient(900px 480px at 96% -2%, #e9e3f6 0%, rgba(233,227,246,0) 52%),
+    var(--canvas);
+}
+body.glass nav.pills{background:rgba(251,251,252,.66);backdrop-filter:blur(14px) saturate(1.5);-webkit-backdrop-filter:blur(14px) saturate(1.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.7),0 8px 28px rgba(48,50,54,.12)}
+body.glass nav.pills button.on{background:rgba(255,255,255,.92)}
+body.glass .panel{background:rgba(251,251,252,.74);backdrop-filter:blur(16px) saturate(1.4);-webkit-backdrop-filter:blur(16px) saturate(1.4);border-color:rgba(255,255,255,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.65),0 10px 34px rgba(48,50,54,.10)}
+body.glass .card{background:rgba(251,251,252,.8);border-color:rgba(255,255,255,.55)}
 .card{border:1px solid var(--rule);border-radius:var(--r-g);background:var(--surface);padding:14px 16px;margin:10px 0}
 .card.active{border-color:var(--primary);box-shadow:0 0 0 2px rgba(13,114,217,.15)}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -82,6 +109,10 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
 .progress{height:4px;background:var(--soft);border-radius:99px;overflow:hidden;margin-top:8px}
 .progress>i{display:block;height:100%;width:0;background:var(--primary);transition:width .2s}
 </style>
+<!-- ★ 统一 WASM OCR 引擎：宿主桥（WebView2→python+tesseract）不可用时自动启用（浏览器/安卓）。
+     依赖同目录 ocr-engine\ 资源；文件不存在（如 Windows 壳 file:// 加载）时仅 404，不影响主流程。 -->
+<script src="ocr-engine/ocr-wasm.js" defer></script>
+<script src="ocr-engine/pdf.min.js" defer></script>
 </head>
 <body>
 <p data-aigc-mark="1" style="margin:0 0 8px;font-size:10px;line-height:1.3;color:#6b6560;font-weight:400;">AI生成</p>
@@ -280,6 +311,11 @@ pre.code{background:#0f1524;color:#d7e2ff;padding:12px;border-radius:10px;overfl
     <h2>数据</h2>
     <div class="row"><button class="btn" id="btnExport">导出数据</button><button class="btn danger" id="btnWipe">重置</button></div>
   </div>
+  <div class="panel">
+    <h2>外观</h2>
+    <div class="row"><button class="btn" id="btnGlass">液态玻璃：关</button></div>
+    <p class="hint">可选增强：毛玻璃质感（背景模糊 + 饱和度提升 + 高光描边，机制借鉴 liquid-glass-react）。默认关闭；低性能设备建议保持关闭。</p>
+  </div>
 </main>
 </div>
 <script>
@@ -354,12 +390,53 @@ async function inflatePdfStreams(bytes,raw){
 function sanitizeText(t){
   return String(t||"").replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g," ");
 }
+/* Android/offline: pdf.js text-layer extraction (bundled with ocr-engine) */
+async function pdfJsTextLayer(file){
+  if(!window.pdfjsLib)return null;
+  const t0=Date.now();
+  try{
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc=new URL("ocr-engine/pdf.worker.min.js",document.baseURI).href;
+    const buf=new Uint8Array(await file.arrayBuffer());
+    const pdf=await window.pdfjsLib.getDocument({data:buf,isEvalSupported:false,cMapUrl:new URL("ocr-engine/cmaps/",document.baseURI).href,cMapPacked:true}).promise;
+    const out=[];
+    for(let p=1;p<=pdf.numPages;p++){
+      if(Date.now()-t0>90000)break;
+      const page=await pdf.getPage(p);
+      const tc=await page.getTextContent();
+      let s="",lastY=null;
+      for(let i=0;i<tc.items.length;i++){
+        const it=tc.items[i];
+        if(!it||typeof it.str!=="string"||!it.str)continue;
+        const y=it.transform?it.transform[5]:null;
+        if(lastY!==null&&y!==null&&Math.abs(y-lastY)>2)s+="\n";
+        s+=it.str;lastY=y;
+      }
+      out.push("[page "+p+"]\n"+s);
+      if(page.cleanup)try{page.cleanup();}catch(e){}
+    }
+    const total=pdf.numPages;
+    try{pdf.destroy();}catch(e){}
+    return {text:out.join("\n"),pages:total,used:out.length};
+  }catch(e){return {text:"",error:String((e&&e.message)||e)};}
+}
 async function readFileAsText(file){
   const name=file.name||"untitled";
   const buf=await file.arrayBuffer();
   const u8=new Uint8Array(buf);
   const isPdf=/\.pdf$/i.test(name)||(u8[0]===0x25&&u8[1]===0x50&&u8[2]===0x44&&u8[3]===0x46);
   if(isPdf){
+    // (1) pdf.js text layer: reliable path for Android/offline (pdf.js ships with ocr-engine)
+    const pj=await pdfJsTextLayer(file);
+    if(pj&&pj.text){
+      const t=sanitizeText(pj.text).trim();
+      const rb=countReadable(t),rt=textGoodRatio(t);
+      const g=garbledPages(t);
+      const gp=(g.hasPageMarks&&!g.dense)?g.flaggedPages.map(function(x){return x.page;}):[];
+      if(rb<40)return {text:t,ok:false,needOcr:true,chars:rb,ratio:rt,pages:[],garbled:g,reason:"PDF 文本层不足（pdf.js 可读 "+rb+" 字）"};
+      if(g.dense)return {text:t,ok:false,needOcr:true,chars:rb,ratio:rt,pages:[],garbled:g,reason:"PDF 文本层整体疑似乱码（可疑页 "+g.flaggedPages.length+"/"+g.pageCount+"）"};
+      if(g.flaggedPages.length)return {text:t,ok:false,needOcr:true,chars:rb,ratio:rt,pages:gp,garbled:g,reason:"PDF 文本层存在字体乱码（页级命中 "+g.flaggedPages.length+" 页：第 "+gp.slice(0,12).join("、")+" 页）"};
+      return {text:t,ok:true,chars:rb,ratio:rt,engine:"pdfjs"};
+    }
     let text="";
     try{
       const raw=latin1(u8);
@@ -371,8 +448,9 @@ async function readFileAsText(file){
     text=sanitizeText(text).trim();
     const readable=countReadable(text);
     const ratio=textGoodRatio(text);
-    if(readable<40)return {text:text,ok:false,reason:"PDF 文本层不足（扫描件或无 Unicode 映射的内嵌字体）",chars:readable,ratio:ratio,needOcr:true};
-    if(ratio<0.70)return {text:text,ok:false,reason:"PDF 文本层疑似乱码（可读率 "+Math.round(ratio*100)+"%，多为内嵌字体缺少 ToUnicode 映射）",chars:readable,ratio:ratio,needOcr:true};
+    const g=garbledPages(text);
+    if(readable<40)return {text:text,ok:false,reason:"PDF 文本层不足（扫描件或无 Unicode 映射的内嵌字体）",chars:readable,ratio:ratio,needOcr:true,pages:[],garbled:g};
+    if(g.dense||g.flaggedPages.length)return {text:text,ok:false,reason:"PDF 文本层存在字体乱码（行级命中 "+g.flagLines+" 行）",chars:readable,ratio:ratio,needOcr:true,pages:[],garbled:g};
     return {text:text,ok:true,chars:readable,ratio:ratio};
   }
   let text="";
@@ -391,7 +469,95 @@ function textGoodRatio(t){
   const good=(s.match(/[一-鿿A-Za-z0-9]/g)||[]).length;
   return good/s.length;
 }
-// ── 宿主 OCR 桥：Windows 单体壳（WebView2 postMessage）提供；浏览器/安卓壳无此能力时返回 null ──
+/* ── 行/页级乱码判定：与 Python tools/ocr_pipeline.py 的 GARBLE_* 常量/规则完全一致 ──
+   可疑字符 = 私有使用区（BMP/平面15/16）、U+FFFD、以及中文技术书里不可能出现的稀有文字
+   （印度系文字、泰/寮、藏、缅甸、格鲁吉亚、亚美尼亚、希伯来、阿拉伯、叙利亚、塔纳、埃塞俄比亚、
+   切罗基、高棉、蒙古）。正体 CJK、康熙部首(U+2E80–U+2FDF)、注音、假名、谚文、拉丁扩展、希腊、
+   西里尔、数学符号、emoji、全角标点一律视为正常字符，不参与计数。 */
+const GARBLE_RANGES=[[0x0530,0x058F],[0x0590,0x05FF],[0x0600,0x06FF],[0x0700,0x074F],[0x0750,0x077F],[0x0780,0x07BF],[0x0900,0x0DFF],[0x0E00,0x0E7F],[0x0E80,0x0EFF],[0x0F00,0x0FFF],[0x1000,0x109F],[0x10A0,0x10FF],[0x1200,0x137F],[0x13A0,0x13FF],[0x1780,0x17FF],[0x1800,0x18AF],[0xE000,0xF8FF],[0xF0000,0xFFFFD],[0x100000,0x10FFFD],[0xFFFD,0xFFFD]];
+const GARBLE_LINE_MIN_CHARS=3;
+const GARBLE_LINE_MIN_DENSITY=0.10;
+const GARBLE_PAGE_MIN_LINES=2;
+const GARBLE_PAGE_MIN_LINE_DENSITY=0.02;
+const GARBLE_PAGE_MIN_CHARS=6;
+const GARBLE_BOOK_DENSE_RATIO=0.30;
+const GARBLE_OCR_MAX_PAGES=12;
+
+/* ── OCR 按页回填 ─────────────────────────────────────────────────────────────
+   修复：OCR 结果此前被整段替换，未标记页的文本层正文随之丢失（15 万字教材被换成 4.5 千字）。
+   baseText：pdf.js 文本层原文（含 "[page N]" 页标记）；
+   ocrText ：OCR 引擎返回文本（含页标记时按页回填）；
+   pages   ：需要替换的 1 基页码数组（前端 garbledPages() 的页级命中）。
+   引擎未回传页标记（如 Windows 宿主桥返回整本合并文本）或页码为空时，保持整段替换。 */
+/* ── OCR 按页回填 ─────────────────────────────────────────────────────────────
+   修复：OCR 结果此前被整段替换，未标记页的文本层正文随之丢失（15 万字教材被换成 4.5 千字）。
+   baseText：pdf.js 文本层原文（含 "[page N]" 页标记）；
+   ocrText ：OCR 引擎返回文本（含页标记时按页回填）；
+   pages   ：需要替换的 1 基页码数组（前端 garbledPages() 的页级命中）。
+   未命中页按原文切片原样回写（字节级不变）；引擎未回传页标记（如 Windows 宿主桥返回整本
+   合并文本）或页码为空时，保持整段替换。 */
+function backfillOcrPages(baseText,ocrText,pages){
+  var want={},n=0,arr=pages||[];
+  for(var i=0;i<arr.length;i++){var p=parseInt(arr[i],10);if(p>=1&&!want[p]){want[p]=1;n++;}}
+  var base=splitPdfPages(baseText),ocr=splitPdfPages(ocrText);
+  if(!n||!base.hasPageMarks||!ocr.hasPageMarks){
+    return {text:String(ocrText||"").trim(),mode:"whole",replaced:0,requested:n};
+  }
+  var map={};
+  for(var k=0;k<ocr.pages.length;k++)map[ocr.pages[k].page]=ocr.pages[k].body;
+  var s=String(baseText),marks=[],re=/\[page (\d+)\]/g,m;
+  while((m=re.exec(s)))marks.push({page:parseInt(m[1],10),a:m.index+m[0].length});
+  var out=[],replaced=0;
+  for(var j=0;j<marks.length;j++){
+    var end=(j+1<marks.length)?marks[j+1].a-marks[j+1].page.toString().length-7:s.length;
+    var body=s.slice(marks[j].a,end).replace(/^\n/,"");
+    var ocrBody=map[marks[j].page];
+    if(want[marks[j].page]&&typeof ocrBody==="string"&&ocrBody.replace(/\s+/g,"")!==""){
+      body=String(ocrBody).replace(/^\n+/,"").replace(/\n*$/,"\n");replaced++;
+    }
+    out.push("[page "+marks[j].page+"]\n"+body);
+  }
+  return {text:out.join(""),mode:"page",replaced:replaced,requested:n};
+}
+function isGarbledChar(cp){for(var i=0;i<GARBLE_RANGES.length;i++){var r=GARBLE_RANGES[i];if(cp>=r[0]&&cp<=r[1])return true;}return false;}
+function splitPdfPages(text){
+  var s=String(text||""),marks=[],re=/\[page (\d+)\]/g,m;
+  while((m=re.exec(s)))marks.push({n:parseInt(m[1],10),i:m.index,a:m.index+m[0].length});
+  if(!marks.length)return {pages:[{page:1,body:s}],hasPageMarks:false};
+  var out=[];
+  for(var k=0;k<marks.length;k++){var b=(k+1<marks.length)?marks[k+1].i:s.length;out.push({page:marks[k].n,body:s.slice(marks[k].a,b)});}
+  return {pages:out,hasPageMarks:true};
+}
+function garbledPages(text){
+  var sp=splitPdfPages(text),flagged=[],flagLinesAll=0;
+  for(var i=0;i<sp.pages.length;i++){
+    var lines=String(sp.pages[i].body||"").split("\n");
+    var totalLines=0,flagLines=0,pageSusp=0,peak=0;
+    for(var li=0;li<lines.length;li++){
+      var s=lines[li].trim();
+      if(!s)continue;
+      totalLines++;
+      var signif=0,susp=0;
+      for(var ci=0;ci<s.length;){
+        var cp=s.codePointAt(ci);ci+=(cp>0xFFFF)?2:1;
+        if(/\s/.test(String.fromCodePoint(cp)))continue;
+        signif++;
+        if(isGarbledChar(cp))susp++;
+      }
+      if(!susp)continue;
+      pageSusp+=susp;
+      var d=signif?susp/signif:0;
+      if(susp>=GARBLE_LINE_MIN_CHARS&&d>=GARBLE_LINE_MIN_DENSITY){flagLines++;if(d>peak)peak=d;}
+    }
+    if(flagLines>=GARBLE_PAGE_MIN_LINES&&totalLines>0&&(flagLines/totalLines)>=GARBLE_PAGE_MIN_LINE_DENSITY&&pageSusp>=GARBLE_PAGE_MIN_CHARS){
+      flagged.push({page:sp.pages[i].page,flagLines:flagLines,totalLines:totalLines,suspChars:pageSusp,peakLineDensity:Math.round(peak*1000)/1000});
+    }
+    flagLinesAll+=flagLines;
+  }
+  var dense=(sp.hasPageMarks&&sp.pages.length>0&&(flagged.length/sp.pages.length)>=GARBLE_BOOK_DENSE_RATIO);
+  return {flaggedPages:flagged,flagLines:flagLinesAll,pageCount:sp.pages.length,hasPageMarks:sp.hasPageMarks,dense:dense};
+}
+// ── OCR 引擎阶梯 ①宿主桥：Windows 单体壳（WebView2 postMessage → python+tesseract+chi_sim）；浏览器/安卓返回 null 后由 parseFiles 走 ②WASM 引擎（window.__AP_WASM_OCR__，tesseract.js chi_sim+eng，参数与宿主桥一致）──
 const OCR_BRIDGE_TIMEOUT_MS=10*60*1000;
 function hostBridge(){return (window.chrome&&window.chrome.webview&&typeof window.chrome.webview.postMessage==="function")?window.chrome.webview:null;}
 const _ocrPending={};let _ocrSeq=0;
@@ -405,7 +571,7 @@ window.addEventListener("message",function(ev){
     else slot.reject(new Error(d.error||"宿主 OCR 未返回文本"));
   }
 });
-async function ocrViaHost(file,mode){
+async function ocrViaHost(file,mode,pages){
   const bridge=hostBridge();
   if(!bridge)return null;
   const id="ocr"+(++_ocrSeq)+"_"+Date.now();
@@ -416,7 +582,7 @@ async function ocrViaHost(file,mode){
   return new Promise(function(resolve,reject){
     const timer=setTimeout(function(){delete _ocrPending[id];reject(new Error("OCR 超时（10 分钟）；可改用 quick 模式或拆分文件"));},OCR_BRIDGE_TIMEOUT_MS);
     _ocrPending[id]={resolve:resolve,reject:reject,timer:timer};
-    try{bridge.postMessage({type:"astralpath.ocr",id:id,name:String(file.name||"material.pdf"),mode:mode||"standard",data:data});}
+    try{bridge.postMessage({type:"astralpath.ocr",id:id,name:String(file.name||"material.pdf"),mode:mode||"standard",pages:(pages&&pages.length)?pages.join(","):null,data:data});}
     catch(e){clearTimeout(timer);delete _ocrPending[id];reject(e);}
   });
 }
@@ -460,33 +626,51 @@ function extractChapters(text,maxCh){
   return chs;
 }
 function tokenize(text){return (String(text).match(/[一-鿿]{2,8}|[A-Za-z][A-Za-z0-9_\.]{1,20}/g)||[]).filter(function(t){return t.length>=2;});}
+/* ── textRank：稀疏邻接表 ──────────────────────────────────────────────────────
+   修复：原实现用稠密 n×n 矩阵（n=30433 时需 n²×8 B ≈ 7.41 GB）＋每行一个 Float64Array，
+   教材级文本在浏览器里必然 OOM / 永不完成。改为 Map 邻接表累积 → CSR（Int32 列 + Float64 权重），
+   内存 O(非零边)。迭代公式与原稠密实现等价：
+     rank[i]=(1-d)/n + d·Σ_j (w[j][i]/rowSum[j])·rank[j]                      */
 function textRank(tokens,window,iterations,damping){
   window=window||5;iterations=iterations||12;damping=damping||0.85;
   const vocab=[];const seen={};
   for(let i=0;i<tokens.length;i++){if(!seen[tokens[i]]){seen[tokens[i]]=1;vocab.push(tokens[i]);}}
   if(!vocab.length)return {};
-  const idx={};for(let i=0;i<vocab.length;i++)idx[vocab[i]]=i;
+  const idx=Object.create(null);for(let i=0;i<vocab.length;i++)idx[vocab[i]]=i;
   const n=vocab.length;
-  const w=[];for(let i=0;i<n;i++)w.push(new Float64Array(n));
+  const adj=new Array(n);for(let i=0;i<n;i++)adj[i]=null;   // 仅存非零边
+  const link=function(a,b,v){var m=adj[a];if(!m){m=new Map();adj[a]=m;}var o=m.get(b);m.set(b,o===undefined?v:o+v);};
   for(let i=0;i<tokens.length;i++){
     const a=idx[tokens[i]];
     for(let j=i+1;j<Math.min(tokens.length,i+window);j++){
-      const b=idx[tokens[j]];const v=1/(j-i);w[a][b]+=v;w[b][a]=w[a][b];
+      const b=idx[tokens[j]];const v=1/(j-i);link(a,b,v);link(b,a,v);
     }
   }
+  const rowPtr=new Int32Array(n+1);
+  let edges=0;for(let i=0;i<n;i++){const m=adj[i];if(m)edges+=m.size;}
+  const col=new Int32Array(edges),wt=new Float64Array(edges);
+  let k=0;
+  for(let i=0;i<n;i++){
+    rowPtr[i]=k;const m=adj[i];
+    if(m){m.forEach(function(v,b){col[k]=b;wt[k]=v;k++;});}
+    adj[i]=null;                                            // 逐行释放，压低峰值
+  }
+  rowPtr[n]=k;
   const rowSum=new Float64Array(n);
-  for(let i=0;i<n;i++){let s=0;for(let j=0;j<n;j++)s+=w[i][j];rowSum[i]=s;}
-  let rank=new Float64Array(n);for(let i=0;i<n;i++)rank[i]=1/n;
+  for(let i=0;i<n;i++){let s=0;for(let t=rowPtr[i];t<rowPtr[i+1];t++)s+=wt[t];rowSum[i]=s;}
+  const next=new Float64Array(n);let rank=new Float64Array(n);
+  for(let i=0;i<n;i++)rank[i]=1/n;
+  const base=(1-damping)/n;
   for(let it=0;it<iterations;it++){
-    const next=new Float64Array(n);
-    for(let i=0;i<n;i++){
-      let s=0;
-      for(let j=0;j<n;j++){if(w[j][i]<=0)continue;if(rowSum[j]>0)s+=(w[j][i]/rowSum[j])*rank[j];}
-      next[i]=(1-damping)/n+damping*s;
+    next.fill(0);
+    for(let j=0;j<n;j++){
+      const rs=rowSum[j];if(rs<=0)continue;
+      const push=damping*rank[j]/rs;
+      for(let t=rowPtr[j];t<rowPtr[j+1];t++)next[col[t]]+=wt[t]*push;
     }
-    rank=next;
+    for(let i=0;i<n;i++)rank[i]=next[i]+base;
   }
-  const out={};for(let i=0;i<n;i++)out[vocab[i]]=rank[i];return out;
+  const out={};for(let i=0;i<n;i++)out[vocab[i]]=rank[i];return {out:out,stats:{n:n,edges:edges}};
 }
 function pmi(co,a,b,total){if(co<=0||a<=0||b<=0||total<=0)return 0;return Math.max(0,Math.log2((co*total)/(a*b)));}
 function dependencyEdges(text,concepts){
@@ -520,7 +704,7 @@ function buildGraphFromText(text,chapters,opts){
   }
   for(let i=0;i<chapters.length-1;i++)edges.push({from:chapters[i].id,to:chapters[i+1].id,tg:false,w:.85,etype:"prerequisite"});
   const tokens=tokenize(text);
-  const ranks=textRank(tokens);
+  const ranks=textRank(tokens).out;
   const all=Object.keys(ranks).sort(function(a,b){return ranks[b]-ranks[a];});
   const top=[];
   for(let i=0;i<all.length&&top.length<maxConcepts;i++){
@@ -613,26 +797,47 @@ async function parseFiles(fileList,mode){
     try{
       let r=await readFileAsText(f);
       if(!r.ok&&r.needOcr){
-        // 文本层乱码/缺失：自动降级走宿主 OCR（PDF 渲染成图后 tesseract 识别），结果同样进入清洗与章节切分
+        // 文本层乱码/缺失：统一 OCR 引擎阶梯（接口约定：入参 File+mode，出参 {ok,text}，与宿主桥一致）
+        // ① 宿主桥：Windows 单体壳（WebView2 → python tools\ocr_pipeline.py + tesseract，乱码文本层整段替换）
+        // ② WASM 引擎：浏览器/安卓（tesseract.js LSTM，chi_sim+eng、OEM=1、PSM=3、采样策略与 python 管线对齐）
         setMatStatus("","「"+f.name+"」"+(r.reason||"文本层不可用")+"，自动转 OCR 识别（大文件可能需要几分钟）…");
-        let o=null,ocrErr=null;
-        try{o=await ocrViaHost(f,mode);}
+        let o=null,ocrErr=null,ocrEngine="";
+        try{o=await ocrViaHost(f,mode,r.pages);if(o)ocrEngine="宿主桥（python+tesseract"+(r.pages&&r.pages.length?"·定向 "+r.pages.length+" 页":"")+"）";}
         catch(e){ocrErr=(e&&e.message)||String(e);}
+        if(!o&&window.__AP_WASM_OCR__){
+          try{
+            window.__AP_WASM_OCR__.setProgress(function(m){setMatStatus("",m);});
+            const w=await window.__AP_WASM_OCR__.recognize(f,mode,r.pages);
+            if(w&&w.ok){o=w;ocrEngine="WASM 引擎（tesseract.js chi_sim+eng）";}
+            else if(w&&w.error){ocrErr=w.error;}
+          }catch(e){ocrErr=(e&&e.message)||String(e);}
+        }
         if(o&&o.ok){
-          const t=sanitizeText(String(o.text||"")).replace(/\r\n/g,"\n").trim();
-          const good=countReadable(t);
-          if(good>=40){r={text:t,ok:true,chars:good,ocr:true};}
+          const raw=sanitizeText(String(o.text||"")).replace(/\r\n/g,"\n").trim();
+          // 按页回填：只替换标记页，其余页保留 pdf.js 文本层原文（避免整段替换丢正文）
+          const base=r.text||"";
+          const bf=backfillOcrPages(base,raw,r.pages);
+          const t=bf.text;
+          const good=countReadable(t),tb=countReadable(base);
+          if(good>=40){
+            r={text:t,ok:true,chars:good,ocr:true,ocrEngine:ocrEngine,ocrPages:bf.replaced,ocrMode:bf.mode,textLayerChars:tb};
+            setMatStatus("ok","「"+f.name+"」OCR 完成："+good+" 字（文本层 "+tb+" 字，"
+              +(bf.mode==="page"?("按页回填 "+bf.replaced+"/"+bf.requested+" 页"):"整段替换（引擎未回传页标记）")+"）");
+          }
           else ocrErr="OCR 结果可读文本过少";
         }
         if(!r.ok){
-          const hint=(o===null&&!ocrErr)?"（当前环境无 OCR 引擎，请用「粘贴正文」兜底）":(ocrErr?"（OCR 兜底失败："+ocrErr+"）":"");
+          const hint=(ocrErr)?("（OCR 兜底失败："+ocrErr+"）")
+            :((!window.__AP_WASM_OCR__||!window.__AP_WASM_OCR__.available())
+              ?"（当前环境无 OCR 引擎：请用目录内「启动」脚本经本地服务打开网页，或用「粘贴正文」兜底）"
+              :"（当前环境无 OCR 引擎，请用「粘贴正文」兜底）");
           throw new Error((r.reason||"解析失败")+hint);
         }
       }else if(!r.ok){throw new Error(r.reason||"解析失败");}
       const text=r.text||"";
       if(countReadable(text)<20)throw new Error("可读文本过少");
       const book=makeBookFromFile(f.name,text,mode,"user");
-      if(r.ocr)book.ocr=true;
+      if(r.ocr){book.ocr=true;book.ocrPages=r.ocrPages||0;book.ocrMode=r.ocrMode||"whole";book.textLayerChars=r.textLayerChars||0;}
       results.push(book);
     }catch(e){errors.push({name:f.name,reason:e.message||String(e)});}
     $("parseProgBar").style.width=Math.round((i+1)/files.length*100)+"%";
@@ -751,6 +956,73 @@ function migrate(raw){
   Object.assign(d,raw);return d;
 }
 function load(){try{return migrate(JSON.parse(localStorage.getItem(LS)));}catch(e){return defaultState();}}
+// ── P1-M5：教材正文迁 IndexedDB，localStorage 只留轻状态 ─────────────────
+// 原实现把整包状态（含全书正文/章节全文）塞进单个 localStorage 键，配额一爆
+// 就静默截断正文（不可逆丢数据）。现在大文本放 IndexedDB（容量数百 MB 起）：
+// 内存中的 S 始终持有全文，落盘副本剥离大文本，加载时异步回填。不可用时整体降级。
+const IDB_OK=!!(window.indexedDB&&window.indexedDB.open);
+let _idbP=null;
+function idbDb(){
+  if(_idbP)return _idbP;
+  _idbP=new Promise(function(res){
+    try{
+      const rq=indexedDB.open(LS,1);
+      rq.onupgradeneeded=function(){if(!rq.result.objectStoreNames.contains("blob"))rq.result.createObjectStore("blob");};
+      rq.onsuccess=function(){res(rq.result);};
+      rq.onerror=function(){_idbP=null;res(null);};
+      rq.onblocked=function(){_idbP=null;res(null);};
+    }catch(e){_idbP=null;res(null);}
+  });
+  return _idbP;
+}
+function idbReq(mode,fn){
+  return idbDb().then(function(db){
+    if(!db)return null;
+    return new Promise(function(res){
+      try{
+        const rq=fn(db.transaction("blob",mode).objectStore("blob"));
+        rq.onsuccess=function(){res(rq.result);};
+        rq.onerror=function(){res(null);};
+      }catch(e){res(null);}
+    });
+  });
+}
+function idbGet(key){return idbReq("readonly",function(st){return st.get(key);});}
+function idbSet(key,val){return idbReq("readwrite",function(st){return st.put(val,key);});}
+function idbDelPrefix(prefix){
+  return idbReq("readonly",function(st){return st.getAllKeys();}).then(function(keys){
+    (keys||[]).forEach(function(k){
+      if(String(k).indexOf(prefix)===0)idbReq("readwrite",function(st){return st.delete(k);});
+    });
+  });
+}
+// 回填：__idb 标记的书/章节，从 IndexedDB 恢复正文（缺失时由页面自身回退到标题展示）
+function hydrateTexts(s){
+  if(!IDB_OK)return Promise.resolve();
+  return Promise.all((s.books||[]).filter(function(b){return b.__idb;}).map(function(b){
+    const jobs=[idbGet("text:"+b.id).then(function(t){if(typeof t==="string")b.sourceText=t;})];
+    (b.chapters||[]).forEach(function(c){
+      if(c.__idb)jobs.push(idbGet("body:"+b.id+":"+c.id).then(function(t){if(typeof t==="string")c.body=t;}));
+    });
+    return Promise.all(jobs);
+  }));
+}
+// 老版本数据升级：正文还内联在 localStorage 里的书，迁去 IndexedDB
+function upgradeLegacyTexts(s){
+  if(!IDB_OK)return false;
+  let need=false;
+  (s.books||[]).forEach(function(b){
+    if(b.__idb)return;
+    const big=(b.sourceText||"").length>2000
+      ||(b.chapters||[]).some(function(c){return (c.body||"").length>800;});
+    if(big){
+      b.__idb=true;b.__txtDirty=true;
+      (b.chapters||[]).forEach(function(c){if((c.body||"").length>800){c.__idb=true;c.__dirty=true;}});
+      need=true;
+    }
+  });
+  return need;
+}
 // P3-3：配额耗尽时 save() 会返回 false，但原先所有调用方都忽略返回值 →
 // 界面照常显示"已保存"，数据实际没落盘（静默丢失）。这里统一上报到顶栏状态位。
 function setStoreWarn(msg){
@@ -758,17 +1030,42 @@ function setStoreWarn(msg){
   if(msg){el.textContent="⚠ "+msg;el.style.color="var(--danger)";}
   else{el.textContent="单体 · 本机数据";el.style.color="";}
 }
+// ── P1-M4：债务扫描缓存 ─────────────────────────────────────────────
+// scanDebts 对每条边做 scoreOfMemo 递归 + downMass BFS（O(E·V)），却在 7 处被调用；
+// 大教材上图谱/知债/今日一次渲染要重复算几十遍。按修订号缓存：所有写路径都经过
+// save()，在唯一落盘口统一失效；切书/删除也走 save()，读路径零成本命中。
+let _debtRev=0,_debtCache={rev:-1,list:[]};
+function invalidateDebts(){_debtRev++;}
 function save(s){
-  try{localStorage.setItem(LS,JSON.stringify(s));setStoreWarn("");return true;}
-  catch(e){
-    try{
-      s.books.forEach(function(b){if(b.sourceText&&b.sourceText.length>2000)b.sourceText=b.sourceText.slice(0,2000);(b.chapters||[]).forEach(function(c){if(c.body&&c.body.length>800)c.body=c.body.slice(0,800);});});
-      localStorage.setItem(LS,JSON.stringify(s));setStoreWarn("本机存储将满，已自动精简教材正文后保存");return true;
-    }catch(e2){
-      setStoreWarn("本机存储已满，本次改动未保存。请到「账户」导出数据后重置");
-      return false;
+  invalidateDebts();
+  try{
+    if(IDB_OK){
+      (s.books||[]).forEach(function(b){
+        if(!b.__idb)return;
+        if(b.__txtDirty){idbSet("text:"+b.id,b.sourceText||"");b.__txtDirty=false;}
+        (b.chapters||[]).forEach(function(c){
+          if(c.__idb&&c.__dirty){idbSet("body:"+b.id+":"+c.id,c.body||"");c.__dirty=false;}
+        });
+      });
     }
+    localStorage.setItem(LS,JSON.stringify(liteCopy(s)));
+    setStoreWarn("");return true;
+  }catch(e){
+    // P1-M5：不再静默截断正文。正文已迁 IndexedDB 后仍爆配额，说明轻状态本身
+    // 过大——显式报警让用户导出/重置，而不是悄悄丢数据。
+    setStoreWarn("本机存储已满，本次改动未保存。请到「账户」导出数据后重置");
+    return false;
   }
+}
+// 落盘副本：__idb 标记的书/章节的大文本以 IndexedDB 为权威，localStorage 里置空
+function liteCopy(s){
+  if(!IDB_OK||!(s.books||[]).some(function(b){return b.__idb;}))return s;
+  const c=JSON.parse(JSON.stringify(s,function(k,v){return (k==="__txtDirty"||k==="__dirty")?undefined:v;}));
+  (c.books||[]).forEach(function(b){
+    if(b.__idb)b.sourceText="";
+    (b.chapters||[]).forEach(function(ch){if(ch.__idb)ch.body="";});
+  });
+  return c;
 }
 let S=load();
 function activeBook(){return S.books.find(function(b){return b.id===S.activeBookId;})||S.books[0]||sampleBook();}
@@ -800,21 +1097,37 @@ function scoreOfMemo(id,visiting){
   return v;
 }
 function scanDebts(){
-  return activeEdges().map(function(e){
+  if(_debtCache.rev===_debtRev)return _debtCache.list;
+  const list=activeEdges().map(function(e){
     const sf=scoreOf(e.from),st=scoreOf(e.to);
     const wrong=(S.logs||[]).filter(function(l){return l.kp===e.to&&!l.ok;}).length;
     const fr=wrong>0?wrong:0;
     const imp=impactV2(sf,st,e.w,e.tg,fr,downMass(e.to));
     return {from:e.from,to:e.to,fromName:title(e.from),toName:title(e.to),sf:sf,st:st,imp:imp,freq:fr,status:imp>=K.hit?"open":"cleared"};
   }).filter(function(d){return d.imp>0;}).sort(function(a,b){return b.imp-a.imp;});
+  _debtCache={rev:_debtRev,list:list};
+  return list;
 }
 function ingestBook(book){
   S.books=[book].concat(S.books.filter(function(b){return b.id!==book.id;}));
-  S.activeBookId=book.id;ensureMastery(book);save(S);
+  S.activeBookId=book.id;ensureMastery(book);
+  // P1-M5：解析出的真实教材正文/章节全文走 IndexedDB（标记 + 置脏，save 时写入）
+  if(IDB_OK){
+    book.__idb=true;book.__txtDirty=true;
+    (book.chapters||[]).forEach(function(c){c.__idb=true;c.__dirty=true;});
+  }
+  save(S);
 }
+const PAGE_ORDER=["home","materials","graph","debt","today","agent","profile","account"];
+let _lastPage=-1;
 function go(p){
-  document.querySelectorAll("main").forEach(m=>m.hidden=true);
-  const el=$("p-"+p);if(el)el.hidden=false;
+  // P3：按导航方向播放入场动画（GalReview 路由过渡）；prefers-reduced-motion 时 CSS 侧已关闭
+  const idx=PAGE_ORDER.indexOf(p);
+  const dir=(_lastPage>=0&&idx>=0&&idx!==_lastPage)?(idx>_lastPage?"anim-r":"anim-l"):null;
+  if(idx>=0)_lastPage=idx;
+  document.querySelectorAll("main").forEach(m=>{m.hidden=true;m.classList.remove("anim-l","anim-r");});
+  const el=$("p-"+p);
+  if(el){el.hidden=false;if(dir){void el.offsetWidth;el.classList.add(dir);}}
   document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.p===p));
   try{
     if(p==="home")renderHome();if(p==="materials")renderMats();if(p==="graph")renderGraph();
@@ -838,7 +1151,7 @@ function renderMats(){
   $("matList").innerHTML=list.length?list.map(m=>{
     const st=m.status==="ready"?"ready":m.status==="error"?"error":"partial";
     const cls=st==="error"?"err":""; // badge 全绿：ready / partial / parsing 均绿，仅 error 用红
-    return '<div class="card '+(m.id===S.activeBookId?"active":"")+'" data-book="'+esc(m.id)+'"><div class="row" style="justify-content:space-between"><strong>'+esc(m.name)+'</strong><span class="badge '+cls+'">'+st+'</span></div><div class="hint">'+(m.chars||0)+' 字 · '+(m.nodes||[]).length+' 节点 · '+(m.edges||[]).length+' 边 · '+(m.chapters||[]).length+' 章 · '+esc(m.parseMode||"-")+(m.ocr?' · OCR':'')+'</div><div class="row" style="margin-top:8px"><button class="btn" data-view="'+esc(m.id)+'">查看详情</button><button class="btn primary" data-use="'+esc(m.id)+'">用此书识网</button><button class="btn danger" data-del="'+esc(m.id)+'">删除</button></div></div>';
+    return '<div class="card '+(m.id===S.activeBookId?"active":"")+'" data-book="'+esc(m.id)+'"><div class="row" style="justify-content:space-between"><strong>'+esc(m.name)+'</strong><span class="badge '+cls+'">'+st+'</span></div><div class="hint">'+(m.chars||0)+' 字 · '+(m.nodes||[]).length+' 节点 · '+(m.edges||[]).length+' 边 · '+(m.chapters||[]).length+' 章 · '+esc(m.parseMode||"-")+(m.ocr?(' · OCR'+(m.ocrPages?('（回填 '+m.ocrPages+' 页）'):'')):'')+'</div><div class="row" style="margin-top:8px"><button class="btn" data-view="'+esc(m.id)+'">查看详情</button><button class="btn primary" data-use="'+esc(m.id)+'">用此书识网</button><button class="btn danger" data-del="'+esc(m.id)+'">删除</button></div></div>';
   }).join(""):'<div class="empty">暂无资料。点「导入示例资料」，或上传 PDF/TXT/MD（乱码/扫描版自动转 OCR）。</div>';
   $("matList").querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>showDetail(b.dataset.view));
   $("matList").querySelectorAll("[data-use]").forEach(b=>b.onclick=()=>{setActive(b.dataset.use);go("graph");});
@@ -894,7 +1207,7 @@ function renderGraph(){
     el.innerHTML="<span>"+esc(p.node.title)+"</span><small>"+(d?"impact="+d.imp.toFixed(3):"diff "+(p.node.diff||2))+"</small>";
     el.onclick=()=>{
       const body=(book.chapters||[]).find(c=>c.id===p.node.id);
-      const preList=prereqs(p.node.id).map(title).join("、");
+      const preList=prereqs(p.node.id).map(function(t){return esc(title(t));}).join("、");
       $("nodeInfo").innerHTML="<strong>"+esc(p.node.title)+"</strong><br/><span class=\"hint\">score="+scoreOf(p.node.id).toFixed(6)+" · 先修："+(preList||"无")+" · 下游 "+downMass(p.node.id)+" 个"+(body?"<br/>"+esc((body.body||"").slice(0,160)):"")+"</span>";
     };
     dag.appendChild(el);
@@ -907,7 +1220,7 @@ function renderGraph(){
   $("chTree").querySelectorAll("[data-ch]").forEach(el=>el.onclick=()=>{
     const ch=(book.chapters||[]).find(c=>c.id===el.dataset.ch);
     if(!ch){$("chBody").textContent="章节不存在";return;}
-    $("chBody").innerHTML="<strong>"+esc(ch.title)+"</strong><div style=\"margin-top:6px\">"+esc((ch.body||ch.title).slice(0,400))+"</div><div class=\"hint\" style=\"margin-top:8px\">先修："+prereqs(ch.id).map(title).join("、")+" · score="+scoreOf(ch.id).toFixed(4)+"</div>";
+    $("chBody").innerHTML="<strong>"+esc(ch.title)+"</strong><div style=\"margin-top:6px\">"+esc((ch.body||ch.title).slice(0,400))+"</div><div class=\"hint\" style=\"margin-top:8px\">先修："+prereqs(ch.id).map(function(t){return esc(title(t));}).join("、")+" · score="+scoreOf(ch.id).toFixed(4)+"</div>";
   });
 }
 function renderDebt(){
@@ -997,9 +1310,30 @@ function renderToday(){
   $("todayList").querySelectorAll("[data-start]").forEach(b=>b.onclick=()=>loadQuiz(b.dataset.start));
   if(!window._q)loadQuiz(null);else paintQuiz(window._q);
 }
+// ── 意图登记表（唯一事实源：tools/agent-intents.json）────────────────
+// 以下四个字面量必须与 JSON 逐字一致，由 scripts/verify_agent_intents.py 三方对拍：
+// JSON ↔ 本块 ↔ src/AstralPath.Core/Agent/AgentRouter.cs 的 DefaultAgentIntents.Table。
+// 保持严格 JSON 写法（双引号、无尾逗号），脚本可直接 json.loads。
 const CRISIS=["不想活","自杀","轻生","结束生命","自残","伤害自己","跳楼","上吊","suicide","kill myself","活不下去"];
 const BANNED=["身份证","银行卡密码","详细住址"];
 const NEGATIVE=["哈哈","呵呵","随便","没事了","thanks","thank you","ok","好的"];
+const INTENTS=[
+{"id":"debt.diagnose","anchors":["知识债","债边","诊断","红边","薄弱"]},
+{"id":"debt.explain","anchors":["解释","为什么","怎么来的","公式"]},
+{"id":"plan.create","anchors":["计划","14天","安排","复习计划"]},
+{"id":"plan.rebalance","anchors":["减负","重排","调整计划","太重"]},
+{"id":"today.tasks","anchors":["今日","今天做","今日任务"]},
+{"id":"practice.start","anchors":["练习","做题","小测","测验"]},
+{"id":"progress.check","anchors":["进度","销账","进展","streak"]},
+{"id":"graph.view","anchors":["图谱","识网","知识图谱","思维导图"]},
+{"id":"material.parse","anchors":["解析资料","上传","ocr","教材","藏书"]},
+{"id":"kb.search","anchors":["知识库","检索","查资料","文档"]},
+{"id":"profile.view","anchors":["画像","我的标签","学习画像"]},
+{"id":"profile.optout","anchors":["退出画像","关闭画像","opt-out"]},
+{"id":"whatif.simulate","anchors":["what-if","如果","模拟","假设"]},
+{"id":"sale.check","anchors":["销账检查","能否销账","销账条件"]},
+{"id":"meta.help","anchors":["帮助","怎么用","说明"]}
+];
 function normalize(s){
   return String(s||"").replace(/[！-～]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/　/g," ").replace(/\s+/g," ").toLowerCase().trim();
 }
@@ -1013,23 +1347,7 @@ function intentRoute(t){
                       .reduce((a,b)=>b.length>a.length?b:a,"");
   if(negHit&&norm.length>0&&negHit.length/norm.length>=0.6)
     return {id:"meta.help",score:0,decision:"fallback",trace:"R2.5:negative;ratio="+(negHit.length/norm.length).toFixed(2)};
-  const intents=[
-    ["debt.diagnose",["知识债","债边","诊断","红边","薄弱"]],
-    ["debt.explain",["解释","为什么","怎么来的","公式"]],
-    ["plan.create",["计划","14天","安排","复习计划"]],
-    ["plan.rebalance",["减负","重排","调整计划","太重"]],
-    ["today.tasks",["今日","今天做","今日任务"]],
-    ["practice.start",["练习","做题","小测","测验"]],
-    ["progress.check",["进度","销账","进展","streak"]],
-    ["graph.view",["图谱","识网","知识图谱","思维导图"]],
-    ["material.parse",["解析资料","上传","ocr","教材","藏书"]],
-    ["kb.search",["知识库","检索","查资料","文档"]],
-    ["profile.view",["画像","我的标签","学习画像"]],
-    ["profile.optout",["退出画像","关闭画像","opt-out"]],
-    ["whatif.simulate",["what-if","如果","模拟","假设"]],
-    ["sale.check",["销账检查","能否销账","销账条件"]],
-    ["meta.help",["帮助","怎么用","说明"]]
-  ];
+  const intents=INTENTS.map(function(i){return [i.id,i.anchors];});
   let best=null,bestScore=0,bestAnchor="";
   for(const pair of intents){
     const id=pair[0],anchors=pair[1];let hit=0,anc="";
@@ -1125,7 +1443,7 @@ $("agentIn").addEventListener("keydown",e=>{if(e.key==="Enter")send();});
 document.querySelectorAll("[data-q]").forEach(b=>b.onclick=()=>{chat("user",b.dataset.q);chat("bot",reply(b.dataset.q));});
 function renderProfile(){
   const nodes=activeNodes();
-  $("masteryList").innerHTML=nodes.length?nodes.map(n=>'<div class="card"><div class="row" style="justify-content:space-between"><strong>'+esc(n.title)+'</strong><b>'+scoreOf(n.id).toFixed(3)+'</b></div><div class="bar"><i style="width:'+(scoreOf(n.id)*100).toFixed(1)+'%"></i></div></div>').join(""):'<div class="empty">暂无知识点</div>';
+  $("masteryList").innerHTML=nodes.length?nodes.map(n=>{const sc=scoreOf(n.id);return '<div class="card"><div class="row" style="justify-content:space-between"><strong>'+esc(n.title)+'</strong><b>'+sc.toFixed(3)+'</b></div><div class="bar"><i style="width:'+(sc*100).toFixed(1)+'%"></i></div></div>';}).join(""):'<div class="empty">暂无知识点</div>';
   const logs=S.logs||[];
   const acc=logs.length?logs.filter(x=>x.ok).length/logs.length:0.5;
   const brier=logs.length?logs.reduce((a,b)=>a+Math.pow(b.conf/5-(b.ok?1:0),2),0)/logs.length:.25;
@@ -1141,7 +1459,11 @@ function renderAccount(){
   $("authLine").textContent=S.user?("已登录："+S.user):"未登录";
   $("consentLine").textContent=S.consent?"已同意教师可见":"未授权";
   $("userName").textContent=S.user?(S.user.split("@")[0]+"（有债）"):"王小明（有债）";
+  const g=$("btnGlass");if(g)g.textContent="液态玻璃："+(S.glass?"开":"关");
 }
+// P3：液态玻璃可选增强（账户页开关，状态随 S 持久化）
+function applyGlass(){document.body.classList.toggle("glass",!!S.glass);}
+$("btnGlass").onclick=()=>{S.glass=!S.glass;save(S);applyGlass();renderAccount();};
 $("fileInput").onchange=()=>{
   const fs=Array.from($("fileInput").files||[]);
   $("fileHint").textContent=fs.length?fs.map(f=>f.name+"（"+Math.max(1,Math.round(f.size/1024))+"KB）").join("、"):"尚未选择文件";
@@ -1233,9 +1555,13 @@ $("btnExport").onclick=()=>{
     setTimeout(()=>URL.revokeObjectURL(a.href),2000);
   }catch(e){alert("导出失败："+e.message);}
 };
-$("btnWipe").onclick=()=>{if(confirm("清空本机数据？")){S=defaultState();save(S);go("home");}};
-(function init(){
+$("btnWipe").onclick=()=>{if(confirm("清空本机数据？")){try{idbDelPrefix("text:");idbDelPrefix("body:");}catch(e){}S=defaultState();save(S);go("home");}};
+(async function init(){
   try{
+    // P1-M5：先从 IndexedDB 回填教材正文（毫秒级），再首次渲染；
+    // 老版本数据若正文还内联在 localStorage，这里一次性升级迁移。
+    if(IDB_OK){await hydrateTexts(S);if(upgradeLegacyTexts(S))save(S);}
+    applyGlass();
     ensureMastery(activeBook());go("home");whatif();ensureChat();
     // P3-9：首次访问（本机尚无任何数据）时明确说明「这是示例数据」并给出下一步，
     // 避免新用户一进来就看到「开放债边 30」而误以为系统在指控自己。

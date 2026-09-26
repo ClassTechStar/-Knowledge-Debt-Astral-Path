@@ -1,7 +1,12 @@
 package com.astralpath.app
 
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -9,6 +14,7 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.webkit.WebViewAssetLoader
 import java.io.BufferedReader
@@ -21,6 +27,55 @@ import java.io.BufferedReader
 class MainActivity : AppCompatActivity() {
     private lateinit var web: WebView
     private lateinit var assetLoader: WebViewAssetLoader
+
+    // ── 文件选择支持：<input type="file"> 依赖 WebChromeClient.onShowFileChooser ──
+    private var filePathCallback: ValueCallback<Array<Uri>>? = null
+    private val fileChooserLauncher =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            val cb = filePathCallback
+            filePathCallback = null
+            if (cb == null) return@registerForActivityResult
+            val uris = if (result.resultCode == Activity.RESULT_OK) parsePickerResult(result.data) else null
+            android.util.Log.i(
+                "AstralPathPicker",
+                "picker result: code=${result.resultCode} dataUri=${result.data?.data} " +
+                    "clip=${result.data?.clipData} extras=${result.data?.extras?.keySet()} uris=${uris?.contentToString()}"
+            )
+            // 验证返回的 content:// URI 在本进程是否真的可读（诊断 MIUI“安全访问”授权链路）
+            uris?.forEach { u ->
+                runCatching {
+                    val name = contentResolver.query(u, null, null, null, null)?.use { c ->
+                        if (c.moveToFirst()) c.getString(c.getColumnIndex(android.provider.OpenableColumns.DISPLAY_NAME)) else null
+                    }
+                    val readable = contentResolver.openInputStream(u)?.use { s -> s.read() >= 0 } == true
+                    android.util.Log.i("AstralPathPicker", "uri=$u name=$name readable=$readable")
+                }.onFailure { android.util.Log.w("AstralPathPicker", "uri=$u check failed: $it") }
+            }
+            cb.onReceiveValue(uris ?: arrayOf())
+        }
+
+    /**
+     * 解析文件选择器返回的 URI。
+     * AOSP DocumentsUI 把 URI 放在 intent.data / ClipData，FileChooserParams.parseResult 可直接解析；
+     * 但 MIUI/HyperOS 的“安全访问”选择链路（photopicker → fileexplorer）把 URI 放进
+     * Intent.EXTRA_STREAM（ArrayList 或单个 Uri）返回，parseResult 拿到 null，
+     * 于是在 WebView 的 input type=file 上永远收不到文件（change 事件不触发）。
+     */
+    private fun parsePickerResult(data: Intent?): Array<Uri>? {
+        if (data == null) return null
+        WebChromeClient.FileChooserParams.parseResult(Activity.RESULT_OK, data)?.let {
+            if (it.isNotEmpty()) return it
+        }
+        val out = ArrayList<Uri>()
+        when (val stream = data.extras?.get(Intent.EXTRA_STREAM)) {
+            is Uri -> out.add(stream)
+            is List<*> -> for (item in stream) when (item) {
+                is Uri -> out.add(item)
+                is String -> runCatching { Uri.parse(item) }.getOrNull()?.let { u -> out.add(u) }
+            }
+        }
+        return if (out.isNotEmpty()) out.toTypedArray() else null
+    }
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,7 +93,8 @@ class MainActivity : AppCompatActivity() {
             domStorageEnabled = true
             databaseEnabled = true
             allowFileAccess = true
-            allowContentAccess = false
+            // 文件选择器返回的是 content:// URI，必须允许 WebView 读取
+            allowContentAccess = true
             useWideViewPort = true
             loadWithOverviewMode = true
             setSupportZoom(false)
@@ -56,6 +112,57 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, message ?: "", Toast.LENGTH_SHORT).show()
                 result?.confirm()
                 return true
+            }
+
+            override fun onConsoleMessage(consoleMessage: android.webkit.ConsoleMessage?): Boolean {
+                android.util.Log.w(
+                    "AstralPathJS",
+                    "[${consoleMessage?.messageLevel()}] ${consoleMessage?.message()} @ ${consoleMessage?.sourceId()}:${consoleMessage?.lineNumber()}"
+                )
+                return true
+            }
+
+            /**
+             * 文件选择（藏书阁「上传并解析」）：
+             * 不实现此回调时 <input type="file"> 在 Android WebView 上点击完全无响应。
+             */
+            override fun onShowFileChooser(
+                webView: WebView?,
+                callback: ValueCallback<Array<Uri>>?,
+                params: FileChooserParams?
+            ): Boolean {
+                // 防重复回调：上一次未消费的回调先置空，避免 WebView 后续拒绝再次触发
+                filePathCallback?.onReceiveValue(null)
+                filePathCallback = callback ?: return false
+                val intent = Intent(Intent.ACTION_GET_CONTENT).apply {
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    type = "*/*"
+                    // 前端 accept=.pdf,.txt,.md…（扩展名形式），映射为 MIME 以便 DocumentsUI 过滤
+                    putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(
+                        "application/pdf", "text/plain", "text/markdown",
+                        "application/x-pdf", "text/x-markdown"
+                    ))
+                    if (params?.mode == FileChooserParams.MODE_OPEN_MULTIPLE) {
+                        putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                    }
+                }
+                return try {
+                    fileChooserLauncher.launch(intent)
+                    true
+                } catch (_: ActivityNotFoundException) {
+                    // 无系统文件选择器时回退为不过滤类型再试一次
+                    try {
+                        fileChooserLauncher.launch(Intent(Intent.ACTION_GET_CONTENT).apply {
+                            addCategory(Intent.CATEGORY_OPENABLE); type = "*/*"
+                            if (params?.mode == FileChooserParams.MODE_OPEN_MULTIPLE) putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                        })
+                        true
+                    } catch (_: Exception) {
+                        filePathCallback = null
+                        Toast.makeText(this@MainActivity, "系统未提供文件选择器", Toast.LENGTH_SHORT).show()
+                        false
+                    }
+                }
             }
         }
         web.webViewClient = object : WebViewClient() {
@@ -101,8 +208,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onResume() {
-        super.onResume()
         web.onResume()
+        super.onResume()
     }
 
     override fun onDestroy() {

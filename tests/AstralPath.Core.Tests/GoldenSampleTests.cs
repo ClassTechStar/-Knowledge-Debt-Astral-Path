@@ -12,17 +12,26 @@ public class GoldenSampleTests
     {
         get
         {
+            // 环境变量 → 常规候选 → 从测试输出目录逐级向上回溯（不硬编码机器特定路径）
+            var env = Environment.GetEnvironmentVariable("ASTRALPATH_GOLDEN_DIR");
+            if (!string.IsNullOrWhiteSpace(env) && Directory.Exists(env)) return env;
             var candidates = new[]
             {
                 Path.Combine(AppContext.BaseDirectory, "eval", "golden"),
                 Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "eval", "golden"),
-                Path.Combine(Directory.GetCurrentDirectory(), "eval", "golden"),
-                @"C:\Users\18948\XiaomiMiMoProjects\Knowledge Debt Astral Path\eval\golden"
+                Path.Combine(Directory.GetCurrentDirectory(), "eval", "golden")
             };
             foreach (var c in candidates)
             {
                 var full = Path.GetFullPath(c);
                 if (Directory.Exists(full)) return full;
+            }
+            var dir = AppContext.BaseDirectory;
+            for (var i = 0; i < 8 && !string.IsNullOrEmpty(dir); i++)
+            {
+                var full = Path.Combine(dir, "eval", "golden");
+                if (Directory.Exists(full)) return Path.GetFullPath(full);
+                dir = Path.GetDirectoryName(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
             }
             throw new DirectoryNotFoundException("eval/golden not found");
         }

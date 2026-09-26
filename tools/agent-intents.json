@@ -1,0 +1,23 @@
+{
+  "_comment": "受约束智能体意图登记表 · 唯一事实源（分工方案 §8.2/§44.2 指定 tools/ 下登记表为准；格式用 JSON 以便 verify 脚本零依赖解析）。三方对拍：本文件 ↔ deploy/monolith-web/index.html 的 INTENTS/CRISIS/BANNED/NEGATIVE 字面量 ↔ src/AstralPath.Core/Agent/AgentRouter.cs 的 DefaultAgentIntents.Table。改动任何一方必须同步另两方并跑 scripts/verify_agent_intents.py。",
+  "crisis": ["不想活", "自杀", "轻生", "结束生命", "自残", "伤害自己", "跳楼", "上吊", "suicide", "kill myself", "活不下去"],
+  "banned": ["身份证", "银行卡密码", "详细住址"],
+  "negative": ["哈哈", "呵呵", "随便", "没事了", "thanks", "thank you", "ok", "好的"],
+  "intents": [
+    { "id": "debt.diagnose",   "roles": ["student"], "anchors": ["知识债", "债边", "诊断", "红边", "薄弱"],          "requiredSlots": [], "description": "诊断知识债" },
+    { "id": "debt.explain",    "roles": ["student"], "anchors": ["解释", "为什么", "怎么来的", "公式"],              "requiredSlots": [], "description": "解释红边怎么来的" },
+    { "id": "plan.create",     "roles": ["student"], "anchors": ["计划", "14天", "安排", "复习计划"],                "requiredSlots": [], "description": "生成 14 天计划" },
+    { "id": "plan.rebalance",  "roles": ["student"], "anchors": ["减负", "重排", "调整计划", "太重"],                "requiredSlots": [], "description": "计划减负" },
+    { "id": "today.tasks",     "roles": ["student"], "anchors": ["今日", "今天做", "今日任务"],                      "requiredSlots": [], "description": "今日任务" },
+    { "id": "practice.start",  "roles": ["student"], "anchors": ["练习", "做题", "小测", "测验"],                    "requiredSlots": [], "description": "开始练习" },
+    { "id": "progress.check",  "roles": ["student"], "anchors": ["进度", "销账", "进展", "streak"],                  "requiredSlots": [], "description": "进度查询" },
+    { "id": "graph.view",      "roles": ["student"], "anchors": ["图谱", "识网", "知识图谱", "思维导图"],            "requiredSlots": [], "description": "识网摘要" },
+    { "id": "material.parse",  "roles": ["student"], "anchors": ["解析资料", "上传", "ocr", "教材", "藏书"],         "requiredSlots": [], "description": "资料解析引导" },
+    { "id": "kb.search",       "roles": ["student"], "anchors": ["知识库", "检索", "查资料", "文档"],                "requiredSlots": [], "description": "章节检索" },
+    { "id": "profile.view",    "roles": ["student"], "anchors": ["画像", "我的标签", "学习画像"],                    "requiredSlots": [], "description": "查看画像" },
+    { "id": "profile.optout",  "roles": ["student"], "anchors": ["退出画像", "关闭画像", "opt-out"],                 "requiredSlots": [], "description": "关闭画像" },
+    { "id": "whatif.simulate", "roles": ["student"], "anchors": ["what-if", "如果", "模拟", "假设"],                 "requiredSlots": [], "description": "What-if 模拟" },
+    { "id": "sale.check",      "roles": ["student"], "anchors": ["销账检查", "能否销账", "销账条件"],                "requiredSlots": [], "description": "销账条件查询" },
+    { "id": "meta.help",       "roles": ["student"], "anchors": ["帮助", "怎么用", "说明"],                          "requiredSlots": [], "description": "帮助兜底" }
+  ]
+}

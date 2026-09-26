@@ -21,7 +21,7 @@ public class RegressionP0P1Tests : IClassFixture<WebApplicationFactory<Program>>
     private readonly WebApplicationFactory<Program> _factory;
 
     public RegressionP0P1Tests(WebApplicationFactory<Program> factory)
-        => _factory = factory.WithWebHostBuilder(_ => { });
+        => _factory = factory.WithWebHostBuilder(b => b.UseSetting("Security:RequireAuth", "false")); // 测试明确退出鉴权（生产默认开启）
 
     private static async Task<string> ErrorCode(HttpResponseMessage resp)
     {
@@ -245,5 +245,72 @@ public class RegressionP0P1Tests : IClassFixture<WebApplicationFactory<Program>>
         var countAfter = Directory.GetFiles(dir).Length;
         Assert.Equal(0, seeded2);            // 第二次调用不得再复制任何文件
         Assert.Equal(countBefore, countAfter); // 目录文件数不得增长
+    }
+
+    // ── P1-M3：快照介质 SQLite（WAL）──────────────────────
+    [Fact]
+    public void P13_Snapshot_Legacy_Json_Is_Migrated_Into_Sqlite()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "astralpath-snapmig-" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            Directory.CreateDirectory(dir);
+            var payload = new RuntimeSnapshot
+            {
+                SavedAt = DateTime.UtcNow,
+                PackId = "accounting-v1",
+                Store = new StoreStateDto()
+            };
+            File.WriteAllText(Path.Combine(dir, "runtime-state.json"),
+                JsonSerializer.Serialize(payload, new JsonSerializerOptions(JsonSerializerDefaults.Web)));
+
+            var store = new AstralPathStore(AstralPathStore.FindGraphPack());
+            var snapshot = new RuntimeSnapshotStore(new RuntimeSnapshotOptions { DataDir = dir }, store, new AstralPathModules());
+
+            var load = snapshot.Load();
+            Assert.True(load.Loaded, load.Error);                 // 旧 JSON 被导入
+            Assert.True(File.Exists(Path.Combine(dir, "runtime-state.db"))); // 介质已换 SQLite
+            Assert.True(File.Exists(Path.Combine(dir, "runtime-state.json.migrated"))); // 旧文件留作备份
+
+            // 第二次加载走 SQLite 路径，仍能恢复
+            var store2 = new AstralPathStore(AstralPathStore.FindGraphPack());
+            var modules2 = new AstralPathModules();
+            var again = new RuntimeSnapshotStore(new RuntimeSnapshotOptions { DataDir = dir }, store2, modules2).Load();
+            Assert.True(again.Loaded, again.Error);
+        }
+        finally
+        {
+            try { Directory.Delete(dir, recursive: true); } catch { /* ignore */ }
+        }
+    }
+
+    // ── P1-M1：鉴权默认开启 ───────────────────────────────
+    [Fact]
+    public async Task P14_RequireAuth_True_Gate_Works()
+    {
+        var secureFactory = _factory.WithWebHostBuilder(b => b.UseSetting("Security:RequireAuth", "true"));
+        var client = secureFactory.CreateClient();
+
+        // ① 无令牌访问学生数据 → 401（原先全站裸奔）
+        var anon = await client.GetAsync("/v1/students/demo-student-a/mastery");
+        Assert.Equal(HttpStatusCode.Unauthorized, anon.StatusCode);
+
+        // ② 注册（默认 student 角色）→ 登录 → 携带令牌访问**本人**数据 → 200
+        // 注意：register 会按邮箱自动绑定演示学生，必须用响应里的 demoStudentId，
+        // 否则会被「归属校验」以 403 拦下（那是另一道正在工作的门禁）。
+        var email = $"gate-{Guid.NewGuid():N}@test.local";
+        var reg = await client.PostAsJsonAsync("/api/v1/auth/register", new { email, password = "pass123456" });
+        reg.EnsureSuccessStatusCode();
+        var regData = JsonDocument.Parse(await reg.Content.ReadAsStringAsync()).RootElement.GetProperty("data");
+        var token = regData.GetProperty("accessToken").GetString()!;
+        var demoId = regData.GetProperty("profile").GetProperty("demoStudentId").GetString()!;
+
+        client.DefaultRequestHeaders.Authorization = new("Bearer", token);
+        var own = await client.GetAsync($"/v1/students/{demoId}/mastery");
+        Assert.Equal(HttpStatusCode.OK, own.StatusCode);
+
+        // ③ student 令牌读教师端聚合 → 403（角色门禁）
+        var teacher = await client.GetAsync("/v1/teachers/demo-teacher/hotspots");
+        Assert.Equal(HttpStatusCode.Forbidden, teacher.StatusCode);
     }
 }

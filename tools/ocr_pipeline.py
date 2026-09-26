@@ -221,13 +221,22 @@ def render_pdf_page_png(path: Path, page_index: int, scale: float = 2.0, out_png
 
 
 def tesseract_pdf_pages(path: Path, page_indexes: list[int], scale: float = 2.0, max_pages: int = 12, time_budget_s: float = 40.0) -> tuple[str, str]:
+    """兼容旧签名的薄封装：只返回拼接文本与说明。"""
+    text, note, _pages = tesseract_pdf_pages_detail(
+        path, page_indexes, scale=scale, max_pages=max_pages, time_budget_s=time_budget_s)
+    return text, note
+
+
+def tesseract_pdf_pages_detail(path: Path, page_indexes: list[int], scale: float = 2.0, max_pages: int = 12, time_budget_s: float = 40.0) -> tuple[str, str, dict[int, str]]:
+    """同 tesseract_pdf_pages，但额外返回 {0 基页号: 该页 OCR 文本}，供按页回填。"""
     """PDF → PNG → tesseract（官方 CLI）逐页识别。"""
     exe = find_tesseract()
     if not exe:
-        return "", "tesseract_unavailable"
+        return "", "tesseract_unavailable", {}
     tessdata = find_tessdata()
     lang = resolve_lang(tessdata)
     chunks: list[str] = []
+    pages_out: dict[int, str] = {}
     used = 0
     workdir = Path(tempfile.gettempdir()) / f"astralpath_tess_{os.getpid()}"
     workdir.mkdir(parents=True, exist_ok=True)
@@ -239,7 +248,7 @@ def tesseract_pdf_pages(path: Path, page_indexes: list[int], scale: float = 2.0,
         total = len(doc)
         doc.close()
     except Exception as e:
-        return "", f"pdf_open_error:{e}"
+        return "", f"pdf_open_error:{e}", {}
 
     import time as _tesseract_time
     _t0 = _tesseract_time.time()
@@ -274,12 +283,13 @@ def tesseract_pdf_pages(path: Path, page_indexes: list[int], scale: float = 2.0,
         except Exception:
             pass
         if result.get("text"):
+            pages_out[idx] = result["text"]
             chunks.append(f"[page {idx + 1}]\n{result['text']}")
             used += 1
 
     text = "\n".join(chunks)
     note = f"tesseract:{used}/{min(max_pages, total)} lang={lang} oem={TESS_OEM} psm={TESS_PSM}"
-    return text, note
+    return text, note, pages_out
 
 
 def try_extract_text_pypdf(path: Path, max_pages: int = 40) -> tuple[str, int, str]:
@@ -539,32 +549,176 @@ def build_suggested_tasks(nodes: list, material_title: str, max_tasks: int = 6) 
     return tasks[:max_tasks]
 
 
-def extract_full_text(path: Path, ocr_mode: str = "standard") -> tuple[str, int, str, list[str]]:
-    """尽量抽取 PDF 全部文字：文本层全量 + 扫描页 tesseract 补齐。"""
+# ── 行/页级乱码判定（与前端 deploy/monolith-web/index.html 的 garbledPages() 同一套规则与阈值）──
+# 可疑字符 = 私有使用区（BMP / 平面 15 / 平面 16）、U+FFFD、以及中文技术书里不可能出现的稀有文字。
+# 正体 CJK、康熙部首(U+2E80–U+2FDF)、注音、假名、谚文、拉丁扩展、希腊、西里尔、数学符号、
+# emoji、全角标点一律视为正常字符，不参与计数（旧实现把它们计入"不可读"，把全局可读率拖低）。
+GARBLE_RANGES = (
+    (0x0530, 0x058F),     # 亚美尼亚文
+    (0x0590, 0x05FF),     # 希伯来文
+    (0x0600, 0x06FF),     # 阿拉伯文
+    (0x0700, 0x074F),     # 叙利亚文
+    (0x0750, 0x077F),     # 阿拉伯文补充
+    (0x0780, 0x07BF),     # 塔纳文
+    (0x0900, 0x0DFF),     # 印度系文字（天城/孟加拉/古木基/古吉拉特/奥里亚/泰米尔/泰卢固/卡纳达/马拉雅拉姆/僧伽罗）
+    (0x0E00, 0x0E7F),     # 泰文
+    (0x0E80, 0x0EFF),     # 老挝文
+    (0x0F00, 0x0FFF),     # 藏文
+    (0x1000, 0x109F),     # 缅甸文
+    (0x10A0, 0x10FF),     # 格鲁吉亚文
+    (0x1200, 0x137F),     # 埃塞俄比亚文
+    (0x13A0, 0x13FF),     # 切罗基文
+    (0x1780, 0x17FF),     # 高棉文
+    (0x1800, 0x18AF),     # 蒙古文
+    (0xE000, 0xF8FF),     # 私有使用区（BMP，苹果 logo 等私有字形）
+    (0xF0000, 0xFFFFD),   # 私有使用区（平面 15）
+    (0x100000, 0x10FFFD), # 私有使用区（平面 16）
+    (0xFFFD, 0xFFFD),     # 替换字符
+)
+
+GARBLE_LINE_MIN_CHARS = 3            # 行级：行内可疑字符绝对下限
+GARBLE_LINE_MIN_DENSITY = 0.10       # 行级：可疑字符 / 行内非空白字符
+GARBLE_PAGE_MIN_LINES = 2            # 页级：页内可疑行数下限
+GARBLE_PAGE_MIN_LINE_DENSITY = 0.02  # 页级：可疑行 / 页内非空行
+GARBLE_PAGE_MIN_CHARS = 6            # 页级：页内可疑字符绝对下限
+GARBLE_BOOK_DENSE_RATIO = 0.30       # 可疑页占比 ≥30% → 视为整本文本层不可用，走整本 OCR
+GARBLE_OCR_MAX_PAGES = 12            # 单本最多定向补 OCR 的可疑页数
+
+
+def _is_garbled_char(cp: int) -> bool:
+    """字体乱码字符判定：命中 GARBLE_RANGES 任一区间即视为可疑。"""
+    for lo, hi in GARBLE_RANGES:
+        if lo <= cp <= hi:
+            return True
+    return False
+
+
+def garbled_pages(page_texts: list[str]) -> dict[str, Any]:
+    """行/页级乱码密度判定（与前端 index.html garbledPages 同规则同阈值）。
+
+    行级：susp >= GARBLE_LINE_MIN_CHARS 且 susp/signif >= GARBLE_LINE_MIN_DENSITY → 可疑行。
+    页级：可疑行 >= GARBLE_PAGE_MIN_LINES、可疑行/非空行 >= GARBLE_PAGE_MIN_LINE_DENSITY、
+          页内可疑字符 >= GARBLE_PAGE_MIN_CHARS → 可疑页（定向补 OCR 的触发单位）。
+    """
+    flagged: list[dict[str, Any]] = []
+    for pi, page in enumerate(page_texts):
+        total_lines = 0
+        flag_lines = 0
+        page_susp = 0
+        peak = 0.0
+        for raw in (page or "").split("\n"):
+            line = raw.strip()
+            if not line:
+                continue
+            total_lines += 1
+            signif = 0
+            susp = 0
+            for ch in line:
+                if ch.isspace():
+                    continue
+                signif += 1
+                if _is_garbled_char(ord(ch)):
+                    susp += 1
+            if susp == 0:
+                continue
+            page_susp += susp
+            density = (susp / signif) if signif else 0.0
+            if susp >= GARBLE_LINE_MIN_CHARS and density >= GARBLE_LINE_MIN_DENSITY:
+                flag_lines += 1
+                if density > peak:
+                    peak = density
+        if (flag_lines >= GARBLE_PAGE_MIN_LINES and total_lines > 0
+                and (flag_lines / total_lines) >= GARBLE_PAGE_MIN_LINE_DENSITY
+                and page_susp >= GARBLE_PAGE_MIN_CHARS):
+            flagged.append({"page": pi + 1, "flagLines": flag_lines, "totalLines": total_lines,
+                            "suspChars": page_susp, "peakLineDensity": round(peak, 3)})
+    return {"flaggedPages": flagged, "pageCount": len(page_texts)}
+
+
+def try_extract_text_pages(path: Path, max_pages: int = 100000) -> tuple[list[str], int, str]:
+    """按页抽取文本层（pypdf 优先），返回 (每页文本, 总页数, 引擎名)；失败返回 ([], 0, err)。"""
+    try:
+        from pypdf import PdfReader
+        reader = PdfReader(str(path))
+        try:
+            if getattr(reader, "is_encrypted", False):
+                reader.decrypt("")
+        except Exception:
+            pass
+        n = len(reader.pages)
+        out: list[str] = []
+        for i in range(min(n, max_pages)):
+            try:
+                out.append(reader.pages[i].extract_text() or "")
+            except Exception:
+                out.append("")
+        return out, n, "pypdf"
+    except Exception as exc:
+        err = "pypdf_error:" + type(exc).__name__
+    return [], 0, err
+
+
+def _readable_ratio(text: str) -> float:
+    """[已停用] v2.2.1 起不再参与乱码判定，仅留作参考：可读字符（CJK / ASCII 字母数字）占非空白字符比例。
+    内嵌字体缺 ToUnicode 映射的 PDF，文本层会抽出大量"看似有字、实为乱码"的内容
+    （实测《Python编程：从入门到实践（第3版）》文本层可读率仅约 28%），必须拦下走 OCR。"""
+    s = re.sub(r"\s+", "", text or "")
+    if not s:
+        return 0.0
+    good = sum(1 for ch in s if ("一" <= ch <= "鿿") or ("a" <= ch <= "z") or ("A" <= ch <= "Z") or ("0" <= ch <= "9"))
+    return good / len(s)
+
+def extract_full_text(path: Path, ocr_mode: str = "standard", force_pages: list[int] | None = None) -> tuple[str, int, str, list[str], dict[str, Any]]:
+    """尽量抽取 PDF 全部文字：文本层全量 + 可疑页定向 tesseract 补齐。
+
+    与旧实现的差别：乱码判定由「全局可读率 < 0.70」改为行/页级可疑字符密度（garbled_pages）；
+    命中时只对可疑页 OCR 并逐页回填，其余页保留文本层，避免整本重跑。
+    force_pages：前端（pdf.js 文本层）算出的可疑页（1 基），与本地判定取并集。
+    """
     notes: list[str] = []
-    # 文本层：尽可能全量（deep/standard 不截断；quick 仍限制以保速度）
     if ocr_mode == "quick":
         max_text_pages = 120
     else:
         max_text_pages = 0  # 0 = 全部
+    page_limit = max_text_pages if max_text_pages else 100000
 
-    text, pages, mode = try_extract_text_pypdf(path, max_pages=max_text_pages if max_text_pages else 100000)
+    page_texts, pages, mode = try_extract_text_pages(path, max_pages=page_limit)
+    text = "\n".join(page_texts).strip()
     if len(text) < 80:
-        text2, pages2, mode2 = try_extract_text_pdfium(path, max_pages=max_text_pages if max_text_pages else 100000)
+        text2, pages2, mode2 = try_extract_text_pdfium(path, max_pages=page_limit)
         if len(text2) > len(text):
             text, pages, mode = text2, pages2, mode2
+            page_texts = []  # pdfium 只有整本拼接，无法按页回填
             notes.append("fallback_pdfium")
 
-    # 密度：平均每页字符
     density = (len(text) / pages) if pages else 0
     info = tesseract_info()
     ocr_used = False
 
+    scan = garbled_pages(page_texts) if page_texts else {"flaggedPages": [], "pageCount": 0}
+    flagged = list(scan["flaggedPages"])
+    forced: list[int] = []
+    for p in (force_pages or []):
+        if isinstance(p, int) and p >= 1:
+            forced.append(p)
+    forced = sorted(set(forced))
+    has = {p["page"] for p in flagged}
+    for p in forced:
+        if p not in has:
+            flagged.append({"page": p, "flagLines": 0, "totalLines": 0,
+                            "suspChars": 0, "peakLineDensity": 0.0, "forced": True})
+    detail: dict[str, Any] = {
+        "garbledPages": sorted(p["page"] for p in flagged),
+        "garbleScan": scan,
+        "ocrPages": [],
+        "forcePages": forced,
+    }
+    wide = bool(flagged) and pages > 0 and (len(flagged) / pages) >= GARBLE_BOOK_DENSE_RATIO
+
     if len(text) < 80 or density < 120:
-        notes.append(f"text_layer_sparse:density={density:.1f}")
+        notes.append("text_layer_sparse:density=%.1f" % density)
         if ocr_mode in ("standard", "quick", "deep") and info.get("available"):
             total = pages or 30
-            # 扫描版：优先 OCR 目录区 + 全书均匀采样，保证能抽出完整目录
             toc_idx = list(range(0, min(total, 24)))
             sample = []
             if total > 24:
@@ -583,7 +737,6 @@ def extract_full_text(path: Path, ocr_mode: str = "standard") -> tuple[str, int,
             notes.append(ocr_note)
             ocr_text = clean_ocr_text(ocr_text)
             if len(ocr_text) > len(text) * 0.5:
-                # 合并：保留已有文本层，OCR 结果附在后面供目录抽取
                 if len(ocr_text) > len(text):
                     text = ocr_text
                 else:
@@ -592,14 +745,65 @@ def extract_full_text(path: Path, ocr_mode: str = "standard") -> tuple[str, int,
                 notes.append("ocr_merged")
         else:
             notes.append("tesseract_unavailable_or_no_traineddata")
+    elif wide:
+        notes.append("text_layer_garble_wide:pages=%d/%d" % (len(flagged), pages))
+        if ocr_mode in ("standard", "quick", "deep") and info.get("available"):
+            total = pages or 30
+            toc_idx = list(range(0, min(total, 24)))
+            sample = []
+            if total > 24:
+                step = max(8, total // 20)
+                sample = list(range(24, total, step))[:18]
+            indexes = sorted({i for i in toc_idx + sample if 0 <= i < total})
+            max_ocr = 10 if ocr_mode == "quick" else 28
+            ocr_text, ocr_note = tesseract_pdf_pages(
+                path, indexes, scale=2.0, max_pages=max_ocr,
+                time_budget_s=90.0 if ocr_mode != "quick" else 40.0,
+            )
+            notes.append(ocr_note)
+            ocr_text = clean_ocr_text(ocr_text)
+            if len(ocr_text) > 200:
+                text = ocr_text
+                ocr_used = True
+                notes.append("ocr_replaced_garbled")
+        else:
+            notes.append("tesseract_unavailable_or_no_traineddata")
+    elif flagged:
+        notes.append("text_layer_garble_pages:" + ",".join(str(p["page"]) for p in flagged[:24]))
+        if ocr_mode in ("standard", "quick", "deep") and info.get("available") and page_texts:
+            order = sorted(flagged, key=lambda x: (-float(x.get("peakLineDensity", 0.0)),
+                                                   -int(x.get("suspChars", 0)), int(x["page"])))
+            target = [p["page"] - 1 for p in order][:GARBLE_OCR_MAX_PAGES]
+            ocr_text, ocr_note, ocr_map = tesseract_pdf_pages_detail(
+                path, target, scale=2.0, max_pages=GARBLE_OCR_MAX_PAGES,
+                time_budget_s=60.0 if ocr_mode != "quick" else 30.0,
+            )
+            notes.append(ocr_note)
+            filled = 0
+            for idx, page_ocr in ocr_map.items():
+                body = clean_ocr_text(page_ocr)
+                if len(body.strip()) < 20:
+                    continue
+                if 0 <= idx < len(page_texts):
+                    page_texts[idx] = body
+                    filled += 1
+            detail["ocrPages"] = sorted(i + 1 for i in ocr_map)
+            if filled:
+                text = "\n".join(page_texts).strip()
+                ocr_used = True
+                notes.append("ocr_page_fill:%d/%d" % (filled, len(target)))
+            else:
+                notes.append("ocr_page_fill_none")
+        else:
+            notes.append("tesseract_unavailable_or_no_traineddata")
     else:
         notes.append("text_layer_full")
 
     text = clean_ocr_text(text)
-    return text, pages, mode, notes
+    return text, pages, mode, notes, detail
 
 
-def process_file(path: Path, ocr_mode: str = "standard") -> dict[str, Any]:
+def process_file(path: Path, ocr_mode: str = "standard", force_pages: list[int] | None = None) -> dict[str, Any]:
     info = tesseract_info()
     result: dict[str, Any] = {
         "file": str(path),
@@ -628,6 +832,8 @@ def process_file(path: Path, ocr_mode: str = "standard") -> dict[str, Any]:
         "edges": [],
         "suggestedTasks": [],
         "chapterQuestions": [],
+        "garblePages": [],
+        "ocrPages": [],
     }
     if not path.exists():
         result["notes"].append("file_missing")
@@ -640,11 +846,13 @@ def process_file(path: Path, ocr_mode: str = "standard") -> dict[str, Any]:
         result["notes"].append(f"deep_chapters_import_error:{e}")
         deep_chapters = None
 
-    text, pages, mode, notes = extract_full_text(path, ocr_mode)
+    text, pages, mode, notes, detail = extract_full_text(path, ocr_mode, force_pages=force_pages)
     result["pageCount"] = pages
     result["mode"] = mode
     result["extractedChars"] = len(text)
     result["notes"].extend(notes)
+    result["garblePages"] = detail.get("garbledPages", [])
+    result["ocrPages"] = detail.get("ocrPages", [])
     result["ocrUsed"] = any("tesseract" in n or "ocr" in n for n in notes)
     result["fullText"] = text  # 供 API 存章节全文
     result["textSample"] = text[:4000]
@@ -777,6 +985,18 @@ def process_file(path: Path, ocr_mode: str = "standard") -> dict[str, Any]:
     return result
 
 
+def _parse_pages(raw) -> list[int] | None:
+    """解析 --pages：逗号/分号/空格分隔的 1 基页码，去重排序；空则 None。"""
+    if not raw:
+        return None
+    out: list[int] = []
+    for tok in re.split(r"[,\s;]+", str(raw)):
+        tok = tok.strip()
+        if tok.isdigit():
+            out.append(int(tok))
+    return sorted(set(out)) or None
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="AstralPath OCR pipeline — tesseract CLI aligned",
@@ -786,6 +1006,7 @@ def main() -> int:
     parser.add_argument("--ocr", default="standard", choices=["none", "quick", "standard", "tesseract-only"])
     parser.add_argument("--out", default="-")
     parser.add_argument("--info", action="store_true", help="print tesseract info and exit")
+    parser.add_argument("--pages", default=None, help="comma separated 1-based page numbers to force OCR (from front-end pdf.js scan)")
     # 对齐 tesseract CLI 的可选参数
     parser.add_argument("-l", "--lang", default=None, help="tesseract language, e.g. chi_sim+eng")
     parser.add_argument("--oem", default=None, help="ocr engine mode 0-3")
@@ -840,7 +1061,7 @@ def main() -> int:
             payload = {"ok": False, "error": f"{type(e).__name__}: {e}", "trace": traceback.format_exc()}
     else:
         try:
-            payload = process_file(Path(args.path), ocr_mode=mode)
+            payload = process_file(Path(args.path), ocr_mode=mode, force_pages=_parse_pages(args.pages))
         except Exception as e:
             payload = {"ok": False, "error": f"{type(e).__name__}: {e}", "trace": traceback.format_exc()}
 

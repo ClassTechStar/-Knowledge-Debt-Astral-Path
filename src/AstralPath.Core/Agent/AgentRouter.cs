@@ -456,3 +456,30 @@ public static class NarrativeAssembler
         return "这段内容暂时无法展示，请查看教材原文或联系老师。";
     }
 }
+
+/// <summary>
+/// 默认意图登记表（P2：单一事实源对拍）。
+/// 与 tools/agent-intents.json 及 deploy/monolith-web/index.html 的 INTENTS 字面量
+/// 三方逐字一致；scripts/verify_agent_intents.py 负责对拍，改动任何一方必须同步。
+/// </summary>
+public static class DefaultAgentIntents
+{
+    public static readonly AgentIntent[] Table =
+    {
+        new(1,  "debt.diagnose",   "student", new[] { "知识债", "债边", "诊断", "红边", "薄弱" },  Array.Empty<string>(), "诊断知识债"),
+        new(2,  "debt.explain",    "student", new[] { "解释", "为什么", "怎么来的", "公式" },      Array.Empty<string>(), "解释红边怎么来的"),
+        new(3,  "plan.create",     "student", new[] { "计划", "14天", "安排", "复习计划" },        Array.Empty<string>(), "生成 14 天计划"),
+        new(4,  "plan.rebalance",  "student", new[] { "减负", "重排", "调整计划", "太重" },        Array.Empty<string>(), "计划减负"),
+        new(5,  "today.tasks",     "student", new[] { "今日", "今天做", "今日任务" },              Array.Empty<string>(), "今日任务"),
+        new(6,  "practice.start",  "student", new[] { "练习", "做题", "小测", "测验" },            Array.Empty<string>(), "开始练习"),
+        new(7,  "progress.check",  "student", new[] { "进度", "销账", "进展", "streak" },          Array.Empty<string>(), "进度查询"),
+        new(8,  "graph.view",      "student", new[] { "图谱", "识网", "知识图谱", "思维导图" },    Array.Empty<string>(), "识网摘要"),
+        new(9,  "material.parse",  "student", new[] { "解析资料", "上传", "ocr", "教材", "藏书" }, Array.Empty<string>(), "资料解析引导"),
+        new(10, "kb.search",       "student", new[] { "知识库", "检索", "查资料", "文档" },        Array.Empty<string>(), "章节检索"),
+        new(11, "profile.view",    "student", new[] { "画像", "我的标签", "学习画像" },            Array.Empty<string>(), "查看画像"),
+        new(12, "profile.optout",  "student", new[] { "退出画像", "关闭画像", "opt-out" },         Array.Empty<string>(), "关闭画像"),
+        new(13, "whatif.simulate", "student", new[] { "what-if", "如果", "模拟", "假设" },         Array.Empty<string>(), "What-if 模拟"),
+        new(14, "sale.check",      "student", new[] { "销账检查", "能否销账", "销账条件" },        Array.Empty<string>(), "销账条件查询"),
+        new(15, "meta.help",       "student", new[] { "帮助", "怎么用", "说明" },                  Array.Empty<string>(), "帮助兜底")
+    };
+}

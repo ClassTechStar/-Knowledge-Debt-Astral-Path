@@ -104,7 +104,9 @@ public static class EmbeddedWebApi
                 Environment.SetEnvironmentVariable("ASTRALPATH_GRAPH_PACK", graphPack);
 
             var port = FreeLoopbackPort();
-            var urls = new[] { "--urls", $"http://127.0.0.1:{port}" };
+            // 仅绑定 127.0.0.1 的内嵌壳：页面与 API 同机同进程链路，无网络暴露面，
+            // 显式关闭鉴权（生产 CLI/容器宿主保持 appsettings 的默认开启）。
+            var urls = new[] { "--urls", $"http://127.0.0.1:{port}", "Security:RequireAuth=false" };
 
             try
             {

@@ -9,7 +9,8 @@ public sealed record AuthUser(
     string PasswordHash,
     string DemoStudentId,
     DateTime CreatedAt,
-    DateTime UpdatedAt);
+    DateTime UpdatedAt,
+    string Role = "student");
 
 public sealed record AuthSession(
     string SessionId,
@@ -41,13 +42,16 @@ public sealed class AuthStore
     private readonly Dictionary<string, AuthUser> _usersById = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, AuthSession> _sessions = new(StringComparer.Ordinal);
 
-    public AuthUser Register(string email, string password, string? displayName = null, string? demoStudentId = null)
+    public AuthUser Register(string email, string password, string? displayName = null, string? demoStudentId = null, string role = "student")
     {
         email = (email ?? "").Trim().ToLowerInvariant();
         if (string.IsNullOrWhiteSpace(email) || !email.Contains('@') || !email.Contains('.'))
             throw new ArgumentException("请输入有效邮箱");
         if (string.IsNullOrWhiteSpace(password) || password.Length < 6)
             throw new ArgumentException("密码至少 6 位");
+        role = role.Trim().ToLowerInvariant();
+        if (role is not ("student" or "teacher"))
+            throw new ArgumentException("角色仅支持 student / teacher");
 
         lock (_gate)
         {
@@ -65,7 +69,8 @@ public sealed class AuthStore
                 HashPassword(password),
                 student,
                 DateTime.UtcNow,
-                DateTime.UtcNow);
+                DateTime.UtcNow,
+                role);
             _usersByEmail[email] = user;
             _usersById[userId] = user;
             return user;

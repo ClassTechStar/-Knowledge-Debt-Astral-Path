@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<!-- 知债：星穹学途 · Web 端 OCR 端到端自检页（开发者工具，随仓库分发）。
+     用法：经 serve.ps1 起本地服务后访问 http://127.0.0.1:8799/selftest-ocr.html，
+     并在服务根目录放置 test-book.pdf（用于触发乱码降级 OCR 的样例书）。
+     页面在 iframe 中加载真实单体前端 index.html，以 DataTransfer 注入文件并点击
+     真实「上传并解析」按钮，随后把每一步结果 POST 回 /__selftest/report 供外部读取。 -->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<title>知债 · OCR 端到端自检</title>
+<style>
+body{margin:0;padding:16px;font:13px/1.6 Consolas,monospace;background:#111;color:#cfe;white-space:pre-wrap}
+#out{max-width:900px}
+b{color:#7fd}
+#ifr{position:fixed;right:0;bottom:0;width:520px;height:700px;border:2px solid #468;background:#fff;z-index:9}
+</style>
+</head>
+<body><div id="out">OCR 端到端自检启动…</div>
+<iframe id="ifr" src="index.html"></iframe>
+<script>
+(function () {
+  var out = document.getElementById('out');
+  var ifr = document.getElementById('ifr');
+  function log(s) { out.textContent += "\n" + s; }
+  var report = { startedAt: new Date().toISOString(), ua: navigator.userAgent, steps: [], finalStatus: null, bookCards: null, ok: false };
+
+  function post(path, obj) {
+    try {
+      return fetch(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(obj) }).catch(function () { });
+    } catch (e) { }
+  }
+  function flush() { post('/__selftest/report', report); }
+
+  async function run() {
+    var step = {};
+    try {
+      // 1. 等待 iframe 真实前端就绪
+      var win = ifr.contentWindow, doc = null;
+      for (var i = 0; i < 60; i++) {
+        try { doc = win.document; if (doc && doc.getElementById('btnUpload')) break; } catch (e) { }
+        await new Promise(function (r) { setTimeout(r, 500); });
+      }
+      if (!doc || !doc.getElementById('btnUpload')) throw new Error('iframe 前端未就绪');
+      step.iframe = { ok: true, hasWasmEngine: !!win.__AP_WASM_OCR__, wasmAvailable: win.__AP_WASM_OCR__ ? !!win.__AP_WASM_OCR__.available() : false, hostBridge: !!(win.chrome && win.chrome.webview) };
+      log('前端就绪：WASM 引擎=' + step.iframe.hasWasmEngine + ' available=' + step.iframe.wasmAvailable + ' 宿主桥=' + step.iframe.hostBridge);
+      report.steps.push(step.iframe); flush();
+
+      // 2. 取样例乱码书
+      var resp = await fetch('test-book.pdf');
+      if (!resp.ok) throw new Error('test-book.pdf 获取失败：HTTP ' + resp.status);
+      var buf = await resp.arrayBuffer();
+      var f = new win.File([buf], 'Python编程：从入门到实践（第3版）.pdf', { type: 'application/pdf' });
+      log('样例书：' + buf.byteLength + ' 字节');
+
+      // 3. 先单独验证前端文本层抽取与乱码检测（真实页面函数）
+      var r = await win.readFileAsText(f);
+      step.textlayer = { ok: r.ok, needOcr: !!r.needOcr, chars: r.chars || 0, ratio: (r.ratio == null ? null : (typeof r.ratio === 'number' ? Math.round(r.ratio * 100) / 100 : r.ratio)), reason: r.reason || '' };
+      log('文本层抽取：ok=' + r.ok + ' needOcr=' + r.needOcr + ' 可读字符=' + (r.chars || 0) + ' 可读率=' + step.textlayer.ratio + ' ' + (r.reason || ''));
+      report.steps.push(step.textlayer); flush();
+
+      // 4. 注入文件 → 点击真实上传按钮（端到端）
+      var dt = new win.DataTransfer();
+      dt.items.add(f);
+      var fi = doc.getElementById('fileInput');
+      fi.files = dt.files;
+      fi.dispatchEvent(new win.Event('change', { bubbles: true }));
+      doc.getElementById('btnUpload').click();
+      log('已触发「上传并解析」，轮询解析状态…');
+
+      var t0 = Date.now(), last = '';
+      while (Date.now() - t0 < 20 * 60 * 1000) {
+        await new Promise(function (r2) { setTimeout(r2, 3000); });
+        var st = '';
+        try { st = doc.getElementById('matStatus').textContent || ''; } catch (e) { }
+        if (st !== last) { log('[' + Math.round((Date.now() - t0) / 1000) + 's] ' + st); last = st; }
+        if (/已解析|解析失败|解析异常/.test(st)) break;
+      }
+      report.finalStatus = last;
+      var cards = doc.querySelectorAll('[data-book]');
+      report.bookCards = cards.length;
+      var bookName = '';
+      try { bookName = (doc.querySelector('.card strong') || {}).textContent || ''; } catch (e) { }
+      report.bookName = bookName;
+      report.ok = /已解析/.test(last) && cards.length >= 1;
+      log('最终状态：' + last);
+      log('藏书卡片数：' + cards.length + '；书名：' + bookName);
+      log('自检结论：' + (report.ok ? '✓ 乱码书 → OCR → 解析成功' : '✗ 未成功'));
+      report.finishedAt = new Date().toISOString();
+      flush();
+    } catch (e) {
+      report.error = (e && e.message) ? e.message : String(e);
+      report.ok = false;
+      log('异常：' + report.error);
+      report.finishedAt = new Date().toISOString();
+      flush();
+    }
+  }
+  run();
+})();
+</script>
+</body>
+</html>

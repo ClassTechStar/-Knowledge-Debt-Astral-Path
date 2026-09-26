@@ -5,4 +5,15 @@
     <Nullable>enable</Nullable>
     <LangVersion>latest</LangVersion>
   </PropertyGroup>
+
+  <!--
+    消灭副本漂移（2026-09-26）：本目录不再保存任何源码副本，编译项全部链接自主 Core
+    （src/AstralPath.Core）。算法只此一份：主仓 Core 的任何修改即刻对离线端与
+    84 项离线金样回归生效。保留独立 csproj 而非直接引用主工程，是为了将来可以
+    在这里单独多目标（如 net8.0-android）而不影响主解决方案。
+  -->
+  <ItemGroup>
+    <Compile Include="..\..\AstralPath.Core\**\*.cs"
+             Exclude="..\..\AstralPath.Core\obj\**;..\..\AstralPath.Core\bin\**" />
+  </ItemGroup>
 </Project>

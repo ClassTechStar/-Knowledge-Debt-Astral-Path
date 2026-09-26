@@ -58,19 +58,17 @@ public sealed class AstralPathStore
 
     public static string FindGraphPack()
     {
-        var candidates = new[]
+        // 从安装目录逐级向上回溯（含自身）：安装态第一层命中 {app}\graph-packs，
+        // 开发态覆盖「bin/…/net10.0 → 仓库根」。不硬编码任何机器特定路径（审计 C4 同源修复）。
+        var dir = AppContext.BaseDirectory;
+        for (var i = 0; i < 8 && !string.IsNullOrEmpty(dir); i++)
         {
-            Path.Combine(AppContext.BaseDirectory, "graph-packs", "accounting-v1"),
-            Path.Combine(AppContext.BaseDirectory, "..", "..", "..", "..", "..", "graph-packs", "accounting-v1"),
-            Path.Combine(Directory.GetCurrentDirectory(), "graph-packs", "accounting-v1"),
-            @"C:\Users\18948\XiaomiMiMoProjects\Knowledge Debt Astral Path\graph-packs\accounting-v1"
-        };
-        foreach (var c in candidates)
-        {
-            var full = Path.GetFullPath(c);
-            if (File.Exists(Path.Combine(full, "nodes.json")))
-                return full;
+            var full = Path.GetFullPath(Path.Combine(dir, "graph-packs", "accounting-v1"));
+            if (File.Exists(Path.Combine(full, "nodes.json"))) return full;
+            dir = Path.GetDirectoryName(dir.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar));
         }
+        var cwd = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), "graph-packs", "accounting-v1"));
+        if (File.Exists(Path.Combine(cwd, "nodes.json"))) return cwd;
         throw new DirectoryNotFoundException("graph-packs/accounting-v1 not found");
     }
 

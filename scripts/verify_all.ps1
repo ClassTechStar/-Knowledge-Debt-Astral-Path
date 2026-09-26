@@ -23,6 +23,13 @@ function Step($name, $cmd) {
 # 1) 常量对齐：JS 的 K 对象 ↔ C# 的 FormulaConstants.cs
 Step "constants-K-vs-FormulaConstants" { python scripts/verify_constants.py }
 
+# 1b) 智能体意图登记表三方对拍：tools/agent-intents.json ↔ index.html ↔ AgentRouter.cs
+if (Test-Path scripts/verify_agent_intents.py) {
+    Step "agent-intents-three-way" { python scripts/verify_agent_intents.py }
+} else {
+    Write-Host "[SKIP] scripts/verify_agent_intents.py 尚未生成" -ForegroundColor Yellow
+}
+
 # 2) 知识图包：无环 / 无悬空边 / 无重复边 / why 非空
 if (Test-Path scripts/verify_graph.py) {
     Step "graph-pack" { python scripts/verify_graph.py graph-packs/astralpath-v2/graph_pack.json }
@@ -43,20 +50,11 @@ Step "test-Persistence" { dotnet test tests/AstralPath.Persistence.Tests -c Rele
 Step "test-Desktop"     { dotnet test tests/AstralPath.Desktop.Tests -c Release }
 Step "test-Api"         { dotnet test tests/AstralPath.Api.Tests -c Release }
 Step "test-Eval"        { dotnet test tests/AstralPath.Eval.Tests -c Release }
-# 图谱 / OCR 算法回归（AstralPath.Core 在离线方案里也有副本，一并验证）
+# 图谱 / OCR 算法回归（离线 Core 已改为链接主 Core 源码，漂移不可能再发生）
 Step "test-MobileCore"  { dotnet test src/AstralPath.Mobile.Offline/AstralPath.Mobile.Tests -c Release }
 
-# 5) 三端 HTML 同源
-Write-Host "`n=== monolith-html-sync ===" -ForegroundColor Cyan
-$a = (Get-FileHash deploy/monolith-web/index.html -Algorithm MD5).Hash
-$b = (Get-FileHash src/AstralPath.Native/app/src/main/assets/www/index.html -Algorithm MD5).Hash
-$c = (Get-FileHash src/AstralPath.Monolith/Resources/index.html -Algorithm MD5).Hash
-if ($a -eq $b -and $a -eq $c) {
-    Write-Host "OK · 三端同源 md5=$a"
-} else {
-    Write-Host "MISMATCH · web=$a native=$b monolith=$c" -ForegroundColor Red
-    $failed += "monolith-html-sync"
-}
+# 5) 三端 HTML 同源 + C3 XSS 回归哨兵（统一由同步脚本提供）
+Step "monolith-html-sync" { powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-monolith-html.ps1 -Check }
 
 # 6) 命名规范扫描（含旧名残留；脚本内置「政策声明语境」判定，
 #    "禁止再使用旧名…"这类声明句不会误报 —— 勿再用朴素 Select-String 重复实现）

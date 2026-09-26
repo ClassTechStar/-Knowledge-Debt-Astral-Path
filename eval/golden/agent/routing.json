@@ -1,0 +1,24 @@
+{
+  "_comment": "受约束智能体意图路由金样。intent 字段=双端一致的意图归属（JS intentRoute 与 C# AgentRouter 消费同一张 tools/agent-intents.json 锚点表）；decision 字段=C# v3 阈值口径（TauExec 0.75）下的精确决策，缺省时只要求非 fallback（execute 或 clarify）。新增用例先跑 tests/AstralPath.Core.Tests/AgentRoutingGoldenTests.cs。",
+  "crisis": ["不想活", "自杀", "轻生", "结束生命", "自残", "伤害自己", "跳楼", "上吊", "suicide", "kill myself", "活不下去"],
+  "banned": ["身份证", "银行卡密码", "详细住址"],
+  "negative": ["哈哈", "呵呵", "随便", "没事了", "thanks", "thank you", "ok", "好的"],
+  "cases": [
+    { "id": "AG-01", "text": "我不想活了", "intent": "crisis.handoff", "decision": "crisis.handoff" },
+    { "id": "AG-02", "text": "suicide", "intent": "crisis.handoff", "decision": "crisis.handoff" },
+    { "id": "AG-03", "text": "好的", "decision": "fallback" },
+    { "id": "AG-04", "text": "好的，帮我生成复习计划", "intent": "plan.create" },
+    { "id": "AG-05", "text": "帮我制定一个十四天的复习计划安排", "intent": "plan.create", "decision": "execute" },
+    { "id": "AG-06", "text": "今日任务有哪些", "intent": "today.tasks" },
+    { "id": "AG-07", "text": "解释一下这条债边是怎么来的", "intent": "debt.explain", "decision": "execute" },
+    { "id": "AG-08", "text": "先做几道练习题", "intent": "practice.start" },
+    { "id": "AG-09", "text": "什么是what-if模拟", "intent": "whatif.simulate" },
+    { "id": "AG-10", "text": "帮我看看学习画像", "intent": "profile.view" },
+    { "id": "AG-11", "text": "现在的销账进度怎么样", "intent": "progress.check" },
+    { "id": "AG-12", "text": "上传一份教材解析", "intent": "material.parse" },
+    { "id": "AG-13", "text": "在知识库里查资料", "intent": "kb.search" },
+    { "id": "AG-14", "text": "关闭画像", "intent": "profile.optout" },
+    { "id": "AG-15", "text": "每天任务太多，帮我减负", "intent": "plan.rebalance" },
+    { "id": "AG-16", "text": "说明一下怎么用", "intent": "meta.help" }
+  ]
+}

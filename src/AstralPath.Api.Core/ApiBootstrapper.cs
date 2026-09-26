@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using System.Text.Json;
+using System.Threading.RateLimiting;
 using AstralPath.Contracts;
 using AstralPath.Infrastructure;
 using AstralPath.Persistence;
@@ -82,13 +84,41 @@ public sealed class ApiBootstrapper
 
         builder.WebHost.ConfigureKestrel(options =>
         {
-            options.Limits.MaxRequestBodySize = 2L * 1024 * 1024 * 1024; // 2GB
+            // 512MB：契约口径（P3 13 本教材实测最大 120MB，512MB 上限见 P3 提示词 §13）。
+            // 原 2GB 配合「零限流」构成同网段打满磁盘/内存的攻击面（审计 M2），一并收敛。
+            options.Limits.MaxRequestBodySize = 512L * 1024 * 1024;
         });
         builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
         {
-            options.MultipartBodyLengthLimit = 2L * 1024 * 1024 * 1024;
+            options.MultipartBodyLengthLimit = 512L * 1024 * 1024;
             options.ValueLengthLimit = int.MaxValue;
             options.MultipartHeadersLengthLimit = int.MaxValue;
+        });
+
+        // ── 限流（P1 审计 M2）────────────────────────────────────────────
+        // 全仓原先零限流：同网段可无上限并发上传打满磁盘。按远端 IP 分两个令牌桶：
+        // 上传路径严格（60/min），其余宽松（6000/min，避免演示页轮询误伤）。超限 429，
+        // 响应形状由下方框架级错误转写统一为 {data,error,traceId}。
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = 429;
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(ctx =>
+            {
+                var ip = ctx.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+                var path = ctx.Request.Path.Value ?? "";
+                var isUpload = path.StartsWith("/v1/materials/upload", StringComparison.OrdinalIgnoreCase)
+                            || path.StartsWith("/v1/kb/uploads", StringComparison.OrdinalIgnoreCase);
+                return RateLimitPartition.GetTokenBucketLimiter(
+                    (isUpload ? "up:" : "all:") + ip,
+                    _ => new TokenBucketRateLimiterOptions
+                    {
+                        TokenLimit = isUpload ? 60 : 6000,
+                        TokensPerPeriod = isUpload ? 60 : 6000,
+                        ReplenishmentPeriod = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0,
+                        AutoReplenishment = true
+                    });
+            });
         });
 
         builder.Services.AddControllers()
@@ -161,9 +191,11 @@ public sealed class ApiBootstrapper
 
                 var configured = (builder.Configuration["Security:CorsOrigins"] ?? "")
                     .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                // P1 审计 M1：默认白名单移除 "null"（file:// 页面可携带恶意脚本调用本机 API）。
+                // 确有 file:// 场景时用 Security:CorsOrigins 显式追加。
                 var exact = configured.Length > 0
                     ? configured
-                    : new[] { "https://appassets.androidplatform.net", "null" };
+                    : new[] { "https://appassets.androidplatform.net" };
 
                 policy.SetIsOriginAllowed(origin =>
                     {
@@ -288,6 +320,7 @@ public sealed class ApiBootstrapper
         app.UseSwagger();
         app.UseSwaggerUI();
         app.UseCors("demo");
+        app.UseRateLimiter();
 
         // ── 访问控制（P2-1）──────────────────────────────────────────────
         // 原实现全站零鉴权：无令牌即可读他人画像、**替他人授予/撤销 consent**、替他人提交作答。
@@ -323,6 +356,20 @@ public sealed class ApiBootstrapper
                 await context.Response.WriteAsJsonAsync(
                     new ApiFailure(null, new ApiError(ErrorCodes.AuthRequired,
                         "需要登录：请在 Authorization 头携带 Bearer 令牌", new { }), context.TraceIdentifier),
+                    JsonOpts);
+                return;
+            }
+
+            // 角色门禁（P1 审计 M1）：教师端聚合数据仅教师角色可读。
+            // 与 RequireAuth 同一信任模型——显式关闭鉴权的部署（本地演示/测试）不启用。
+            if (requireAuth && isApi && user is not null
+                && path.StartsWith("/v1/teachers/", StringComparison.OrdinalIgnoreCase)
+                && !string.Equals(user.Role, "teacher", StringComparison.OrdinalIgnoreCase))
+            {
+                context.Response.StatusCode = 403;
+                await context.Response.WriteAsJsonAsync(
+                    new ApiFailure(null, new ApiError(ErrorCodes.Forbidden,
+                        "教师端仅教师角色可访问", new { }), context.TraceIdentifier),
                     JsonOpts);
                 return;
             }
@@ -371,7 +418,7 @@ public sealed class ApiBootstrapper
                 var isProblem = contentType.Contains("problem+json", StringComparison.OrdinalIgnoreCase);
                 // 未匹配路由的 404 / 405 由框架直接返回**空 body**（不是 problem+json），
                 // 因此还要覆盖「空 body 的框架级错误」这一种情况，否则契约仍然不统一。
-                var isEmptyFrameworkError = context.Response.StatusCode is 404 or 405 or 415
+                var isEmptyFrameworkError = context.Response.StatusCode is 404 or 405 or 415 or 429
                                             && buffer.Length == 0;
                 if (context.Response.StatusCode >= 400 && (isProblem || isEmptyFrameworkError)
                     && buffer.Length <= 64 * 1024)
@@ -381,6 +428,7 @@ public sealed class ApiBootstrapper
                         404 => "找不到请求的资源",
                         405 => "该路径不支持此请求方法",
                         415 => "不支持的请求内容类型",
+                        429 => "请求过于频繁，请稍后再试",
                         _ => "请求无法处理"
                     };
                     object? details = null;

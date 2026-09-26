@@ -47,4 +47,9 @@
     <AndroidResource Include="Resources\**\*" />
     <AndroidAsset Include="Assets\**\*" />
   </ItemGroup>
+
+  <!-- MainActivity 依赖 Avalonia.Android（仅 android TFM 引用），桌面腿不参与编译 -->
+  <ItemGroup Condition="!$(TargetFramework.Contains('android'))">
+    <Compile Remove="MainActivity.cs" />
+  </ItemGroup>
 </Project>

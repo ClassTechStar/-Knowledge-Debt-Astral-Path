@@ -5,6 +5,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.3" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\AstralPath.Core\AstralPath.Core.csproj" />
     <ProjectReference Include="..\AstralPath.Graph\AstralPath.Graph.csproj" />
     <ProjectReference Include="..\AstralPath.Contracts\AstralPath.Contracts.csproj" />

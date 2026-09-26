@@ -1,8 +1,12 @@
 using AstralPath.Core.Algorithms;
 using AstralPath.Core.Filtering;
 using AstralPath.Core.Models;
+using AstralPath.Core.Planner;
 
 namespace AstralPath.Mobile.Services;
+
+/// <summary>App 本地计划行（local_plan_item 表的映射；天数由 Core 生成器分配）。</summary>
+public sealed record PlanItem(int Id, int Day, string KpId, string Layer, int Minutes, string Status);
 
 /// <summary>本地图包：只使用内置边，禁止发明先修边。</summary>
 public sealed class LocalGraphService
@@ -42,24 +46,43 @@ public sealed class LocalQuestionService
     }
 }
 
-/// <summary>计划生成 v2（间隔重复 + 影响优先）+ K1–K5 校验。</summary>
+/// <summary>计划生成 v2（间隔重复 + 影响优先）+ K1–K5 校验（对齐主 Core Planner API）。</summary>
 public sealed class LocalPlanService
 {
+    /// <summary>生成 + 自修复（TryGeneratePlan 按天分组）→ 展开为 App 本地计划行。</summary>
     public IReadOnlyList<PlanItem> Build(
         IReadOnlyList<(string FromKp, string ToKp, double Impact)> openDebts,
         IReadOnlyDictionary<string, string> titles,
         int horizonDays = 14,
-        int dayBudget = PlannerConstraintChecker.DefaultDayBudgetMin)
+        int dayBudget = 40)
     {
-        var goals = openDebts
-            .Select(d => new PlannerBuilder.DebtGoal(d.FromKp, d.ToKp, d.Impact))
+        var debts = openDebts
+            .Select(d => new ScannedDebtInput(d.FromKp, d.ToKp, d.Impact, 10))
             .ToList();
-        return PlannerBuilder.Build(goals, titles, horizonDays, dayBudget);
+        PlannerConstraintChecker.TryGeneratePlan(debts, titles, dayBudget, horizonDays, out var schedule, out _);
+        var result = new List<PlanItem>();
+        var id = 1;
+        foreach (var day in schedule.Days)
+        {
+            foreach (var item in day.Items)
+            {
+                var layer = item.Type is "drill" or "quiz" ? "challenge" : "core";
+                result.Add(new PlanItem(id++, day.Day, item.KpId, layer, item.EstMin, "todo"));
+            }
+        }
+        return result;
     }
 
-    public PlanConstraintResult Validate(IReadOnlyList<PlanItem> items,
-        IReadOnlyList<(string From, string To)> openRefs)
-        => PlannerConstraintChecker.Check(items, PlannerConstraintChecker.DefaultDayBudgetMin, openRefs);
+    public ConstraintCheckResult Validate(IReadOnlyList<PlanItem> items,
+        IReadOnlyList<(string From, string To)> openRefs, int dayBudget = 40)
+    {
+        var days = items.GroupBy(i => i.Day).OrderBy(g => g.Key)
+            .Select(g => new PlanDayInput(g.Key, g.Select(i => new PlanItemInput(
+                i.Id.ToString(), i.KpId, i.KpId, "drill", 2, i.Minutes,
+                $"巩固「{i.KpId}」", Array.Empty<string>())).ToList()))
+            .ToList();
+        return PlannerConstraintChecker.Check(days, dayBudget, openRefs);
+    }
 }
 
 /// <summary>作答 + 掌握度 + 销账推进（状态迁移只走 SaleStateMachine）。</summary>

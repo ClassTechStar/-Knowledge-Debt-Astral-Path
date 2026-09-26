@@ -1,0 +1,120 @@
+# ─────────────────────────────────────────────────────────────
+# 知债：星穹学途（Knowledge Debt: Astral Path）· AstralPath
+# .gitignore —— 只纳管源码、契约、文档与金样；构建产物与大文件一律排除
+# ─────────────────────────────────────────────────────────────
+
+# .NET 构建产物
+bin/
+obj/
+*.user
+*.suo
+.vs/
+TestResults/
+*.trx
+*.coverage
+*.nupkg
+
+# 上传的教材原始文件与解析中间产物
+#   ⚠ 这些是用户上传的**受版权保护的教材 PDF**（数百 MB），
+#     既不进版本库，也不应上传到公开仓库。
+materials-uploads/
+**/materials-uploads/
+*.pdf
+*.PDF
+*.epub
+*.docx
+*.pptx
+*.zip
+
+# OCR 运行时（本地虚拟环境与语言数据）
+tools/ocr-venv/
+tools/tessdata/
+*.traineddata
+_smoke_tmp/
+astralpath_smoke/
+
+**/__pycache__/
+*.py[cod]
+
+# 运行时/临时
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# 安装包：dist 中的 Setup exe 走 Git LFS；发布输出与 staging 不入库
+deploy/win-install/publish-api/
+deploy/win-install/publish-desktop/
+deploy/win-install/AstralPath-Setup/
+materials/ocr-debug/
+**/ocr-debug/
+
+# Android 构建缓存与中间产物
+src/AstralPath.Android/.gradle/
+src/AstralPath.Android/build-manual/
+src/AstralPath.Android/local.properties
+*.keystore
+src/AstralPath.Android/dist/test-shots/
+
+# ── Android 构建（签名材料与中间产物不入库）──────────────────────────────
+src/AstralPath.Android/keystore/
+src/AstralPath.Android/keystore.properties
+src/AstralPath.Android/build-manual/
+src/AstralPath.Android/.gradle/
+src/AstralPath.Android/local.properties
+# 中间输出与测试截图；APK 本体保留在 dist/ 作为交付物
+src/AstralPath.Android/dist/*.idsig
+src/AstralPath.Android/dist/*.png
+src/AstralPath.Android/dist/*.xml
+src/AstralPath.Android/dist/test-shots/
+
+# ── 构建产物（Gradle / MSBuild 中间输出不再入库）────────────────────────
+# 注：已被历史跟踪的 src/AstralPath.Native/app/build/** 需另行 git rm --cached 清理，
+#     本规则至少可阻止**新的**构建产物继续被 git add 进来。
+**/app/build/
+**/build/
+*.dex
+.gradle/
+
+# 运行时状态快照（Persistence:DataDir 指到仓库内时）
+runtime-state.json
+runtime-state.json.bak
+runtime-state.json.tmp
+**/.astralpath-state/
+
+# ===== ↑ 以上同步自 .gitignore（「从 .gitignore 同步」只重写以上部分）=====
+.git/
+.hg/
+.svn/
+node_modules/
+bower_components/
+jspm_packages/
+__pycache__/
+site-packages/
+venv/
+coverage/
+htmlcov/
+lcov-report/
+cmakefiles/
+cmake-build-*/
+bazel-*/
+pods/
+deriveddata/
+storybook-static/
+playwright-report/
+test-results/
+allure-results/
+allure-report/
+cdk.out/
+*.egg-info/
+*.dist-info/
+eggs/
+pip-wheel-metadata/
+wheels/
+# ----- ↑ 以上为 ZCode 默认排除规则（自定义规则请写在本行下方，不会被同步/恢复改动）-----
+# 自定义规则写在下方（本行提示可删除）

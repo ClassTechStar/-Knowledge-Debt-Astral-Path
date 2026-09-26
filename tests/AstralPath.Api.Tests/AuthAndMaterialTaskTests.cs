@@ -12,7 +12,7 @@ public class AuthAndMaterialTaskTests : IClassFixture<WebApplicationFactory<Prog
 
     public AuthAndMaterialTaskTests(WebApplicationFactory<Program> factory)
     {
-        _client = factory.CreateClient();
+        _client = factory.WithWebHostBuilder(b => b.UseSetting("Security:RequireAuth", "false")).CreateClient(); // 测试明确退出鉴权（生产默认开启）
     }
 
     private static async Task<JsonElement> Data(HttpResponseMessage resp)

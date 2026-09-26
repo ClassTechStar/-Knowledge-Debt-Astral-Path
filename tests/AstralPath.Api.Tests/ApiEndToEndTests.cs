@@ -12,7 +12,7 @@ public class ApiEndToEndTests : IClassFixture<WebApplicationFactory<Program>>
 
     public ApiEndToEndTests(WebApplicationFactory<Program> factory)
     {
-        _factory = factory.WithWebHostBuilder(_ => { });
+        _factory = factory.WithWebHostBuilder(b => b.UseSetting("Security:RequireAuth", "false")); // 测试明确退出鉴权（生产默认开启）
     }
 
     private HttpClient CreateClient()

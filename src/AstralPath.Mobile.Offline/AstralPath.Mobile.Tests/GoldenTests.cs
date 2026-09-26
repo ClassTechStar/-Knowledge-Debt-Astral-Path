@@ -1,6 +1,7 @@
 using AstralPath.Core.Algorithms;
 using AstralPath.Core.Filtering;
 using AstralPath.Core.Formatting;
+using AstralPath.Core.Planner;
 using AstralPath.Core.Formula;
 using AstralPath.Core.Resources;
 using Xunit;
@@ -198,36 +199,38 @@ public class ConstraintCheckerTests
     [Fact]
     public void GK01_K1_DayBudget()
     {
-        var items = new[]
+        var items = new PlanItemInput[]
         {
-            new PlanItem(1, 1, "A", "core", 25, "todo"),
-            new PlanItem(2, 1, "B", "core", 20, "todo")
+            new("1", "A", "A", "drill", 2, 25, "巩固「A」", Array.Empty<string>()),
+            new("2", "B", "B", "drill", 2, 20, "巩固「B」", Array.Empty<string>())
         };
-        var r = PlannerConstraintChecker.Check(items, 40, Array.Empty<(string, string)>());
-        Assert.Contains(ConstraintCode.K1, r.Violations);
+        var r = PlannerConstraintChecker.Check(new[] { new PlanDayInput(1, items) }, 40, Array.Empty<(string, string)>());
+        Assert.Contains(r.Violations, v => v.Code == "K1");
     }
 
     [Fact]
     public void GK05_K5_Coverage()
     {
-        var items = new[] { new PlanItem(1, 1, "X", "core", 10, "todo") };
-        var r = PlannerConstraintChecker.Check(items, 40, new[] { ("A", "B") });
-        Assert.Contains(ConstraintCode.K5, r.Violations);
+        var items = new[] { new PlanItemInput("1", "X", "X", "drill", 2, 10, "巩固「X」", Array.Empty<string>()) };
+        var r = PlannerConstraintChecker.Check(new[] { new PlanDayInput(1, items) }, 40, new[] { ("A", "B") });
+        Assert.Contains(r.Violations, v => v.Code == "K5");
     }
 
     [Fact]
     public void GK06_BuilderSatisfiesK1K4()
     {
-        var goals = new[]
+        // 主版 Build 只产扁平条目；生成 + 自修复 + 按天分组的入口是 TryGeneratePlan
+        var debts = new[]
         {
-            new PlannerBuilder.DebtGoal("A", "B", 2.0),
-            new PlannerBuilder.DebtGoal("C", "D", 1.0)
+            new ScannedDebtInput("A", "B", 2.0, 10),
+            new ScannedDebtInput("C", "D", 1.0, 10)
         };
-        var plan = PlannerBuilder.Build(goals, new Dictionary<string, string>(), 14, 40);
-        var r = PlannerConstraintChecker.Check(plan, 40, new[] { ("A", "B"), ("C", "D") });
-        Assert.DoesNotContain(ConstraintCode.K1, r.Violations.Distinct());
-        Assert.DoesNotContain(ConstraintCode.K3, r.Violations.Distinct());
-        Assert.DoesNotContain(ConstraintCode.K4, r.Violations.Distinct());
+        var ok = PlannerConstraintChecker.TryGeneratePlan(
+            debts, new Dictionary<string, string>(), 40, 14, out var plan, out var check);
+        Assert.True(ok, "生成器自修复后应通过 K1–K5");
+        Assert.DoesNotContain(check.Violations, v => v.Code == "K1");
+        Assert.DoesNotContain(check.Violations, v => v.Code == "K3");
+        Assert.DoesNotContain(check.Violations, v => v.Code == "K4");
     }
 }
 
@@ -257,12 +260,12 @@ public class GoldenWalkthroughTests
         Assert.True(DebtScanner.IsHit(input));
         Assert.True(impact > FormulaConstants.ImpactHitThreshold);
 
-        // 2) 计划覆盖并满足 K1/K3/K4
-        var plan = PlannerBuilder.Build(
-            new[] { new PlannerBuilder.DebtGoal("N1", "N2", impact) },
-            new Dictionary<string, string>(), 14, 40);
-        var check = PlannerConstraintChecker.Check(plan, 40, new[] { ("N1", "N2") });
-        Assert.DoesNotContain(ConstraintCode.K1, check.Violations.Distinct());
+        // 2) 计划覆盖并满足 K1/K3/K4（主版入口：TryGeneratePlan 生成 + 自修复）
+        var planOk = PlannerConstraintChecker.TryGeneratePlan(
+            new[] { new ScannedDebtInput("N1", "N2", impact, 10) },
+            new Dictionary<string, string>(), 40, 14, out var plan, out var check);
+        Assert.True(planOk);
+        Assert.DoesNotContain(check.Violations, v => v.Code == "K1");
 
         // 3) 三次作答（两次达标）→ 销账
         var sale = SaleStateMachine.Create();
