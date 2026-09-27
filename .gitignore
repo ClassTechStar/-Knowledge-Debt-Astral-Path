@@ -86,3 +86,9 @@ runtime-state.json
 runtime-state.json.bak
 runtime-state.json.tmp
 **/.astralpath-state/
+
+# P3-16 签名密钥（禁止入库）
+*.keystore
+*.jks
+signing.env
+**/astralpath-signing/

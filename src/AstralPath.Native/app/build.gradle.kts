@@ -13,9 +13,11 @@ android {
         versionName = "2.2.0"
     }
     signingConfigs {
-        // 口令一律来自环境变量/CI secret，禁止写入仓库
+        // P3-16 密钥轮换（2026-09-24）：口令/路径一律环境变量；仓库内不存密钥
+        // 本地/CI 先 load ~/.android/astralpath-signing/signing.env
         create("release") {
-            val ks = System.getenv("ASTRALPATH_KEYSTORE") ?: "../astralpath-release.keystore"
+            val ks = System.getenv("ASTRALPATH_KEYSTORE")
+                ?: (System.getProperty("user.home") + "/.android/astralpath-signing/astralpath-release-2026.keystore")
             storeFile = file(ks)
             storePassword = System.getenv("ASTRALPATH_STORE_PASSWORD") ?: ""
             keyAlias = System.getenv("ASTRALPATH_KEY_ALIAS") ?: "astralpath"
