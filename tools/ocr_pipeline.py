@@ -1681,14 +1681,116 @@ def _render_scale_for(path: Path, page_index: int, base: float = 2.0) -> float:
     return base
 
 
+# ---------------------------------------------------------------------------
+# P6-1/2/3 内容专项通道：代码保真 / 公式密集重试 / 旋转文本
+# ---------------------------------------------------------------------------
+_CODE_TOKEN_RE = re.compile(
+    r"\{\s*$|};|=>|</[a-zA-Z]|::|\)\s*;"
+    r"|^\s*(def |class |import |from |func |public |private |static |var |let |const |return |if |for |while )",
+    re.M,
+)
+
+
+def _looks_like_code(text: str) -> bool:
+    """P6-2 代码页判定：代码标记行 ≥3（纯文本页/公式页不会误入）。"""
+    hits = sum(1 for ln in (text or "").splitlines() if _CODE_TOKEN_RE.search(ln))
+    return hits >= 3
+
+
+_CIRCLED_FIX = str.maketrans({"©": "①", "➊": "①", "➋": "②", "➌": "③", "➍": "④", "➎": "⑤",
+                              "❶": "①", "❷": "②", "❸": "③", "❹": "④", "❺": "⑤"})
+
+
+def _fix_code_tokens(text: str) -> str:
+    """P6-2 代码页保守 token 纠错（规则全部窄化，宁可漏纠不可误伤）：
+    ① 圈码/© 还原 ①②③（OCR 高发误识：Kotlin p100/p196 圈码→©）；
+    ② 前邻小写/数字的词尾大写 O → 0（'CartPole-vO'→'-v0'，强化学习 p233 实测）；
+    ③ 数字夹的 l/I → 1。"""
+    s = text.translate(_CIRCLED_FIX)
+    s = re.sub(r"(?<=[a-z0-9_])O(?=[^A-Za-z]|$)", "0", s)
+    s = re.sub(r"(?<=\d)l(?=\d)", "1", s)
+    s = re.sub(r"(?<=\d)I(?=\d)", "1", s)
+    return s
+
+
+_MATH_CHARS = "∑∏∫∂√∞≠≈≤≥±×÷∈∉⊂⊃∪∩→←⇒⇐αβγδεθλµμπσφωΓΔΘΛΞΠΣΦΨΩ∇"
+
+
+def _math_symbol_count(text: str) -> int:
+    return sum(1 for ch in (text or "") if ch in _MATH_CHARS)
+
+
+def _formula_dense(text: str) -> bool:
+    """P6-1 公式密集页判定：数学符号 ≥12 且占词字符 ≥1.5%（花书矩阵页符号上百）。"""
+    n = _math_symbol_count(text)
+    words = len(WORD_CHAR_RE.findall(text or ""))
+    return n >= 12 and words > 0 and n / max(1, words) >= 0.015
+
+
+def _vertical_box_count(res, img_h: float) -> int:
+    """P6-3 竖排框计数：h > 2.5×w 且 >页高 8% 的检测框（旋转 y 轴标签特征，花书 p179）。"""
+    boxes = getattr(res, "boxes", None)
+    boxes = list(boxes) if boxes is not None else []
+    n = 0
+    for b in boxes:
+        if b is None or len(b) < 4:
+            continue
+        try:
+            xs = [float(p[0]) for p in b]
+            ys = [float(p[1]) for p in b]
+            w, h = max(xs) - min(xs), max(ys) - min(ys)
+        except Exception:
+            continue
+        if h > 2.5 * max(w, 2.0) and img_h > 0 and h > 0.08 * img_h:
+            n += 1
+    return n
+
+
 def ocr_image_rapid(image_path: Path) -> str:
-    """单页 PNG → RapidOCR 行序文本（含预处理与项目纠错）。"""
+    """单页 PNG → RapidOCR 行序文本（P6-1/2/3 智能通道版）。
+    ① 基础识别；② 代码页：缩进重建 + 保守 token 纠错；③ 检出竖排框或近空页时
+       ±90° 重试：整页更优则整体替换（旋转扫描页），否则最多附加 5 行增量
+       （竖排 y 轴标签召回；增量行数封顶防垃圾注入）。"""
     from PIL import Image
 
     img = Image.open(image_path)
     img = preprocess_pil_for_ocr(img)
-    res = _rapid_engine()(img)
-    return fix_ocr_text(_rapid_result_to_text(res))
+    eng = _rapid_engine()
+    try:
+        res = eng(img)
+        text0 = _rapid_result_to_text(res)
+        if _looks_like_code(text0):
+            text0 = _fix_code_tokens(_rapid_result_to_text(res, code=True))
+    except Exception:
+        return ""
+    try:
+        vboxes = _vertical_box_count(res, float(img.height))
+    except Exception:
+        vboxes = 0
+    chars0 = len(WORD_CHAR_RE.findall(text0))
+    if vboxes == 0 and chars0 >= 20:
+        return fix_ocr_text(text0)
+    _TP = getattr(Image, "Transpose", Image)  # Pillow≥10 移除了模块级常量
+    best_full = text0
+    extras: list[str] = []
+    for rot_name in ("ROTATE_90", "ROTATE_270"):
+        try:
+            t_r = _rapid_result_to_text(eng(img.transpose(getattr(_TP, rot_name))))
+        except Exception:
+            continue
+        if len(WORD_CHAR_RE.findall(t_r)) > len(WORD_CHAR_RE.findall(best_full)) * 1.15:
+            best_full = t_r
+        elif vboxes >= 2:
+            for ln in t_r.splitlines():
+                s = ln.strip()
+                if (len(s) >= 6 and s not in text0 and s not in extras
+                        and len(WORD_CHAR_RE.findall(s)) >= 4):
+                    extras.append(s)
+    if best_full is not text0:
+        return fix_ocr_text(best_full)
+    if extras:
+        return fix_ocr_text(text0 + "\n" + "\n".join(extras[:5]))
+    return fix_ocr_text(text0)
 
 
 def rapid_pdf_pages_detail(path: Path, page_indexes: list[int], scale: float = 2.0,
@@ -1728,6 +1830,26 @@ def rapid_pdf_pages_detail(path: Path, page_indexes: list[int], scale: float = 2
             return idx, ""
         try:
             text = ocr_image_rapid(rendered)
+            # P6-1 公式重试：数学符号密集页升倍率（≤3.2）重识别一次，
+            # 按（词字符 + 2×数学符号）取更优者；高倍率结果复用同一缓存键
+            if _formula_dense(text) and float(eff_scale) < 3.0:
+                hi_scale = min(3.2, eff_scale * 1.4)
+                png2 = workdir / f"page_{idx:04d}_hi.png"
+                with _PDFIUM_RENDER_LOCK:
+                    rendered2 = render_pdf_page_png(path, idx, scale=hi_scale, out_png=png2)
+                if rendered2 is not None:
+                    try:
+                        t2 = ocr_image_rapid(rendered2)
+                        score = lambda t: len(WORD_CHAR_RE.findall(t)) + 2 * _math_symbol_count(t)
+                        if score(t2) > score(text):
+                            text = t2
+                    except Exception:
+                        pass
+                    finally:
+                        try:
+                            png2.unlink(missing_ok=True)
+                        except Exception:
+                            pass
             _ocr_cache_put(ckey, text)
             return idx, text
         except Exception:
@@ -1762,6 +1884,27 @@ def rapid_pdf_pages_detail(path: Path, page_indexes: list[int], scale: float = 2
     if _failed:
         note += f" fail={len(_failed)}"
     return text, note, pages_out
+
+
+_RAPID_PROBE_OK: bool | None = None
+_RAPID_PROBE_LOCK = threading.Lock()
+
+
+def rapid_engine_usable() -> bool:
+    """P5-5：rapid 不再「可 import 即可用」——惰性实例化探针（每进程一次）。
+    模型加载失败 → False → 分发器回落 tesseract。此前失败时每页静默 fail=0。"""
+    global _RAPID_PROBE_OK
+    if not rapidocr_available():
+        return False
+    if _RAPID_PROBE_OK is None:
+        with _RAPID_PROBE_LOCK:
+            if _RAPID_PROBE_OK is None:
+                try:
+                    _rapid_engine()
+                    _RAPID_PROBE_OK = True
+                except Exception:
+                    _RAPID_PROBE_OK = False
+    return _RAPID_PROBE_OK
 
 
 def _ocr_engine_name() -> str:
