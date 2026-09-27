@@ -348,7 +348,7 @@ def clean_ocr_text(text: str) -> str:
     text = (text or "").replace("　", " ").replace("\x00", "")
     lines = []
     for line in text.splitlines():
-        s = line.strip()
+        s = line.rstrip()  # P6-2：保留行首缩进（代码页），仅去尾
         if not s:
             continue
         if len(s) <= 1 and not s.isdigit():
@@ -1062,6 +1062,8 @@ def extract_full_text(path: Path, ocr_mode: str = "standard", force_pages: list[
         return merged_n
 
     sparse = len(text) < 80 or density < 120
+    if ocr_mode == "quick" and pages and pages > max_text_pages:
+        notes.append("quick_capped:%d/%d" % (max_text_pages, pages))  # P5-5：quick 静默截断显式化
     if sparse:
         notes.append("text_layer_sparse:density=%.1f" % density)
     if not engine_ok:
@@ -1118,6 +1120,7 @@ def extract_full_text(path: Path, ocr_mode: str = "standard", force_pages: list[
     text = clean_ocr_text("\n".join(page_texts)).strip() if page_texts else ""
     if not sparse and not flagged:
         notes.append("text_layer_full")
+    detail["ocrUsed"] = ocr_used  # P5-5：显式布尔，替代 notes 子串反推
     return text, pages, mode, notes, detail
 
 
@@ -1171,7 +1174,7 @@ def process_file(path: Path, ocr_mode: str = "standard", force_pages: list[int] 
     result["notes"].extend(notes)
     result["garblePages"] = detail.get("garbledPages", [])
     result["ocrPages"] = detail.get("ocrPages", [])
-    result["ocrUsed"] = any("tesseract" in n or "ocr" in n for n in notes)
+    result["ocrUsed"] = bool(detail.get("ocrUsed"))  # P5-5：显式布尔（此前 notes 子串反推，「tesseract_unavailable」也误判 true）
     result["fullText"] = text  # 供 API 存章节全文
     result["textSample"] = text[:4000]
 
@@ -1488,15 +1491,16 @@ def fix_ocr_text(text: str, aggressive: bool | None = None) -> str:
             s = s.replace(a, b)
     s = re.sub(r"([一-鿿])([A-Za-z])", r"\1 \2", s)
     s = re.sub(r"([A-Za-z])([一-鿿])", r"\1 \2", s)
-    # 中文软断行：行尾无标点则与下一行合并
+    # 中文软断行：行尾无标点则与下一行合并；P6-2：任一侧带行首缩进（代码行）不合并
     out: list[str] = []
     buf = ""
-    for line in (ln.strip() for ln in s.splitlines() if ln.strip()):
+    for line in (ln.rstrip() for ln in s.splitlines() if ln.strip()):
         if not buf:
             buf = line
             continue
         cjk = sum(1 for c in buf if "一" <= c <= "鿿")
-        soft = not buf.endswith(("。", "！", "？", ".", ":", "：", ";", "；"))
+        soft = (not buf.endswith(("。", "！", "？", ".", ":", "：", ";", "；"))
+                and not line[:1].isspace() and not buf[:1].isspace())
         if cjk * 2 >= len(buf) and soft and len(buf) < 80:
             buf += line
             continue
@@ -1649,12 +1653,13 @@ def _rapid_result_to_text(res, code: bool = False) -> str:
     if not code:
         return "\n".join(" ".join(t[0] for t in sorted(r, key=lambda t: t[1])) for r in rows)
     hs = sorted(wd[3] for r in rows for wd in r if wd[3] > 4)
-    unit = max(8.0, (hs[len(hs) // 2] if hs else 24.0) * 0.55)
+    unit = max(8.0, (hs[len(hs) // 2] if hs else 24.0) * 0.5)  # 拉丁字符宽 ≈ 0.5×字高
     base = min((wd[1] for r in rows for wd in r), default=0.0)
     out_lines = []
     for r in rows:
         left = min(wd[1] for wd in r)
-        pad = max(0, int(round((left - base) / unit)))
+        off = left - base
+        pad = int(round(off / unit)) if off >= unit * 0.6 else 0  # 60% 容差滤 x 噪声
         out_lines.append(" " * pad + " ".join(t[0] for t in sorted(r, key=lambda t: t[1])))
     return "\n".join(out_lines)
 
@@ -1721,10 +1726,10 @@ def _math_symbol_count(text: str) -> int:
 
 
 def _formula_dense(text: str) -> bool:
-    """P6-1 公式密集页判定：数学符号 ≥12 且占词字符 ≥1.5%（花书矩阵页符号上百）。"""
+    """P6-1 公式密集页判定：数学符号 ≥12 且占词字符 ≥1.5%（纯符号矩阵页 words 可为 0）。"""
     n = _math_symbol_count(text)
     words = len(WORD_CHAR_RE.findall(text or ""))
-    return n >= 12 and words > 0 and n / max(1, words) >= 0.015
+    return n >= 12 and n / max(1, words) >= 0.015
 
 
 def _vertical_box_count(res, img_h: float) -> int:
@@ -1916,16 +1921,18 @@ def _ocr_engine_name() -> str:
 
 
 def ocr_engine_ready(info: dict | None = None) -> bool:
-    """当前引擎是否可用：rapid 可导入即用；tesseract 需 exe + tessdata。"""
+    """当前引擎是否可用：rapid 需通过惰性实例化探针；tesseract 需 exe + tessdata。"""
     if _ocr_engine_name() == "rapid":
-        return True
+        return rapid_engine_usable()
     return bool((info if info is not None else tesseract_info()).get("available"))
 
 
 def ocr_pdf_pages_detail(path: Path, page_indexes: list[int], scale: float = 2.0,
                          max_pages: int = 12, time_budget_s: float = 40.0) -> tuple[str, str, dict[int, str]]:
-    """按 ASTRALPATH_OCR_ENGINE 分发到 RapidOCR / tesseract。"""
-    if _ocr_engine_name() == "rapid":
+    """按 ASTRALPATH_OCR_ENGINE 分发到 RapidOCR / tesseract。
+    P5-5：rapid 探针失败自动回落 tesseract（此前 import 成功即认定可用，
+    模型坏掉时整本每页静默失败）。"""
+    if _ocr_engine_name() == "rapid" and rapid_engine_usable():
         return rapid_pdf_pages_detail(path, page_indexes, scale=scale,
                                       max_pages=max_pages, time_budget_s=time_budget_s)
     return tesseract_pdf_pages_detail(path, page_indexes, scale=scale,
