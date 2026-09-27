@@ -4,8 +4,12 @@
 
 1. **资料 OCR / 文本解析**
    - 优先抽取 PDF 文本层（pypdf / pypdfium2）
-   - 扫描版自动启用 **RapidOCR**（`tools/ocr-venv`）
+   - 扫描版自动启用 **RapidOCR v3**（本地 RapidOCR 仓库 `python/` 包，PP-OCRv6 检测/识别模型）
    - 模式：`quick` / `standard` / `none`
+   - **页级多线程并行**：渲染串行（pdfium 非线程安全），OCR 按 `ASTRALPATH_OCR_WORKERS`（默认 4）线程并行，每线程独立引擎实例，单实例 ORT 线程由 `ASTRALPATH_OCR_INTRA`（默认 2）限死防超订阅
+   - 引擎切换：`ASTRALPATH_OCR_ENGINE=auto(默认→rapid) | tesseract`；tesseract 三 PSM 投票路径保留为回退
+   - 引擎基准（120 抽样页，2026-09-27）：rapid3 1.45 页/s ≈ 3.5× 1.4.4（0.41）≈ 13.9× PaddleOCR（0.105），质量持平（CER vs 文本层 0.36–0.37）
+   - **全量双轮评测（2026-09-27，12 本 5,982 页）**：独立最大化抽取 337.9 万词字符 vs 生产管线 245.4 万（72.6%）。6 本文本层书 ≈99% 完好；C#/Go/Java 仅 51–54%（代码在截图里，无乱码不触发 OCR）；强化学习 15%（pypdf 欠抽取无兜底）；扫描大模型 6.6%（只 OCR 28 页）；黄仁勋 9.2% 字符被 pypdf 康熙部首污染（⻩/⼭/⾹，乱码判定豁免区）。RapidOCR 正文 CER 0.3–5.4%（12 页独立视觉真值）。深度优化任务清单见 `docs/ocr-max-vs-production-2026-09-27.md`
 
 2. **按文件自动生成知识图谱**
    - 章节标题抽取 → 顺序先修边

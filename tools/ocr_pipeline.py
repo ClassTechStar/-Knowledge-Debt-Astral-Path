@@ -18,6 +18,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import traceback
 from pathlib import Path
 from typing import Any
@@ -717,7 +718,7 @@ def extract_full_text(path: Path, ocr_mode: str = "standard", force_pages: list[
 
     if len(text) < 80 or density < 120:
         notes.append("text_layer_sparse:density=%.1f" % density)
-        if ocr_mode in ("standard", "quick", "deep") and info.get("available"):
+        if ocr_mode in ("standard", "quick", "deep") and ocr_engine_ready(info):
             total = pages or 30
             toc_idx = list(range(0, min(total, 24)))
             sample = []
@@ -730,7 +731,7 @@ def extract_full_text(path: Path, ocr_mode: str = "standard", force_pages: list[
                 max_ocr = 10
             else:
                 max_ocr = 28
-            ocr_text, ocr_note = tesseract_pdf_pages(
+            ocr_text, ocr_note = ocr_pdf_pages(
                 path, indexes, scale=2.0, max_pages=max_ocr,
                 time_budget_s=90.0 if ocr_mode != "quick" else 40.0,
             )
@@ -747,7 +748,7 @@ def extract_full_text(path: Path, ocr_mode: str = "standard", force_pages: list[
             notes.append("tesseract_unavailable_or_no_traineddata")
     elif wide:
         notes.append("text_layer_garble_wide:pages=%d/%d" % (len(flagged), pages))
-        if ocr_mode in ("standard", "quick", "deep") and info.get("available"):
+        if ocr_mode in ("standard", "quick", "deep") and ocr_engine_ready(info):
             total = pages or 30
             toc_idx = list(range(0, min(total, 24)))
             sample = []
@@ -756,7 +757,7 @@ def extract_full_text(path: Path, ocr_mode: str = "standard", force_pages: list[
                 sample = list(range(24, total, step))[:18]
             indexes = sorted({i for i in toc_idx + sample if 0 <= i < total})
             max_ocr = 10 if ocr_mode == "quick" else 28
-            ocr_text, ocr_note = tesseract_pdf_pages(
+            ocr_text, ocr_note = ocr_pdf_pages(
                 path, indexes, scale=2.0, max_pages=max_ocr,
                 time_budget_s=90.0 if ocr_mode != "quick" else 40.0,
             )
@@ -770,11 +771,11 @@ def extract_full_text(path: Path, ocr_mode: str = "standard", force_pages: list[
             notes.append("tesseract_unavailable_or_no_traineddata")
     elif flagged:
         notes.append("text_layer_garble_pages:" + ",".join(str(p["page"]) for p in flagged[:24]))
-        if ocr_mode in ("standard", "quick", "deep") and info.get("available") and page_texts:
+        if ocr_mode in ("standard", "quick", "deep") and ocr_engine_ready(info) and page_texts:
             order = sorted(flagged, key=lambda x: (-float(x.get("peakLineDensity", 0.0)),
                                                    -int(x.get("suspChars", 0)), int(x["page"])))
             target = [p["page"] - 1 for p in order][:GARBLE_OCR_MAX_PAGES]
-            ocr_text, ocr_note, ocr_map = tesseract_pdf_pages_detail(
+            ocr_text, ocr_note, ocr_map = ocr_pdf_pages_detail(
                 path, target, scale=2.0, max_pages=GARBLE_OCR_MAX_PAGES,
                 time_budget_s=60.0 if ocr_mode != "quick" else 30.0,
             )
@@ -815,7 +816,7 @@ def process_file(path: Path, ocr_mode: str = "standard", force_pages: list[int] 
         "extractedChars": 0,
         "needsOcr": False,
         "ocrUsed": False,
-        "ocrEngine": "tesseract",
+        "ocrEngine": _ocr_engine_name(),
         "tesseract": info,
         "notes": [],
         "textSample": "",
@@ -1082,10 +1083,6 @@ def main() -> int:
     return 0 if payload.get("ok", False) else 1
 
 
-if __name__ == "__main__":
-    sys.exit(main())
-
-
 # ═══════════════════════════════════════════════════════════════
 # OCR v2：预处理 / 置信度 / 多配置投票 / 中文断行 / 误识修复
 # ═══════════════════════════════════════════════════════════════
@@ -1235,6 +1232,194 @@ def ocr_image_v2(image_path: Path, workdir: Path, tag: str) -> str:
     return fix_ocr_text(merged)
 
 
+# ---------------------------------------------------------------------------
+# RapidOCR 引擎（rapidocr v3 包）+ 页级并行
+# 引擎选择：ASTRALPATH_OCR_ENGINE = auto(默认) | rapid | tesseract
+# 并行度：ASTRALPATH_OCR_WORKERS（默认 4 个线程，每线程独立引擎实例）
+# 单实例线程：ASTRALPATH_OCR_INTRA（默认 2，EngineConfig.onnxruntime.intra_op_num_threads）
+# ---------------------------------------------------------------------------
+
+_RAPID_TL = threading.local()
+_RAPID_INIT_LOCK = threading.Lock()
+_PDFIUM_RENDER_LOCK = threading.Lock()  # pdfium 全局状态非线程安全：渲染串行，OCR 并行
+
+
+def rapidocr_available() -> bool:
+    try:
+        import rapidocr  # noqa: F401
+        return True
+    except Exception:
+        return False
+
+
+def _env_int(name: str, default: int) -> int:
+    try:
+        return max(1, int(os.environ.get(name, str(default))))
+    except Exception:
+        return default
+
+
+def _rapid_workers() -> int:
+    return _env_int("ASTRALPATH_OCR_WORKERS", 4)
+
+
+def _rapid_intra() -> int:
+    return _env_int("ASTRALPATH_OCR_INTRA", 2)
+
+
+def _rapid_engine():
+    """线程本地 RapidOCR 实例：每线程独立加载，EngineConfig 限制单实例线程防超订阅。
+    初始化（含模型下载/校验）用全局锁串行化，避免多线程同时落盘同名模型文件。"""
+    eng = getattr(_RAPID_TL, "engine", None)
+    if eng is not None:
+        return eng
+    from rapidocr import RapidOCR
+
+    intra = _rapid_intra()
+    with _RAPID_INIT_LOCK:
+        eng = getattr(_RAPID_TL, "engine", None)
+        if eng is not None:
+            return eng
+        eng = RapidOCR(params={
+            "EngineConfig.onnxruntime.intra_op_num_threads": intra,
+            "EngineConfig.onnxruntime.inter_op_num_threads": 1,
+        })
+        _RAPID_TL.engine = eng
+    return eng
+
+
+def _rapid_result_to_text(res) -> str:
+    """boxes+txts → 行序文本：按 y 聚行、行内按 x 排序（对齐 words_to_text 口径）。"""
+    txts = getattr(res, "txts", None)
+    txts = list(txts) if txts is not None else []
+    boxes = getattr(res, "boxes", None)
+    boxes = list(boxes) if boxes is not None else []
+    if not txts:
+        return ""
+    words = []
+    for i, t in enumerate(txts):
+        box = boxes[i] if i < len(boxes) else None
+        if box is not None and len(box) >= 4:
+            try:
+                y = sum(float(p[1]) for p in box) / 4.0
+                x = sum(float(p[0]) for p in box) / 4.0
+            except Exception:
+                x = y = 0.0
+        else:
+            x = y = 0.0
+        words.append((str(t), x, y))
+    rows: list[list[tuple]] = []
+    for w in sorted(words, key=lambda t: (t[2], t[1])):
+        row = next((r for r in rows if abs(r[0][2] - w[2]) <= 14), None)
+        if row is None:
+            row = []
+            rows.append(row)
+        row.append(w)
+    rows.sort(key=lambda r: sum(x[2] for x in r) / len(r))
+    return "\n".join(" ".join(t[0] for t in sorted(r, key=lambda t: t[1])) for r in rows)
+
+
+def ocr_image_rapid(image_path: Path) -> str:
+    """单页 PNG → RapidOCR 行序文本（含项目纠错归一）。"""
+    from PIL import Image
+
+    img = Image.open(image_path)
+    res = _rapid_engine()(img)
+    return fix_ocr_text(_rapid_result_to_text(res))
+
+
+def rapid_pdf_pages_detail(path: Path, page_indexes: list[int], scale: float = 2.0,
+                           max_pages: int = 12, time_budget_s: float = 40.0) -> tuple[str, str, dict[int, str]]:
+    """PDF → PNG（复用 pypdfium2 渲染）→ RapidOCR 页级并行识别，返回 {0基页号: 文本}。"""
+    if not rapidocr_available():
+        return "", "rapidocr_unavailable", {}
+    try:
+        import pypdfium2 as pdfium
+
+        doc = pdfium.PdfDocument(str(path))
+        total = len(doc)
+        doc.close()
+    except Exception as e:
+        return "", f"pdf_open_error:{e}", {}
+    import time as _t
+
+    _t0 = _t.time()
+    targets = sorted({i for i in page_indexes if 0 <= i < total})[:max_pages]
+    workdir = Path(tempfile.gettempdir()) / f"astralpath_rapid_{os.getpid()}"
+    workdir.mkdir(parents=True, exist_ok=True)
+
+    _failed: list[int] = []
+
+    def _one(idx: int) -> tuple[int, str]:
+        png = workdir / f"page_{idx:04d}.png"
+        with _PDFIUM_RENDER_LOCK:
+            rendered = render_pdf_page_png(path, idx, scale=scale, out_png=png)
+        if rendered is None:
+            _failed.append(idx)
+            return idx, ""
+        try:
+            return idx, ocr_image_rapid(rendered)
+        except Exception:
+            _failed.append(idx)
+            return idx, ""
+
+    pages_out: dict[int, str] = {}
+    workers = _rapid_workers()
+    if workers <= 1 or len(targets) <= 1:
+        for idx in targets:
+            if pages_out and _t.time() - _t0 > time_budget_s:
+                break
+            pages_out[idx] = _one(idx)[1]
+    else:
+        from concurrent.futures import ThreadPoolExecutor
+
+        with ThreadPoolExecutor(max_workers=workers) as pool:
+            for start in range(0, len(targets), workers):
+                if pages_out and _t.time() - _t0 > time_budget_s:
+                    break
+                for idx, tx in pool.map(_one, targets[start:start + workers]):
+                    pages_out[idx] = tx
+
+    used = sum(1 for v in pages_out.values() if v.strip())
+    text = "\n".join(pages_out[i] for i in sorted(pages_out) if pages_out[i].strip())
+    note = f"rapidocr:{used}/{min(max_pages, total)} workers={workers} intra={_rapid_intra()}"
+    if _failed:
+        note += f" fail={len(_failed)}"
+    return text, note, pages_out
+
+
+def _ocr_engine_name() -> str:
+    env = (os.environ.get("ASTRALPATH_OCR_ENGINE") or "auto").strip().lower()
+    want_rapid = env in ("", "auto", "rapid", "rapidocr")
+    if want_rapid and rapidocr_available():
+        return "rapid"
+    return "tesseract"
+
+
+def ocr_engine_ready(info: dict | None = None) -> bool:
+    """当前引擎是否可用：rapid 可导入即用；tesseract 需 exe + tessdata。"""
+    if _ocr_engine_name() == "rapid":
+        return True
+    return bool((info if info is not None else tesseract_info()).get("available"))
+
+
+def ocr_pdf_pages_detail(path: Path, page_indexes: list[int], scale: float = 2.0,
+                         max_pages: int = 12, time_budget_s: float = 40.0) -> tuple[str, str, dict[int, str]]:
+    """按 ASTRALPATH_OCR_ENGINE 分发到 RapidOCR / tesseract。"""
+    if _ocr_engine_name() == "rapid":
+        return rapid_pdf_pages_detail(path, page_indexes, scale=scale,
+                                      max_pages=max_pages, time_budget_s=time_budget_s)
+    return tesseract_pdf_pages_detail(path, page_indexes, scale=scale,
+                                      max_pages=max_pages, time_budget_s=time_budget_s)
+
+
+def ocr_pdf_pages(path: Path, page_indexes: list[int], scale: float = 2.0,
+                  max_pages: int = 12, time_budget_s: float = 40.0) -> tuple[str, str]:
+    text, note, _pages = ocr_pdf_pages_detail(
+        path, page_indexes, scale=scale, max_pages=max_pages, time_budget_s=time_budget_s)
+    return text, note
+
+
 def ocr_quality_grade(text: str) -> dict[str, Any]:
     lines = [ln for ln in (text or "").splitlines() if ln.strip()]
     letters = sum(1 for c in text if c.isalpha())
@@ -1246,3 +1431,7 @@ def ocr_quality_grade(text: str) -> dict[str, Any]:
     grade = "A" if score >= 0.85 else "B" if score >= 0.7 else "C" if score >= 0.5 else "D"
     return {"score": round(score, 4), "grade": grade, "cjk_ratio": round(cjk_ratio, 4),
             "noise_ratio": round(noise_ratio, 4), "lines": len(lines)}
+
+
+if __name__ == "__main__":
+    sys.exit(main())
