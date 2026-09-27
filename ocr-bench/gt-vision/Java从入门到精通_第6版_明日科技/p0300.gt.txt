@@ -1,0 +1,22 @@
+import java.util.Date;                          //导入java.util.Date类
+public class Eval {                             //新建类
+    public static void main(String[] args) {    //主方法
+        Date date = new Date();                 //创建Date对象date
+        String year = String.format("%tY", date);      //将date进行格式化
+        String month = String.format("%tB", date);
+        String day = String.format("%td", date);
+        System.out.println("今年是: " + year + "年");  //输出信息
+        System.out.println("现在是: " + month);
+        System.out.println("今天是: " + day + "号");
+    }
+}
+运行结果如图10.18所示。
+2. 时间格式化
+使用format()方法不仅可以完成日期的格式化，也可以实现时间的格式化。时间的格式化转换符要比日期的格式化转换符更多、更精确，它可以将时间格式化为时、分、秒、毫秒等。格式化时间的转换符如表10.2所示。
+Console
+<terminated> Eval [Java Application] D:\Java\jdk-11\bin
+今年是：2021年
+现在是：二月
+今天是：24号
+图10.18 例10.13的运行结果
+表10.2 时间格式化转换符

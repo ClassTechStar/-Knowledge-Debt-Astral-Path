@@ -1,0 +1,57 @@
+perf: n=19 avgMs=1016 pagesPerS=0.98 avgChars=309
+per-page: p1:1124ms/136c, p2:819ms/160c, p13:967ms/272c, p15:1187ms/540c, p25:319ms/0c, p38:592ms/127c, p83:289ms/0c, p106:779ms/161c, p118:635ms/73c, p120:1578ms/527c, p168:1790ms/1031c, p185:235ms/0c, p200:744ms/198c, p236:1801ms/1001c, p255:813ms/15c, p300:1441ms/618c, p400:1378ms/389c, p401:237ms/0c, p450:2576ms/622c
+
+=== a) OCR vs textlayer CER ===
+p450: cer=0.5118
+p200: cer=0.3952
+p13: cer=0.3430
+p106: cer=0.2422
+p168: cer=0.2295
+p15: cer=0.2260
+p118: cer=0.1967
+p2: cer=0.1524
+p300: cer=0.1434
+p120: cer=0.0849
+p38: cer=0.0619
+p236: cer=0.0317
+p400: cer=0.0115
+mean=0.2023 n=13 worst5=[(450, 0.5118), (200, 0.3952), (13, 0.343), (106, 0.2422), (168, 0.2295)]
+
+=== b) OCR vs rapid3 ref CER ===
+p255: cer=0.8667 (r3chars=10, ocrchars=15)
+p450: cer=0.3351 (r3chars=568, ocrchars=622)
+p200: cer=0.0872 (r3chars=174, ocrchars=198)
+p2: cer=0.0519 (r3chars=161, ocrchars=160)
+p168: cer=0.0163 (r3chars=1031, ocrchars=1031)
+p1: cer=0.0133 (r3chars=136, ocrchars=136)
+p13: cer=0.0025 (r3chars=276, ocrchars=272)
+p15: cer=0.0025 (r3chars=541, ocrchars=540)
+p236: cer=0.0017 (r3chars=1000, ocrchars=1001)
+p25: cer=0.0000 (r3chars=0, ocrchars=0)
+p38: cer=0.0000 (r3chars=128, ocrchars=127)
+p83: cer=0.0000 (r3chars=0, ocrchars=0)
+p106: cer=0.0000 (r3chars=161, ocrchars=161)
+p118: cer=0.0000 (r3chars=72, ocrchars=73)
+p120: cer=0.0000 (r3chars=527, ocrchars=527)
+p185: cer=0.0000 (r3chars=0, ocrchars=0)
+p300: cer=0.0000 (r3chars=618, ocrchars=618)
+p400: cer=0.0000 (r3chars=389, ocrchars=389)
+p401: cer=0.0000 (r3chars=0, ocrchars=0)
+mean=0.0725 n=19 charDelta(ocr-r3)=78 worst5=[(255, 0.8667), (450, 0.3351), (200, 0.0872), (2, 0.0519), (168, 0.0163)]
+
+=== d) GT comparison ===
+p200: CER(textlayer,GT)=0.1801 CER(myOCR,GT)=0.3799 CER(rapid3,GT)=0.3270
+GT first80: '步骤26 计算图的可视化(2) 177\n图26-3 Goldstein-Price函数的计算图\n到这里就完成了计算图的可视化。将来我们会根据需要使用这里实现的函'
+myOCR first80: '步骤26 计算图的可视化(2)177\nMul Mut\nMal Mul Mul Mul\nMul Mal Add Mul Mul Pow Pow Mal Mul A'
+TL first80: "步骤26\n计算图的可视化(2) I 177 \n刷\n白\nγ\n/\n镑\n'\ni\n怕\n刷\n命\nυ\n卢\nMul \nMul \n? \nMul \n图:! (卜1\nGold s "
+
+p400: CER(textlayer,GT)=0.0115 CER(myOCR,GT)=0.0000 CER(rapid3,GT)=0.0000
+GT first80: '第5阶段 DeZero高级挑战\n\n在第4阶段，我们向DeZero增加了机器学习，尤其是神经网络特有的功能。具体来说是Layer、Optimizer和DataLo'
+myOCR first80: '第5阶段\nDeZero高级挑战\n在第4阶段，我们向DeZero增加了机器学习，尤其是神经网络特有的功能。\n具体来说是Layer、Optimizer和DataLo'
+TL first80: '第5 阶段\nDeZer。高级挑战\n在第4 阶段，我们向DeZero增加了机器学习，尤其是神经网络特有的功能。\n具体来说是Lay町、\nOptimizer 和Dat'
+
+=== empty OCR pages ===
+p25: '' (ms=319)
+p83: '' (ms=289)
+p185: '' (ms=235)
+p401: '' (ms=237)

@@ -147,7 +147,44 @@ def bounded_levenshtein(a: str, b: str, tau: int) -> int:
 
 
 # ───────────────────────── GraphInference: TextRank / PMI ─────────────────────────
+_JIEBA = None
+_JIEBA_TRIED = False
+
+# K-04：正则 8 字窗口机械切片会把连续汉字切成无语义伪词；有 jieba 用 jieba，
+# 没有则回退原口径（不引入硬依赖）。停用表滤掉分词后高频虚词与章节噪声。
+_CN_STOPWORDS = {
+    "我们", "你们", "他们", "自己", "什么", "这个", "那个", "一个", "没有", "不是",
+    "可以", "进行", "使用", "通过", "如果", "那么", "因此", "但是", "然后", "以及",
+    "或者", "并且", "对于", "关于", "以上", "下面", "如下", "其中", "之间", "开始",
+    "结束", "时候", "现在", "可能", "需要", "应该", "如何", "这些", "那些", "这样",
+    "小结", "习题", "本章", "参考", "文献", "目录", "前言", "后记", "附录", "版本",
+    "出版", "印刷", "字数", "定价", "编著",
+    # 英文虚词（jieba 会把 in/for/the 等当词吐出来）
+    "in", "on", "of", "to", "is", "are", "an", "as", "at", "by", "or", "if", "it",
+    "we", "be", "do", "no", "so", "up", "an", "the", "and", "for", "not", "with",
+    "from", "this", "that", "will", "can", "its", "one", "two", "use", "using",
+}
+
+
+def _get_jieba():
+    global _JIEBA, _JIEBA_TRIED
+    if not _JIEBA_TRIED:
+        _JIEBA_TRIED = True
+        try:
+            import jieba
+
+            jieba.setLogLevel(60)
+            _JIEBA = jieba
+        except Exception:
+            _JIEBA = None
+    return _JIEBA
+
+
 def tokenize(text: str) -> List[str]:
+    jieba = _get_jieba()
+    if jieba is not None:
+        return [t for t in jieba.lcut(text)
+                if 2 <= len(t) <= 20 and t.lower() not in _CN_STOPWORDS and not t.isspace()]
     return [t for t in re.findall(r"[一-鿿]{2,8}|[A-Za-z][A-Za-z0-9_\.]{1,20}", text) if len(t) >= 2]
 
 
@@ -181,7 +218,10 @@ def text_rank(tokens: List[str], window=5, iterations=8, damping=0.85) -> Dict[s
                 if w[j][i] > 0 and row[j] > 0:
                     s += (w[j][i] / row[j]) * rank[j]
             nxt[i] = (1 - damping) / n + damping * s
+        delta = max((abs(a - b) for a, b in zip(rank, nxt)), default=0.0)
         rank = nxt
+        if delta < 1e-6:  # K-17：收敛即停，固定 8 轮只是上界
+            break
     return {vocab[i]: rank[i] for i in range(n)}
 
 
@@ -282,6 +322,43 @@ def extract_entities(text: str, chapters, max_terms=24):
     return list(dict.fromkeys(merged))[: max_terms + len(titles)], ranks
 
 
+def remove_cycles(edges: List[dict]) -> List[dict]:
+    """K-13：有向图环校验 + 破环。kg_builder 原先完全无环检测，C001→C002→C003→C001 可直接入库。
+    破环删边优先级：非 prerequisite 边先删（related/attach 不该顶掉主干先修链），
+    同类型按 weight 小者先删；环内全是 prerequisite 时删 weight 最小者。"""
+    if not edges:
+        return edges
+    etype_rank = {"prerequisite": 0, "attach": 1, "related": 2}
+    adj: Dict[str, List[int]] = defaultdict(list)
+    for i, e in enumerate(edges):
+        adj[e["from"]].append(i)
+    color: Dict[str, int] = defaultdict(int)  # 0=white 1=gray 2=black
+    removed: set = set()
+
+    def dfs(u: str, stack: List[int]):
+        color[u] = 1
+        for i in adj.get(u, ()):
+            if i in removed:
+                continue
+            v = edges[i]["to"]
+            if color.get(v, 0) == 1:
+                # stack 保存根→u 的边索引链；环 = 路径上从 v 展开的那段 + 闭合边 i
+                pos = next(k for k, j in enumerate(stack) if edges[j]["from"] == v)
+                cands = [j for j in stack[pos:] if j not in removed] + [i]
+                non_prereq = [j for j in cands if edges[j]["etype"] != "prerequisite"]
+                pool = non_prereq or cands
+                victim = min(pool, key=lambda j: (etype_rank.get(edges[j]["etype"], 3), edges[j]["w"]))
+                removed.add(victim)
+            elif color.get(v, 0) == 0:
+                dfs(v, stack + [i])
+        color[u] = 2
+
+    for e in edges:
+        if color.get(e["from"], 0) == 0:
+            dfs(e["from"], [])
+    return [e for i, e in enumerate(edges) if i not in removed]
+
+
 def build_graph(text: str, book_name: str, max_terms=24):
     chapters = extract_chapters(text)
     entities, ranks = extract_entities(text, chapters, max_terms=max_terms)
@@ -299,21 +376,41 @@ def build_graph(text: str, book_name: str, max_terms=24):
         id_of[e] = nid
         nodes.append({"id": nid, "title": e, "kind": "term", "course": book_name, "diff": min(5, 2 + int((ranks.get(e, 0) * 8))), "body": ""})
     edges = []
-    seen = set()
+    edge_by_pair = {}
+    # K-14：同一节点对的边按类型强度保留最强（prerequisite > attach > related），
+    # 后到的强边替换先到的弱边（原先 sorted(a,b) 无向去重 + PMI 先插会静默顶掉先修边）。
+    _ETYPE_RANK = {"prerequisite": 0, "attach": 1, "related": 2}
 
     def add(a, b, tg, w, et):
         if not a or not b or a == b:
             return
-        ek = tuple(sorted((a, b)))
-        if ek in seen:
+        ek = (a, b) if a < b else (b, a)
+        old = edge_by_pair.get(ek)
+        if old is not None:
+            if (_ETYPE_RANK[et], w) < (_ETYPE_RANK[old["etype"]], old["w"]):
+                old["from"], old["to"], old["tg"], old["w"], old["etype"] = a, b, tg, w, et
             return
-        seen.add(ek)
-        edges.append({"from": a, "to": b, "tg": tg, "w": w, "etype": et})
+        e = {"from": a, "to": b, "tg": tg, "w": w, "etype": et}
+        edge_by_pair[ek] = e
+        edges.append(e)
 
     for i in range(len(chapters) - 1):
         add(chapters[i]["id"], chapters[i + 1]["id"], False, 0.85, "prerequisite")
+    # 依赖句式（强边先插，K-14）
+    for c in top_entities(entities, id_of, max_terms)[:12]:
+        try:
+            rx = re.compile(
+                r"(?:基于|先学|掌握|了解|学会)\s*" + re.escape(c) + r"\s*(?:后|之后|再|然后|才能|才能理解|的基础上)\s*([一-鿿A-Za-z0-9_·、]{2,12})"
+            )
+        except re.error:
+            continue
+        for m in rx.finditer(text[:100000]):
+            tgt = m.group(1).strip()
+            hit = next((x for x in entities if tgt in x or x in tgt), None)
+            if hit and hit != c:
+                add(id_of.get(c), id_of.get(hit), True, 1.3, "prerequisite")
     # PMI 共现
-    top = [e for e in entities if e not in id_of or id_of.get(e, "").startswith("T")][:max_terms]
+    top = top_entities(entities, id_of, max_terms)
     tokens = tokenize(text[:150000])
     co, cnt = defaultdict(int), defaultdict(int)
     window = 8
@@ -333,25 +430,26 @@ def build_graph(text: str, book_name: str, max_terms=24):
         p = pmi(c, cnt[a], cnt[b], total)
         if p >= 1.0:
             add(id_of.get(a), id_of.get(b), False, min(p / 6, 2), "related")
-    # 依赖句式
-    for c in top[:12]:
-        try:
-            rx = re.compile(
-                r"(?:基于|先学|掌握|了解|学会)\s*" + re.escape(c) + r"\s*(?:后|之后|再|然后|才能|才能理解|的基础上)\s*([一-鿿A-Za-z0-9_·、]{2,12})"
-            )
-        except re.error:
-            continue
-        for m in rx.finditer(text[:100000]):
-            tgt = m.group(1).strip()
-            hit = next((x for x in entities if tgt in x or x in tgt), None)
-            if hit and hit != c:
-                add(id_of.get(c), id_of.get(hit), True, 1.3, "prerequisite")
-    # 词挂章节
+    # 词挂章节：K-14 归属按「出现次数最多的章」（定义性出现），不再取第一个包含它的章
+    # （正文含目录/前言时老逻辑会把全书术语错挂第 1 章）
     for e in top:
-        ch = next((c for c in chapters if e in c["body"]), chapters[0] if chapters else None)
+        best = None
+        for c in chapters:
+            n = c["body"].count(e)
+            if n > 0 and (best is None or n > best[0]):
+                best = (n, c)
+        ch = best[1] if best else (chapters[0] if chapters else None)
         if ch:
             add(ch["id"], id_of.get(e), False, 0.55, "attach")
-    return {"name": book_name, "chapters": chapters, "nodes": nodes, "edges": edges}
+    before = len(edges)
+    edges = remove_cycles(edges)
+    return {"name": book_name, "chapters": chapters, "nodes": nodes, "edges": edges,
+            "cyclesRemoved": before - len(edges)}
+
+
+def top_entities(entities, id_of, max_terms):
+    """构图用的术语子集（章节节点之外的实体，按原顺序截断）。"""
+    return [e for e in entities if e not in id_of or id_of.get(e, "").startswith("T")][:max_terms]
 
 
 # ───────────────────────── simple-mind-map 树 / Markdown ─────────────────────────

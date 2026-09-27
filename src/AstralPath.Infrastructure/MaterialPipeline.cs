@@ -47,7 +47,6 @@ public static class MaterialPipeline
     {
         var candidates = new[]
         {
-            @"C:\Users\18948\XiaomiMiMoProjects\Knowledge Debt Astral Path\tools\ocr_pipeline.py",
             Path.Combine(Directory.GetCurrentDirectory(), "tools", "ocr_pipeline.py"),
             Path.Combine(AppContext.BaseDirectory, "tools", "ocr_pipeline.py")
         };
@@ -64,10 +63,15 @@ public static class MaterialPipeline
         var env = Environment.GetEnvironmentVariable("ASTRALPATH_OCR_PYTHON");
         if (!string.IsNullOrWhiteSpace(env) && File.Exists(env)) return env;
 
+        // P3-15：优先仓库内 tools/ocr-venv（跟随工作目录/部署目录/脚本目录），失效的用户级硬编码路径已移除
+        string? scriptDir = null;
+        try { scriptDir = Path.GetDirectoryName(ResolveOcrScript()); } catch { /* script 未找到时跳过该候选 */ }
         var candidates = new[]
         {
             Environment.GetEnvironmentVariable("MIMO_PYTHON") ?? "",
-            @"C:\Users\18948\XiaomiMiMoProjects\Knowledge Debt Astral Path\tools\ocr-venv\Scripts\python.exe",
+            scriptDir is not null ? Path.Combine(scriptDir, "ocr-venv", "Scripts", "python.exe") : "",
+            Path.Combine(Directory.GetCurrentDirectory(), "tools", "ocr-venv", "Scripts", "python.exe"),
+            Path.Combine(AppContext.BaseDirectory, "tools", "ocr-venv", "Scripts", "python.exe"),
             @"C:\Program Files\Xiaomi MiMo\resources\runtimes\win32-x64\python\python.exe"
         };
         foreach (var c in candidates)
@@ -94,12 +98,29 @@ public static class MaterialPipeline
     {
         var env = Environment.GetEnvironmentVariable("TESSDATA_PREFIX");
         if (!string.IsNullOrWhiteSpace(env) && Directory.Exists(env)) return env;
+        string? scriptDir = null;
+        try { scriptDir = Path.GetDirectoryName(ResolveOcrScript()); } catch { /* ignore */ }
         var candidates = new[]
         {
-            @"C:\Users\18948\XiaomiMiMoProjects\Knowledge Debt Astral Path\tools\tessdata",
+            scriptDir is not null ? Path.Combine(scriptDir, "tessdata") : "",
             @"C:\Program Files\Tesseract-OCR\tessdata"
         };
-        return candidates.FirstOrDefault(Directory.Exists);
+        return candidates.FirstOrDefault(c => !string.IsNullOrWhiteSpace(c) && Directory.Exists(c));
+    }
+
+    /// <summary>P0-5：OCR 超时按模式参数化——full 全书 OCR 需要长超时；
+    /// ASTRALPATH_OCR_TIMEOUT_SECONDS 可整体覆盖（秒）。</summary>
+    private static int ResolveTimeoutMinutes(string ocrMode)
+    {
+        var env = Environment.GetEnvironmentVariable("ASTRALPATH_OCR_TIMEOUT_SECONDS");
+        if (double.TryParse(env, out var sec) && sec > 0)
+            return Math.Max(1, (int)Math.Ceiling(sec / 60.0));
+        return ocrMode switch
+        {
+            "full" => 40,
+            "standard" => 20,
+            _ => 3,
+        };
     }
 
     /// <summary>OCR 进程并发闸：高负载时避免多份 Python/Tesseract 打满 CPU/内存。</summary>
@@ -166,8 +187,9 @@ public static class MaterialPipeline
             // 而顺序 ReadToEnd(stdout) 永远等不到 EOF。必须并行读 + 超时杀进程。
             var stdoutTask = proc.StandardOutput.ReadToEndAsync(ct);
             var stderrTask = proc.StandardError.ReadToEndAsync(ct);
+            var timeoutMinutes = ResolveTimeoutMinutes(ocrMode);
             using var timeoutCts = CancellationTokenSource.CreateLinkedTokenSource(ct);
-            timeoutCts.CancelAfter(TimeSpan.FromMinutes(3));
+            timeoutCts.CancelAfter(TimeSpan.FromMinutes(timeoutMinutes));
             try
             {
                 await proc.WaitForExitAsync(timeoutCts.Token);
@@ -175,7 +197,7 @@ public static class MaterialPipeline
             catch (OperationCanceledException)
             {
                 try { proc.Kill(entireProcessTree: true); } catch { /* ignore */ }
-                throw new TimeoutException($"OCR 超时(180s)：{Path.GetFileName(filePath)} mode={ocrMode}");
+                throw new TimeoutException($"OCR 超时({timeoutMinutes}min)：{Path.GetFileName(filePath)} mode={ocrMode}");
             }
             var stdout = await stdoutTask;
             var stderr = await stderrTask;
@@ -442,8 +464,13 @@ public static class MaterialPipeline
             ? string.Join("; ", nt.EnumerateArray().Select(x => x.GetString()))
             : null;
         var now = DateTime.UtcNow;
-        return new MaterialDoc(id, name, path, size, "ready", ocrMode, ocrUsed, pageCount, chars, nodes, edges,
-            $"auto-{id}", notes, now, now, null);
+        // P4-4：python 侧异常被 catch 后仍会写出 {ok:false, error}（exit 1）。
+        // 此前硬编码 "ready" → 空壳图谱伪装解析成功（假成功）。现在如实上报 failed。
+        var ok = payload.ValueKind != JsonValueKind.Object
+                 || !payload.TryGetProperty("ok", out var okEl)
+                 || okEl.ValueKind != JsonValueKind.False;
+        return new MaterialDoc(id, name, path, size, ok ? "ready" : "failed", ocrMode, ocrUsed, pageCount, chars, nodes, edges,
+            $"auto-{id}", notes, now, now, ok ? null : "OCR 管线返回 ok=false（详见 notes/服务端日志）");
     }
 
     public static MaterialChapterBundle? ParseChapterBundle(string materialId, string materialName, JsonElement payload)

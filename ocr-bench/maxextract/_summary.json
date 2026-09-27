@@ -1,0 +1,122 @@
+{
+ "C#从入门到精通_第7版_+_明日科技_+": {
+  "pages": 868,
+  "method_text": 316,
+  "method_ocr": 552,
+  "method_none": 0,
+  "chars": 400308,
+  "tl_chars": 218202,
+  "ocr_only_pages": 54,
+  "book": "C#从入门到精通（第7版）+(明日科技)+.pdf"
+ },
+ "Go语言从入门到精通": {
+  "pages": 506,
+  "method_text": 141,
+  "method_ocr": 365,
+  "method_none": 0,
+  "chars": 221171,
+  "tl_chars": 116517,
+  "ocr_only_pages": 34,
+  "book": "Go语言从入门到精通.pdf"
+ },
+ "Java从入门到精通_第6版_明日科技": {
+  "pages": 775,
+  "method_text": 271,
+  "method_ocr": 504,
+  "method_none": 0,
+  "chars": 418917,
+  "tl_chars": 224894,
+  "ocr_only_pages": 32,
+  "book": "Java从入门到精通（第6版） (明日科技) .pdf"
+ },
+ "Kotlin编程实践_Kotlin从入门到实战": {
+  "pages": 294,
+  "method_text": 290,
+  "method_ocr": 4,
+  "method_none": 0,
+  "chars": 145515,
+  "tl_chars": 144367,
+  "ocr_only_pages": 1,
+  "book": "Kotlin编程实践：Kotlin从入门到实战.pdf"
+ },
+ "Python编程_从入门到实践_第3版": {
+  "pages": 732,
+  "method_text": 703,
+  "method_ocr": 27,
+  "method_none": 2,
+  "chars": 370780,
+  "tl_chars": 365553,
+  "ocr_only_pages": 2,
+  "book": "Python编程：从入门到实践（第3版）.pdf"
+ },
+ "图灵程序设计丛书--深度学习入门4_强化学习_日_斋藤康毅_1": {
+  "pages": 333,
+  "method_text": 314,
+  "method_ocr": 17,
+  "method_none": 2,
+  "chars": 163719,
+  "tl_chars": 161576,
+  "ocr_only_pages": 1,
+  "book": "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf"
+ },
+ "大模型应用开发_动手做_AI_Agent_黄佳": {
+  "pages": 290,
+  "method_text": 0,
+  "method_ocr": 290,
+  "method_none": 0,
+  "chars": 273726,
+  "tl_chars": 0,
+  "ocr_only_pages": 290,
+  "book": "大模型应用开发：动手做 AI Agent (黄佳) .pdf"
+ },
+ "深度学习_Deep_Learning_花书_Ian_Goodfellow_Yoshua_Bengio_Aaron_Cou": {
+  "pages": 738,
+  "method_text": 735,
+  "method_ocr": 3,
+  "method_none": 0,
+  "chars": 593884,
+  "tl_chars": 592999,
+  "ocr_only_pages": 0,
+  "book": "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf"
+ },
+ "深度学习入门2_自制框架_斋藤康毅_-扫描版_1": {
+  "pages": 504,
+  "method_text": 487,
+  "method_ocr": 11,
+  "method_none": 6,
+  "chars": 231876,
+  "tl_chars": 231097,
+  "ocr_only_pages": 3,
+  "book": "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF"
+ },
+ "深度学习入门_基于Python的理论与实现+_斋藤康毅_+": {
+  "pages": 314,
+  "method_text": 297,
+  "method_ocr": 10,
+  "method_none": 7,
+  "chars": 152164,
+  "tl_chars": 149608,
+  "ocr_only_pages": 4,
+  "book": "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf"
+ },
+ "深度学习进阶_自然语言处理_斋藤康毅": {
+  "pages": 427,
+  "method_text": 411,
+  "method_ocr": 11,
+  "method_none": 5,
+  "chars": 207477,
+  "tl_chars": 203527,
+  "ocr_only_pages": 4,
+  "book": "深度学习进阶：自然语言处理 (斋藤康毅) .pdf"
+ },
+ "黄仁勋_英伟达之芯__美_斯蒂芬_威特": {
+  "pages": 201,
+  "method_text": 193,
+  "method_ocr": 8,
+  "method_none": 0,
+  "chars": 199071,
+  "tl_chars": 197405,
+  "ocr_only_pages": 8,
+  "book": "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf"
+ }
+}

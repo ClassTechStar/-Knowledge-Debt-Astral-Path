@@ -1,0 +1,80 @@
+{
+  "book": "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf",
+  "slug": "图灵程序设计丛书--深度学习入门4_强化学习_日_斋藤康毅_1",
+  "pages": 333,
+  "needsOcrPages": 3,
+  "zeroTextPages": 3,
+  "tocCandidatePages": [7, 8, 11],
+  "chHeadPages": 174,
+  "samples": {
+    "ocrPages": [1, 2, 7, 8, 11, 18, 20, 55, 65, 98, 126, 136, 144, 150, 152, 209, 232, 233, 256, 282, 300],
+    "visualPages": [1, 98, 144, 233, 256],
+    "reasons": "封面/版权 1,2（1为零文本层）；目录候选 7,8,11（11 同时是 textlayer-vs-rapid3 字符差最大页 +1337）；章首候选 6 页 20,55,98,136,232,282（全书真实章首共10个：20,55,75,98,136,172,200,232,258,282）；中段30%-80%低字数页 4 页 126,144,209,256；suspRatio 全书全为0.0 故改选字符差代表页 11,233（233 为 OCR 比文本层多356字的页）；随机(seed42) 18,65,152；另加 gt-vision 存在的 150,300 用于真值对拍。共21页 ≤22。"
+  },
+  "ocrSampleStats": {
+    "n": 21,
+    "avgMs": 1332.0,
+    "pagesPerS": 0.751,
+    "avgChars": 473.5
+  },
+  "cerVsTextlayer": {
+    "n": 20,
+    "mean": 0.0727,
+    "worst": [
+      { "page": 233, "cer": 0.3861 },
+      { "page": 144, "cer": 0.2271 },
+      { "page": 256, "cer": 0.1576 },
+      { "page": 126, "cer": 0.1389 },
+      { "page": 98, "cer": 0.0977 }
+    ]
+  },
+  "cerVsRapid3Ref": {
+    "n": 21,
+    "mean": 0.0212,
+    "worst": [
+      { "page": 233, "cer": 0.2992 },
+      { "page": 2, "cer": 0.0511 }
+    ],
+    "charDelta": 68
+  },
+  "cerVsGtVision": [
+    { "page": 150, "cerMyOcr": 0.0505, "cerTextlayer": 0.039, "cerRapid3Ref": 0.0547 },
+    { "page": 300, "cerMyOcr": 0.031, "cerTextlayer": 0.0093, "cerRapid3Ref": 0.0463 }
+  ],
+  "chapters": [
+    { "page": 20, "title": "第1章 老虎机问题", "pattern": "^第N章" },
+    { "page": 55, "title": "第2章 马尔可夫决策过程", "pattern": "^第N章" },
+    { "page": 75, "title": "第3章 贝尔曼方程", "pattern": "^第N章" },
+    { "page": 98, "title": "第4章 动态规划法", "pattern": "^第N章" },
+    { "page": 136, "title": "第5章 蒙特卡洛方法", "pattern": "^第N章" },
+    { "page": 172, "title": "第6章 TD方法", "pattern": "^第N章" },
+    { "page": 200, "title": "第7章 神经网络和Q学习", "pattern": "^第N章" },
+    { "page": 232, "title": "第8章 DQN", "pattern": "^第N章" },
+    { "page": 258, "title": "第9章 策略梯度法", "pattern": "^第N章" },
+    { "page": 282, "title": "第10章 进一步学习", "pattern": "^第N章" }
+  ],
+  "visualFindings": [
+    { "page": 1, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "封面：O'Reilly/图灵丛书红白版式+鱼插画，全 raster/曲线无文本层；OCR 恢复126字符（书名/作者/出版社），顺序正确。" },
+    { "page": 98, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": true, "hasFigure": true, "orderOk": true, "notes": "第4章章首页，单栏。图4-1流程图内含数学标签 p(s'|s,a)、r(s,a,s')、π(a|s)、v_π(s)，文本层缺失这些图内标签（TL 366字 vs OCR 429字）。无水印无倾斜。" },
+    { "page": 144, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "整页几乎由图5-5/图5-6（智能代理试验示意图）构成，仅一行正文+图注；文本层缺图内小数字/π/奖励标签，故 CER(vs TL)=0.227。低字数页本质是整页图。" },
+    { "page": 233, "columns": 1, "hasCode": true, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "图8-1 OpenAI Gym 截图含大量英文UI文字（Algorithms/Classic control/CartPole-v1 等），文本层完全缺失；代码块 env = gym.make('CartPole-v0') 文本层抽成 'CartPole-vO'（0→O）；页眉 zoom4 渲染确认纸面为 DQN 而文本层为 DON。OCR 能恢复截图文字但两次OCR间 CER 达0.30（截图栅格噪声）。" },
+    { "page": 256, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": true, "hasFigure": true, "orderOk": true, "notes": "图8-13 DQN/Dueling DQN 网络结构图（引自论文）+图8-14 Pong 截图；正文含 A(s,a)、V(s)、Q(s,a) 记号。文本层缺两图内容（TL 221字 vs OCR 306字），图注可抽到。" }
+  ],
+  "defects": [
+    { "page": 233, "type": "code", "detail": "代码字体 ToUnicode 映射错误：数字0→字母O，'CartPole-v0' 抽成 'CartPole-vO'；同型错误扩散至 236/241/246/265。对编程书致命：复制文本层代码即得错误代码", "severity": "high" },
+    { "page": 100, "type": "formula", "detail": "正文行内数学记号大面积错乱（文本层）：Vk(s')→vk+i^y、V0(s)→70(s)/K⑻、Vπ(s)→7t(s) 等；prose 完好但公式不可读。OCR 参考可恢复大部分", "severity": "high" },
+    { "page": 233, "type": "garble", "detail": "页眉 DQN→DON（zoom4 渲染确认纸面为 DQN，属文本层 Q→O 映射错）；同型见 235/247/320 页页眉", "severity": "medium" },
+    { "page": 100, "type": "garble", "detail": "句号'。'被映射为拉丁字母 o（如 '…policy evaluation) o'），全书≥34页系统性标点错位", "severity": "medium" },
+    { "page": 233, "type": "missed_content", "detail": "图8-1 OpenAI Gym 截图内全部英文 UI 文本不在文本层（TL 348字 vs OCR 785字）；OCR 可恢复但噪声大、两次OCR一致性差", "severity": "medium" },
+    { "page": 98, "type": "missed_content", "detail": "图4-1 流程图内数学标签 p(s'|s,a)/r(s,a,s')/π(a|s)/v_π(s) 缺失于文本层", "severity": "medium" },
+    { "page": 256, "type": "missed_content", "detail": "图8-13 网络结构图与图8-14 Pong 截图内容缺失于文本层", "severity": "medium" },
+    { "page": 126, "type": "missed_content", "detail": "文本层 271 字 vs OCR 356 字，页内部分内容（图/公式区）未被文本层覆盖", "severity": "medium" },
+    { "page": 305, "type": "garble", "detail": "页眉 '第10章'→'第W章'（数字10→W 映射错）", "severity": "low" },
+    { "page": 144, "type": "missed_content", "detail": "图5-5/5-6 图内数字/π/奖励标签未入文本层（整页为图的页面，TL 181字 vs OCR 122字，OCR 反而漏读图注小字）", "severity": "low" },
+    { "page": 1, "type": "blank", "detail": "封面零文本层（全 raster），OCR 恢复126字符书名/作者/出版社信息", "severity": "low" },
+    { "page": 309, "type": "blank", "detail": "零文本层页（后置广告/版权页），需 OCR 兜底", "severity": "low" },
+    { "page": 333, "type": "blank", "detail": "末页零文本层，需 OCR 兜底", "severity": "low" },
+    { "page": 2, "type": "order", "detail": "版权页行序在两次 OCR 间不一致（O'REILLY® 与 Beijing·Boston·Farnham 行互换），CER 0.051 全部来自行序；非文本层缺陷", "severity": "low" }
+  ],
+  "conclusions": "本轮疑案不成立：Round B 简报称'文本层仅5.2万字符(156字/页)'，但盘上 Round B 产物 textlayer jsonl 实测 217,377 字符（含空白，653字/页；CJK 100,264），与 rapid3 全页 OCR 参考（215,688字符，CJK 100,582，偏差0.3%）高度一致；我的 inventory 直测 PDF 内嵌文本层 161,576 非空白字符（485字/页）。'5.2万'更可能是另一套抽取器/口径的结果而非盘上 jsonl。真实情况：文本层整本完整、prose 合法（非 CID 乱码、无 PUA/FFFD，suspRatio 全 0），仅 3 页零文本（1/309/333 封面与后置页）；chars<50 仅0.9%、>200 达95.5%。文本层的真实缺陷是'局部性'的：a) 特定字体 ToUnicode 映射错（代码字体 0→O、页眉 Q→O、10→W、句号→o，≥34页标点级污染），b) 数学公式区重灾（p100 型），c) 所有截图/示意图内文字系统性缺失（图占页则字数骤降，如 126/144/233/256）。GT 对拍（p300：文本层 0.0093 vs 本轮OCR 0.031）证明有文本层处文本层比 OCR 更准。OCR 价值在兜底：3 个零文本页 + 全书图内文字（如 p233 图8-1 约恢复280字符）。建议管线：文本层为主通道、零文本页/图页 OCR 兜底；对代码块与页眉字体加映射修正表；不要用'字符密度均值'判文本层质量（本轮已证其放行/误判双向失灵），应改用 PUA/FFFD/suspRatio+抽页 CER。"
+}

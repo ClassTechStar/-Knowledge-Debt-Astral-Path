@@ -1,0 +1,8 @@
+第10章 Windows窗体应用程序常用控件
+窗口是由控件构成的，熟练应用控件是高效开发Windows窗体应用程序的重要前提。控件是用户可以输入或操作数据的对象，分为常用控件和高级控件，本章先来认识一下常用控件。
+本章知识架构及重点、难点如下。
+【思维导图：Windows窗体应用程序常用控件 — 控件概述（控件的种类及作用/控件命名规范）、选择类控件（ComboBox控件/CheckBox控件/RadioButton控件/NumericUpDown控件/ListBox控件）、分组类控件（Panel控件/GroupBox控件/TabControl控件）、菜单、工具栏和状态栏控件（MenuStrip控件/ToolStrip控件/StatusStrip控件）、控件的相关操作（添加/对齐/锁定/删除）、文本类控件（Label控件/Button控件/TextBox控件/RichTextBox控件）】
+10.1 控件概述
+10.1.1 控件的分类及作用
+Visual Studio 2022中，常用控件包括文本控件、选择控件、分组控件、菜单控件、工具栏控件和状态栏控件，如表10.1所示。控件的基类是位于System.Windows.Forms命名空间的Control类，其他控件类都直接或间接地派生自Control类。
+表10.1 常用控件

@@ -1,0 +1,59 @@
+package main                                          //声明 main 包
+
+import "fmt"                                          //导入 fmt 包，用于打印字符串
+
+type carInMotion interface {                          //为行驶中的汽车声明接口
+    move(speed int)                                   //行驶函数。参数是汽车此刻的行驶速度
+    brake() (int, int)                                //刹车函数。返回值分别是刹车前的速度和刹车后的速度
+    park()                                            //泊车函数
+    //消耗燃油函数。参数分别为剩余燃油量和燃油平均消耗，返回值是汽车还能行驶的距离
+    consumeOil(fuelLeft float64, aver_consumption float64) (distance float64)
+}
+
+type car struct {                                     //表示汽车的结构体
+    color string                                      //车身颜色
+}
+
+func (c *car) move(speed int) {                       //实现接口中的 move()函数
+    fmt.Printf("一辆%v 的汽车在以%vkm/h 的速度匀速行驶\n", c.color, speed)
+}
+
+func (c *car) brake() (int, int) {                    //实现接口中的 brake()函数
+    fmt.Printf("这辆%v 的汽车开始刹车\n", c.color)
+    speedBeforeBrake := 60                            //刹车前的速度
+    speedAfterBrake := 0                              //刹车后的速度
+    return speedBeforeBrake, speedAfterBrake
+}
+
+func (c *car) park() {                                //实现接口中的 park()函数
+    fmt.Printf("这辆%v 的汽车停在路边的车位里\n", c.color)
+}
+
+//实现接口中的 consumeOil()函数
+func (c *car) consumeOil(fuelLeft float64, aver_consumption float64) (distance float64) {
+    fmt.Printf("这辆%v 的汽车剩余燃油%vL，燃油平均消耗%vL/100km\n",
+        c.color, fuelLeft, aver_consumption)
+    return fuelLeft / aver_consumption * 100
+}
+
+func main() {                                         //声明 main()函数
+    var cim carInMotion                               //声明接口变量
+    cr := car{color: "红色"}                           //键值对初始化结构体
+    cim = &cr                                         //对初始化的结构体变量执行"取地址"操作
+    cim.move(60)                                      //调用 move()函数，并传递参数
+    speedBeforeBrake, speedAfterBrake := cim.brake()  //调用 brake()函数，获取返回值
+    fmt.Printf("刹车前的速度是%vkm/h，刹车后的速度是%vkm/h\n",
+        speedBeforeBrake, speedAfterBrake)
+    cim.park()                                        //调用 park()函数
+    distance := cim.consumeOil(27, 6.3)               //调用 consumeOil()函数，先传递参数，再获取返回值
+    fmt.Printf("还能继续行驶%.2fkm\n", distance)       //对计算结果保留两位小数
+}
+
+运行结果如下。
+
+一辆红色的汽车在以 60km/h 的速度匀速行驶
+这辆红色的汽车开始刹车
+刹车前的速度是 60km/h，刹车后的速度是 0km/h
+这辆红色的汽车停在路边的车位里
+这辆红色的汽车剩余燃油 27L，燃油平均消耗 6.3L/100km
+还能继续行驶 428.57km

@@ -1,0 +1,17 @@
+TL total chars=231097, empty=9 [1, 25, 83, 185, 255, 256, 267, 399, 401]
+R3 total chars=292012, empty(<10c)=7 [25, 83, 185, 256, 267, 399, 401]
+TL avg/page=459, R3 avg/page=579
+
+--- p2 TL: "i里计监刊\n深度学习入门8:\n自制框架\nBuilding Deep Learning Framework \nBeijing' Boston • Farnham • Sebastopol • Tokyo \n[日]\n斋藤康毅著\n郑明智译\n自回到回国\nO'Reilly Japan, Inc授权人民邮电出版社有限公司出版\n人民邮电出版社\n北\n京\n"
+
+--- p1 myOCR: "O'REILLY R\nオライリー・ジャパン\nTURING 图灵程序设计丛书\n深度学习入门2\n自制框架\nBuilding Deep Learning\nFramework\n[曰]斋藤康毅著\n郑明智译\n中国工信出版集团 人民邮电出版社\nPOSTS & TELECOM PRESS"
+
+--- p236 TL first200: '步骤32\n高阶导数(实现篇) I \n213 \n为什么让create_graph=False作为默认设置呢?这是|大| 为只需要一次反\n向传播的情况占大多数。如果需要求二阶导数，将参数设置为True 即可。在\n这种情况下，反向传播的计算会创建出新的计算图，反向传播得以继续进行。\n32.4 \n修改一\ninit__. py\n到这里就完成了新DeZero 的核心功能\n我们将在dezero/corc.py '
+
+--- p236 myOCR first200: '步骤32 高阶导数(实现篇) 213\n为什么让create_graph=False作为默认设置呢？这是因为只需要一次反\n向传播的情况占大多数。如果需要求二阶导数，将参数设置为True即可。在\n这种情况下，反向传播的计算会创建出新的计算图，反向传播得以继续进行。\n32.4 修改__init__.py\n到这里就完成了新DeZero的核心功能。我们将在dezero/core.py中完成\n目前所做的修改。'
+
+--- p13 TL first250: '目录\nIIIJ I气\nXVIJ \n第1 阶段\n自动微分\n… \n……… 1 \n步骤1\n作为"箱子"的变量\n… \n· \n…. . .. 3 \n1.1 \n什么是变量…\n… …·\n‘…. . . . . .. 3 \nl.2 \n实现Variable 类\n…… … \n… \n.... 4 \nl.3 \n(补充) NumPy 的多维数纽\n……. . . . . . . . .. ... 6 \n步骤2\n创建变茧的的数..... ....... ..... \n... .... ...8 \n2.1 \n什么是函数\n……·'
+
+--- p255 myOCR: 'COX\nA\n1716\nX\n()'
+
+--- p450 TL chars=230 first150: '步骤57\nconv2d 函数和pooling 函数\nI\n427 \nim2col \n一-\nC*KH*KW \n圄λ7-\n1\n对输入数据展开j也化应用区域(:2 x :2;也化的例子)\nOH*OW*C \n如果以这种方式展开数据，之后只要针对展开后的炬阵求山其中每一行\n的民大值，将全ili果变形为什适的)~'

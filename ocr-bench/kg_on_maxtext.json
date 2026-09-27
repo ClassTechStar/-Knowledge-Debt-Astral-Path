@@ -1,0 +1,82 @@
+{
+ "Java从入门到精通_第6版_明日科技": {
+  "chars": 527267,
+  "nodes": 251,
+  "edges": 270,
+  "stats": {
+   "chapters": 23,
+   "sections": 200,
+   "terms": 28,
+   "nodes": 251,
+   "edges": 270,
+   "algorithm": "kg-v2-hierarchy-cooc-dag",
+   "refs": {
+    "knowledgeGraph": "triple/RDF + 节点属性 + 关系谓词（参考 GitHub/KnowledgeGraph）",
+    "mindMap": "simple-mind-map 逻辑结构树 + Markdown 大纲（参考 GitHub/mind-map）"
+   }
+  },
+  "ms": 105
+ },
+ "大模型应用开发_动手做_AI_Agent_黄佳": {
+  "chars": 332081,
+  "nodes": 196,
+  "edges": 211,
+  "stats": {
+   "chapters": 10,
+   "sections": 158,
+   "terms": 28,
+   "nodes": 196,
+   "edges": 211,
+   "algorithm": "kg-v2-hierarchy-cooc-dag",
+   "refs": {
+    "knowledgeGraph": "triple/RDF + 节点属性 + 关系谓词（参考 GitHub/KnowledgeGraph）",
+    "mindMap": "simple-mind-map 逻辑结构树 + Markdown 大纲（参考 GitHub/mind-map）"
+   }
+  },
+  "ms": 80
+ },
+ "C#从入门到精通_第7版_+_明日科技_+": {
+  "chars": 505169,
+  "nodes": 253,
+  "edges": 266,
+  "stats": {
+   "chapters": 25,
+   "sections": 200,
+   "terms": 28,
+   "nodes": 253,
+   "edges": 266,
+   "algorithm": "kg-v2-hierarchy-cooc-dag",
+   "refs": {
+    "knowledgeGraph": "triple/RDF + 节点属性 + 关系谓词（参考 GitHub/KnowledgeGraph）",
+    "mindMap": "simple-mind-map 逻辑结构树 + Markdown 大纲（参考 GitHub/mind-map）"
+   }
+  },
+  "ms": 102
+ },
+ "深度学习入门2_自制框架_斋藤康毅_-扫描版_1": {
+  "chars": 333504,
+  "nodes": 229,
+  "edges": 240,
+  "stats": {
+   "chapters": 1,
+   "sections": 200,
+   "terms": 28,
+   "nodes": 229,
+   "edges": 240,
+   "algorithm": "kg-v2-hierarchy-cooc-dag",
+   "refs": {
+    "knowledgeGraph": "triple/RDF + 节点属性 + 关系谓词（参考 GitHub/KnowledgeGraph）",
+    "mindMap": "simple-mind-map 逻辑结构树 + Markdown 大纲（参考 GitHub/mind-map）"
+   }
+  },
+  "ms": 69
+ },
+ "图灵程序设计丛书--深度学习入门4_强化学习_日_斋藤康毅_1": {
+  "chars": 221111,
+  "chapters": 10,
+  "sections": 101,
+  "terms": 28,
+  "nodes": 139,
+  "edges": 147
+ }
+}

@@ -38,9 +38,8 @@ TESSERACT_EXE_CANDIDATES = [
 TESSDATA_CANDIDATES = [
     os.environ.get("TESSDATA_PREFIX", ""),
     os.environ.get("ASTRALPATH_TESSDATA", ""),
-    r"C:\Users\18948\XiaomiMiMoProjects\Knowledge Debt Astral Path\tools\tessdata",
+    str(Path(__file__).resolve().parent / "tessdata"),
     r"C:\Program Files\Tesseract-OCR\tessdata",
-    r"C:\Users\18948\Documents\GitHub\tesseract\tessdata",
 ]
 
 # tesseract OEM：0=legacy, 1=LSTM, 2=both, 3=default
@@ -467,16 +466,6 @@ def build_nodes_edges(chapters: list[dict], terms: list[dict], material_title: s
             m = re.search(r"第\s*(\d+)", ch.get("title", ""))
             if m:
                 ch_map[int(m.group(1))] = chapter_nodes[idx]
-    for sec in chapters:
-        if sec.get("kind") != "section":
-            continue
-        m = sec_re.search(sec.get("title", ""))
-        if not m:
-            continue
-        ch_num = int(m.group(1))
-        parent = ch_map.get(ch_num)
-        # find node id for this section by order — rebuild lookup
-    # simpler: zip sections to chapter by title prefix number
     sec_node_by_title = {}
     s_i = 0
     for ch in chapters:
@@ -551,9 +540,9 @@ def build_suggested_tasks(nodes: list, material_title: str, max_tasks: int = 6) 
 
 
 # ── 行/页级乱码判定（与前端 deploy/monolith-web/index.html 的 garbledPages() 同一套规则与阈值）──
-# 可疑字符 = 私有使用区（BMP / 平面 15 / 平面 16）、U+FFFD、以及中文技术书里不可能出现的稀有文字。
-# 正体 CJK、康熙部首(U+2E80–U+2FDF)、注音、假名、谚文、拉丁扩展、希腊、西里尔、数学符号、
-# emoji、全角标点一律视为正常字符，不参与计数（旧实现把它们计入"不可读"，把全局可读率拖低）。
+# 可疑字符 = 私有使用区（BMP / 平面 15 / 平面 16）、U+FFFD、CJK 部首区（康熙部首 + 部首补充，
+# pypdf ToUnicode 缺陷会把"黄"抽成"⻩"这类伪汉字，P0-3 起计入可疑）、以及中文技术书里不可能出现的稀有文字。
+# 正体 CJK、注音、假名、谚文、拉丁扩展、希腊、西里尔、数学符号、emoji、全角标点一律视为正常字符。
 GARBLE_RANGES = (
     (0x0530, 0x058F),     # 亚美尼亚文
     (0x0590, 0x05FF),     # 希伯来文
@@ -571,6 +560,7 @@ GARBLE_RANGES = (
     (0x13A0, 0x13FF),     # 切罗基文
     (0x1780, 0x17FF),     # 高棉文
     (0x1800, 0x18AF),     # 蒙古文
+    (0x2E80, 0x2FDF),     # CJK 部首区（部首补充 U+2E80–U+2EFF + 康熙部首 U+2F00–U+2FDF）：正常文本不应出现，pypdf cmap 缺陷高发区
     (0xE000, 0xF8FF),     # 私有使用区（BMP，苹果 logo 等私有字形）
     (0xF0000, 0xFFFFD),   # 私有使用区（平面 15）
     (0x100000, 0x10FFFD), # 私有使用区（平面 16）
@@ -636,6 +626,303 @@ def garbled_pages(page_texts: list[str]) -> dict[str, Any]:
     return {"flaggedPages": flagged, "pageCount": len(page_texts)}
 
 
+# ---------------------------------------------------------------------------
+# P0/P1 抽取质量核心：部首修复 / 双抽取器 / 逐页择优合并 / 弱页检测 / 图示页 / 缓存
+# ---------------------------------------------------------------------------
+WORD_CHAR_RE = re.compile(r"[A-Za-z0-9一-鿿]")
+
+# NFKC 修不了的 CJK 部首补充区（U+2E80–U+2EEF）映射：条目全部来自真实语料上下文验证
+# （pypdf cmap 缺陷实测字形：⻩埔/红⻩绿灯、汽⻋、拷⻉、咸⻥直播、⻁爸⻁妈、吸⾎⻤…）。
+# 只收录有语料实证的字形；未收录的会命中 GARBLE_RANGES 部首区，显性可见而非静默。
+_RADICAL_EXTRA = {
+    "⻩": "黄", "⻓": "长", "⻅": "见", "⻋": "车", "⻢": "马", "⻆": "角",
+    "⻔": "门", "⻛": "风", "⻜": "飞", "⻚": "页", "⻄": "西", "⻉": "贝",
+    "⺠": "民", "⻝": "食", "⻬": "齐", "⻦": "鸟", "⻘": "青", "⻣": "骨",
+    "⻨": "麦", "⻮": "齿", "⻰": "龙", "⻥": "鱼", "⻙": "韦", "⻁": "虎",
+    "⻤": "鬼", "⺎": "兀",
+}
+
+
+def _build_radical_map() -> dict[str, str]:
+    """康熙部首区（U+2F00–U+2FD5）NFKC 可直接还原；部首补充区用实证表补齐。"""
+    import unicodedata
+    m: dict[str, str] = {}
+    for cp in range(0x2F00, 0x2FE0):
+        ch = chr(cp)
+        n = unicodedata.normalize("NFKC", ch)
+        if n != ch and len(n) == 1:
+            m[ch] = n
+    m.update(_RADICAL_EXTRA)
+    return m
+
+
+_RADICAL_MAP = _build_radical_map()
+
+
+def fix_radical_chars(text: str) -> str:
+    """把 pypdf cmap 缺陷产生的部首伪汉字还原为正体 CJK（黄仁勋实测污染 9.21%）。"""
+    if not text:
+        return text
+    if not any(0x2E80 <= ord(c) <= 0x2FDF for c in text):
+        return text
+    return "".join(_RADICAL_MAP.get(c, c) for c in text)
+
+
+def garbled_char_count(text: str) -> int:
+    return sum(1 for ch in text or "" if _is_garbled_char(ord(ch)))
+
+
+def page_word_quality(text: str) -> int:
+    """页面质量分：词字符数 − 3×乱码字符（乱码不但无用还污染搜索/建图）。"""
+    return max(0, len(WORD_CHAR_RE.findall(text or "")) - 3 * garbled_char_count(text))
+
+
+MERGE_OCR_WIN_RATIO = 1.25  # OCR 质量须超出文本层 25% 才替补：识别错误不该冤胜可信文本层
+
+
+def merge_page_texts(text_layer: str, ocr_text: str, figure: bool = False,
+                     ocr_ratio: float = MERGE_OCR_WIN_RATIO) -> tuple[str, str]:
+    """P1-7 逐页择优：返回 (合并文本, 决策)。决策 ∈ text/ocr/text_only/ocr_only/none。
+    图示页（P1-8）反向偏好文本层，OCR 只保留长行/含 CJK 行，滤掉节点标签噪声。
+    ocr_ratio：OCR 获胜阈值。出版方夹层可疑（overlay_suspect）的书传 1.0 ——
+    视觉真值实测该类书 OCR CER 0.0000 vs 隐藏层 0.0115，字数相近时 OCR 反而更准。"""
+    q_tl = page_word_quality(text_layer)
+    q_oc = page_word_quality(ocr_text)
+    if q_tl == 0 and q_oc == 0:
+        return "", "none"
+    if q_tl == 0:
+        return (ocr_text, "ocr_only") if q_oc > 0 else ("", "none")
+    if q_oc == 0:
+        return text_layer, "text_only"
+    if figure:
+        if q_tl >= 60:
+            return text_layer, "text"
+        kept = "\n".join(ln for ln in ocr_text.splitlines()
+                         if len(ln.strip()) >= 6 or sum(1 for c in ln if "一" <= c <= "鿿") >= 2)
+        return (kept if page_word_quality(kept) > 20 else text_layer), "text"
+    if q_oc > q_tl * ocr_ratio and q_oc >= 20:
+        return ocr_text, "ocr"
+    return text_layer, "text"
+
+
+def weak_page_indexes(page_texts: list[str], ratio: float = 0.4, floor: int = 20) -> tuple[list[int], float]:
+    """P0-4 弱页判定：词字符 < max(floor, 中位数×ratio)。
+    以"有内容页"(≥60) 的中位数为基准——中等密度页缺一半（代码截图页）即命中。
+    若有内容页太少（整本无文本层），返回空：整本稀疏走 sparse/full 分支。"""
+    words = [page_word_quality(t) for t in page_texts]
+    filled = [w for w in words if w >= 60]
+    if len(filled) < max(4, int(len(words) * 0.2)):
+        return [], 0.0
+    filled.sort()
+    n = len(filled)
+    med = float(filled[n // 2]) if n % 2 else (filled[n // 2 - 1] + filled[n // 2]) / 2.0
+    thr = max(float(floor), med * ratio)
+    weak = [i for i, w in enumerate(words) if w < thr]
+    return weak, med
+
+
+def try_extract_text_pdfium_pages(path: Path, max_pages: int = 100000) -> tuple[list[str], int, str]:
+    """pypdfium2 逐页文本层（P0-1 交叉验证的另一路）。失败返回 ([], 0, err)。"""
+    try:
+        import pypdfium2 as pdfium
+    except Exception as e:
+        return [], 0, f"pdfium_unavailable:{e}"
+    try:
+        doc = pdfium.PdfDocument(str(path))
+        n = len(doc)
+        out: list[str] = []
+        for i in range(min(n, max_pages)):
+            try:
+                page = doc[i]
+                tp = page.get_textpage()
+                out.append(tp.get_text_range() or "")
+                tp.close()
+                page.close()
+            except Exception:
+                out.append("")
+        doc.close()
+        return out, n, "pdfium"
+    except Exception as e:
+        return [], 0, f"pdfium_error:{type(e).__name__}:{e}"
+
+
+_FPDF_PAGEOBJ_IMAGE = 3
+
+
+def image_coverage_pages(path: Path, page_indexes: list[int]) -> dict[int, float]:
+    """批量计算页面图片对象面积占比（P0-4/P1-8 用）。每页必有返回值（异常按 0 处理）。"""
+    out: dict[int, float] = {}
+    try:
+        import pypdfium2 as pdfium
+        doc = pdfium.PdfDocument(str(path))
+        targets = sorted({i for i in page_indexes if 0 <= i < len(doc)})
+        for idx in targets:
+            area = 0.0
+            total = 1.0
+            try:
+                page = doc[idx]
+                pw, ph = page.get_size()
+                total = max(1.0, pw * ph)
+                for obj in page.get_objects(max_depth=4):
+                    if obj.type != _FPDF_PAGEOBJ_IMAGE:
+                        continue
+                    try:
+                        l, b, r, t = obj.get_bounds()  # PdfImage：返回 (left, bottom, right, top)
+                    except Exception:
+                        l, b, r, t = obj.get_pos()
+                    area += max(0.0, r - l) * max(0.0, t - b)
+                page.close()
+            except Exception:
+                pass
+            out[idx] = min(1.0, area / total)
+        doc.close()
+    except Exception:
+        return {}
+    return out
+
+
+def is_figure_page(ocr_text: str, image_cov: float = 0.0) -> bool:
+    """P1-8 图示页：大图 + OCR 行平均极短（思维导图/计算图节点标签会被串成流水）。"""
+    lines = [ln.strip() for ln in (ocr_text or "").splitlines() if ln.strip()]
+    if len(lines) < 6:
+        return False
+    avg = sum(len(ln) for ln in lines) / len(lines)
+    return (image_cov >= 0.5 and avg < 12) or avg < 5.0
+
+
+# ── P3-16 页级 OCR 缓存（生产 rapid 路径）：key 含引擎/倍率/预处理标志，环境变化自动失效 ──
+# P5-5 补充：PIPELINE_VERSION 进 key——OCR 通道/纠错规则变化时 +1，旧缓存整体失效
+# （否则行为改了还命中旧文本，实测大模型书 1.1s 全命中旧缓存的教训）。
+PIPELINE_VERSION = "3.2"
+_OCR_CACHE_DIR = os.path.join(os.path.expanduser("~"), ".astralpath", "ocr-cache", "prod")
+_OCR_PAGE_CACHE: dict[str, str] = {}
+
+
+def _ocr_cache_key(path: Path, idx: int, scale: float) -> str:
+    import hashlib
+    try:
+        st = os.stat(path)
+        raw = f"{path.name}|{st.st_size}|{int(st.st_mtime)}|{idx}|{scale}|{_ocr_engine_name()}|{os.environ.get('ASTRALPATH_OCR_PREPROCESS', '1')}|v{PIPELINE_VERSION}"
+    except Exception:
+        raw = f"{path.name}|?|{idx}|{scale}|v{PIPELINE_VERSION}"
+    return hashlib.sha1(raw.encode("utf-8")).hexdigest()
+
+
+def _ocr_cache_get(key: str) -> str | None:
+    if key in _OCR_PAGE_CACHE:
+        return _OCR_PAGE_CACHE[key]
+    fp = os.path.join(_OCR_CACHE_DIR, key + ".txt")
+    try:
+        with open(fp, encoding="utf-8") as f:
+            val = f.read()
+        _OCR_PAGE_CACHE[key] = val
+        return val
+    except Exception:
+        return None
+
+
+def _ocr_cache_put(key: str, text: str) -> None:
+    _OCR_PAGE_CACHE[key] = text
+    try:
+        os.makedirs(_OCR_CACHE_DIR, exist_ok=True)
+        with open(os.path.join(_OCR_CACHE_DIR, key + ".txt"), "w", encoding="utf-8") as f:
+            f.write(text)
+    except Exception:
+        pass
+
+
+# ── P1-9 rapid 路径预处理（对齐 umi：灰度 + 对比度拉伸；ASTRALPATH_OCR_PREPROCESS=0 可关）──
+def preprocess_pil_for_ocr(img):
+    if os.environ.get("ASTRALPATH_OCR_PREPROCESS", "1") != "1":
+        return img
+    try:
+        from PIL import Image, ImageOps
+        g = img.convert("L")
+        g = ImageOps.autocontrast(g, cutoff=2)
+        return g.convert("RGB")
+    except Exception:
+        return img
+
+
+# ── P1-11 出版方 OCR 夹层复核：文本层 vs 抽样 OCR 的相似度过低 → 文本层不可信 ──
+def overlay_suspect_check(path: Path, page_texts: list[str], sample: int = 6,
+                          time_budget_s: float = 60.0) -> dict[str, Any]:
+    import difflib
+    total = len(page_texts)
+    if total < 20:
+        return {"checked": 0, "suspect": False}
+    cand = [i for i, t in enumerate(page_texts) if 150 <= page_word_quality(t) <= 1200]
+    if not cand:
+        return {"checked": 0, "suspect": False}
+    step = max(1, len(cand) // sample)
+    targets = cand[::step][:sample]
+    _txt, _note, ocr_map = ocr_pdf_pages_detail(path, targets, scale=2.0, max_pages=sample,
+                                                time_budget_s=time_budget_s)
+    sims: list[float] = []
+    for idx, ocr_t in ocr_map.items():
+        if not ocr_t or page_word_quality(ocr_t) < 50:
+            continue
+        a = re.sub(r"[^\w一-鿿]+", "", page_texts[idx] or "", flags=re.UNICODE)
+        b = re.sub(r"[^\w一-鿿]+", "", ocr_t or "", flags=re.UNICODE)
+        if not a or not b:
+            continue
+        sims.append(difflib.SequenceMatcher(None, a, b).ratio())
+    med = sorted(sims)[len(sims) // 2] if sims else 1.0
+    return {"checked": len(sims), "median_sim": round(med, 4), "suspect": bool(sims) and med < 0.90}
+
+
+def try_extract_text_pymupdf_pages(path: Path, max_pages: int = 100000) -> tuple[list[str], int, str]:
+    """PyMuPDF 逐页文本层（抽取质量通常最好；环境无 pymupdf 时不参与）。"""
+    try:
+        import pymupdf
+    except Exception as e:
+        return [], 0, f"pymupdf_unavailable:{e}"
+    try:
+        doc = pymupdf.open(str(path))
+        n = doc.page_count
+        out: list[str] = []
+        for i in range(min(n, max_pages)):
+            try:
+                out.append(doc[i].get_text("text") or "")
+            except Exception:
+                out.append("")
+        doc.close()
+        return out, n, "pymupdf"
+    except Exception as e:
+        return [], 0, f"pymupdf_error:{type(e).__name__}:{e}"
+
+
+def _select_extractor(cands: list[tuple[str, list[str], int]]) -> tuple[list[str], int, str, list[str]]:
+    """P0-1 抽取器交叉验证：优先排除部首污染者，其余取词字符最多者。
+    cands: [(name, page_texts, pages)]；返回 (page_texts, pages, mode, notes)。"""
+    notes: list[str] = []
+    scored: list[tuple[str, int, float, list[str], int]] = []
+    for name, texts, pages in cands:
+        if not pages or not texts:
+            continue
+        w = sum(page_word_quality(t) for t in texts)
+        r = garbled_char_count("".join(texts)) / max(1, w)
+        scored.append((name, w, r, texts, pages))
+    if not scored:
+        if cands:
+            return cands[0][1], cands[0][2], cands[0][0], ["extractor:all_failed"]
+        return [], 0, "none", notes
+    # 部首污染排除：某家污染率 >0.4% 且另一家不到其一半 → 弃用
+    clean = [s for s in scored if s[2] <= 0.004]
+    polluted = [s for s in scored if s[2] > 0.004]
+    if polluted and clean and min(s[2] for s in polluted) > 2 * max(s[2] for s in clean):
+        for name, _w, r, _t, _p in polluted:
+            notes.append("extractor_rejected:%s(radical=%.3f)" % (name, r))
+        scored = clean
+    best = max(scored, key=lambda s: s[1])
+    for name, w, r, _t, _p in scored:
+        if name == best[0]:
+            notes.append("extractor:%s(words=%d_radical=%.3f)" % (name, w, r))
+        else:
+            notes.append("extractor_alt:%s(words=%d)" % (name, w))
+    return best[3], best[4], best[0], notes
+
+
 def try_extract_text_pages(path: Path, max_pages: int = 100000) -> tuple[list[str], int, str]:
     """按页抽取文本层（pypdf 优先），返回 (每页文本, 总页数, 引擎名)；失败返回 ([], 0, err)。"""
     try:
@@ -670,10 +957,16 @@ def _readable_ratio(text: str) -> float:
     return good / len(s)
 
 def extract_full_text(path: Path, ocr_mode: str = "standard", force_pages: list[int] | None = None) -> tuple[str, int, str, list[str], dict[str, Any]]:
-    """尽量抽取 PDF 全部文字：文本层全量 + 可疑页定向 tesseract 补齐。
+    """尽量抽取 PDF 全部文字：双抽取器交叉验证 + 逐页择优合并（文本层 × OCR）。
 
-    与旧实现的差别：乱码判定由「全局可读率 < 0.70」改为行/页级可疑字符密度（garbled_pages）；
-    命中时只对可疑页 OCR 并逐页回填，其余页保留文本层，避免整本重跑。
+    相对旧实现的关键变化：
+    - P0-1 pypdf 与 pdfium 逐页双抽，按词字符量 + 部首污染率择优（pypdf 大面积欠抽取/伪汉字不再静默）
+    - P0-2 部首伪汉字还原（fix_radical_chars：⻩→黄 等）
+    - P0-3 乱码判定纳入 CJK 部首区
+    - P0-4 弱文本层页逐页补 OCR（词字符 < 有内容页中位数 40%，或图片对象占比 ≥55%）
+    - P0-6 取消 wide-garble「整本文本层被 28 页 OCR 替换」的分支，一律逐页回填
+    - P1-7 逐页 1.25 规则择优合并；P1-8 图示页降噪；P1-11 出版方 OCR 夹层复核
+    - ocr_mode="full"：定向 OCR 无页数上限；整本无文本层时全书逐页 OCR
     force_pages：前端（pdf.js 文本层）算出的可疑页（1 基），与本地判定取并集。
     """
     notes: list[str] = []
@@ -683,18 +976,29 @@ def extract_full_text(path: Path, ocr_mode: str = "standard", force_pages: list[
         max_text_pages = 0  # 0 = 全部
     page_limit = max_text_pages if max_text_pages else 100000
 
-    page_texts, pages, mode = try_extract_text_pages(path, max_pages=page_limit)
-    text = "\n".join(page_texts).strip()
-    if len(text) < 80:
-        text2, pages2, mode2 = try_extract_text_pdfium(path, max_pages=page_limit)
-        if len(text2) > len(text):
-            text, pages, mode = text2, pages2, mode2
-            page_texts = []  # pdfium 只有整本拼接，无法按页回填
-            notes.append("fallback_pdfium")
+    # ── P0-1 多抽取器交叉验证（pymupdf / pypdf / pdfium，可用者参与，择优）──
+    pm_texts, pm_pages, _pm_mode = try_extract_text_pymupdf_pages(path, max_pages=page_limit)
+    pp_texts, pp_pages, _pp_mode = try_extract_text_pages(path, max_pages=page_limit)
+    pd_texts, pd_pages, _pd_mode = try_extract_text_pdfium_pages(path, max_pages=page_limit)
+    page_texts, pages, mode, sel_notes = _select_extractor([
+        ("pymupdf", pm_texts, pm_pages),
+        ("pypdf", pp_texts, pp_pages),
+        ("pdfium", pd_texts, pd_pages),
+    ])
+    notes.extend(sel_notes)
 
+    # ── P0-2 部首伪汉字还原 ──
+    if page_texts:
+        fixed_pages = sum(1 for t in page_texts if t and any(0x2E80 <= ord(c) <= 0x2FDF for c in t))
+        if fixed_pages:
+            page_texts = [fix_radical_chars(t) for t in page_texts]
+            notes.append("radical_fix:pages=%d" % fixed_pages)
+
+    text = "\n".join(page_texts).strip()
     density = (len(text) / pages) if pages else 0
     info = tesseract_info()
     ocr_used = False
+    engine_ok = ocr_engine_ready(info) and ocr_mode != "none"
 
     scan = garbled_pages(page_texts) if page_texts else {"flaggedPages": [], "pageCount": 0}
     flagged = list(scan["flaggedPages"])
@@ -708,99 +1012,112 @@ def extract_full_text(path: Path, ocr_mode: str = "standard", force_pages: list[
         if p not in has:
             flagged.append({"page": p, "flagLines": 0, "totalLines": 0,
                             "suspChars": 0, "peakLineDensity": 0.0, "forced": True})
+
     detail: dict[str, Any] = {
         "garbledPages": sorted(p["page"] for p in flagged),
         "garbleScan": scan,
         "ocrPages": [],
         "forcePages": forced,
+        "weakPages": [],
+        "figurePages": [],
+        "overlaySuspect": False,
     }
-    wide = bool(flagged) and pages > 0 and (len(flagged) / pages) >= GARBLE_BOOK_DENSE_RATIO
+    figure_pages: set[int] = set()
 
-    if len(text) < 80 or density < 120:
-        notes.append("text_layer_sparse:density=%.1f" % density)
-        if ocr_mode in ("standard", "quick", "deep") and ocr_engine_ready(info):
-            total = pages or 30
-            toc_idx = list(range(0, min(total, 24)))
-            sample = []
-            if total > 24:
-                step = max(8, total // 20)
-                sample = list(range(24, total, step))[:18]
-            indexes = sorted({i for i in toc_idx + sample if 0 <= i < total})
-            if ocr_mode == "quick":
-                indexes = indexes[:12]
-                max_ocr = 10
-            else:
-                max_ocr = 28
-            ocr_text, ocr_note = ocr_pdf_pages(
-                path, indexes, scale=2.0, max_pages=max_ocr,
-                time_budget_s=90.0 if ocr_mode != "quick" else 40.0,
-            )
-            notes.append(ocr_note)
-            ocr_text = clean_ocr_text(ocr_text)
-            if len(ocr_text) > len(text) * 0.5:
-                if len(ocr_text) > len(text):
-                    text = ocr_text
-                else:
-                    text = text + "\n" + ocr_text
-                ocr_used = True
-                notes.append("ocr_merged")
-        else:
-            notes.append("tesseract_unavailable_or_no_traineddata")
-    elif wide:
-        notes.append("text_layer_garble_wide:pages=%d/%d" % (len(flagged), pages))
-        if ocr_mode in ("standard", "quick", "deep") and ocr_engine_ready(info):
-            total = pages or 30
-            toc_idx = list(range(0, min(total, 24)))
-            sample = []
-            if total > 24:
-                step = max(8, total // 20)
-                sample = list(range(24, total, step))[:18]
-            indexes = sorted({i for i in toc_idx + sample if 0 <= i < total})
-            max_ocr = 10 if ocr_mode == "quick" else 28
-            ocr_text, ocr_note = ocr_pdf_pages(
-                path, indexes, scale=2.0, max_pages=max_ocr,
-                time_budget_s=90.0 if ocr_mode != "quick" else 40.0,
-            )
-            notes.append(ocr_note)
-            ocr_text = clean_ocr_text(ocr_text)
-            if len(ocr_text) > 200:
-                text = ocr_text
-                ocr_used = True
-                notes.append("ocr_replaced_garbled")
-        else:
-            notes.append("tesseract_unavailable_or_no_traineddata")
-    elif flagged:
-        notes.append("text_layer_garble_pages:" + ",".join(str(p["page"]) for p in flagged[:24]))
-        if ocr_mode in ("standard", "quick", "deep") and ocr_engine_ready(info) and page_texts:
-            order = sorted(flagged, key=lambda x: (-float(x.get("peakLineDensity", 0.0)),
-                                                   -int(x.get("suspChars", 0)), int(x["page"])))
-            target = [p["page"] - 1 for p in order][:GARBLE_OCR_MAX_PAGES]
-            ocr_text, ocr_note, ocr_map = ocr_pdf_pages_detail(
-                path, target, scale=2.0, max_pages=GARBLE_OCR_MAX_PAGES,
-                time_budget_s=60.0 if ocr_mode != "quick" else 30.0,
-            )
-            notes.append(ocr_note)
-            filled = 0
-            for idx, page_ocr in ocr_map.items():
-                body = clean_ocr_text(page_ocr)
-                if len(body.strip()) < 20:
+    def _ocr_and_merge(targets: list[int], scale: float, max_pages: int, budget: float,
+                       cov: dict[int, float], ocr_ratio: float = MERGE_OCR_WIN_RATIO) -> int:
+        """OCR 一批页并逐页择优回填 page_texts；返回被 OCR 内容替换/降噪的页数。
+        budget 是整批总预算（秒）：逐 chunk 递减，超时截断并记 note（页缓存可续跑）。"""
+        nonlocal ocr_used
+        if not targets or not engine_ok:
+            return 0
+        merged_n = 0
+        chunk = 48
+        import time as _t
+        deadline = _t.time() + budget
+        for s in range(0, len(targets), chunk):
+            remaining = deadline - _t.time()
+            if merged_n >= 0 and remaining <= 10 and s > 0:
+                notes.append("ocr_budget_truncated:%d/%d_pages" % (s, len(targets)))
+                break
+            part = targets[s:s + chunk]
+            _t2, _nt, ocr_map = ocr_pdf_pages_detail(path, part, scale=scale,
+                                                     max_pages=len(part), time_budget_s=max(15.0, remaining))
+            if not ocr_map:
+                continue
+            ocr_used = True
+            for idx, ocr_t in ocr_map.items():
+                if not (0 <= idx < len(page_texts)):
                     continue
-                if 0 <= idx < len(page_texts):
+                fig = is_figure_page(ocr_t, cov.get(idx, 0.0))
+                if fig:
+                    figure_pages.add(idx)
+                body, decision = merge_page_texts(page_texts[idx], clean_ocr_text(ocr_t), figure=fig,
+                                                  ocr_ratio=ocr_ratio)
+                if decision in ("ocr", "ocr_only") and body.strip():
                     page_texts[idx] = body
-                    filled += 1
-            detail["ocrPages"] = sorted(i + 1 for i in ocr_map)
-            if filled:
+                    merged_n += 1
+            detail["ocrPages"] = sorted(set(detail["ocrPages"]) | {i + 1 for i in ocr_map})
+        detail["figurePages"] = sorted(i + 1 for i in figure_pages)
+        return merged_n
+
+    sparse = len(text) < 80 or density < 120
+    if sparse:
+        notes.append("text_layer_sparse:density=%.1f" % density)
+    if not engine_ok:
+        if sparse:
+            notes.append("ocr_engine_unavailable")
+    else:
+        cov = image_coverage_pages(path, list(range(len(page_texts)))) if page_texts else {}
+        weak, med = ([], 0.0)
+        if not sparse:
+            weak, med = weak_page_indexes(page_texts)
+            detail["medianPageWords"] = med
+        detail["weakPages"] = sorted({i + 1 for i in weak})
+        # 目标选择：整本稀疏，或书里存在成规模图片内容（median cov ≥0.03 或存在 ≥0.5 的整页图）
+        # → 全书逐页 OCR（P0-4 的彻底解：图文混排书靠密度阈值必然漏半图页）；
+        # 纯文本书 → 乱码页 ∪ 弱页 ∪ 前端可疑页。
+        cov_vals = sorted(cov.values()) if cov else []
+        has_images = bool(cov_vals) and (cov_vals[len(cov_vals) // 2] >= 0.03 or cov_vals[-1] >= 0.5)
+        if sparse or has_images:
+            targets = list(range(len(page_texts)))
+            notes.append("full_page_ocr:reason=%s" % ("sparse" if sparse else "image_content"))
+        else:
+            targets = sorted({p["page"] - 1 for p in flagged} | set(weak) | {p - 1 for p in forced})
+
+        if ocr_mode == "full":
+            cap, budget = 1000000, 7200.0
+        elif ocr_mode == "quick":
+            cap, budget = 30, 40.0
+        else:  # standard（含 deep）
+            cap = _env_int("ASTRALPATH_OCR_MAX_PAGES", 1500)
+            budget = float(os.environ.get("ASTRALPATH_OCR_BUDGET_S", "900"))
+
+        if targets:
+            # P1-11 夹层复核（仅 standard/full、非稀疏、页数充足时）：文本层疑似劣质出版方 OCR → full 下全页重抽
+            if ocr_mode in ("standard", "full") and not sparse and len(page_texts) >= 20:
+                overlay = overlay_suspect_check(path, page_texts)
+                detail["overlay"] = overlay
+                detail["overlaySuspect"] = bool(overlay.get("suspect"))
+                if overlay.get("suspect"):
+                    notes.append("overlay_suspect:sim=%.2f" % overlay.get("median_sim", 1.0))
+                    if ocr_mode == "full":
+                        targets = list(range(len(page_texts)))
+            order = sorted(set(targets))[:cap]
+            # 夹层可疑（出版方隐藏 OCR 层「合法但错误」）→ OCR 与文本层字数相近时以 OCR 为准
+            merge_ratio = 1.0 if detail.get("overlaySuspect") else MERGE_OCR_WIN_RATIO
+            merged = _ocr_and_merge(order, scale=2.0, max_pages=len(order), budget=budget, cov=cov,
+                                    ocr_ratio=merge_ratio)
+            if merged:
                 text = "\n".join(page_texts).strip()
                 ocr_used = True
-                notes.append("ocr_page_fill:%d/%d" % (filled, len(target)))
-            else:
-                notes.append("ocr_page_fill_none")
-        else:
-            notes.append("tesseract_unavailable_or_no_traineddata")
-    else:
-        notes.append("text_layer_full")
+            notes.append("targeted_ocr:targets=%d_merged=%d_cap=%d" % (len(order), merged, cap))
+            if len(targets) > cap:
+                notes.append("targeted_ocr_truncated:%d/%d_raise_ASTRALPATH_OCR_MAX_PAGES_or_use_full" % (cap, len(targets)))
 
-    text = clean_ocr_text(text)
+    text = clean_ocr_text("\n".join(page_texts)).strip() if page_texts else ""
+    if not sparse and not flagged:
+        notes.append("text_layer_full")
     return text, pages, mode, notes, detail
 
 
@@ -894,7 +1211,6 @@ def process_file(path: Path, ocr_mode: str = "standard", force_pages: list[int] 
         except Exception as e:
             result["notes"].append(f"deep_parse_error:{e}")
 
-    result["terms"] = [{"term": t, "freq": 1} for t in (result.get("terms") or [])][:30]
     result["sentences"] = extract_sentences(text)
 
     # 知识图谱：完整目录入图
@@ -907,6 +1223,12 @@ def process_file(path: Path, ocr_mode: str = "standard", force_pages: list[int] 
         result["edges"] = kg.get("edges", [])
         result["graphAlgorithm"] = kg.get("stats", {}).get("algorithm", "kg-v2")
         result["graphStats"] = kg.get("stats", {})
+        # P2-14 输入质量闸：文本层欠抽取/夹层可疑/OCR 截断时，图谱可信度打折并显式标记
+        if any(k in n for n in result["notes"]
+               for k in ("sparse", "underextract", "overlay_suspect", "truncated", "radical")):
+            result["graphStats"]["inputQuality"] = "low"
+        else:
+            result["graphStats"]["inputQuality"] = "ok"
         result["terms"] = [
             {"term": t.get("term"), "freq": t.get("freq"), "score": t.get("score")}
             for t in kg.get("terms", [])[:30]
@@ -1004,7 +1326,7 @@ def main() -> int:
         epilog="tesseract imagename outputbase [-l lang] [--oem oem] [--psm psm] [configfiles...]",
     )
     parser.add_argument("path", nargs="?", default=".", help="PDF/image/text path")
-    parser.add_argument("--ocr", default="standard", choices=["none", "quick", "standard", "tesseract-only"])
+    parser.add_argument("--ocr", default="standard", choices=["none", "quick", "standard", "full", "tesseract-only"])
     parser.add_argument("--out", default="-")
     parser.add_argument("--info", action="store_true", help="print tesseract info and exit")
     parser.add_argument("--pages", default=None, help="comma separated 1-based page numbers to force OCR (from front-end pdf.js scan)")
@@ -1154,11 +1476,16 @@ def words_to_text(words: list[tuple[str, float, float, float]]) -> str:
     return "\n".join(" ".join(t[0] for t in sorted(r, key=lambda t: t[2])) for r in rows)
 
 
-def fix_ocr_text(text: str) -> str:
-    """全角归一 + 中英文粘连拆开 + 软断行合并。"""
+def fix_ocr_text(text: str, aggressive: bool | None = None) -> str:
+    """中英文粘连拆开 + 软断行合并（不改变字符内容）。
+    P1-10：全角→半角标点、×→* 等会改写原文的归一化只在 aggressive=True 时做
+    （env ASTRALPATH_OCR_AGGRESSIVE_NORMALIZE=1），默认保留原文标点。"""
+    if aggressive is None:
+        aggressive = os.environ.get("ASTRALPATH_OCR_AGGRESSIVE_NORMALIZE", "") == "1"
     s = (text or "").replace("　", " ").replace("\x00", "")
-    for a, b in CHAR_CONFUSIONS:
-        s = s.replace(a, b)
+    if aggressive:
+        for a, b in CHAR_CONFUSIONS:
+            s = s.replace(a, b)
     s = re.sub(r"([一-鿿])([A-Za-z])", r"\1 \2", s)
     s = re.sub(r"([A-Za-z])([一-鿿])", r"\1 \2", s)
     # 中文软断行：行尾无标点则与下一行合并
@@ -1288,8 +1615,10 @@ def _rapid_engine():
     return eng
 
 
-def _rapid_result_to_text(res) -> str:
-    """boxes+txts → 行序文本：按 y 聚行、行内按 x 排序（对齐 words_to_text 口径）。"""
+def _rapid_result_to_text(res, code: bool = False) -> str:
+    """boxes+txts → 行序文本：按 y 聚行、行内按 x 排序（对齐 words_to_text 口径）。
+    code=True（P6-2）：按行首 x 起点相对全页最小行首的偏移重建缩进，
+    unit 取词高中位数×0.55——代码页缩进不再被拍平。"""
     txts = getattr(res, "txts", None)
     txts = list(txts) if txts is not None else []
     boxes = getattr(res, "boxes", None)
@@ -1299,31 +1628,65 @@ def _rapid_result_to_text(res) -> str:
     words = []
     for i, t in enumerate(txts):
         box = boxes[i] if i < len(boxes) else None
+        x0 = y = h = 0.0
         if box is not None and len(box) >= 4:
             try:
-                y = sum(float(p[1]) for p in box) / 4.0
-                x = sum(float(p[0]) for p in box) / 4.0
+                xs = [float(p[0]) for p in box]
+                ys = [float(p[1]) for p in box]
+                x0, y = min(xs), sum(ys) / len(ys)
+                h = max(ys) - min(ys)
             except Exception:
-                x = y = 0.0
-        else:
-            x = y = 0.0
-        words.append((str(t), x, y))
+                x0 = y = 0.0
+        words.append((str(t), x0, y, h))
     rows: list[list[tuple]] = []
-    for w in sorted(words, key=lambda t: (t[2], t[1])):
-        row = next((r for r in rows if abs(r[0][2] - w[2]) <= 14), None)
+    for wd in sorted(words, key=lambda t: (t[2], t[1])):
+        row = next((r for r in rows if abs(r[0][2] - wd[2]) <= 14), None)
         if row is None:
             row = []
             rows.append(row)
-        row.append(w)
+        row.append(wd)
     rows.sort(key=lambda r: sum(x[2] for x in r) / len(r))
-    return "\n".join(" ".join(t[0] for t in sorted(r, key=lambda t: t[1])) for r in rows)
+    if not code:
+        return "\n".join(" ".join(t[0] for t in sorted(r, key=lambda t: t[1])) for r in rows)
+    hs = sorted(wd[3] for r in rows for wd in r if wd[3] > 4)
+    unit = max(8.0, (hs[len(hs) // 2] if hs else 24.0) * 0.55)
+    base = min((wd[1] for r in rows for wd in r), default=0.0)
+    out_lines = []
+    for r in rows:
+        left = min(wd[1] for wd in r)
+        pad = max(0, int(round((left - base) / unit)))
+        out_lines.append(" " * pad + " ".join(t[0] for t in sorted(r, key=lambda t: t[1])))
+    return "\n".join(out_lines)
+
+
+def _render_scale_for(path: Path, page_index: int, base: float = 2.0) -> float:
+    """P1-9 自适应渲染倍率：短边渲染不足 MinSize(1080px) 时提高倍率（封顶 4x）。"""
+    if os.environ.get("ASTRALPATH_OCR_RENDER_SCALE"):
+        try:
+            return float(os.environ["ASTRALPATH_OCR_RENDER_SCALE"])
+        except Exception:
+            pass
+    try:
+        import pypdfium2 as pdfium
+        doc = pdfium.PdfDocument(str(path))
+        page = doc[page_index]
+        w, h = page.get_size()
+        page.close()
+        doc.close()
+        long_pt = max(float(w), float(h))
+        if long_pt > 0 and long_pt * base < 1080.0:
+            return min(4.0, round(1080.0 / long_pt, 2))
+    except Exception:
+        pass
+    return base
 
 
 def ocr_image_rapid(image_path: Path) -> str:
-    """单页 PNG → RapidOCR 行序文本（含项目纠错归一）。"""
+    """单页 PNG → RapidOCR 行序文本（含预处理与项目纠错）。"""
     from PIL import Image
 
     img = Image.open(image_path)
+    img = preprocess_pil_for_ocr(img)
     res = _rapid_engine()(img)
     return fix_ocr_text(_rapid_result_to_text(res))
 
@@ -1351,17 +1714,30 @@ def rapid_pdf_pages_detail(path: Path, page_indexes: list[int], scale: float = 2
     _failed: list[int] = []
 
     def _one(idx: int) -> tuple[int, str]:
+        ckey = _ocr_cache_key(path, idx, scale)
+        cached = _ocr_cache_get(ckey)
+        if cached is not None:
+            return idx, cached
         png = workdir / f"page_{idx:04d}.png"
         with _PDFIUM_RENDER_LOCK:
-            rendered = render_pdf_page_png(path, idx, scale=scale, out_png=png)
+            # pdfium 全局状态非线程安全：倍率计算也要开文档，必须与渲染一起串行
+            eff_scale = _render_scale_for(path, idx, base=scale)
+            rendered = render_pdf_page_png(path, idx, scale=eff_scale, out_png=png)
         if rendered is None:
             _failed.append(idx)
             return idx, ""
         try:
-            return idx, ocr_image_rapid(rendered)
+            text = ocr_image_rapid(rendered)
+            _ocr_cache_put(ckey, text)
+            return idx, text
         except Exception:
             _failed.append(idx)
             return idx, ""
+        finally:
+            try:
+                png.unlink(missing_ok=True)
+            except Exception:
+                pass
 
     pages_out: dict[int, str] = {}
     workers = _rapid_workers()

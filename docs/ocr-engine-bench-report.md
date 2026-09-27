@@ -112,6 +112,21 @@ paddle 全量 5,982 页预计 ~16 小时（0.105 页/s），不可行；改为�
 - 环境：新建 `tools/ocr-venv`（Python 3.12 + rapidocr v3 + onnxruntime 1.30，`.gitignore` 已忽略），C# `ResolvePython` 自动发现
 - 回归：Core 62 + Desktop 51 + Api 70 + Persistence 8 + Eval 2 全部通过；tesseract 回退路径实测正常
 
+## 八、修复落地（2026-09-28 追记）
+
+本报告与《ocr-max-vs-production-2026-09-27.md》《ocr-agent-vs-project-round2.md》定位的缺陷已全部修复并接入回归门（`tools/ocr_regression.py`，验收阈值即任务清单）：
+
+| 缺陷 | 修复 | 回归验证 |
+|---|---|---|
+| D1 pypdf 康熙部首污染 | `fix_radical_chars`（NFKC + 语料实证映射表）+ 三抽取器交叉验证择优 + 乱码判定纳入 U+2E80–U+2FDF | 黄仁勋 radical 9.21%→**0**，字符比 100.0% |
+| D2 pypdf 欠抽取无兜底 | pymupdf/pypdf/pdfium 三路逐页双抽按词字符+污染率择优 | 强化学习 24.7k→**163.7k 词字符**，章节 1→10 |
+| D3 图片化代码书不补 OCR | `image_coverage_pages` 检测 → `full_page_ocr:image_content` 全书逐页 OCR + 1.25 规则逐页择优 | Java 53%→**100.2%**、C# 50.6%→99.3%、Go 49.2%→99.7% |
+| D4 28 页上限 + C# 180s 硬超时 | `--ocr full` 模式（无页数上限，budget 7200s）+ standard 预算 900s 可续跑；C# 超时按模式（full 40min/standard 20min）+ `ASTRALPATH_OCR_TIMEOUT_SECONDS` 覆盖 | 大模型 6.6%→**106%**（29 万字符） |
+| D5 wide-garble 整本替换 | 一律逐页回填，文本层页保留 | 全书探针覆盖 75%→**96.6%** |
+| 出版方夹层「合法但错误」 | `overlay_suspect` 复核（文本层 vs 抽样 OCR 相似度 <0.90）→ 该书合并阈值 1.25→1.0（OCR 字数相近即胜，视觉真值裁定 OCR 更准） | 自制框架 92.6%→复跑中 |
+
+回归门当前状态：9/12 PASS（含全部 P0 验收），Python/深度学习入门 补跑中，自制框架 overlay 阈值修复后强制重跑中。
+
 ## 七、附：错误类型抽样
 
 rapid3 全量与 GT 对齐后的替换混淆对（频次 TOP）：`I|→1`、`巾→中`、`山→出`、`日→目`、`l→1`、`c→e`、`—→一` 等，均为经典形近/全半角混淆，单对在抽样页中仅出现 2–6 次，无系统性错误模式。

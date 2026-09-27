@@ -14,11 +14,17 @@
 """
 from __future__ import annotations
 
+import bisect
 import re
 from collections import defaultdict
 from typing import Any
 
-CHAPTER_NUM_RE = re.compile(r"第\s*([0-9]+|[一二三四五六七八九十百零]+)\s*章")
+CHAPTER_NUM_RE = re.compile(
+    r"第\s*([0-9]+|[一二三四五六七八九十百零]+)\s*(?:章|篇|部分|阶段|讲)"
+    r"|(?:步骤|Step)\s*#?([0-9]+)"
+    r"|(?:Part|Unit|Lesson|Stage)\s*#?([0-9]+)",
+    re.I,
+)
 SECTION_NUM_RE = re.compile(r"^(\d{1,2}(?:\.\d{1,2}){0,2})")
 CN_NUM = {
     "一": 1, "二": 2, "三": 3, "四": 4, "五": 5,
@@ -40,14 +46,28 @@ STOP_TERMS = {
 }
 
 
+# P2-12：章节形态扩展——第N章/篇/部分/阶段/讲、行首"步骤N"、Part/Unit/Lesson/Stage N
+CHAPTER_FIND_RE = re.compile(
+    r"第\s*[0-9一二三四五六七八九十百零]+\s*(?:章|篇|部分|阶段|讲)[^\n]{0,40}"
+    r"|^\s*(?:步骤|Step)\s*#?\d+[^\n]{0,40}"
+    r"|^\s*(?:Part|Unit|Lesson|Stage)\s+#?\d+[^\n]{0,40}",
+    re.I | re.M,
+)
+
+
 def parse_chapter_num(title: str) -> int | None:
     m = CHAPTER_NUM_RE.search(title)
     if not m:
         return None
-    token = m.group(1)
-    if token.isdigit():
-        return int(token)
-    return CN_NUM.get(token)
+    for tok in m.groups():
+        if tok is None:
+            continue
+        if tok.isdigit():
+            return int(tok)
+        v = CN_NUM.get(tok)
+        if v is not None:
+            return v
+    return None
 
 
 def parse_section_code(title: str) -> str | None:
@@ -77,7 +97,7 @@ NOISE_TITLE = re.compile(
 
 def clean_chapter_title(t: str) -> str:
     t = re.sub(r"\s+", " ", (t or "").strip())
-    t = re.sub(r"^[第]*\s*([0-9一二三四五六七八九十百零]+)\s*章\s*", r"第\1章 ", t)
+    t = re.sub(r"^[第]*\s*([0-9一二三四五六七八九十百零]+)\s*(章|篇|部分|阶段|讲)\s*", r"第\1\2 ", t)
     # 目录后接说明文字：截到句号/逗号/空白说明
     t = re.split(r"[。；;：:，,—\-—]|另外|包括|其中|介绍|讲解了|重点介绍|本书", t)[0]
     t = re.sub(r"\s+\d{1,4}$", "", t)  # 去掉页码
@@ -147,10 +167,18 @@ def extract_outline(text: str, max_chapters: int = 80, max_sections: int = 200) 
     seen_c: set[str] = set()
     seen_s: set[str] = set()
 
-    for m in re.finditer(r"(第\s*[0-9一二三四五六七八九十百零]+\s*章[^\n]{0,40})", text):
-        raw = clean_chapter_title(strip_noise_title(m.group(1)))
+    # P2-12：章节形态扩展（复用模块级 CHAPTER_FIND_RE）
+    for m in CHAPTER_FIND_RE.finditer(text):
+        raw = clean_chapter_title(strip_noise_title(m.group(0)))
         if is_noise_title(raw):
             continue
+        # P2-12：编号独立成行时（如"步骤6"后换行才是标题），把下一行并入标题
+        if re.fullmatch(r"(?:步骤|Step)\s*#?\d+|第\s*[0-9一二三四五六七八九十百零]+\s*(?:篇|阶段|讲|部分)", (raw or "").strip()):
+            nxt = [ln for ln in text[m.end():m.end() + 100].splitlines() if ln.strip()]
+            if nxt:
+                tail = clean_chapter_title(strip_noise_title(nxt[0]))
+                if tail and not is_noise_title(tail) and not CHAPTER_NUM_RE.search(tail[:10]):
+                    raw = clean_chapter_title(f"{raw} {tail}")
         num = parse_chapter_num(raw)
         key = f"ch:{num if num is not None else raw}"
         if key in seen_c or len(raw) < 3:
@@ -208,8 +236,11 @@ def extract_terms_weighted(text: str, chapter_offsets: list[tuple[int, str]], li
     ]
     # 位置：章节区间
     bounds = sorted(chapter_offsets)  # (offset, chapter_id/title)
+    bound_offs = [o for o, _n in bounds]
+    bound_names = [n for _o, n in bounds]
     counts: dict[str, int] = defaultdict(int)
     first_pos: dict[str, int] = {}
+    ch_counts: dict[str, dict[str, int]] = defaultdict(lambda: defaultdict(int))
     for pat in pats:
         for m in finditer(pat, text):
             term = (m.group(1) or "").strip()
@@ -238,6 +269,11 @@ def extract_terms_weighted(text: str, chapter_offsets: list[tuple[int, str]], li
             counts[term] += 1
             if term not in first_pos:
                 first_pos[term] = m.start()
+            # P2-13：按章统计术语分布（不只首次出现）
+            if bound_offs:
+                k = bisect.bisect_right(bound_offs, m.start()) - 1
+                if k >= 0:
+                    ch_counts[term][bound_names[k]] += 1
 
     def score(term: str) -> float:
         freq = counts[term]
@@ -265,8 +301,15 @@ def extract_terms_weighted(text: str, chapter_offsets: list[tuple[int, str]], li
             "score": round(score(t), 4),
             "first_offset": pos,
             "host_chapter": host,
+            "chapter_top": sorted(ch_counts.get(t, {}).items(), key=lambda kv: (-kv[1], kv[0]))[:3],
         })
     return out
+
+
+def _same_paragraph(text: str, a: int, b: int) -> bool:
+    """P2-13：两个位置是否落在同一段落（之间无空行、换行 ≤2）。"""
+    seg = text[a:b]
+    return seg.count("\n\n") == 0 and seg.count("\n") <= 2
 
 
 def cooccurrence_edges(
@@ -276,7 +319,7 @@ def cooccurrence_edges(
     window: int = 180,
     max_edges: int = 24,
 ) -> list[dict]:
-    """术语共现：只连 first_offset 较早 → 较晚，保证无环。"""
+    """术语共现：只连 first_offset 较早 → 较晚，保证无环。同段共现额外加权。"""
     items = sorted(((term_positions[t], t) for t in node_id_by_term if t in term_positions), key=lambda x: x[0])
     scores: list[tuple[float, str, str]] = []
     for i, (pos_i, ti) in enumerate(items):
@@ -288,6 +331,8 @@ def cooccurrence_edges(
             # 共现强度
             gap = pos_j - pos_i
             w = 1.0 + max(0.0, (window - gap) / window)
+            if _same_paragraph(text, pos_i, pos_j):
+                w += 1.0
             scores.append((w, ti, tj))
     scores.sort(key=lambda x: (-x[0], x[1], x[2]))
     edges = []
@@ -400,10 +445,10 @@ def build_knowledge_graph(
     """完整构图算法。目录尽量全量入图（章+节+小节）。"""
     chapters, sections = extract_outline(text, max_chapters=max_chapters, max_sections=max_sections)
 
-    # 若章过少，从文件名/正则兜底
+    # 若章过少，从文件名/正则兜底（P2-12：同样覆盖 步骤N/阶段N/Part N 等形态）
     if len(chapters) < 2:
-        for m in re.finditer(r"(第\s*\d+\s*章[^\n]{0,24})", text):
-            t = clean_chapter_title(strip_noise_title(m.group(1)))
+        for m in CHAPTER_FIND_RE.finditer(text):
+            t = clean_chapter_title(strip_noise_title(m.group(0)))
             if is_noise_title(t):
                 continue
             chapters.append({"title": t, "kind": "chapter", "level": 0,
@@ -533,6 +578,14 @@ def build_knowledge_graph(
                 "from": ch_ids[0], "to": nid, "edgeType": "prerequisite", "weight": 0.7,
                 "source": "kg:term-fallback",
             })
+        # P2-13：术语在多章高频出现时补 related 边（章 → 术语，方向保持无环）
+        for ch_name, _c in (term.get("chapter_top") or [])[1:3]:
+            hid2 = ch_id.get(ch_name)
+            if hid2 and hid2 != host_id:
+                edges.append({
+                    "from": hid2, "to": nid, "edgeType": "related", "weight": 0.6,
+                    "source": "kg:term-distribution",
+                })
 
     # 术语共现（仅 term→term，且先出现→后出现，天然无环）
     if len(term_id) >= 2:

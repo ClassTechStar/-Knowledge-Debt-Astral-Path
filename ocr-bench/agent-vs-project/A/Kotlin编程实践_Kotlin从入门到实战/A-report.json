@@ -1,0 +1,157 @@
+{
+  "book": "Kotlin编程实践：Kotlin从入门到实战",
+  "slug": "Kotlin编程实践_Kotlin从入门到实战",
+  "pages": 294,
+  "needsOcrPages": 15,
+  "zeroTextPages": 1,
+  "tocCandidatePages": [],
+  "chHeadPages": 17,
+  "samples": {
+    "ocrPages": [1, 2, 9, 14, 73, 89, 100, 116, 139, 161, 180, 182, 196, 213, 214, 222, 260, 266],
+    "visualPages": [1, 9, 14, 100, 180],
+    "reasons": "封面/版权=1,2；目录候选页为空（全书无目录页，文本层搜「目录」仅正文命中），改选前言起始页9作前置结构页；章首页6页从13个第X章页均匀取：14(第1章)/73(第3章)/116(第5章)/161(第7章)/214(第10章)/266(第13章)，且均为needsOcr低文本页；低字数页4页取书中段30%-80%(页89-235)内chars最少且未与章首重复者：139(69)/182(56)/213(72)/222(63)；suspRatio全书均为0.0（无PUA/FFFD乱码），改以非CJK密度最高的纯代码页替代：89(chars422,cjk19)/196(chars278,cjk0)；随机中段3页：100/180/260。合计18页≤22。"
+  },
+  "ocrSampleStats": {
+    "n": 18,
+    "avgMs": 895.6,
+    "pagesPerS": 1.117,
+    "avgChars": 233.0
+  },
+  "cerVsTextlayer": {
+    "n": 17,
+    "mean": 0.0038,
+    "worst": [
+      { "page": 180, "cer": 0.0341 },
+      { "page": 196, "cer": 0.0124 },
+      { "page": 89, "cer": 0.0117 },
+      { "page": 100, "cer": 0.0055 },
+      { "page": 260, "cer": 0.0008 }
+    ]
+  },
+  "cerVsRapid3Ref": {
+    "n": 18,
+    "mean": 0.0061,
+    "worst": [
+      { "page": 180, "cer": 0.0482 },
+      { "page": 260, "cer": 0.0397 },
+      { "page": 196, "cer": 0.0123 },
+      { "page": 89, "cer": 0.007 },
+      { "page": 100, "cer": 0.0024 }
+    ],
+    "charDelta": -4
+  },
+  "chapters": [
+    { "page": 8, "title": "序言", "pattern": "序言" },
+    { "page": 9, "title": "前言", "pattern": "前言" },
+    { "page": 14, "title": "第1章 安装并运行Kotlin", "pattern": "第X章" },
+    { "page": 39, "title": "第2章 Kotlin基础", "pattern": "第X章" },
+    { "page": 73, "title": "第3章 Kotlin中的面向对象编程", "pattern": "第X章" },
+    { "page": 104, "title": "第4章 函数式编程", "pattern": "第X章" },
+    { "page": 116, "title": "第5章 集合", "pattern": "第X章" },
+    { "page": 150, "title": "第6章 序列", "pattern": "第X章" },
+    { "page": 161, "title": "第7章 作用域函数", "pattern": "第X章" },
+    { "page": 172, "title": "第8章 Kotlin委托", "pattern": "第X章" },
+    { "page": 194, "title": "第9章 测试", "pattern": "第X章" },
+    { "page": 214, "title": "第10章 输入/输出", "pattern": "第X章" },
+    { "page": 221, "title": "第11章 其他", "pattern": "第X章" },
+    { "page": 255, "title": "第12章 Spring框架", "pattern": "第X章" },
+    { "page": 266, "title": "第13章 协程与结构化并发", "pattern": "第X章" }
+  ],
+  "visualFindings": [
+    {
+      "page": 1,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": true,
+      "orderOk": true,
+      "notes": "封面：单栏，O'Reilly标志+书名+动物插画+作者，无水印/倾斜/阴影；页面无文本层，OCR顺序（书名→英文副题→作者）与视觉一致"
+    },
+    {
+      "page": 9,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": false,
+      "orderOk": true,
+      "notes": "前言：单栏正文+橙色超链接+脚注角标，阅读序与OCR一致；因全书无目录页，以本页替代目录页做视觉检查"
+    },
+    {
+      "page": 14,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": false,
+      "orderOk": true,
+      "notes": "章首页：仅「第1章/安装并运行Kotlin」两行居中，其余空白，排版干净；此类页即全部15个needsOcr低文本页，OCR恢复与文本层CER=0"
+    },
+    {
+      "page": 100,
+      "columns": 1,
+      "hasCode": true,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": true,
+      "orderOk": true,
+      "notes": "代码块（Java反编译代码）+边栏乌鸦图标；OCR将NBSP缩进拍平为顶格，行尾圈码➌误识为「©」，static final空格丢失成staticfinal；文本层缩进与圈码➊➋➌均正确；整体行序与视觉一致"
+    },
+    {
+      "page": 180,
+      "columns": 1,
+      "hasCode": true,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": false,
+      "orderOk": true,
+      "notes": "样页最差CER页：视觉确认存在代码行 fun `uninitialized value throws exception`() { 及其闭括号，本次OCR漏识这2行；其余文本顺序与视觉一致，无水印/倾斜"
+    }
+  ],
+  "defects": [
+    {
+      "page": 180,
+      "type": "missed_content",
+      "detail": "OCR漏识2行代码：fun `uninitialized value throws exception`() { 及其后的闭括号 }（CER 0.034 vs 文本层、0.048 vs Round B 参考均为样页最高）",
+      "severity": "medium"
+    },
+    {
+      "page": 89,
+      "type": "code",
+      "detail": "plus()/minus() 两个测试函数的闭括号 } 行丢失，并出现游离字符「3」（圈码或括号误识），函数边界被破坏；Round B 参考同病（427 vs 424 字符），属引擎系统性弱点",
+      "severity": "medium"
+    },
+    {
+      "page": 100,
+      "type": "code",
+      "detail": "代码块缩进被拍平（文本层以NBSP保留最多6格缩进，OCR全部顶格）；行尾圈码➌误识为「©」；static final 空格丢失合并为 staticfinal",
+      "severity": "medium"
+    },
+    {
+      "page": 1,
+      "type": "missed_content",
+      "detail": "全书无目录页：tocCandidatePages为空，文本层搜「目录」仅正文命中（工程根目录等）；版权/前言之后直接进第1章，影响导航",
+      "severity": "medium"
+    },
+    {
+      "page": 196,
+      "type": "code",
+      "detail": "纯代码页（cjk=0）缩进拍平、反引号内空格与标点处理不稳定（CER 0.012）",
+      "severity": "low"
+    },
+    {
+      "page": 1,
+      "type": "other",
+      "detail": "封面页无文本层（全书唯一zeroText页）；OCR完整恢复97字符且与Round B参考逐字一致，可自动兜底",
+      "severity": "low"
+    },
+    {
+      "page": 9,
+      "type": "other",
+      "detail": "inventory的chHeads启发式存在误报：p9/p10/p160/p244为正文提及「第X章」，非章首页（真实章首13页+这4个误报=17）",
+      "severity": "low"
+    }
+  ],
+  "conclusions": "本书为单栏代码教材，文本层质量极高：279/294页有文本，全页suspRatio=0.0，代码缩进以NBSP保留、圈码➊➋➌为原生Unicode；15个needsOcr页全部是极短章首页（5-17字符）。本次RapidOCR(zoom1.5)抽样18页：与文本层平均CER 0.38%（13页为0），与Round B rapid3参考平均CER 0.61%，仅p180/p260有实质差异且互有胜负（p180我方漏2行代码，p260我方反而多识别1行），其余13页与参考逐字节一致，速度1.12页/s（平均895.6ms/页）。主要风险全部集中在代码块：缩进拍平、圈码误识（➌→©、游离「3」）、个别代码行/闭括号漏识（p89/p180）。视觉检查5页均无水印/倾斜/阴影，阅读序与OCR一致。建议：正文以文本层为主、OCR仅兜底needsOcr页（已验证CER=0）；代码块若需OCR须人工复核缩进与括号。"
+}

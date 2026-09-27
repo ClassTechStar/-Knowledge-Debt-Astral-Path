@@ -1,0 +1,289 @@
+{
+ "book": "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf",
+ "slug": "深度学习入门_基于Python的理论与实现+_斋藤康毅_+",
+ "pages": 314,
+ "needsOcrPages": 11,
+ "zeroTextPages": 11,
+ "tocCandidatePages": [
+  14
+ ],
+ "chHeadPages": 145,
+ "samples": {
+  "ocrPages": [
+   1,
+   3,
+   13,
+   14,
+   25,
+   33,
+   42,
+   61,
+   93,
+   105,
+   106,
+   137,
+   144,
+   145,
+   156,
+   167,
+   211,
+   230,
+   259,
+   277,
+   291,
+   312
+  ],
+  "visualPages": [
+   1,
+   14,
+   25,
+   145,
+   167,
+   230,
+   277
+  ],
+  "reasons": "封面/版权:1,3;目录候选:13,14(inventory仅标14,实为13-14双页);章首候选6+2页:25,93,105,106,145,211,259,291(0文本隔页+chHeads>1内容页+真章首106);低字数页(全书30%-80%区间chars最少):230,156,167,144;suspRatio最高2页:33(0.0194,fffd=6),42(0.0128,fffd=3);随机中段3页:61,137,277;零文本尾页312。共22页,zoom1.5一次跑完"
+ },
+ "ocrSampleStats": {
+  "n": 22,
+  "avgMs": 1020.3,
+  "pagesPerS": 0.98,
+  "avgChars": 364.7
+ },
+ "cerVsTextlayer": {
+  "n": 15,
+  "mean": 0.1042,
+  "worst": [
+   {
+    "page": 230,
+    "cer": 0.8746
+   },
+   {
+    "page": 167,
+    "cer": 0.2857
+   },
+   {
+    "page": 156,
+    "cer": 0.113
+   },
+   {
+    "page": 211,
+    "cer": 0.0701
+   },
+   {
+    "page": 42,
+    "cer": 0.0648
+   }
+  ]
+ },
+ "cerVsRapid3Ref": {
+  "n": 17,
+  "mean": 0.0447,
+  "worst": [
+   {
+    "page": 230,
+    "cer": 0.4855
+   },
+   {
+    "page": 167,
+    "cer": 0.0814
+   },
+   {
+    "page": 93,
+    "cer": 0.0449
+   },
+   {
+    "page": 33,
+    "cer": 0.041
+   },
+   {
+    "page": 156,
+    "cer": 0.0393
+   }
+  ],
+  "charDelta": -42
+ },
+ "chapters": [
+  {
+   "page": 13,
+   "title": "目录",
+   "pattern": "目录"
+  },
+  {
+   "page": 17,
+   "title": "译者序",
+   "pattern": "译者序"
+  },
+  {
+   "page": 18,
+   "title": "前言",
+   "pattern": "前言"
+  },
+  {
+   "page": 26,
+   "title": "第1章 Python入门",
+   "pattern": "第N章"
+  },
+  {
+   "page": 46,
+   "title": "第2章 感知机",
+   "pattern": "第N章"
+  },
+  {
+   "page": 62,
+   "title": "第3章 神经网络",
+   "pattern": "第N章"
+  },
+  {
+   "page": 106,
+   "title": "第4章 神经网络的学习",
+   "pattern": "第N章"
+  },
+  {
+   "page": 146,
+   "title": "第5章 误差反向传播法",
+   "pattern": "第N章"
+  },
+  {
+   "page": 188,
+   "title": "第6章 与学习相关的技巧",
+   "pattern": "第N章"
+  },
+  {
+   "page": 226,
+   "title": "第7章 卷积神经网络",
+   "pattern": "第N章"
+  },
+  {
+   "page": 260,
+   "title": "第8章 深度学习",
+   "pattern": "第N章"
+  },
+  {
+   "page": 292,
+   "title": "附录A Softmax-with-Loss层的计算图",
+   "pattern": "附录A"
+  },
+  {
+   "page": 304,
+   "title": "参考文献",
+   "pattern": "参考文献"
+  },
+  {
+   "page": 311,
+   "title": "版权(Copyright ©2016 Koki Saitoh)",
+   "pattern": "版权"
+  }
+ ],
+ "visualFindings": [
+  {
+   "page": 1,
+   "columns": 1,
+   "hasCode": false,
+   "hasTable": false,
+   "hasFormula": false,
+   "hasFigure": true,
+   "orderOk": true,
+   "notes": "整页图片封面(红底+鱼插图),无文本层;OCR读出O'Reilly/TURING/书名/作者共139字,与rapid3完全一致"
+  },
+  {
+   "page": 14,
+   "columns": 1,
+   "hasCode": false,
+   "hasTable": false,
+   "hasFormula": false,
+   "hasFigure": false,
+   "orderOk": true,
+   "notes": "目录页,单栏点线引导符;OCR原文本仅460/1543字(丢点线),归一化去点线后CER=0.003,条目顺序一致"
+  },
+  {
+   "page": 25,
+   "columns": 0,
+   "hasCode": false,
+   "hasTable": false,
+   "hasFormula": false,
+   "hasFigure": false,
+   "orderOk": true,
+   "notes": "渲染确认为完全空白页;零文本页中25/105/145/187/259/291/303共7页均为章节前空白隔页,OCR空检测正确,非缺陷"
+  },
+  {
+   "page": 145,
+   "columns": 0,
+   "hasCode": false,
+   "hasTable": false,
+   "hasFormula": false,
+   "hasFigure": false,
+   "orderOk": true,
+   "notes": "空白隔页,同p25"
+  },
+  {
+   "page": 167,
+   "columns": 1,
+   "hasCode": false,
+   "hasTable": false,
+   "hasFormula": true,
+   "hasFigure": true,
+   "orderOk": true,
+   "notes": "书页142:式(5.10)/(5.11)分式+三张计算图;分式与∂上下标被线性化打散,CER升至0.286;正文行OCR与文本层几乎逐字一致"
+  },
+  {
+   "page": 230,
+   "columns": 1,
+   "hasCode": false,
+   "hasTable": false,
+   "hasFormula": false,
+   "hasFigure": true,
+   "orderOk": false,
+   "notes": "书页205:整页仅图7-4卷积数字矩阵;文本层按矢量顺序、OCR按检测框顺序读数字,行序完全不同致CER 0.87;数字内容与图题'图7-4卷积运算的计算顺序'均捕获,网格行列结构丢失"
+  },
+  {
+   "page": 277,
+   "columns": 1,
+   "hasCode": false,
+   "hasTable": false,
+   "hasFormula": false,
+   "hasFigure": true,
+   "orderOk": true,
+   "notes": "书页252:单栏正文+鸟标边注块+脚注ch08/half_float_network.py;OCR与rapid3逐字一致(cerR3=0),阅读顺序正常;无水印无倾斜"
+  }
+ ],
+ "defects": [
+  {
+   "page": 167,
+   "type": "formula",
+   "detail": "独立分式公式(∂y/∂x=-1/x²)与计算图中∂、上下标在OCR输出中线性化乱序,二维结构丢失;全书公式密集,此为最主要质量损失源(文本层几乎不含∑∂σ等符号,cer()归一化会掩盖该损失)",
+   "severity": "medium"
+  },
+  {
+   "page": 230,
+   "type": "figure",
+   "detail": "整页数字矩阵图(图7-4):OCR按检测框顺序输出,CER对文本层0.875、对rapid3仍0.486;数字本身齐全但行列网格结构不可恢复",
+   "severity": "medium"
+  },
+  {
+   "page": 25,
+   "type": "blank",
+   "detail": "空白隔页25/105/145/187/259/291/303共7页;另4个零文本页1/2/312/313为整页图片(封面/作者介绍/封底),OCR均可读出内容;inventory的needsOcr标记对空白页为误报,建议管线预筛空白页跳过OCR",
+   "severity": "low"
+  },
+  {
+   "page": 33,
+   "type": "garble",
+   "detail": "文本层含6个U+FFFD替换符(suspRatio=0.0194全书最高),OCR输出正常;缺陷在文本层不在OCR",
+   "severity": "low"
+  },
+  {
+   "page": 42,
+   "type": "garble",
+   "detail": "文本层含3个U+FFFD(suspRatio=0.0128);OCR与rapid3一致(CER=0.009),文本层自身劣化",
+   "severity": "low"
+  },
+  {
+   "page": 13,
+   "type": "other",
+   "detail": "目录页点线引导符与页码对齐依赖排版,OCR原文丢点线致原始字符数仅1/3(532/1473),归一化CER无碍,但若下游直接用OCR原文解析目录页码会失败",
+   "severity": "low"
+  }
+ ],
+ "conclusions": "本书管线质量良好:314页中仅11页无文本层,且全部是空白隔页(25/105/145/187/259/291/303共7页)或整页图片(封面1/作者介绍2/封底312/313),无内容性缺页;图片页OCR均可读出有效文本。22样页OCR(同rapid3引擎,zoom1.5)平均1020ms/页≈0.98页/s,约为rapid3全页参考速度的2倍;对文本层平均CER 0.104(被图形页230/公式页167拉高,纯正文页普遍<0.03),对rapid3参考平均CER 0.045、总字符差仅-42。视觉检查:全书单栏、无水印、无倾斜、阅读顺序正常。最需注意:(1)分式/计算图等二维公式的线性化乱序是主要损失,c指标因归一化剥符号而低估;(2)整页图数字矩阵读取顺序与排版序不一致;(3)目录页点线依赖归一化;(4)空白页可预先剔除以提速。"
+}

@@ -1,0 +1,18 @@
+{
+ "engine": "paddle",
+ "workers": 4,
+ "intra": 2,
+ "total_wall_s": 2908.54,
+ "books": {
+  "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF": {
+   "pages_total": 504,
+   "pages_this_run": 504,
+   "resumed_pages": 0,
+   "wall_s": 2908.54,
+   "pages_per_s": 0.173,
+   "chars": 230657,
+   "errors": 0,
+   "sum_ms": 11565121
+  }
+ }
+}

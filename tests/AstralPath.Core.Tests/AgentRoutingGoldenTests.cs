@@ -8,7 +8,7 @@ namespace AstralPath.Core.Tests;
 /// 意图路由金样（P2：JS/C# 双实现消费同一张 tools/agent-intents.json 锚点表）。
 /// 表一致性由 scripts/verify_agent_intents.py 三方对拍；本测试锁 **C# 路由行为**：
 /// 危机词最高优先、负例占比 ≥60% 才落（A4 回归）、多锚点加分（A34）、
-/// 15 个意图的归属与文档（P1 提示词 §4.3）一致。
+/// 22 个意图的归属与文档（P1 提示词 §4.3 / P5-1 登记表=运行时表）一致。
 /// </summary>
 public class AgentRoutingGoldenTests
 {
@@ -80,13 +80,15 @@ public class AgentRoutingGoldenTests
     }
 
     [Fact]
-    public void DefaultTable_Covers_All_15_Documented_Intents()
+    public void DefaultTable_Covers_All_22_Documented_Intents()
     {
         var expected = new[]
         {
-            "debt.diagnose", "debt.explain", "plan.create", "plan.rebalance", "today.tasks",
-            "practice.start", "progress.check", "graph.view", "material.parse", "kb.search",
-            "profile.view", "profile.optout", "whatif.simulate", "sale.check", "meta.help"
+            "crisis.handoff", "debt.diagnose", "debt.explain", "plan.create", "plan.rebalance",
+            "today.tasks", "practice.start", "progress.check", "graph.view", "material.parse",
+            "kb.search", "kb.ingest", "profile.view", "profile.optout", "teacher.hotspots",
+            "consent.grant", "consent.revoke", "whatif.simulate", "narrative.read", "sale.check",
+            "meta.help", "meta.feedback"
         };
         Assert.Equal(expected, DefaultAgentIntents.Table.Select(i => i.IntentId).ToArray());
     }

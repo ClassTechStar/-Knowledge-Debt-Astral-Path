@@ -894,7 +894,7 @@ function renderGraph(){
     el.innerHTML="<span>"+esc(p.node.title)+"</span><small>"+(d?"impact="+d.imp.toFixed(3):"diff "+(p.node.diff||2))+"</small>";
     el.onclick=()=>{
       const body=(book.chapters||[]).find(c=>c.id===p.node.id);
-      const preList=prereqs(p.node.id).map(title).join("、");
+      const preList=prereqs(p.node.id).map(t=>esc(title(t))).join("、");
       $("nodeInfo").innerHTML="<strong>"+esc(p.node.title)+"</strong><br/><span class=\"hint\">score="+scoreOf(p.node.id).toFixed(6)+" · 先修："+(preList||"无")+" · 下游 "+downMass(p.node.id)+" 个"+(body?"<br/>"+esc((body.body||"").slice(0,160)):"")+"</span>";
     };
     dag.appendChild(el);
@@ -907,7 +907,7 @@ function renderGraph(){
   $("chTree").querySelectorAll("[data-ch]").forEach(el=>el.onclick=()=>{
     const ch=(book.chapters||[]).find(c=>c.id===el.dataset.ch);
     if(!ch){$("chBody").textContent="章节不存在";return;}
-    $("chBody").innerHTML="<strong>"+esc(ch.title)+"</strong><div style=\"margin-top:6px\">"+esc((ch.body||ch.title).slice(0,400))+"</div><div class=\"hint\" style=\"margin-top:8px\">先修："+prereqs(ch.id).map(title).join("、")+" · score="+scoreOf(ch.id).toFixed(4)+"</div>";
+    $("chBody").innerHTML="<strong>"+esc(ch.title)+"</strong><div style=\"margin-top:6px\">"+esc((ch.body||ch.title).slice(0,400))+"</div><div class=\"hint\" style=\"margin-top:8px\">先修："+prereqs(ch.id).map(t=>esc(title(t))).join("、")+" · score="+scoreOf(ch.id).toFixed(4)+"</div>";
   });
 }
 function renderDebt(){
@@ -927,13 +927,28 @@ function buildPlan(){
   const ds=scanDebts().filter(d=>d.status==="open");
   const source=ds.length?ds:activeEdges().slice(0,5).map(e=>({from:e.from,to:e.to,imp:.5}));
   if(!source.length){S.plan=[];save(S);return S.plan;}
-  const plan=[];let id=1;const offs=[0,2,6];
+  // P6-7（K-05）：原实现把 8 条债边 ×6 项全压在 day1/2/3/4/7/8，day1 最坏 280 分钟，
+  // 与「每日 ≤40 分钟」的承诺相反。现按池子顺序放置：每日累计 ≤40min、
+  // 同日同知识点去重、放不下顺延到下一空位、超出 14 天才丢弃。
+  const pool=[];
   source.slice(0,8).forEach(d=>{
-    offs.forEach((o,pi)=>{
-      const day=1+o;
-      plan.push({id:id++,day,kp:d.from,layer:"core",min:pi===0?20:12,st:"todo"});
-      plan.push({id:id++,day:Math.min(14,day+1),kp:d.to,layer:"challenge",min:pi===0?15:10,st:"todo"});
+    [0,2,6].forEach((o,pi)=>{
+      pool.push({kp:d.from,layer:"core",min:pi===0?20:12,day0:1+o});
+      pool.push({kp:d.to,layer:"challenge",min:pi===0?15:10,day0:Math.min(14,2+o)});
     });
+  });
+  const DAY_CAP=40;
+  const load={};            // day -> 已排分钟
+  const seenDayKp=new Set();// "day:kp" 同日去重
+  const plan=[];let id=1;
+  pool.forEach(t=>{
+    let day=Math.min(14,t.day0);
+    while(day<=14&&(load[day]||0)+t.min>DAY_CAP)day++;          // 超额顺延
+    while(day<=14&&seenDayKp.has(day+":"+t.kp))day++;           // 同日同 kp 去重
+    if(day>14)return;                                           // 14 天边界外丢弃
+    load[day]=(load[day]||0)+t.min;
+    seenDayKp.add(day+":"+t.kp);
+    plan.push({id:id++,day,kp:t.kp,layer:t.layer,min:t.min,st:"todo"});
   });
   S.plan=plan;save(S);return plan;
 }
@@ -1000,6 +1015,10 @@ function renderToday(){
 const CRISIS=["不想活","自杀","轻生","结束生命","自残","伤害自己","跳楼","上吊","suicide","kill myself","活不下去"];
 const BANNED=["身份证","银行卡密码","详细住址"];
 const NEGATIVE=["哈哈","呵呵","随便","没事了","thanks","thank you","ok","好的"];
+// P5-1：恢复顶层 INTENTS 字面量（verify_agent_intents.py 靠它做三方对拍）。
+// 必须与 tools/agent-intents.json 的 intents 逐字一致（id 顺序 + 锚点）；此前内联进
+// intentRoute 导致对拍门禁实跑即红。22 意图 = 运行时 DefaultAgentIntents.Table 同源。
+const INTENTS=[["crisis.handoff",[]],["debt.diagnose",["知识债","债边","诊断","红边","薄弱"]],["debt.explain",["解释","为什么","怎么来的","公式"]],["plan.create",["计划","14天","安排","复习计划"]],["plan.rebalance",["减负","重排","调整计划","太重"]],["today.tasks",["今日","今天做","今日任务"]],["practice.start",["练习","做题","小测","测验"]],["progress.check",["进度","销账","进展","streak"]],["graph.view",["图谱","识网","知识图谱","思维导图"]],["material.parse",["解析资料","上传","OCR","教材","藏书"]],["kb.search",["知识库","检索","查资料","文档"]],["kb.ingest",["入库","上传文档","发布知识"]],["profile.view",["画像","我的标签","学习画像"]],["profile.optout",["退出画像","关闭画像","opt-out"]],["teacher.hotspots",["热点","班级","共性问题"]],["consent.grant",["授权","同意可见","consent"]],["consent.revoke",["撤销","取消授权","关闭可见"]],["whatif.simulate",["what-if","如果","模拟","假设"]],["narrative.read",["故事","叙事","讲解"]],["sale.check",["销账检查","能否销账","销账条件"]],["meta.help",["帮助","怎么用","说明"]],["meta.feedback",["反馈","建议","不好用"]]];
 function normalize(s){
   return String(s||"").replace(/[！-～]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0)).replace(/　/g," ").replace(/\s+/g," ").toLowerCase().trim();
 }
@@ -1013,23 +1032,11 @@ function intentRoute(t){
                       .reduce((a,b)=>b.length>a.length?b:a,"");
   if(negHit&&norm.length>0&&negHit.length/norm.length>=0.6)
     return {id:"meta.help",score:0,decision:"fallback",trace:"R2.5:negative;ratio="+(negHit.length/norm.length).toFixed(2)};
-  const intents=[
-    ["debt.diagnose",["知识债","债边","诊断","红边","薄弱"]],
-    ["debt.explain",["解释","为什么","怎么来的","公式"]],
-    ["plan.create",["计划","14天","安排","复习计划"]],
-    ["plan.rebalance",["减负","重排","调整计划","太重"]],
-    ["today.tasks",["今日","今天做","今日任务"]],
-    ["practice.start",["练习","做题","小测","测验"]],
-    ["progress.check",["进度","销账","进展","streak"]],
-    ["graph.view",["图谱","识网","知识图谱","思维导图"]],
-    ["material.parse",["解析资料","上传","ocr","教材","藏书"]],
-    ["kb.search",["知识库","检索","查资料","文档"]],
-    ["profile.view",["画像","我的标签","学习画像"]],
-    ["profile.optout",["退出画像","关闭画像","opt-out"]],
-    ["whatif.simulate",["what-if","如果","模拟","假设"]],
-    ["sale.check",["销账检查","能否销账","销账条件"]],
-    ["meta.help",["帮助","怎么用","说明"]]
-  ];
+  // P5-1：消费顶层 INTENTS 字面量（锚点表与 C#/JSON 同源），不再内联。
+  // 学生端按角色过滤：教师/管理员专属意图（kb.ingest/teacher.hotspots）对 student 不可达，
+  // 与 C# 端 RoleMask 语义一致；student 可达 = roles 含 student/demo 的 17 个。
+  const studentSkip=new Set(["kb.ingest","teacher.hotspots"]);
+  const intents=INTENTS.filter(p=>!studentSkip.has(p[0]));
   let best=null,bestScore=0,bestAnchor="";
   for(const pair of intents){
     const id=pair[0],anchors=pair[1];let hit=0,anc="";

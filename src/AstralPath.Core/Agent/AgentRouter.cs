@@ -406,36 +406,18 @@ public sealed class AgentRouter
     public bool IsBanned(string? text) => _banned.ContainsAny(text);
 
     public static AgentRouter CreateDefault() => new(
-        crisisWords: new[] { "自杀", "不想活", "轻生", "结束生命", "自残", "伤害自己", "跳楼", "上吊", "suicide", "kill myself" },
+        crisisWords: new[] { "自杀", "不想活", "轻生", "结束生命", "自残", "伤害自己", "跳楼", "上吊", "suicide", "kill myself", "活不下去" },
         bannedWords: Formula.FormulaWeights.BannedWords,
         negativeWords: new[] { "哈哈", "呵呵", "随便", "没事了", "thanks", "thank you", "ok", "好的" },
-        intents: DefaultIntents());
+        intents: DefaultAgentIntents.Table);
 
-    public static IReadOnlyList<AgentIntent> DefaultIntents() => new AgentIntent[]
-    {
-        new(0, "crisis.handoff", "student,teacher,admin,demo", Array.Empty<string>(), Array.Empty<string>(), "危机转介"),
-        new(1, "debt.diagnose", "student,demo", new[] { "知识债", "债边", "诊断", "红边", "薄弱" }, new string[0], "知识债诊断"),
-        new(2, "debt.explain", "student,teacher,demo", new[] { "解释", "为什么", "怎么来的", "公式" }, new string[0], "债边解释"),
-        new(3, "plan.create", "student,demo", new[] { "计划", "14天", "安排", "复习计划" }, new string[0], "生成修复计划"),
-        new(4, "plan.rebalance", "student,demo", new[] { "减负", "重排", "调整计划", "太重" }, new string[0], "计划减负"),
-        new(5, "today.tasks", "student,demo", new[] { "今日", "今天做", "今日任务" }, new string[0], "今日任务"),
-        new(6, "practice.start", "student,demo", new[] { "练习", "做题", "小测", "测验" }, new string[0], "开始练习"),
-        new(7, "progress.check", "student,demo", new[] { "进度", "销账", "进展", "streak" }, new string[0], "销账进度"),
-        new(8, "graph.view", "student,teacher,demo", new[] { "图谱", "识网", "知识图谱", "思维导图" }, new string[0], "查看图谱"),
-        new(9, "material.parse", "student,teacher,demo", new[] { "解析资料", "上传", "OCR", "教材" }, new string[0], "解析资料"),
-        new(10, "kb.search", "student,teacher,demo", new[] { "知识库", "检索", "查资料", "文档" }, new string[0], "知识库检索"),
-        new(11, "kb.ingest", "teacher,admin", new[] { "入库", "上传文档", "发布知识" }, new string[0], "知识入库"),
-        new(12, "profile.view", "student,demo", new[] { "画像", "我的标签", "学习画像" }, new string[0], "查看画像"),
-        new(13, "profile.optout", "student,demo", new[] { "退出画像", "关闭画像", "opt-out" }, new string[0], "画像退出"),
-        new(14, "teacher.hotspots", "teacher,admin,demo", new[] { "热点", "班级", "共性问题" }, new string[0], "班级热点"),
-        new(15, "consent.grant", "student,demo", new[] { "授权", "同意可见", "consent" }, new string[0], "授权教师可见"),
-        new(16, "consent.revoke", "student,demo", new[] { "撤销", "取消授权", "关闭可见" }, new string[0], "撤销授权"),
-        new(17, "whatif.simulate", "student,teacher,demo", new[] { "what-if", "如果", "模拟", "假设" }, new string[0], "What-if 模拟"),
-        new(18, "narrative.read", "student,demo", new[] { "故事", "叙事", "讲解" }, new string[0], "叙事讲解"),
-        new(19, "sale.check", "student,demo", new[] { "销账检查", "能否销账", "条件" }, new string[0], "销账检查"),
-        new(20, "meta.help", "student,teacher,admin,demo", new[] { "帮助", "怎么用", "说明" }, new string[0], "帮助"),
-        new(21, "meta.feedback", "student,teacher,demo", new[] { "反馈", "建议", "不好用" }, new string[0], "反馈"),
-    };
+    /// <summary>
+    /// [P5-1 合并] 原先这里内联着第二张 22 意图运行时表，与登记表
+    /// DefaultAgentIntents.Table（15 意图）长期漂移。现在统一委托登记表，
+    /// 登记表即运行时表；内容必须与 tools/agent-intents.json 逐字一致，
+    /// 由 scripts/verify_agent_intents.py 对拍。
+    /// </summary>
+    public static IReadOnlyList<AgentIntent> DefaultIntents() => DefaultAgentIntents.Table;
 }
 
 /// <summary>结构化叙事装配（§47 OC-6）：模板 + 槽位，天生避开禁词。</summary>
@@ -458,28 +440,36 @@ public static class NarrativeAssembler
 }
 
 /// <summary>
-/// 默认意图登记表（P2：单一事实源对拍）。
+/// 默认意图登记表（P2：单一事实源对拍；P5-1 起同时是运行时表）。
 /// 与 tools/agent-intents.json 及 deploy/monolith-web/index.html 的 INTENTS 字面量
-/// 三方逐字一致；scripts/verify_agent_intents.py 负责对拍，改动任何一方必须同步。
+/// 逐字一致；scripts/verify_agent_intents.py 负责对拍，改动任何一方必须同步。
+/// 角色为逗号分隔多值（与 JSON 的 roles 数组一一对应）。
 /// </summary>
 public static class DefaultAgentIntents
 {
     public static readonly AgentIntent[] Table =
     {
-        new(1,  "debt.diagnose",   "student", new[] { "知识债", "债边", "诊断", "红边", "薄弱" },  Array.Empty<string>(), "诊断知识债"),
-        new(2,  "debt.explain",    "student", new[] { "解释", "为什么", "怎么来的", "公式" },      Array.Empty<string>(), "解释红边怎么来的"),
-        new(3,  "plan.create",     "student", new[] { "计划", "14天", "安排", "复习计划" },        Array.Empty<string>(), "生成 14 天计划"),
-        new(4,  "plan.rebalance",  "student", new[] { "减负", "重排", "调整计划", "太重" },        Array.Empty<string>(), "计划减负"),
-        new(5,  "today.tasks",     "student", new[] { "今日", "今天做", "今日任务" },              Array.Empty<string>(), "今日任务"),
-        new(6,  "practice.start",  "student", new[] { "练习", "做题", "小测", "测验" },            Array.Empty<string>(), "开始练习"),
-        new(7,  "progress.check",  "student", new[] { "进度", "销账", "进展", "streak" },          Array.Empty<string>(), "进度查询"),
-        new(8,  "graph.view",      "student", new[] { "图谱", "识网", "知识图谱", "思维导图" },    Array.Empty<string>(), "识网摘要"),
-        new(9,  "material.parse",  "student", new[] { "解析资料", "上传", "ocr", "教材", "藏书" }, Array.Empty<string>(), "资料解析引导"),
-        new(10, "kb.search",       "student", new[] { "知识库", "检索", "查资料", "文档" },        Array.Empty<string>(), "章节检索"),
-        new(11, "profile.view",    "student", new[] { "画像", "我的标签", "学习画像" },            Array.Empty<string>(), "查看画像"),
-        new(12, "profile.optout",  "student", new[] { "退出画像", "关闭画像", "opt-out" },         Array.Empty<string>(), "关闭画像"),
-        new(13, "whatif.simulate", "student", new[] { "what-if", "如果", "模拟", "假设" },         Array.Empty<string>(), "What-if 模拟"),
-        new(14, "sale.check",      "student", new[] { "销账检查", "能否销账", "销账条件" },        Array.Empty<string>(), "销账条件查询"),
-        new(15, "meta.help",       "student", new[] { "帮助", "怎么用", "说明" },                  Array.Empty<string>(), "帮助兜底")
+        new(0,  "crisis.handoff",   "student,teacher,admin,demo", Array.Empty<string>(),                             Array.Empty<string>(), "危机转介"),
+        new(1,  "debt.diagnose",    "student,demo",               new[] { "知识债", "债边", "诊断", "红边", "薄弱" },  Array.Empty<string>(), "知识债诊断"),
+        new(2,  "debt.explain",     "student,teacher,demo",       new[] { "解释", "为什么", "怎么来的", "公式" },      Array.Empty<string>(), "债边解释"),
+        new(3,  "plan.create",      "student,demo",               new[] { "计划", "14天", "安排", "复习计划" },        Array.Empty<string>(), "生成修复计划"),
+        new(4,  "plan.rebalance",   "student,demo",               new[] { "减负", "重排", "调整计划", "太重" },        Array.Empty<string>(), "计划减负"),
+        new(5,  "today.tasks",      "student,demo",               new[] { "今日", "今天做", "今日任务" },              Array.Empty<string>(), "今日任务"),
+        new(6,  "practice.start",   "student,demo",               new[] { "练习", "做题", "小测", "测验" },            Array.Empty<string>(), "开始练习"),
+        new(7,  "progress.check",   "student,demo",               new[] { "进度", "销账", "进展", "streak" },          Array.Empty<string>(), "销账进度"),
+        new(8,  "graph.view",       "student,teacher,demo",       new[] { "图谱", "识网", "知识图谱", "思维导图" },    Array.Empty<string>(), "查看图谱"),
+        new(9,  "material.parse",   "student,teacher,demo",       new[] { "解析资料", "上传", "OCR", "教材", "藏书" }, Array.Empty<string>(), "解析资料"),
+        new(10, "kb.search",        "student,teacher,demo",       new[] { "知识库", "检索", "查资料", "文档" },        Array.Empty<string>(), "知识库检索"),
+        new(11, "kb.ingest",        "teacher,admin",              new[] { "入库", "上传文档", "发布知识" },            Array.Empty<string>(), "知识入库"),
+        new(12, "profile.view",     "student,demo",               new[] { "画像", "我的标签", "学习画像" },            Array.Empty<string>(), "查看画像"),
+        new(13, "profile.optout",   "student,demo",               new[] { "退出画像", "关闭画像", "opt-out" },         Array.Empty<string>(), "画像退出"),
+        new(14, "teacher.hotspots", "teacher,admin,demo",         new[] { "热点", "班级", "共性问题" },                Array.Empty<string>(), "班级热点"),
+        new(15, "consent.grant",    "student,demo",               new[] { "授权", "同意可见", "consent" },             Array.Empty<string>(), "授权教师可见"),
+        new(16, "consent.revoke",   "student,demo",               new[] { "撤销", "取消授权", "关闭可见" },            Array.Empty<string>(), "撤销授权"),
+        new(17, "whatif.simulate",  "student,teacher,demo",       new[] { "what-if", "如果", "模拟", "假设" },         Array.Empty<string>(), "What-if 模拟"),
+        new(18, "narrative.read",   "student,demo",               new[] { "故事", "叙事", "讲解" },                    Array.Empty<string>(), "叙事讲解"),
+        new(19, "sale.check",       "student,demo",               new[] { "销账检查", "能否销账", "销账条件" },        Array.Empty<string>(), "销账检查"),
+        new(20, "meta.help",        "student,teacher,admin,demo", new[] { "帮助", "怎么用", "说明" },                  Array.Empty<string>(), "帮助"),
+        new(21, "meta.feedback",    "student,teacher,demo",       new[] { "反馈", "建议", "不好用" },                  Array.Empty<string>(), "反馈"),
     };
 }

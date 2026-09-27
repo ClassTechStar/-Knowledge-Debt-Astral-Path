@@ -9,6 +9,7 @@
 from __future__ import annotations
 
 import hashlib
+import random
 import re
 from typing import Any
 
@@ -25,6 +26,10 @@ CHAPTER_RES = [
     re.compile(r"(第\s*([0-9]+|[一二三四五六七八九十百零]+)\s*章\s*[^\n]{0,60})"),
     re.compile(r"(Chapter\s+(\d+)\s+[^\n]{0,50})", re.I),
     re.compile(r"(第\s*([0-9]+|[一二三四五六七八九十百零]+)\s*部分\s*[^\n]{0,40})"),
+    # P2-12：篇/阶段/讲、行首"步骤N"、Part/Unit/Lesson/Stage N（自制框架/强化学习等书的章节形态）
+    re.compile(r"(第\s*([0-9]+|[一二三四五六七八九十百零]+)\s*(?:篇|阶段|讲)\s*[^\n]{0,40})"),
+    re.compile(r"(?m)^\s*(步骤\s*\d+[^\n]{2,48})$"),
+    re.compile(r"(?m)^\s*((?:Part|Unit|Lesson|Stage)\s+\d+[^\n]{2,48})$", re.I),
 ]
 
 SECTION_RES = [
@@ -76,11 +81,14 @@ def _is_noise(t: str) -> bool:
 
 
 def _parse_ch_num(title: str) -> int | None:
-    m = re.search(r"第\s*([0-9]+|[一二三四五六七八九十百零]+)\s*[章部]", title)
+    m = re.search(r"第\s*([0-9]+|[一二三四五六七八九十百零]+)\s*(?:章|部分|篇|阶段|讲)", title)
     if m:
         tok = m.group(1)
         return int(tok) if tok.isdigit() else CN_NUM.get(tok)
-    m = re.search(r"Chapter\s+(\d+)", title, re.I)
+    m = re.search(r"步骤\s*(\d+)", title)
+    if m:
+        return int(m.group(1))
+    m = re.search(r"(?:Chapter|Part|Unit|Lesson|Stage|Step)\s*(\d+)", title, re.I)
     return int(m.group(1)) if m else None
 
 
@@ -149,6 +157,8 @@ def extract_full_toc(text: str, max_chapters: int = 80, max_sections: int = 240)
 
     chapters.sort(key=lambda x: (x["chapterNum"] if x["chapterNum"] is not None else 999, x["offset"]))
     sections.sort(key=lambda x: (x.get("chapterNum") or 999, x["offset"], x.get("sectionCode") or ""))
+    # P5-4：截断显式化——总数在截断前记录，随 toc 返回（此前 sec=240 静默截断无人知晓）
+    chapters_total, sections_total = len(chapters), len(sections)
     chapters = chapters[:max_chapters]
     sections = sections[:max_sections]
 
@@ -169,7 +179,8 @@ def extract_full_toc(text: str, max_chapters: int = 80, max_sections: int = 240)
                     best = c["id"]
             pid = best or chapters[0]["id"]
         sec["parentId"] = pid
-    return {"chapters": chapters, "sections": sections}
+    return {"chapters": chapters, "sections": sections,
+            "chaptersTotal": chapters_total, "sectionsTotal": sections_total}
 
 
 def _pick_body_offset(text: str, offsets: list[int], title: str) -> int:
@@ -375,6 +386,17 @@ def generate_chapter_questions(
             "why": "来自本章正文细节",
         })
 
+    # K-07/P6-6：正确答案不再恒在 A 位——以题目 id（内容哈希）为种子的确定性洗牌。
+    # 同内容重跑 correctIndex 稳定（幂等）；跨题/跨章位置分布均匀，杜绝「两题即会选 A」。
+    for q in qs:
+        opts = q.get("options") or []
+        ci = q.get("correctIndex", 0)
+        if len(opts) > 1 and isinstance(ci, int) and 0 <= ci < len(opts):
+            seed = int(hashlib.sha256(str(q.get("id", "")).encode("utf-8")).hexdigest()[:8], 16)
+            order = list(range(len(opts)))
+            random.Random(seed).shuffle(order)
+            q["options"] = [opts[i] for i in order]
+            q["correctIndex"] = order.index(ci)
     return qs[: max(2, n + 1)]
 
 
@@ -442,5 +464,9 @@ def build_deep_chapter_payload(
             "sectionCount": len(sec_out),
             "questionCount": total_q,
             "textChars": len(text),
+            # P5-4：截断透明度——抽到的总数 vs 入库数（sectionsCapped=True 表示被 240 上限截断）
+            "chaptersTotal": toc.get("chaptersTotal", len(bodies)),
+            "sectionsTotal": toc.get("sectionsTotal", len(sec_out)),
+            "sectionsCapped": toc.get("sectionsTotal", len(sec_out)) > len(sec_out),
         },
     }

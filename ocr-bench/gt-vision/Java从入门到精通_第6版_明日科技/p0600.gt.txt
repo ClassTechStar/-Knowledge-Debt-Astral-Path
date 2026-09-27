@@ -1,0 +1,21 @@
+☑ BasicStroke(float width, int cap, int join)。
+☑ BasicStroke(float width, int cap, int join, float miterlimit)。
+☑ BasicStroke(float width, int cap, int join, float miterlimit, float[] dash, float dash_phase)。
+这些构造方法中的参数说明如表19.3所示。
+表19.3 BasicStroke类构造方法的参数说明
+参数 | 说明
+width | 笔画宽度。此宽度必须大于或等于 0.0f。如果将宽度设置为 0.0f，则将笔画设置为当前设备的默认宽度
+cap | 线端点的装饰
+join | 应用在路径线段交会处的装饰
+miterlimit | 斜接处的剪裁限制。该参数值必须大于或等于 1.0f
+dash | 表示虚线模式的数组
+dash_phase | 开始虚线模式的偏移量
+cap 参数可以使用 CAP_BUTT、CAP_ROUND 和 CAP_SQUARE 常量，这3个常量对线端点的装饰效果如图19.5所示。
+CAP_ROUND
+CAP_BUTT
+CAP_SQUARE
+图19.5 cap参数对线端点的装饰效果
+join参数用于修饰线段交会效果，可以使用 JOIN_BEVEL、JOIN_MITER 和 JOIN_ROUND常量，效果如图19.6所示。
+编程训练（答案位置：资源包\TM\s1\19\编程训练）
+【训练3】彩色扇形 绘制4个指定角度的填充扇形，并设置填充扇形的颜色分别为黄、红、青和黑，效果如图19.7所示。
+【训练4】绘制线条不同粗细的椭圆 设置笔画的粗细，绘制4个线条不同粗细的椭圆，效果如图19.8所示。

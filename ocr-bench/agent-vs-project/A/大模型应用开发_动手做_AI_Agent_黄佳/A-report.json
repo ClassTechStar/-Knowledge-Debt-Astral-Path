@@ -1,0 +1,66 @@
+{
+  "book": "大模型应用开发：动手做 AI Agent (黄佳) .pdf",
+  "slug": "大模型应用开发_动手做_AI_Agent_黄佳",
+  "pages": 290,
+  "needsOcrPages": 290,
+  "zeroTextPages": 290,
+  "tocCandidatePages": [],
+  "chHeadPages": 0,
+  "samples": {
+    "ocrPages": [1, 3, 4, 12, 17, 46, 72, 82, 102, 139, 150, 155, 173, 222, 250, 267, 278, 289],
+    "visualPages": [1, 12, 155, 222, 289],
+    "reasons": "封面/版权(1,3)；目录(12，OCR核实目录实为12-17页)；章首6个(46,102,139,173,222,267，覆盖第2/4/5/6/8/10章)；低字数页4个(4,17,82,289，rapid3参考中最低字符页)；suspRatio全为0.0退化(无文本层)，改选ASCII占比最高的代码页2个(155,278)；随机3个含视觉真值页(150,250)+72。共18页≤22；中后段(>42页)占11页，弥补Round B只碰前28页。inventory的tocCandidatePages=[]与chHeadPages=0为原样记录——纯图书无文本层导致inventory结构性漏检，OCR核实目录页=12-17、章首=10个。needsOcr页号分布：1-290全部需要OCR，前/中/后三段均匀(无文本层盲区)。"
+  },
+  "ocrSampleStats": {
+    "n": 18,
+    "avgMs": 1835.4,
+    "pagesPerS": 0.545,
+    "avgChars": 1033.6
+  },
+  "cerVsTextlayer": {
+    "n": 0,
+    "mean": 0.0,
+    "worst": []
+  },
+  "cerVsRapid3Ref": {
+    "n": 18,
+    "mean": 0.0116,
+    "worst": [
+      {"page": 289, "cer": 0.045},
+      {"page": 250, "cer": 0.0443},
+      {"page": 155, "cer": 0.0366},
+      {"page": 46, "cer": 0.0321},
+      {"page": 72, "cer": 0.0233}
+    ],
+    "charDelta": 131
+  },
+  "chapters": [
+    {"page": 18, "title": "第1章 何谓Agent，为何Agent", "pattern": "导论：Agent定义、Life 3.0、大模型即大脑"},
+    {"page": 46, "title": "第2章 基于大模型的Agent技术框架", "pattern": "四大要素框架（感知/规划/工具/记忆）"},
+    {"page": 68, "title": "第3章 OpenAI API、LangChain 和 LlamaIndex", "pattern": "开发工具链（含LangSmith）"},
+    {"page": 102, "title": "第4章 Agent 1：自动化办公的实现——通过Assistants API和DALL·E 3模型创作PPT", "pattern": "OpenAI Assistants API + 多模态生成"},
+    {"page": 139, "title": "第5章 Agent 2：多功能选择的引擎——通过Function Calling调用函数", "pattern": "Function Calling"},
+    {"page": 173, "title": "第6章 Agent 3：推理与行动的协同——通过LangChain中的ReAct框架实现自动定价", "pattern": "ReAct（推理+行动协同）"},
+    {"page": 203, "title": "第7章 Agent 4：计划和执行的解耦——通过LangChain中的Plan-and-Execute实现智能调度库存", "pattern": "Plan-and-Execute"},
+    {"page": 222, "title": "第8章 Agent 5：知识的提取与整合——通过LlamaIndex实现检索增强生成", "pattern": "RAG / LlamaIndex"},
+    {"page": 233, "title": "第9章 Agent 6：GitHub的网红聚落 AutoGPT、BabyAGI和CAMEL", "pattern": "开源自动Agent范式"},
+    {"page": 267, "title": "第10章 Agent 7：多Agent框架——AutoGen和MetaGPT", "pattern": "多Agent协作框架"}
+  ],
+  "visualFindings": [
+    {"page": 1, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "封面：红底大字标题+机器人吉祥物插画；OCR按标题/副标题/宣传语顺序正确读出；无水印、无倾斜。"},
+    {"page": 12, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "目录页单栏+右对齐页码，红色『目录/CONTENTS』标签；章-节层级清晰，OCR顺序正确；目录实跨12-17页。"},
+    {"page": 155, "columns": 1, "hasCode": true, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "整页控制台输出(Run对象转储)，等宽长标识符(run_18KvhNrYI4riYYtwlXkWVOXF)与时间戳是OCR误读重灾区，内容页中CER最高(3.66%)；右缘有装订阴影暗带。"},
+    {"page": 222, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "第8章章首：反白红底大标题；图8.1为AI生成插图(带图注)、图8.2为图标网格；对话体(咖哥/小雪)；OCR按正文→图注顺序正确。"},
+    {"page": 289, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "后部荐书广告页：左半整页空白、内容集中于右2/3，3个书封图片；书封内嵌文字(如GPT图解)被OCR误读导致本样页CER最高(4.5%)；底部有装订阴影。"}
+  ],
+  "defects": [
+    {"page": 0, "type": "missed_content", "detail": "Round B max_ocr=28截断：全书290页无文本层，管线仅OCR前28页得21,536字符(为该28页rapid3参考22,214字符的96.9%，质量尚可)，但第29-290页共262页/309,578字符(占全书93.3%)完全丢失，总覆盖率仅6.5%(21536/331792)", "severity": "high"},
+    {"page": 0, "type": "other", "detail": "inventory对纯图扫描书结构性失明：needsOcr=290/290判断正确，但tocCandidatePages=[]、chHeadPages=0，目录(12-17)与10个章首全部漏检——依赖文本层的结构探测在零文本层书上失效，需OCR后二次探测", "severity": "medium"},
+    {"page": 155, "type": "code", "detail": "整页控制台输出的长标识符/时间戳易误读，CER=3.66%为内容页最差；全书此类代码/控制台页较多(第4-10章Agent实战)", "severity": "medium"},
+    {"page": 150, "type": "code", "detail": "代码行前幻觉插入前缀：GT『#创建一个新的 Thread』被OCR为『In #创建一个新的 Thread』(对拍rapid3/GT均可见)", "severity": "low"},
+    {"page": 289, "type": "other", "detail": "书封图片内嵌文字OCR不可靠(vs rapid3 CER=4.5%，样页最差)，图片内小字美术字属于OCR固有盲区", "severity": "low"},
+    {"page": 250, "type": "other", "detail": "对话体长段落换行/合并差异导致vs GT CER=3.1%、vs rapid3 4.4%，多为分段差异而非字符错误", "severity": "low"},
+    {"page": 155, "type": "other", "detail": "扫描装订阴影：p155右缘暗带、p289底部暗带，全书扫描件普遍存在轻微阴影但不影响主体识别", "severity": "low"}
+  ],
+  "conclusions": "本书290页全部为纯图扫描(零文本层，zeroTextPages=290/290)，是12本中对拍价值最大的一本。Round B的21,536字符100%来自rapidocr对前28页的OCR(max_ocr=28截断)，对其覆盖的28页质量尚可(≈该段参考字符的96.9%)，但全书覆盖率仅6.5%。按样页实测均1,033.6字符/页外推，全本OCR可恢复约30.0万字符(参考全本331,792字符)，是Round B的13.9倍；按实测0.545页/s全本OCR仅需约9分钟(参考引擎约15.6分钟)，成本完全可承受——对无文本层书籍应解除max_ocr截断或按需上调。质量方面：18个样页vs rapid3参考平均CER=1.16%(中位数0.26%)，无error页，charDelta=+131(与参考基本持平)；有视觉真值的两页(p150 CER=0.5%、p250 CER=3.1%)证实OCR质量真实可靠，说明rapid3参考可作本项目可信基线。inventory在本书暴露结构性盲区：结构字段(目录/章首)全为0/[]，需OCR后补探测；OCR核实目录=12-17页、10个章首(第1-10章位于18/46/68/102/139/173/203/222/233/267页)，全书为『第X章+7个Agent实战模式』结构(Function Calling/ReAct/Plan-and-Execute/RAG/AutoGPT系/AutoGen/MetaGPT)。视觉检查5页均为单栏、阅读序正确、无水印无倾斜，主要缺陷集中在代码/控制台长标识符误读、书封内嵌小字与轻微装订阴影。cerVsTextlayer因文本层为空无法计算(n=0)。"
+}

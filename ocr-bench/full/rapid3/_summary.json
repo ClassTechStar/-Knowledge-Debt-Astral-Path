@@ -1,0 +1,128 @@
+{
+ "engine": "rapid3",
+ "workers": 4,
+ "intra": 2,
+ "total_wall_s": 3884.85,
+ "books": {
+  "Kotlin编程实践：Kotlin从入门到实战.pdf": {
+   "pages_total": 294,
+   "pages_this_run": 294,
+   "resumed_pages": 0,
+   "wall_s": 172.32,
+   "pages_per_s": 1.706,
+   "chars": 143713,
+   "errors": 0,
+   "sum_ms": 671265
+  },
+  "Go语言从入门到精通.pdf": {
+   "pages_total": 506,
+   "pages_this_run": 506,
+   "resumed_pages": 0,
+   "wall_s": 270.06,
+   "pages_per_s": 1.874,
+   "chars": 222513,
+   "errors": 0,
+   "sum_ms": 1062221
+  },
+  "大模型应用开发：动手做 AI Agent (黄佳) .pdf": {
+   "pages_total": 290,
+   "pages_this_run": 290,
+   "resumed_pages": 0,
+   "wall_s": 237.53,
+   "pages_per_s": 1.221,
+   "chars": 273726,
+   "errors": 0,
+   "sum_ms": 936335
+  },
+  "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF": {
+   "pages_total": 504,
+   "pages_this_run": 504,
+   "resumed_pages": 0,
+   "wall_s": 253.35,
+   "pages_per_s": 1.989,
+   "chars": 230047,
+   "errors": 0,
+   "sum_ms": 1001271
+  },
+  "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf": {
+   "pages_total": 333,
+   "pages_this_run": 333,
+   "resumed_pages": 0,
+   "wall_s": 191.33,
+   "pages_per_s": 1.74,
+   "chars": 165548,
+   "errors": 0,
+   "sum_ms": 754558
+  },
+  "C#从入门到精通（第7版）+(明日科技)+.pdf": {
+   "pages_total": 868,
+   "pages_this_run": 868,
+   "resumed_pages": 0,
+   "wall_s": 489.21,
+   "pages_per_s": 1.774,
+   "chars": 404247,
+   "errors": 0,
+   "sum_ms": 1938186
+  },
+  "深度学习进阶：自然语言处理 (斋藤康毅) .pdf": {
+   "pages_total": 427,
+   "pages_this_run": 427,
+   "resumed_pages": 0,
+   "wall_s": 365.18,
+   "pages_per_s": 1.169,
+   "chars": 205724,
+   "errors": 0,
+   "sum_ms": 1447555
+  },
+  "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf": {
+   "pages_total": 201,
+   "pages_this_run": 201,
+   "resumed_pages": 0,
+   "wall_s": 244.65,
+   "pages_per_s": 0.822,
+   "chars": 194939,
+   "errors": 0,
+   "sum_ms": 963474
+  },
+  "Java从入门到精通（第6版） (明日科技) .pdf": {
+   "pages_total": 775,
+   "pages_this_run": 612,
+   "resumed_pages": 163,
+   "wall_s": 387.65,
+   "pages_per_s": 1.579,
+   "chars": 349110,
+   "errors": 0,
+   "sum_ms": 1507163
+  },
+  "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf": {
+   "pages_total": 738,
+   "pages_this_run": 738,
+   "resumed_pages": 0,
+   "wall_s": 596.44,
+   "pages_per_s": 1.237,
+   "chars": 587324,
+   "errors": 0,
+   "sum_ms": 2371200
+  },
+  "Python编程：从入门到实践（第3版）.pdf": {
+   "pages_total": 732,
+   "pages_this_run": 732,
+   "resumed_pages": 0,
+   "wall_s": 490.43,
+   "pages_per_s": 1.493,
+   "chars": 368002,
+   "errors": 0,
+   "sum_ms": 1942702
+  },
+  "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf": {
+   "pages_total": 314,
+   "pages_this_run": 314,
+   "resumed_pages": 0,
+   "wall_s": 186.69,
+   "pages_per_s": 1.682,
+   "chars": 151920,
+   "errors": 0,
+   "sum_ms": 732454
+  }
+ }
+}

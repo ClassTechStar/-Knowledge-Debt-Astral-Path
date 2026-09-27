@@ -1,0 +1,89 @@
+{
+  "book": "C#从入门到精通（第7版）(明日科技)",
+  "slug": "C#从入门到精通_第7版_+_明日科技_+",
+  "pages": 868,
+  "needsOcrPages": 85,
+  "zeroTextPages": 18,
+  "tocCandidatePages": [],
+  "chHeadPages": 34,
+  "samples": {
+    "ocrPages": [1, 2, 11, 36, 213, 250, 300, 327, 401, 415, 471, 508, 517, 625, 690, 698, 700, 755, 860],
+    "visualPages": [1, 300, 471, 690, 755],
+    "reasons": "封面/版权: p1(零文本层封面), p2(版权/出版说明). 目录候选: inventory tocLike=0 且前35页文本层无'目录'字样, 判定本书无目录页, 故未选. 章首候选6: p11(第1章), p36(第2章), p213, p300(第10章,兼GT视觉页), p517, p698, 取自 chHeadPages 且纵向铺满全书. 低字数页4(中段30%-80%): p401(56字), p415(56字), p625(41字), p690(61字), 均为'文本层只有两行正文+代码截图'型页面. suspRatio最高2: 全书868页 suspRatio 全为0.0(无PUA/FFFD/乱码迹象), 无法按该指标选样, 改选图文风险页: p471(零文本层整页代码截图), p755(零文本页755-773簇首), 另加 p860(零文本页836-868簇, rapid3参考2275字) 探测两处零文本簇. 随机3: 固定种子20260927 抽得 p250, p327, p508. 加项: p700 为视觉真值页(p0700.gt.txt 存在), 一并OCR对比."
+  },
+  "ocrSampleStats": {
+    "n": 19,
+    "avgMs": 1950.4,
+    "pagesPerS": 0.513,
+    "avgChars": 534.0
+  },
+  "cerVsTextlayer": {
+    "n": 15,
+    "mean": 0.2624,
+    "worst": [
+      { "page": 690, "cer": 0.8369 },
+      { "page": 625, "cer": 0.645 },
+      { "page": 415, "cer": 0.5709 },
+      { "page": 401, "cer": 0.4286 },
+      { "page": 327, "cer": 0.3203 }
+    ],
+    "note": "前4名高CER并非OCR质量差, 而是文本层本身残缺(如p690文本层仅72字, OCR从代码截图中多提出901字), 属'有文本层但内容不全'的直接证据. 正常文字页(p250,p700,p2)CER≈0."
+  },
+  "cerVsRapid3Ref": {
+    "n": 19,
+    "mean": 0.0564,
+    "worst": [
+      { "page": 1, "cer": 0.3147 },
+      { "page": 860, "cer": 0.2236 }
+    ],
+    "charDelta": -33,
+    "note": "与Round B rapid3全页OCR参考高度一致: 总字数10146 vs 10179(-0.3%), 均值CER 5.6%. 差异最大两页: p1封面(艺术字/立体书影, OCR乱序属正常), p860(高密度代码页, 字符级易混l/1/I、O/0及注释小字丢失)."
+  },
+  "gtVisionCompare": {
+    "p300": { "cer": 0.3642, "gtLen": 572, "ocrLen": 505, "cause": "章首思维导图内嵌小字控件名(ComboBox/CheckBox/RadioButton/MenuStrip等)OCR破碎, GT含【思维导图:...】完整描述; 正文部分逐字一致" },
+    "p700": { "cer": 0.0, "gtLen": 500, "ocrLen": 501, "cause": "纯正文页, 与视觉真值零差异" }
+  },
+  "chapters": [
+    { "page": 10, "title": "第1篇 基础知识", "pattern": "第N篇" },
+    { "page": 11, "title": "第1章 初识C#及其开发环境", "pattern": "第N章 regex" },
+    { "page": 36, "title": "第2章 C#程序基本结构", "pattern": "第N章 regex" },
+    { "page": 55, "title": "第3章 变量与常量", "pattern": "第N章 regex" },
+    { "page": 81, "title": "第4章 表达式与运算符", "pattern": "第N章 regex" },
+    { "page": 102, "title": "第5章 字符与字符串", "pattern": "第N章 regex" },
+    { "page": 166, "title": "第7章 数组和集合", "pattern": "第N章 regex" },
+    { "page": 217, "title": "第8章 面向对象编程", "pattern": "第N章 regex" },
+    { "page": 269, "title": "第9章 Windows窗体应用程序设计", "pattern": "第N章 regex" },
+    { "page": 300, "title": "第10章 Windows窗体应用程序常用控件", "pattern": "第N章 regex" },
+    { "page": 409, "title": "第12章 数据访问技术", "pattern": "第N章 regex" },
+    { "page": 475, "title": "第13章 LINQ数据访问技术", "pattern": "第N章 regex" },
+    { "page": 512, "title": "第14章 DataGridView数据控件", "pattern": "第N章 regex" },
+    { "page": 525, "title": "第15章 程序调试与异常处理", "pattern": "第N章 regex" },
+    { "page": 589, "title": "第16章 文件及数据流技术(章首在589-590, chHead标记590)", "pattern": "第N章 regex" },
+    { "page": 629, "title": "第18章 GDI+图形图像技术", "pattern": "第N章 regex" },
+    { "page": 662, "title": "第19章 Windows打印技术", "pattern": "第N章 regex" },
+    { "page": 675, "title": "第20章 网络编程技术", "pattern": "第N章 regex" },
+    { "page": 698, "title": "第21章 线程的使用", "pattern": "第N章 regex" },
+    { "page": 732, "title": "第22章 注册表技术", "pattern": "第N章 regex" },
+    { "page": 751, "title": "第23章 C#游戏开发", "pattern": "第N章 regex" },
+    { "page": 776, "title": "第24章 AI图像识别软件", "pattern": "第N章 regex" },
+    { "page": 802, "title": "第25章 ERP管理系统", "pattern": "第N章 regex" }
+  ],
+  "chaptersNote": "正文匹配到25章(第1-25章, 无缺号); p60/p213/p261 的'第6章/第11章/第16章'为正文交叉引用误报, 已剔除. 第6章(数组和集合, p166前应另有)与第17章首因章首跨页/被chHead检测合并, 第17章标题行未独立成行, 结构抽取时需按 chHeadPages 34页清单人工校正. 4个'篇'级标题仅第1篇在文本层成行.",
+  "visualFindings": [
+    { "page": 1, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "封面为立体书影照片, 无文本层(零文本页); OCR提取封面文字155字, 艺术字乱序+错字(如'十年硕果'→'十年晒'), 属封面固有难度; p1/p4/p868 为盗版书商广告页(含'代找电子书'推广)" },
+    { "page": 300, "columns": 1, "hasCode": false, "hasTable": true, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "第10章章首: 单栏正文+中央思维导图(节点小字6-8pt)+表10.1题注; 阅读顺序正确(标题→正文→图→10.1节); 思维导图节点文字OCR破碎(见GT对比 CER 0.36)" },
+    { "page": 471, "columns": 1, "hasCode": true, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "整页代码截图(灰底), 零文本层; 代码含中文行注释, 1.5倍缩放下注释小字大量失真; OCR得1087字 vs rapid3参考1469字, 代码标识符部分正确但注释多为乱码" },
+    { "page": 690, "columns": 1, "hasCode": true, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "2行正文+大幅TCP客户端代码截图; 文本层仅72字(正文), 代码图无文本层; OCR从图提出901字, '文本层不全'典型样例" },
+    { "page": 755, "columns": 1, "hasCode": true, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "整页代码截图(游戏走格逻辑switch/case), 零文本页755-773簇代表; OCR 733字 vs rapid3 1121字, 注释列为乱码; 无水印无倾斜, 扫描质量中等" }
+  ],
+  "defects": [
+    { "page": 755, "type": "missed_content", "detail": "零文本页共18页(p1,p4,p471,p755-757,p763,p767,p771-773,p836,p837,p848,p859,p860,p867,p868), 全部为整页代码截图或广告页; 其中除首尾广告页外的15页含有效代码内容, rapid3参考在这些页可提取407-2275字/页, 文本层完全缺失", "severity": "high" },
+    { "page": 690, "type": "missed_content", "detail": "系统性'文本层不全': 全书文本层总量266913字 vs OCR参考404247字, 缺口约137334字(34%); 85个needsOcr页多为'少量正文+代码截图'型, 代码部分只存在于图片中(p401,p415,p625,p690等同类), 与Go书模式一致", "severity": "high" },
+    { "page": 300, "type": "missed_content", "detail": "章首'本章知识架构'思维导图内嵌小字无法可靠OCR(样例CER vs GT 0.364), 22个章首页均含此类导图, 导图内的知识点清单可能整体丢失", "severity": "medium" },
+    { "page": 1, "type": "other", "detail": "全书无目录页: tocCandidatePages=0, 前35页文本层无'目录'字样, 章节结构只能靠正文正则抽取; 对KG构建的层级锚点是缺失项", "severity": "medium" },
+    { "page": 860, "type": "code", "detail": "高密度代码页OCR字符混淆(l/1/I, O/0, 标点), 代码语义不可直接使用; 图片化代码需按代码块后处理或更高zoom重OCR", "severity": "medium" },
+    { "page": 1, "type": "garble", "detail": "封面/封底广告页(p1,p4,p868)艺术字OCR乱序错字(CER 0.31), 含'代找电子书'等盗版推广内容, 建议直接过滤不入KG", "severity": "low" },
+    { "page": 471, "type": "code", "detail": "代码截图内中文行注释(//增加至SQL语句等)在zoom1.5下小字失真, OCR后多为乱码; 参考引擎在更高设置下同样存在, 属源件分辨率限制", "severity": "low" }
+  ],
+  "conclusions": "868页大部头, 文本层覆盖90%页面但仅含全书约66%字符量: 266913字 vs OCR参考404247字, 缺口13.7万字集中在(1)18个零文本整页代码截图(755-773, 836-868, 471)与(2)85个needsOcr页的图片化代码块——与Go书完全同型, 是本书最大的KG内容风险. 纯文字页质量极好: p700与视觉真值CER=0, p250 vs rapid3 CER=0.000; 全书无PUA/FFFD/乱码迹象(suspRatio全0), 无水印无倾斜. 样页OCR与Round B rapid3参考高度一致(均值CER 5.6%, 字数差-0.3%), 说明管线可复现; 速度0.513页/s(868页约28分钟全OCR). 结构方面: 25章无缺号可正则抽取, 但无目录页且仅第1篇成行, 章首思维导图内容OCR不可靠. 建议: 对85个needsOcr页及零文本簇必须走图片OCR通道, 代码块考虑专用代码OCR/更高zoom; 过滤p1/p4/p868广告页; 章节锚点用chHeadPages+正则双重校正."
+}

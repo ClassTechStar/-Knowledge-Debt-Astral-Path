@@ -1,0 +1,90 @@
+{
+  "book": "黄仁勋：英伟达之芯_【美】斯蒂芬·威特",
+  "slug": "黄仁勋_英伟达之芯__美_斯蒂芬_威特",
+  "pages": 201,
+  "needsOcrPages": 33,
+  "zeroTextPages": 7,
+  "tocCandidatePages": [],
+  "chHeadPages": 27,
+  "samples": {
+    "ocrPages": [1, 2, 3, 10, 11, 33, 43, 86, 94, 95, 96, 104, 156, 163, 168, 169, 172, 179, 198],
+    "visualPages": [1, 10, 11, 95, 168],
+    "reasons": "封面/版权2页(1,2)+献词页3；章首候选6页(10,43,86,104,156,163后记)；中段30%-80%低字数页4页(94章末注/95零文本部扉页/96中英引语页，中段低字数非章首页仅此3页，另补96相邻94)；suspRatio最高2页：inventory显示全书suspRatio全为0(无PUA/fffd乱码)，改取零文本异常簇168,169(附录人物关系表图像页)；随机3页(seed=42)：11,33,179；另补2页覆盖尾部结构172(院士推荐01)与198(重磅赞誉)，共19页≤22。本书无目录页(tocCandidatePages为空，文本层亦未见目录)。"
+  },
+  "ocrSampleStats": {
+    "n": 19,
+    "avgMs": 1619.74,
+    "pagesPerS": 0.617,
+    "avgChars": 393.95
+  },
+  "cerVsTextlayer": {
+    "n": 15,
+    "mean": 0.0046,
+    "worst": [
+      { "page": 11, "cer": 0.0322 },
+      { "page": 179, "cer": 0.0187 },
+      { "page": 163, "cer": 0.0174 }
+    ]
+  },
+  "cerVsRapid3Ref": {
+    "n": 19,
+    "mean": 0.0052,
+    "worst": [
+      { "page": 172, "cer": 0.0227 },
+      { "page": 179, "cer": 0.0196 },
+      { "page": 11, "cer": 0.0182 }
+    ],
+    "charDelta": 47
+  },
+  "chapters": [
+    { "page": 4, "title": "推荐序 从摩尔定律到黄氏定律(沈向洋)", "pattern": "推荐序" },
+    { "page": 6, "title": "引言 他并非总是赢家，可一旦赢了就是大手笔", "pattern": "引言" },
+    { "page": 10, "title": "第1章 求学生涯：从被霸凌的小学生到优秀的大学生", "pattern": "第X章" },
+    { "page": 16, "title": "第2章 职涯早期：AMD、LSI和太阳微系统公司", "pattern": "第X章" },
+    { "page": 23, "title": "第3章 从餐厅里起步的Nvidia：我们做出的每一个决定都是错误的", "pattern": "第X章" },
+    { "page": 30, "title": "第4章 英伟达遭遇绝境：我们公司离破产只有30天", "pattern": "第X章" },
+    { "page": 35, "title": "第5章 咸鱼翻身：完美的显卡TNT，承载着一个改变世界的惊天秘密", "pattern": "第X章" },
+    { "page": 43, "title": "第6章 新机器时代曙光初现：首个在游戏中超越人类的神经网络\"水母\"", "pattern": "第X章" },
+    { "page": 48, "title": "第7章 死亡竞赛：迭代，迭代，再迭代！执行，执行，再执行！", "pattern": "第X章" },
+    { "page": 57, "title": "第8章 游戏玩家拯救英伟达：爸爸，你得再加把劲儿", "pattern": "第X章" },
+    { "page": 63, "title": "第9章 \"光速\"之道：秘密开发CUDA，让游戏玩家为科学研发买单", "pattern": "第X章" },
+    { "page": 72, "title": "第10章 同频共振：洞悉即将降临的机遇", "pattern": "第X章" },
+    { "page": 79, "title": "第11章 范式转变的时刻：AlexNet横空出世", "pattern": "第X章" },
+    { "page": 86, "title": "第12章 千载难逢的机会：周五晚上做决定，周一早上我们就转型成了AI芯片公司", "pattern": "第X章" },
+    { "page": 97, "title": "第13章 由机器引领的时代：从月球发射激光，精准击中街道上的一枚硬币", "pattern": "第X章" },
+    { "page": 104, "title": "第14章 AI行业的佼佼者：不管看到什么，我总能发现其中的不足之处", "pattern": "第X章" },
+    { "page": 112, "title": "第15章 AI工厂：造芯片原本是为了打怪兽，我们却用它来造大脑", "pattern": "第X章" },
+    { "page": 119, "title": "第16章 全球最具价值的半导体企业：我们其实是一家软件公司", "pattern": "第X章" },
+    { "page": 124, "title": "第17章 这个时代最重要的科技公司：AI激战中唯一的\"军火供应商\"", "pattern": "第X章" },
+    { "page": 129, "title": "第18章 人类需要更多的智慧：我们正站在机械进化的起点", "pattern": "第X章" },
+    { "page": 134, "title": "第19章 更多电力更大算力：如果英伟达表现不佳，整个科技界都会萎靡不振", "pattern": "第X章" },
+    { "page": 138, "title": "第20章 地球上最重要的股票：基于愿景的运气和超乎常人的智慧", "pattern": "第X章" },
+    { "page": 145, "title": "第21章 向理性本身发起挑战：我得保留点儿秘密", "pattern": "第X章" },
+    { "page": 150, "title": "第22章 深不见底的恐惧：AI会是人类的终结者吗？", "pattern": "第X章" },
+    { "page": 156, "title": "第23章 思考机器：唯有黄仁勋这位\"代达罗斯\"，才能真正洞悉这全貌", "pattern": "第X章" },
+    { "page": 163, "title": "后记 一切都将焕然一新", "pattern": "后记" },
+    { "page": 166, "title": "致谢", "pattern": "致谢" },
+    { "page": 167, "title": "附录 黄仁勋人物关系表", "pattern": "附录" },
+    { "page": 172, "title": "院士推荐 01-06(周健工/芮勇等6篇，至p197)", "pattern": "NN序号" },
+    { "page": 198, "title": "重磅赞誉(至书末p201)", "pattern": "其他" }
+  ],
+  "visualFindings": [
+    { "page": 1, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "整幅照片封面(绿底人物照)，白字叠加，单栏；OCR顺序与视觉一致；底部深底白字出版社小字被误识：财政→财波；文本层0字符，OCR恢复94字符。" },
+    { "page": 10, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "章首极简页，仅\"第1章\"+章题两行，无正文；文本层可提取，OCR完全一致。" },
+    { "page": 11, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "单栏正文页，打印清晰，无首字下沉、无水印倾斜；但本次OCR把第一行正文\"1973年底的某一天…黄仁勋出生于\"整行漏识仅余\"一\"字；rapid3全书参考同页捕获了该行，属运行间不稳定漏行。" },
+    { "page": 95, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "第二部分部扉页：整页灰底渐变设计图，白字英文书名+中文部题；图像页无文本层，OCR完整恢复87字符，顺序正确。" },
+    { "page": 168, "columns": 2, "hasCode": false, "hasTable": true, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "附录\"黄仁勋人物关系表\"：两列表格(人名列+简介列)隔行底纹；文本层0字符；OCR按行展平为\"姓名+简介\"线性文本，行内顺序正确、14个条目人名全部正确；表格结构信息(底纹/分组标题)丢失但内容保全。p169同型页发现OpenAI误作OpenAl、末条目人名缺失。" }
+  ],
+  "defects": [
+    { "page": 11, "type": "missed_content", "detail": "正文首行\"1973年底的某一天，10岁的黄仁勋从宿舍床上起身，踏上了前往学校的冒险旅程。黄仁勋出生于\"整行漏识，仅余误识\"一\"字(约40字)；rapid3全书参考同页有此行，属检测框漏检的运行间不稳定现象，CER最差页0.0322。", "severity": "high" },
+    { "page": 169, "type": "missed_content", "detail": "附录人物关系表\"科学界合作伙伴\"末条目仅识别出描述\"斯坦福大学计算机科学家，发起ImageNet竞赛…\"，人名(李飞飞)缺失；rapid3参考同样缺失，两次独立运行一致漏检，疑该姓名单元格为特殊字体/配色。", "severity": "medium" },
+    { "page": 1, "type": "garble", "detail": "封面底部深底白字小号出版社名\"中国财政经济出版社\"误识为\"中国财波经济出版社\"(政→波)。", "severity": "low" },
+    { "page": 169, "type": "garble", "detail": "OpenAI误作OpenAl(小写l→大写I)；p168\"本·加利克\"间隔号误用全角片假名中点\"・\"，标点不统一。", "severity": "low" },
+    { "page": 179, "type": "garble", "detail": "破折号丢失：\"不容忽视—黄仁勋与英伟达\"识作\"不容忽视黄仁勋与英伟达\"；引号/全角标点在多页有半角化倾向(p11等)。", "severity": "low" },
+    { "page": 11, "type": "garble", "detail": "形近字误识：推搡→推操；前引号'Chinks'左引号丢失。", "severity": "low" },
+    { "page": 168, "type": "table", "detail": "附录人物关系表(168-170)为两列隔行底纹表格，OCR展平为线性文本，表格结构与\"核心员工/商业合作伙伴/竞争对手\"分组靠文本行保留，底纹等版式信息丢失；内容层面恢复完整(文本层0字符→OCR恢复423/501/174字符)。", "severity": "low" },
+    { "page": 95, "type": "other", "detail": "全书7个零文本页(1,95,168-171)均为设计页/表格页(封面、部扉、人物关系表、导读手册页)，文本层完全缺失(needsOcr占33页/16%)；OCR(zoom1.5)可全部恢复文字，属文本层先天缺陷而非OCR缺陷。", "severity": "low" },
+    { "page": 2, "type": "other", "detail": "本书PDF无目录页(tocCandidatePages为空，文本层全文检索无\"目录\")，章节导航只能靠重建的章节清单；书籍结构本身缺失TOC。", "severity": "low" }
+  ],
+  "conclusions": "本书为201页人名/专名密集的中文传记(简体，含大量中英混排人名/公司名/产品名)。文本层整体质量很高：可提取页与rapidocr-v3 OCR对比CER均值仅0.46%，15个有文本层样页中12页CER=0(逐字一致)，人名译名(本·贝斯/Ben Bays、杰夫·费舍尔、苏姿丰等)在文本层页几乎无误识；全书文本层无PUA/fffd乱码(suspRatio全0)。OCR(rapidocr-v3, zoom1.5)同样高质量：vs文本层CER均值0.46%、vs rapid3全书参考CER均值0.52%、总字符差仅+47；速度约1.62s/页(0.62页/s)。OCR最大价值在7个零文本设计页：封面、部扉(95)、附录人物关系表(168-170)、导读手册页(171)全部恢复文字，168/169表格类页面行序与人名保全极佳。主要风险是OCR运行间不稳定：本次p11整行漏识(rapid3参考同页正常)，说明单次OCR存在偶发漏行，关键页建议双跑校验；另有李飞飞条目人名两次运行均漏检、封面出版社专名误识、破折号/引号丢失等低危问题。本书无目录页，需依赖重建章节清单(引言+23章+后记/致谢/附录+6篇院士推荐+重磅赞誉)。整体判定：文本层为主、OCR补零文本页的管线对本书适用性良好，无致命缺陷。"
+}

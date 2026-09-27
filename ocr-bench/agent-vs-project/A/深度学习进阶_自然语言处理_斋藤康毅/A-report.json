@@ -1,0 +1,77 @@
+{
+  "book": "深度学习进阶：自然语言处理 (斋藤康毅)",
+  "slug": "深度学习进阶_自然语言处理_斋藤康毅",
+  "pages": 427,
+  "needsOcrPages": 9,
+  "zeroTextPages": 9,
+  "tocCandidatePages": [9, 10, 12],
+  "chHeadPages": 207,
+  "samples": {
+    "ocrPages": [1, 2, 3, 9, 12, 18, 24, 45, 65, 80, 118, 152, 196, 211, 285, 287, 294, 296, 344, 398],
+    "visualPages": [1, 9, 45, 65, 211],
+    "reasons": "封面/版权=1,2（零文本页）；目录候选=9,12；章首候选6=24(第1章),80(第2章),152(第4章),196(第5章),296(第7章),398(附录A)，兼顾前/中/后段与附录；低字数页4(中段30%-80%即128-342页内最低)=287(130字),211(178字),285(182字),294(184字)；suspRatio最高页45(0.019)+Round B标记garble页3,118全部命中；随机3(random.seed42)=18,65,344(344恰为第8章章首)。共20页≤22。"
+  },
+  "ocrSampleStats": {
+    "n": 20,
+    "avgMs": 1425.2,
+    "pagesPerS": 0.702,
+    "avgChars": 407.4
+  },
+  "cerVsTextlayer": {
+    "n": 18,
+    "mean": 0.0576,
+    "worst": [
+      {"page": 285, "cer": 0.2708},
+      {"page": 287, "cer": 0.1985},
+      {"page": 211, "cer": 0.1978},
+      {"page": 45, "cer": 0.1071},
+      {"page": 118, "cer": 0.0955}
+    ]
+  },
+  "cerVsRapid3Ref": {
+    "n": 20,
+    "mean": 0.015,
+    "worst": [
+      {"page": 287, "cer": 0.0876},
+      {"page": 45, "cer": 0.0794}
+    ],
+    "charDelta": -8
+  },
+  "chapters": [
+    {"page": 9, "title": "目录", "pattern": "目录（候选页9-12）"},
+    {"page": 16, "title": "前言", "pattern": "^前言$"},
+    {"page": 24, "title": "第1章　神经网络的复习", "pattern": "第N章　标题"},
+    {"page": 80, "title": "第2章　自然语言和单词的分布式表示", "pattern": "第N章　标题"},
+    {"page": 116, "title": "第3章　word2vec", "pattern": "第N章（章名+引言页）"},
+    {"page": 152, "title": "第4章　word2vec的高速化", "pattern": "第N章　标题"},
+    {"page": 196, "title": "第5章　RNN", "pattern": "第N章（章名+引言页）"},
+    {"page": 242, "title": "第6章　Gated RNN", "pattern": "第N章（章名+引言页）"},
+    {"page": 296, "title": "第7章　基于RNN生成文本", "pattern": "第N章（章名+引言页）"},
+    {"page": 344, "title": "第8章　Attention", "pattern": "第N章（章名+引言页）"},
+    {"page": 398, "title": "附录A　sigmoid函数和tanh函数的导数", "pattern": "附录X　标题"},
+    {"page": 404, "title": "附录B　运行WordNet", "pattern": "附录X　标题"},
+    {"page": 410, "title": "附录C　GRU", "pattern": "附录X　标题"},
+    {"page": 414, "title": "后记（415含致谢）", "pattern": "^后记$"},
+    {"page": 418, "title": "参考文献", "pattern": "^参考文献$"}
+  ],
+  "visualFindings": [
+    {"page": 1, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "封面：红底标题块+鱼类插画+出版社标；零文本层，OCR恢复丛书名/书名/作者/出版社；无水印无倾斜"},
+    {"page": 9, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "目录页：单栏、点线引导、页码右对齐、页眉'vi|目录'；OCR行序与视觉一致（vs文本层CER仅0.006）"},
+    {"page": 45, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": true, "hasFigure": true, "orderOk": true, "notes": "公式密集页：图1-14导数示意图+行内分式∂L/∂xi+显示公式(1.9)(1.10)雅可比矩阵+译注脚注；正文序正确，公式区损失最重（见defects#1）；文本层本页另有10处PUA乱码"},
+    {"page": 65, "columns": 1, "hasCode": true, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "代码页：代码块4行逐行完整保留（含注释#(300,2)）；图1-31螺旋散点图仅坐标刻度被拾取为数字串；代码→正文→图阅读序正确"},
+    {"page": 211, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": true, "hasFigure": true, "orderOk": true, "notes": "计算图页：图5-12 RNN正/反向传播图占上半页、下半页空白；标签按'正向行→反向行'输出与视觉基本一致；下标误识（h9→hg等）；文本层仅178字符缺图内标签"}
+  ],
+  "defects": [
+    {"page": 45, "type": "formula", "detail": "密集分式公式损失：行内分式∂L/∂xi仅剩'L'；式(1.10)雅可比矩阵分子分母配对打乱、左端∂L/∂x与∂L/∂W误读为'x0/Te/Me'；∂计数视觉约20→OCR 15（约25%丢失）。公式书核心风险点", "severity": "high"},
+    {"page": 211, "type": "formula", "detail": "计算图下标误识：h9→hg、dh0→dho、dh9→dhg、dx9→6xp（下标9被读成g/o/p）", "severity": "medium"},
+    {"page": 287, "type": "order", "detail": "图6-36网络结构图标签阅读序错乱：'Time Softmax with Loss'读成'with Loss Time Softmax'，'共享权重'与'Time LSTM'粘连；vs rapid3 CER=0.0876为样页最高", "severity": "medium"},
+    {"page": 3, "type": "garble", "detail": "文本层缺陷：标题'数字版权声明'为乱码（හਁ/ᇇै्），OCR完整恢复——Round B garble页3属实但属文本层问题", "severity": "low"},
+    {"page": 118, "type": "garble", "detail": "文本层缺陷：图3-1标签字体编码乱码（CBUDI=batch等+1偏移、PUA/控制符），OCR完全恢复为'基于计数的方法（batch学习）/基于推理的方法（mini-batch学习）'", "severity": "low"},
+    {"page": 65, "type": "other", "detail": "正文变量x两处误识为乘号×（'×是输入数据'）；斜体/字体切换致字形混淆", "severity": "low"},
+    {"page": 285, "type": "missed_content", "detail": "文本层缺计算图标签（tl 179字符 vs OCR 226），致vs文本层CER 0.27为样页最高，而vs rapid3仅0.005——OCR更完整", "severity": "low"},
+    {"page": 1, "type": "blank", "detail": "封面(1)与版权/作者页(2)零文本层，OCR正常回填", "severity": "low"},
+    {"page": 79, "type": "blank", "detail": "章间整页分隔艺术图页(79,195,295,343)零文本层，需OCR回填", "severity": "low"},
+    {"page": 426, "type": "blank", "detail": "书末零文本页：417(插图页)、426/427(封底/空白)", "severity": "low"}
+  ],
+  "conclusions": "本书文本层覆盖率高（418/427页），正文质量好，可直接抽取；9个零文本页为封面/章间分隔图/封底，OCR均可回填。Round B标记的garble页3/45/118核实为文本层字体编码缺陷（+1偏移如CBUDI=batch、PUA、竖排分式线性化），OCR能完整或大部分恢复，属文本层问题而非OCR失败。20样页RapidOCR(zoom1.5)平均1425ms/页(0.70页/s)、407字符/页；vs文本层CER均值0.058（最差页285/287/211均为文本层缺计算图标签所致，OCR反而更全）；vs rapid3全页参考CER均值0.015、总字符差仅-8，两次独立OCR高度一致。真实OCR损失集中在斋藤系列特色内容：密集分式公式（约25%的∂符号丢失、分子分母配对打乱、行内分式塌缩）与计算图下标及标签阅读序。建议：正文用文本层，公式/计算图区域以OCR交叉校验回填；chHeadPages=207为含页眉'第N章'的误报计数，实际章首仅15处（前言+8章+3附录+后记+参考文献）。"
+}

@@ -1,0 +1,45 @@
+5.3.2 不调用Function，直接运行助手
+此时，如果不调用 Function，直接运行助手，我们看看会发生什么。
+# 创建一个新的 Thread
+thread = client.beta.threads.create()
+print(f"Thread 的信息 :\n{thread}\n")
+
+# 在 Thread 中添加用户的消息
+message = client.beta.threads.messages.create(
+    thread_id=thread.id,
+    role="user",
+    content="你好，请和我随便说句话吧！"
+)
+print(f"Message 的信息 :\n{message}\n")
+
+# 运行助手来处理 Thread
+run = client.beta.threads.runs.create(
+    thread_id=thread.id,
+    assistant_id=assistant_id
+)
+print(f"Run 的初始信息 :\n{message}\n")
+
+# 轮询以检查 Run 的状态
+import time
+n = 0
+while True:
+    n += 1
+    run = client.beta.threads.runs.retrieve(
+        thread_id=thread.id,
+        run_id=run.id
+    )
+    print(f"Run 的第 {n} 次轮询信息 :\n{run}\n")
+    if run.status == 'completed':
+        break
+    time.sleep(5) # 等待 5s 后再次检查
+
+# 获取助手在 Thread 中的回应
+messages = client.beta.threads.messages.list(
+    thread_id=thread.id
+)
+
+# 输出助手的回应
+for message in messages.data:
+    if message.role == "assistant":
+        print(f" 助手的回应 :\n{ message.content }\n")
+第5章 Agent 2：多功能选择的引擎——通过 Function Calling 调用函数 133

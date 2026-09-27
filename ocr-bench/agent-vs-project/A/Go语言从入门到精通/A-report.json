@@ -1,0 +1,340 @@
+{
+  "book": "Go语言从入门到精通（明日科技编著，清华大学出版社2024，ISBN 9787302651659）",
+  "slug": "Go语言从入门到精通",
+  "pages": 506,
+  "needsOcrPages": 41,
+  "zeroTextPages": 11,
+  "tocCandidatePages": [],
+  "chHeadPages": 26,
+  "samples": {
+    "ocrPages": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      11,
+      66,
+      100,
+      146,
+      225,
+      250,
+      280,
+      310,
+      315,
+      337,
+      364,
+      398,
+      430,
+      450,
+      460,
+      487
+    ],
+    "visualPages": [
+      6,
+      18,
+      250,
+      315,
+      450,
+      487
+    ],
+    "reasons": "封面/封底1,2+版权页3；tocCandidatePages为空（得到电子版无目录页），改取前言/本书内容5,6；章首候选6页：11(第1章),66(第2章),146(第5章),225(第8章),315(第12章),460(第18章)；低字数页4页取中段30%-80%区间：250(6字符),310(12),337(9),364(18)；全书suspRatio均为0.0（并列最高，无PUA/FFFD），改取尾部零文本页398,487验证；随机3页：100,280,430；另有GT视觉真值页450一并OCR。共21页（≤22），一次ocr-pages跑完。"
+  },
+  "ocrSampleStats": {
+    "n": 21,
+    "avgMs": 1525.0,
+    "pagesPerS": 0.656,
+    "avgChars": 439.4
+  },
+  "cerVsTextlayer": {
+    "n": 17,
+    "mean": 0.2683,
+    "worst": [
+      {
+        "page": 250,
+        "cer": 0.9895
+      },
+      {
+        "page": 310,
+        "cer": 0.9275
+      },
+      {
+        "page": 337,
+        "cer": 0.4857
+      },
+      {
+        "page": 450,
+        "cer": 0.4154
+      },
+      {
+        "page": 364,
+        "cer": 0.3455
+      }
+    ],
+    "note": "均值0.2683主要由文本层缺内容抬高（如250页文本层仅8字符而OCR有1480字符）；纯文字页(3,5,6)CER约0.00-0.02，文本层完整时OCR与文本层几乎一致。"
+  },
+  "cerVsRapid3Ref": {
+    "n": 21,
+    "mean": 0.0358,
+    "worst": [
+      {
+        "page": 250,
+        "cer": 0.2048
+      },
+      {
+        "page": 3,
+        "cer": 0.1443
+      }
+    ],
+    "charDelta": 82,
+    "note": "与rapid3全页参考高度一致；250为代码页注释与l/I混淆，3为版权页小字（rapid3漏识101/131字符，本OCR反而更全，对文本层CER=0.0）。"
+  },
+  "gtVisionBonus": [
+    {
+      "page": 250,
+      "cer": 0.0496,
+      "detail": "视觉真值2359字符，OCR 1480字符（代码页注释分离导致部分整行合并），CER 4.96%"
+    },
+    {
+      "page": 450,
+      "cer": 0.0048,
+      "detail": "视觉真值对齐近乎完美"
+    }
+  ],
+  "chapters": [
+    {
+      "page": 10,
+      "title": "第1篇 基础知识",
+      "pattern": "第N篇"
+    },
+    {
+      "page": 11,
+      "title": "第1章 初识Go语言",
+      "pattern": "第N章"
+    },
+    {
+      "page": 66,
+      "title": "第2章 Go语言基础",
+      "pattern": "第N章"
+    },
+    {
+      "page": 78,
+      "title": "第3章 Go语言基本数据类型与运算符",
+      "pattern": "第N章"
+    },
+    {
+      "page": 115,
+      "title": "第4章 流程控制",
+      "pattern": "第N章"
+    },
+    {
+      "page": 146,
+      "title": "第5章 复合数据类型",
+      "pattern": "第N章"
+    },
+    {
+      "page": 175,
+      "title": "第2篇 进阶提高",
+      "pattern": "第N篇"
+    },
+    {
+      "page": 176,
+      "title": "第6章 函数",
+      "pattern": "第N章"
+    },
+    {
+      "page": 208,
+      "title": "第7章 指针",
+      "pattern": "第N章"
+    },
+    {
+      "page": 225,
+      "title": "第8章 结构体",
+      "pattern": "第N章"
+    },
+    {
+      "page": 247,
+      "title": "第9章 接口",
+      "pattern": "第N章"
+    },
+    {
+      "page": 268,
+      "title": "第10章 错误处理",
+      "pattern": "第N章"
+    },
+    {
+      "page": 284,
+      "title": "第11章 并发编程",
+      "pattern": "第N章"
+    },
+    {
+      "page": 314,
+      "title": "第3篇 高级应用",
+      "pattern": "第N篇"
+    },
+    {
+      "page": 315,
+      "title": "第12章 包管理",
+      "pattern": "第N章"
+    },
+    {
+      "page": 333,
+      "title": "第13章 标准库",
+      "pattern": "第N章"
+    },
+    {
+      "page": 359,
+      "title": "第14章 编译与测试工具",
+      "pattern": "第N章"
+    },
+    {
+      "page": 377,
+      "title": "第15章 反射",
+      "pattern": "第N章"
+    },
+    {
+      "page": 394,
+      "title": "第16章 MySQL数据库编程",
+      "pattern": "第N章"
+    },
+    {
+      "page": 433,
+      "title": "第17章 文件处理",
+      "pattern": "第N章"
+    },
+    {
+      "page": 460,
+      "title": "第18章 网络编程",
+      "pattern": "第N章"
+    },
+    {
+      "page": 481,
+      "title": "第4篇 项目实战",
+      "pattern": "第N篇"
+    },
+    {
+      "page": 482,
+      "title": "第19章 Go语言在爬虫中的应用",
+      "pattern": "第N章"
+    }
+  ],
+  "visualFindings": [
+    {
+      "page": 6,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": false,
+      "orderOk": true,
+      "notes": "前言页，单栏纯文字，下半页留白属正常排版；无水印无倾斜。"
+    },
+    {
+      "page": 18,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": true,
+      "hasFormula": false,
+      "hasFigure": true,
+      "orderOk": true,
+      "notes": "图1.4为go1.20.2下载列表截图（表格以图片形式嵌入，File name/Kind/OS/Arch/Size/SHA256六列文字全部无文本层）；下附文件管理器截图。视觉阅读序与OCR顺序一致。"
+    },
+    {
+      "page": 250,
+      "columns": 1,
+      "hasCode": true,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": true,
+      "orderOk": true,
+      "notes": "整页为代码清单截图（灰底，代码主体+右侧对齐注释两栏布局）+运行结果块；文本层仅8字符。OCR把代码与注释合并成同一行，//注释符丢失，carInMotion误识为carlnMotion（l/I混淆）。"
+    },
+    {
+      "page": 315,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": true,
+      "orderOk": true,
+      "notes": "第12章章首页，含知识架构思维导图（图片）；导图节点文字（包管理工具/GOPATH/常用内置包等）不在文本层，OCR按检测框顺序输出，不反映导图结构。"
+    },
+    {
+      "page": 450,
+      "columns": 1,
+      "hasCode": true,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": false,
+      "orderOk": true,
+      "notes": "代码块（encoding/json示例）+运行结果+正文单栏混排；OCR对视觉真值CER=0.0048，质量极高。"
+    },
+    {
+      "page": 487,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": true,
+      "orderOk": true,
+      "notes": "整页为Windows开始菜单搜索cmd的截图（零文本层）；OCR将搜索建议列表（cmd命令大全/md5/cmder等）当正文输出，属UI截图噪声。"
+    }
+  ],
+  "defects": [
+    {
+      "page": 250,
+      "type": "missed_content",
+      "detail": "系统性缺陷的典型样本：整页代码清单为截图，文本层仅8字符而OCR有1480字符。全书文本层共140,406字符 vs rapid3 OCR参考286,212字符，缺失145,806字符（约51%）；其中129,044字符缺在'有文本层'的页面上，205页存在代码/截图文字整块缺失（Round B纯文本层管线只拿到约一半内容）",
+      "severity": "high"
+    },
+    {
+      "page": 310,
+      "type": "missed_content",
+      "detail": "代码截图页文本层仅20字符（OCR 462字符）；同类needsOcr页共41页，其中11页完全零文本层(1,2,34,131,398,414,425,458,487,497,501)",
+      "severity": "high"
+    },
+    {
+      "page": 250,
+      "type": "code",
+      "detail": "代码OCR语义受损：右侧对齐注释与代码同行合并、//注释符丢失（如'l声明 main 包'）、l/I混淆（carInMotion→carlnMotion）；任何纯OCR管线恢复的代码不可直接运行",
+      "severity": "medium"
+    },
+    {
+      "page": 18,
+      "type": "table",
+      "detail": "图1.4下载列表为六列表格截图，表格文字完全无文本层，文本层管线丢失整表",
+      "severity": "medium"
+    },
+    {
+      "page": 487,
+      "type": "other",
+      "detail": "整页UI截图（开始菜单）页，OCR把搜索建议列表文字当正文输出为噪声；零文本层页398,487等needsOcr判定正确但OCR结果需过滤",
+      "severity": "low"
+    },
+    {
+      "page": 315,
+      "type": "order",
+      "detail": "章首知识导图节点文字OCR顺序为检测框序，不反映导图逻辑结构",
+      "severity": "low"
+    },
+    {
+      "page": 1,
+      "type": "garble",
+      "detail": "封面/封底(1,2)零文本层且拼音装饰字体'RUANJIANCAIFASHIPINDAJIANGTANG'两套OCR均部分误识",
+      "severity": "low"
+    },
+    {
+      "page": 3,
+      "type": "garble",
+      "detail": "版权页小字号行rapid3参考漏识101/131字符（CER 0.1443），本次OCR反而完整（vs文本层CER=0.0），属参考缺陷而非本书缺陷",
+      "severity": "low"
+    },
+    {
+      "page": 5,
+      "type": "other",
+      "detail": "全书无目录页（得到电子版），tocCandidatePages为空，章节导航只能依赖'第N章/第N篇'标题模式抽取",
+      "severity": "low"
+    }
+  ],
+  "conclusions": "本书为'文本层页+图片页'混合型PDF：506页中465页有文本层，但文本层只含正文叙述，代码清单/IDE截图/安装对话框/表格/思维导图全部以图片嵌入——文本层140,406字符 vs 全页OCR参考286,212字符，缺口145,806字符(约51%)，41页needsOcr（11页零文本）判定准确。纯文字页上文本层质量极好（OCR vs 文本层 CER约0.00-0.02，无PUA/FFFD、suspRatio全0、无水印无倾斜），Round B 8秒/14万字符的管线结论得到复核：速度快是因为只走了文本层，代价是丢掉约一半内容（主要是代码与截图文字）。RapidOCR样页质量好：vs rapid3参考CER 0.0358、vs 视觉真值0.0048-0.0496、0.66页/秒；主要残余缺陷是代码页注释合并与l/I混淆。章节结构完整可抽取：4篇19章。建议管线对41个needsOcr页做OCR回退，并对正文页中的图片区域（代码/表格）做选择性OCR补齐。"
+}

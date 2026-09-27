@@ -1,0 +1,973 @@
+{
+ "engines_full": {
+  "rapid3": {
+   "C#从入门到精通_第7版_+_明日科技_+": {
+    "pages_ocr": 868,
+    "pages_gt": 868,
+    "empty_pages": 1,
+    "success_rate": 0.9988,
+    "eng_chars": 404247,
+    "gt_chars": 218202,
+    "chars_ratio": 1.853,
+    "cer_mean": 0.9211,
+    "cer_median": 0.3946,
+    "cer_p90": 2.5735,
+    "cer_n": 731,
+    "ocr_beyond_textlayer_pages": 53,
+    "ocr_gain_pages": 525,
+    "top_confusions": {},
+    "sum_ms": 1938186,
+    "errors": 0
+   },
+   "Go语言从入门到精通": {
+    "pages_ocr": 506,
+    "pages_gt": 506,
+    "empty_pages": 0,
+    "success_rate": 1.0,
+    "eng_chars": 222513,
+    "gt_chars": 116517,
+    "chars_ratio": 1.91,
+    "cer_mean": 0.96,
+    "cer_median": 0.5873,
+    "cer_p90": 2.2492,
+    "cer_n": 412,
+    "ocr_beyond_textlayer_pages": 33,
+    "ocr_gain_pages": 351,
+    "top_confusions": {},
+    "sum_ms": 1062221,
+    "errors": 0
+   },
+   "Java从入门到精通_第6版_明日科技": {
+    "pages_ocr": 775,
+    "pages_gt": 775,
+    "empty_pages": 0,
+    "success_rate": 1.0,
+    "eng_chars": 422929,
+    "gt_chars": 224894,
+    "chars_ratio": 1.881,
+    "cer_mean": 1.0226,
+    "cer_median": 0.5107,
+    "cer_p90": 2.8319,
+    "cer_n": 685,
+    "ocr_beyond_textlayer_pages": 31,
+    "ocr_gain_pages": 499,
+    "top_confusions": {
+     "('—', '一')->1": 1,
+     "('Ⅰ', '1')->1": 1,
+     "('Ⅳ', 'V')->1": 1,
+     "('I', 'l')->1": 1
+    },
+    "sum_ms": 3392088,
+    "errors": 0
+   },
+   "Kotlin编程实践_Kotlin从入门到实战": {
+    "pages_ocr": 294,
+    "pages_gt": 294,
+    "empty_pages": 0,
+    "success_rate": 1.0,
+    "eng_chars": 143713,
+    "gt_chars": 144367,
+    "chars_ratio": 0.995,
+    "cer_mean": 0.0377,
+    "cer_median": 0.0085,
+    "cer_p90": 0.0799,
+    "cer_n": 265,
+    "ocr_beyond_textlayer_pages": 1,
+    "ocr_gain_pages": 3,
+    "top_confusions": {
+     "('一', '—')->2": 1
+    },
+    "sum_ms": 671265,
+    "errors": 0
+   },
+   "Python编程_从入门到实践_第3版": {
+    "pages_ocr": 732,
+    "pages_gt": 732,
+    "empty_pages": 2,
+    "success_rate": 0.9973,
+    "eng_chars": 368002,
+    "gt_chars": 365553,
+    "chars_ratio": 1.007,
+    "cer_mean": 0.0443,
+    "cer_median": 0.0085,
+    "cer_p90": 0.0836,
+    "cer_n": 708,
+    "ocr_beyond_textlayer_pages": 2,
+    "ocr_gain_pages": 34,
+    "top_confusions": {},
+    "sum_ms": 1942702,
+    "errors": 0
+   },
+   "图灵程序设计丛书--深度学习入门4_强化学习_日_斋藤康毅_1": {
+    "pages_ocr": 333,
+    "pages_gt": 333,
+    "empty_pages": 2,
+    "success_rate": 0.994,
+    "eng_chars": 165548,
+    "gt_chars": 161576,
+    "chars_ratio": 1.025,
+    "cer_mean": 0.1538,
+    "cer_median": 0.0899,
+    "cer_p90": 0.363,
+    "cer_n": 329,
+    "ocr_beyond_textlayer_pages": 1,
+    "ocr_gain_pages": 27,
+    "top_confusions": {
+     "('I', '|')->1": 6,
+     "('0', '日')->1": 1,
+     "('X', '×')->1": 1,
+     "('S', 'る')->1": 1,
+     "('刖', '前')->1": 1,
+     "('目', '言')->1": 1,
+     "('e', 'ε')->1": 1,
+     "('a', 'α')->1": 1,
+     "('V', 'v')->1": 1,
+     "('維', '维')->1": 1
+    },
+    "sum_ms": 754558,
+    "errors": 0
+   },
+   "大模型应用开发_动手做_AI_Agent_黄佳": {
+    "pages_ocr": 290,
+    "pages_gt": 290,
+    "empty_pages": 0,
+    "success_rate": 1.0,
+    "eng_chars": 273726,
+    "gt_chars": 0,
+    "chars_ratio": 273726.0,
+    "cer_mean": null,
+    "cer_median": null,
+    "cer_p90": null,
+    "cer_n": 0,
+    "ocr_beyond_textlayer_pages": 290,
+    "ocr_gain_pages": 0,
+    "top_confusions": {},
+    "sum_ms": 936335,
+    "errors": 0
+   },
+   "深度学习_Deep_Learning_花书_Ian_Goodfellow_Yoshua_Bengio_Aaron_Cou": {
+    "pages_ocr": 738,
+    "pages_gt": 738,
+    "empty_pages": 1,
+    "success_rate": 0.9986,
+    "eng_chars": 587324,
+    "gt_chars": 593596,
+    "chars_ratio": 0.989,
+    "cer_mean": 0.0537,
+    "cer_median": 0.0207,
+    "cer_p90": 0.1366,
+    "cer_n": 730,
+    "ocr_beyond_textlayer_pages": 0,
+    "ocr_gain_pages": 1,
+    "top_confusions": {
+     "('3', '8')->1": 1,
+     "('v', 'V')->1": 1,
+     "('2', '²')->1": 1,
+     "('1', '¹')->1": 1,
+     "('x', 'X')->1": 1
+    },
+    "sum_ms": 2371200,
+    "errors": 0
+   },
+   "深度学习入门2_自制框架_斋藤康毅_-扫描版_1": {
+    "pages_ocr": 504,
+    "pages_gt": 504,
+    "empty_pages": 6,
+    "success_rate": 0.9881,
+    "eng_chars": 230047,
+    "gt_chars": 231097,
+    "chars_ratio": 0.995,
+    "cer_mean": 0.2192,
+    "cer_median": 0.1914,
+    "cer_p90": 0.3968,
+    "cer_n": 490,
+    "ocr_beyond_textlayer_pages": 1,
+    "ocr_gain_pages": 21,
+    "top_confusions": {
+     "('巾', '中')->2": 3,
+     "('o', '.')->1": 3,
+     "('巾', '中')->1": 3,
+     "('c', 'e')->3": 3,
+     "('l', '1')->3": 2,
+     "('山', '出')->2": 2,
+     "('0', '.')->1": 2,
+     "('日', '目')->1": 2,
+     "('只', '其')->1": 2,
+     "('皮', '度')->1": 2
+    },
+    "sum_ms": 1001271,
+    "errors": 0
+   },
+   "深度学习入门_基于Python的理论与实现+_斋藤康毅_+": {
+    "pages_ocr": 314,
+    "pages_gt": 314,
+    "empty_pages": 7,
+    "success_rate": 0.9777,
+    "eng_chars": 151920,
+    "gt_chars": 149620,
+    "chars_ratio": 1.015,
+    "cer_mean": 0.1335,
+    "cer_median": 0.0703,
+    "cer_p90": 0.3516,
+    "cer_n": 301,
+    "ocr_beyond_textlayer_pages": 4,
+    "ocr_gain_pages": 15,
+    "top_confusions": {},
+    "sum_ms": 732454,
+    "errors": 0
+   },
+   "深度学习进阶_自然语言处理_斋藤康毅": {
+    "pages_ocr": 427,
+    "pages_gt": 427,
+    "empty_pages": 5,
+    "success_rate": 0.9883,
+    "eng_chars": 205724,
+    "gt_chars": 203605,
+    "chars_ratio": 1.01,
+    "cer_mean": 0.1194,
+    "cer_median": 0.0557,
+    "cer_p90": 0.2409,
+    "cer_n": 416,
+    "ocr_beyond_textlayer_pages": 4,
+    "ocr_gain_pages": 9,
+    "top_confusions": {
+     "('0', '8')->1": 1
+    },
+    "sum_ms": 1447555,
+    "errors": 0
+   },
+   "黄仁勋_英伟达之芯__美_斯蒂芬_威特": {
+    "pages_ocr": 201,
+    "pages_gt": 201,
+    "empty_pages": 0,
+    "success_rate": 1.0,
+    "eng_chars": 194939,
+    "gt_chars": 197405,
+    "chars_ratio": 0.988,
+    "cer_mean": 0.0227,
+    "cer_median": 0.005,
+    "cer_p90": 0.064,
+    "cer_n": 167,
+    "ocr_beyond_textlayer_pages": 8,
+    "ocr_gain_pages": 0,
+    "top_confusions": {
+     "('裹', '裏')->1": 1,
+     "('搡', '操')->1": 1,
+     "('l', 'I')->1": 1,
+     "('一', '—')->1": 1
+    },
+    "sum_ms": 963474,
+    "errors": 0
+   }
+  },
+  "paddle": {
+   "大模型应用开发_动手做_AI_Agent_黄佳": {
+    "pages_ocr": 290,
+    "pages_gt": 290,
+    "empty_pages": 0,
+    "success_rate": 1.0,
+    "eng_chars": 296826,
+    "gt_chars": 0,
+    "chars_ratio": 296826.0,
+    "cer_mean": null,
+    "cer_median": null,
+    "cer_p90": null,
+    "cer_n": 0,
+    "ocr_beyond_textlayer_pages": 290,
+    "ocr_gain_pages": 0,
+    "top_confusions": {},
+    "sum_ms": 12039440,
+    "errors": 0
+   },
+   "深度学习入门2_自制框架_斋藤康毅_-扫描版_1": {
+    "pages_ocr": 504,
+    "pages_gt": 504,
+    "empty_pages": 6,
+    "success_rate": 0.9881,
+    "eng_chars": 230657,
+    "gt_chars": 231097,
+    "chars_ratio": 0.998,
+    "cer_mean": 0.2193,
+    "cer_median": 0.1876,
+    "cer_p90": 0.3983,
+    "cer_n": 490,
+    "ocr_beyond_textlayer_pages": 2,
+    "ocr_gain_pages": 22,
+    "top_confusions": {
+     "('巾', '中')->2": 3,
+     "('o', '.')->1": 3,
+     "('巾', '中')->1": 3,
+     "('c', 'e')->3": 3,
+     "('l', '1')->3": 2,
+     "('山', '出')->2": 2,
+     "('0', '.')->1": 2,
+     "('日', '目')->1": 2,
+     "('只', '其')->1": 2,
+     "('一', '—')->2": 1
+    },
+    "sum_ms": 11565121,
+    "errors": 0
+   }
+  }
+ },
+ "project": {
+  "C#从入门到精通_第7版_+_明日科技_+": {
+   "ok": true,
+   "mode": "pypdf",
+   "ocr_engine": "rapid",
+   "extracted_chars": 269709,
+   "gt_chars": 218202,
+   "chars_ratio": 1.236,
+   "page_cer_mean": null,
+   "page_cer_median": null,
+   "page_cer_p90": null,
+   "page_cer_n": 0,
+   "whole_cer": 0.0697,
+   "elapsed_s": 13.8
+  },
+  "Go语言从入门到精通": {
+   "ok": true,
+   "mode": "pypdf",
+   "ocr_engine": "rapid",
+   "extracted_chars": 140004,
+   "gt_chars": 116517,
+   "chars_ratio": 1.202,
+   "page_cer_mean": null,
+   "page_cer_median": null,
+   "page_cer_p90": null,
+   "page_cer_n": 0,
+   "whole_cer": 0.081,
+   "elapsed_s": 8.0
+  },
+  "Java从入门到精通_第6版_明日科技": {
+   "ok": true,
+   "mode": "pypdf",
+   "ocr_engine": "rapid",
+   "extracted_chars": 270715,
+   "gt_chars": 224894,
+   "chars_ratio": 1.204,
+   "page_cer_mean": null,
+   "page_cer_median": null,
+   "page_cer_p90": null,
+   "page_cer_n": 0,
+   "whole_cer": 0.0,
+   "elapsed_s": 46.9
+  },
+  "Kotlin编程实践_Kotlin从入门到实战": {
+   "ok": true,
+   "mode": "pypdf",
+   "ocr_engine": "rapid",
+   "extracted_chars": 177556,
+   "gt_chars": 144367,
+   "chars_ratio": 1.23,
+   "page_cer_mean": null,
+   "page_cer_median": null,
+   "page_cer_p90": null,
+   "page_cer_n": 0,
+   "whole_cer": 0.0743,
+   "elapsed_s": 14.4
+  },
+  "Python编程_从入门到实践_第3版": {
+   "ok": true,
+   "mode": "pdfium",
+   "ocr_engine": "rapid",
+   "extracted_chars": 467326,
+   "gt_chars": 365553,
+   "chars_ratio": 1.278,
+   "page_cer_mean": null,
+   "page_cer_median": null,
+   "page_cer_p90": null,
+   "page_cer_n": 0,
+   "whole_cer": 0.0047,
+   "elapsed_s": 2.3
+  },
+  "图灵程序设计丛书--深度学习入门4_强化学习_日_斋藤康毅_1": {
+   "ok": true,
+   "mode": "pypdf",
+   "ocr_engine": "rapid",
+   "extracted_chars": 51996,
+   "gt_chars": 161576,
+   "chars_ratio": 0.322,
+   "page_cer_mean": null,
+   "page_cer_median": null,
+   "page_cer_p90": null,
+   "page_cer_n": 0,
+   "whole_cer": 0.7273,
+   "elapsed_s": 10.9
+  },
+  "大模型应用开发_动手做_AI_Agent_黄佳": {
+   "ok": true,
+   "mode": "pypdf",
+   "ocr_engine": "rapid",
+   "extracted_chars": 21536,
+   "gt_chars": 0,
+   "chars_ratio": 21536.0,
+   "page_cer_mean": null,
+   "page_cer_median": null,
+   "page_cer_p90": null,
+   "page_cer_n": 0,
+   "whole_cer": null,
+   "elapsed_s": 115.3
+  },
+  "深度学习_Deep_Learning_花书_Ian_Goodfellow_Yoshua_Bengio_Aaron_Cou": {
+   "ok": true,
+   "mode": "pypdf",
+   "ocr_engine": "rapid",
+   "extracted_chars": 782261,
+   "gt_chars": 593596,
+   "chars_ratio": 1.318,
+   "page_cer_mean": null,
+   "page_cer_median": null,
+   "page_cer_p90": null,
+   "page_cer_n": 0,
+   "whole_cer": 0.0,
+   "elapsed_s": 21.9
+  },
+  "深度学习入门2_自制框架_斋藤康毅_-扫描版_1": {
+   "ok": true,
+   "mode": "pypdf",
+   "ocr_engine": "rapid",
+   "extracted_chars": 338429,
+   "gt_chars": 231097,
+   "chars_ratio": 1.464,
+   "page_cer_mean": null,
+   "page_cer_median": null,
+   "page_cer_p90": null,
+   "page_cer_n": 0,
+   "whole_cer": 0.0,
+   "elapsed_s": 67.2
+  },
+  "深度学习入门_基于Python的理论与实现+_斋藤康毅_+": {
+   "ok": true,
+   "mode": "pypdf",
+   "ocr_engine": "rapid",
+   "extracted_chars": 209723,
+   "gt_chars": 149620,
+   "chars_ratio": 1.402,
+   "page_cer_mean": null,
+   "page_cer_median": null,
+   "page_cer_p90": null,
+   "page_cer_n": 0,
+   "whole_cer": 0.006,
+   "elapsed_s": 9.7
+  },
+  "深度学习进阶_自然语言处理_斋藤康毅": {
+   "ok": true,
+   "mode": "pypdf",
+   "ocr_engine": "rapid",
+   "extracted_chars": 279335,
+   "gt_chars": 203605,
+   "chars_ratio": 1.372,
+   "page_cer_mean": null,
+   "page_cer_median": null,
+   "page_cer_p90": null,
+   "page_cer_n": 0,
+   "whole_cer": 0.0273,
+   "elapsed_s": 13.0
+  },
+  "黄仁勋_英伟达之芯__美_斯蒂芬_威特": {
+   "ok": true,
+   "mode": "pypdf",
+   "ocr_engine": "rapid",
+   "extracted_chars": 224004,
+   "gt_chars": 197405,
+   "chars_ratio": 1.135,
+   "page_cer_mean": null,
+   "page_cer_median": null,
+   "page_cer_p90": null,
+   "page_cer_n": 0,
+   "whole_cer": 0.1017,
+   "elapsed_s": 13.2
+  }
+ },
+ "bench": {
+  "bench_paddle": {
+   "engine": "paddle",
+   "workers": 4,
+   "intra_threads": 2,
+   "pages": 120,
+   "wall_s": 1146.35,
+   "warm_s": 15.39,
+   "serial_avg_ms": 23995.9,
+   "serial_s_per_page": 24.0,
+   "parallel_speedup": 2.51,
+   "sum_ms": 4482941,
+   "avg_ms": 37357.8,
+   "pages_per_s": 0.105,
+   "total_chars": 64512,
+   "total_cjk": 39206,
+   "errors": 0,
+   "mean_cer_vs_textlayer": 0.3741,
+   "cer_n": 96,
+   "total_wall_incl_warm_s": 1412.53,
+   "per_book": {
+    "Kotlin编程实践：Kotlin从入门到实战.pdf": {
+     "pages": 10,
+     "chars": 3657,
+     "ms": 284974,
+     "errors": 0,
+     "avg_ms": 28497.4,
+     "mean_cer": 0.0505
+    },
+    "Go语言从入门到精通.pdf": {
+     "pages": 10,
+     "chars": 3749,
+     "ms": 296924,
+     "errors": 0,
+     "avg_ms": 29692.4,
+     "mean_cer": 1.3623
+    },
+    "大模型应用开发：动手做 AI Agent (黄佳) .pdf": {
+     "pages": 10,
+     "chars": 9401,
+     "ms": 498201,
+     "errors": 0,
+     "avg_ms": 49820.1,
+     "mean_cer": null
+    },
+    "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF": {
+     "pages": 10,
+     "chars": 3570,
+     "ms": 229009,
+     "errors": 0,
+     "avg_ms": 22900.9,
+     "mean_cer": 0.2551
+    },
+    "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf": {
+     "pages": 10,
+     "chars": 4635,
+     "ms": 301087,
+     "errors": 0,
+     "avg_ms": 30108.7,
+     "mean_cer": 0.097
+    },
+    "C#从入门到精通（第7版）+(明日科技)+.pdf": {
+     "pages": 10,
+     "chars": 3251,
+     "ms": 270618,
+     "errors": 0,
+     "avg_ms": 27061.8,
+     "mean_cer": 0.5215
+    },
+    "深度学习进阶：自然语言处理 (斋藤康毅) .pdf": {
+     "pages": 10,
+     "chars": 4427,
+     "ms": 323415,
+     "errors": 0,
+     "avg_ms": 32341.5,
+     "mean_cer": 0.1576
+    },
+    "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf": {
+     "pages": 10,
+     "chars": 9167,
+     "ms": 646396,
+     "errors": 0,
+     "avg_ms": 64639.6,
+     "mean_cer": 0.0031
+    },
+    "Java从入门到精通（第6版） (明日科技) .pdf": {
+     "pages": 10,
+     "chars": 4719,
+     "ms": 351667,
+     "errors": 0,
+     "avg_ms": 35166.7,
+     "mean_cer": 1.2876
+    },
+    "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf": {
+     "pages": 10,
+     "chars": 7403,
+     "ms": 482326,
+     "errors": 0,
+     "avg_ms": 48232.6,
+     "mean_cer": 0.028
+    },
+    "Python编程：从入门到实践（第3版）.pdf": {
+     "pages": 10,
+     "chars": 5731,
+     "ms": 412660,
+     "errors": 0,
+     "avg_ms": 41266.0,
+     "mean_cer": 0.3267
+    },
+    "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf": {
+     "pages": 10,
+     "chars": 4802,
+     "ms": 385664,
+     "errors": 0,
+     "avg_ms": 38566.4,
+     "mean_cer": 0.1164
+    }
+   }
+  },
+  "bench_rapid": {
+   "engine": "rapid",
+   "workers": 4,
+   "intra_threads": 4,
+   "pages": 120,
+   "wall_s": 294.06,
+   "warm_s": 1.55,
+   "serial_avg_ms": 1610.7,
+   "serial_s_per_page": 1.61,
+   "parallel_speedup": 0.66,
+   "sum_ms": 1153504,
+   "avg_ms": 9612.5,
+   "pages_per_s": 0.408,
+   "total_chars": 61078,
+   "total_cjk": 38307,
+   "errors": 0,
+   "mean_cer_vs_textlayer": 0.3595,
+   "cer_n": 96,
+   "total_wall_incl_warm_s": 313.6,
+   "per_book": {
+    "Kotlin编程实践：Kotlin从入门到实战.pdf": {
+     "pages": 10,
+     "chars": 3596,
+     "ms": 67536,
+     "errors": 0,
+     "avg_ms": 6753.6,
+     "mean_cer": 0.0614
+    },
+    "Go语言从入门到精通.pdf": {
+     "pages": 10,
+     "chars": 3732,
+     "ms": 70909,
+     "errors": 0,
+     "avg_ms": 7090.9,
+     "mean_cer": 1.2823
+    },
+    "大模型应用开发：动手做 AI Agent (黄佳) .pdf": {
+     "pages": 10,
+     "chars": 7854,
+     "ms": 126144,
+     "errors": 0,
+     "avg_ms": 12614.4,
+     "mean_cer": null
+    },
+    "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF": {
+     "pages": 10,
+     "chars": 3566,
+     "ms": 69456,
+     "errors": 0,
+     "avg_ms": 6945.6,
+     "mean_cer": 0.2675
+    },
+    "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf": {
+     "pages": 10,
+     "chars": 4609,
+     "ms": 88017,
+     "errors": 0,
+     "avg_ms": 8801.7,
+     "mean_cer": 0.1064
+    },
+    "C#从入门到精通（第7版）+(明日科技)+.pdf": {
+     "pages": 10,
+     "chars": 3020,
+     "ms": 64513,
+     "errors": 0,
+     "avg_ms": 6451.3,
+     "mean_cer": 0.4409
+    },
+    "深度学习进阶：自然语言处理 (斋藤康毅) .pdf": {
+     "pages": 10,
+     "chars": 4215,
+     "ms": 78147,
+     "errors": 0,
+     "avg_ms": 7814.7,
+     "mean_cer": 0.1824
+    },
+    "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf": {
+     "pages": 10,
+     "chars": 8758,
+     "ms": 199263,
+     "errors": 0,
+     "avg_ms": 19926.3,
+     "mean_cer": 0.0394
+    },
+    "Java从入门到精通（第6版） (明日科技) .pdf": {
+     "pages": 10,
+     "chars": 4500,
+     "ms": 80120,
+     "errors": 0,
+     "avg_ms": 8012.0,
+     "mean_cer": 1.1607
+    },
+    "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf": {
+     "pages": 10,
+     "chars": 6984,
+     "ms": 129799,
+     "errors": 0,
+     "avg_ms": 12979.9,
+     "mean_cer": 0.1012
+    },
+    "Python编程：从入门到实践（第3版）.pdf": {
+     "pages": 10,
+     "chars": 5511,
+     "ms": 105214,
+     "errors": 0,
+     "avg_ms": 10521.4,
+     "mean_cer": 0.2674
+    },
+    "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf": {
+     "pages": 10,
+     "chars": 4733,
+     "ms": 74386,
+     "errors": 0,
+     "avg_ms": 7438.6,
+     "mean_cer": 0.1229
+    }
+   }
+  },
+  "bench_rapid3": {
+   "engine": "rapid3",
+   "workers": 4,
+   "intra_threads": 4,
+   "pages": 120,
+   "wall_s": 82.76,
+   "warm_s": 1.51,
+   "serial_avg_ms": 584.9,
+   "serial_s_per_page": 0.58,
+   "parallel_speedup": 0.85,
+   "sum_ms": 314767,
+   "avg_ms": 2623.1,
+   "pages_per_s": 1.45,
+   "total_chars": 62422,
+   "total_cjk": 38651,
+   "errors": 0,
+   "mean_cer_vs_textlayer": 0.3636,
+   "cer_n": 96,
+   "total_wall_incl_warm_s": 91.78,
+   "per_book": {
+    "Kotlin编程实践：Kotlin从入门到实战.pdf": {
+     "pages": 10,
+     "chars": 3591,
+     "ms": 20799,
+     "errors": 0,
+     "avg_ms": 2079.9,
+     "mean_cer": 0.0649
+    },
+    "Go语言从入门到精通.pdf": {
+     "pages": 10,
+     "chars": 3737,
+     "ms": 21479,
+     "errors": 0,
+     "avg_ms": 2147.9,
+     "mean_cer": 1.311
+    },
+    "大模型应用开发：动手做 AI Agent (黄佳) .pdf": {
+     "pages": 10,
+     "chars": 8252,
+     "ms": 31816,
+     "errors": 0,
+     "avg_ms": 3181.6,
+     "mean_cer": null
+    },
+    "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF": {
+     "pages": 10,
+     "chars": 3567,
+     "ms": 19870,
+     "errors": 0,
+     "avg_ms": 1987.0,
+     "mean_cer": 0.2542
+    },
+    "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf": {
+     "pages": 10,
+     "chars": 4630,
+     "ms": 23225,
+     "errors": 0,
+     "avg_ms": 2322.5,
+     "mean_cer": 0.101
+    },
+    "C#从入门到精通（第7版）+(明日科技)+.pdf": {
+     "pages": 10,
+     "chars": 3106,
+     "ms": 19847,
+     "errors": 0,
+     "avg_ms": 1984.7,
+     "mean_cer": 0.4707
+    },
+    "深度学习进阶：自然语言处理 (斋藤康毅) .pdf": {
+     "pages": 10,
+     "chars": 4355,
+     "ms": 22728,
+     "errors": 0,
+     "avg_ms": 2272.8,
+     "mean_cer": 0.155
+    },
+    "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf": {
+     "pages": 10,
+     "chars": 8864,
+     "ms": 47916,
+     "errors": 0,
+     "avg_ms": 4791.6,
+     "mean_cer": 0.0353
+    },
+    "Java从入门到精通（第6版） (明日科技) .pdf": {
+     "pages": 10,
+     "chars": 4552,
+     "ms": 22846,
+     "errors": 0,
+     "avg_ms": 2284.6,
+     "mean_cer": 1.2251
+    },
+    "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf": {
+     "pages": 10,
+     "chars": 7407,
+     "ms": 35069,
+     "errors": 0,
+     "avg_ms": 3506.9,
+     "mean_cer": 0.0411
+    },
+    "Python编程：从入门到实践（第3版）.pdf": {
+     "pages": 10,
+     "chars": 5592,
+     "ms": 27878,
+     "errors": 0,
+     "avg_ms": 2787.8,
+     "mean_cer": 0.3094
+    },
+    "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf": {
+     "pages": 10,
+     "chars": 4769,
+     "ms": 21294,
+     "errors": 0,
+     "avg_ms": 2129.4,
+     "mean_cer": 0.1156
+    }
+   }
+  },
+  "bench_rapid3_12x2": {
+   "engine": "rapid3",
+   "workers": 12,
+   "intra_threads": 2,
+   "pages": 120,
+   "wall_s": 99.09,
+   "warm_s": 2.43,
+   "serial_avg_ms": 791.4,
+   "serial_s_per_page": 0.79,
+   "parallel_speedup": 0.96,
+   "sum_ms": 1127880,
+   "avg_ms": 9399.0,
+   "pages_per_s": 1.211,
+   "total_chars": 62422,
+   "total_cjk": 38651,
+   "errors": 0,
+   "mean_cer_vs_textlayer": 0.3636,
+   "cer_n": 96,
+   "total_wall_incl_warm_s": 117.6,
+   "per_book": {
+    "Kotlin编程实践：Kotlin从入门到实战.pdf": {
+     "pages": 10,
+     "chars": 3591,
+     "ms": 77309,
+     "errors": 0,
+     "avg_ms": 7730.9,
+     "mean_cer": 0.0649
+    },
+    "Go语言从入门到精通.pdf": {
+     "pages": 10,
+     "chars": 3737,
+     "ms": 82309,
+     "errors": 0,
+     "avg_ms": 8230.9,
+     "mean_cer": 1.311
+    },
+    "大模型应用开发：动手做 AI Agent (黄佳) .pdf": {
+     "pages": 10,
+     "chars": 8252,
+     "ms": 119491,
+     "errors": 0,
+     "avg_ms": 11949.1,
+     "mean_cer": null
+    },
+    "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF": {
+     "pages": 10,
+     "chars": 3567,
+     "ms": 72136,
+     "errors": 0,
+     "avg_ms": 7213.6,
+     "mean_cer": 0.2542
+    },
+    "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf": {
+     "pages": 10,
+     "chars": 4630,
+     "ms": 84682,
+     "errors": 0,
+     "avg_ms": 8468.2,
+     "mean_cer": 0.101
+    },
+    "C#从入门到精通（第7版）+(明日科技)+.pdf": {
+     "pages": 10,
+     "chars": 3106,
+     "ms": 70576,
+     "errors": 0,
+     "avg_ms": 7057.6,
+     "mean_cer": 0.4707
+    },
+    "深度学习进阶：自然语言处理 (斋藤康毅) .pdf": {
+     "pages": 10,
+     "chars": 4355,
+     "ms": 81304,
+     "errors": 0,
+     "avg_ms": 8130.4,
+     "mean_cer": 0.155
+    },
+    "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf": {
+     "pages": 10,
+     "chars": 8864,
+     "ms": 167491,
+     "errors": 0,
+     "avg_ms": 16749.1,
+     "mean_cer": 0.0353
+    },
+    "Java从入门到精通（第6版） (明日科技) .pdf": {
+     "pages": 10,
+     "chars": 4552,
+     "ms": 81804,
+     "errors": 0,
+     "avg_ms": 8180.4,
+     "mean_cer": 1.2251
+    },
+    "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf": {
+     "pages": 10,
+     "chars": 7407,
+     "ms": 121215,
+     "errors": 0,
+     "avg_ms": 12121.5,
+     "mean_cer": 0.0411
+    },
+    "Python编程：从入门到实践（第3版）.pdf": {
+     "pages": 10,
+     "chars": 5592,
+     "ms": 99716,
+     "errors": 0,
+     "avg_ms": 9971.6,
+     "mean_cer": 0.3094
+    },
+    "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf": {
+     "pages": 10,
+     "chars": 4769,
+     "ms": 69847,
+     "errors": 0,
+     "avg_ms": 6984.7,
+     "mean_cer": 0.1156
+    }
+   }
+  },
+  "bench_rapid_v1_untuned": {
+   "engine": "rapid",
+   "workers": 8,
+   "pages": 120,
+   "wall_s": 548.32,
+   "warm_s": 2.05,
+   "sum_ms": 4279245,
+   "avg_ms": 35660.4,
+   "pages_per_s": 0.219,
+   "total_chars": 61078,
+   "total_cjk": 38307,
+   "errors": 0,
+   "mean_cer_vs_textlayer": 0.3595,
+   "cer_n": 96,
+   "total_wall_incl_warm_s": 550.37
+  }
+ }
+}

@@ -1,0 +1,17 @@
+{
+ "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF": {
+  "ok": true,
+  "elapsed_s": 61.1,
+  "chars": 339043,
+  "mode": "pypdf",
+  "ocrPages": null,
+  "notes": [
+   "extractor_alt:pymupdf(words=231097)",
+   "extractor:pypdf(words=231131_radical=0.000)",
+   "extractor_alt:pdfium(words=212477)",
+   "full_page_ocr:reason=image_content",
+   "targeted_ocr:targets=504_merged=8_cap=1500",
+   "text_layer_full"
+  ]
+ }
+}

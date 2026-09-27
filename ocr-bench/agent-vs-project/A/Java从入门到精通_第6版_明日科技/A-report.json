@@ -1,0 +1,390 @@
+{
+  "book": "Java从入门到精通（第6版） (明日科技) .pdf",
+  "slug": "Java从入门到精通_第6版_明日科技",
+  "pages": 775,
+  "needsOcrPages": 43,
+  "zeroTextPages": 20,
+  "tocCandidatePages": [
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    27,
+    28,
+    29,
+    31,
+    32
+  ],
+  "chHeadPages": 23,
+  "samples": {
+    "ocrPages": [
+      1,
+      3,
+      16,
+      20,
+      32,
+      119,
+      150,
+      239,
+      244,
+      300,
+      365,
+      421,
+      430,
+      482,
+      494,
+      495,
+      547,
+      600,
+      609,
+      674,
+      700
+    ],
+    "visualPages": [
+      1,
+      16,
+      244,
+      300,
+      421,
+      600
+    ],
+    "reasons": "封面/版权=p1,p3；目录候选=p16,p20（inventory tocLike 启发式漏报目录，实际 p16-32 为超链接式目录，此处按文本层确认回填）；章首=6 个真实章首页 p32/p119/p244/p365/p495/p674（inventory chHeads 启发式报 50 页含大量目录行，按文本层行首 第N章 校准为 23 章）；低字数中段页 30%-80%=p421/p482/p547/p609（均零文本，疑漏图块）；suspRatio 全书均为 0.0、无最高页，改用 needsOcr 低字数页 p239/p494 替代；gt-vision 真值页 p300/p600 必含；随机=p150/p430/p700。共 21 页 ≤22。"
+  },
+  "ocrSampleStats": {
+    "n": 21,
+    "avgMs": 1765.1,
+    "pagesPerS": 0.567,
+    "avgChars": 544.2
+  },
+  "cerVsTextlayer": {
+    "n": 16,
+    "mean": 0.3101,
+    "worst": [
+      {
+        "page": 494,
+        "cer": 0.9423
+      },
+      {
+        "page": 239,
+        "cer": 0.9165
+      },
+      {
+        "page": 430,
+        "cer": 0.7349
+      },
+      {
+        "page": 300,
+        "cer": 0.5659
+      },
+      {
+        "page": 700,
+        "cer": 0.4484
+      }
+    ]
+  },
+  "cerVsRapid3Ref": {
+    "n": 21,
+    "mean": 0.0085,
+    "worst": [
+      {
+        "page": 365,
+        "cer": 0.0856
+      },
+      {
+        "page": 32,
+        "cer": 0.018
+      }
+    ],
+    "charDelta": 10
+  },
+  "chapters": [
+    {
+      "page": 32,
+      "title": "第1章 初识Java",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 49,
+      "title": "第2章 熟悉Eclipse开发工具",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 78,
+      "title": "第3章 Java语言基础",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 119,
+      "title": "第4章 流程控制",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 144,
+      "title": "第5章 数组",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 177,
+      "title": "第6章 类和对象",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 209,
+      "title": "第7章 继承、多态、抽象类与接口",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 244,
+      "title": "第8章 包和内部类",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 259,
+      "title": "第9章 异常处理",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 274,
+      "title": "第10章 字符串",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 313,
+      "title": "第11章 常用类库",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 365,
+      "title": "第12章 集合类",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 378,
+      "title": "第13章 枚举类型与泛型",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 399,
+      "title": "第14章 lambda表达式与流处理",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 447,
+      "title": "第15章 I/O（输入／输出）",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 469,
+      "title": "第16章 反射与注解",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 495,
+      "title": "第17章 数据库操作",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 522,
+      "title": "第18章 Swing程序设计",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 590,
+      "title": "第19章 Java绘图",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 620,
+      "title": "第20章 多线程",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 648,
+      "title": "第21章 网络通信",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 674,
+      "title": "第22章 奔跑吧小恐龙",
+      "pattern": "行首 第N章　标题"
+    },
+    {
+      "page": 703,
+      "title": "第23章 MR人脸识别打卡系统",
+      "pattern": "行首 第N章　标题"
+    }
+  ],
+  "visualFindings": [
+    {
+      "page": 1,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": true,
+      "orderOk": true,
+      "notes": "封面整页图片无文本层；OCR 231 字还原书名/资源库卖点，顺序正确，无水印倾斜"
+    },
+    {
+      "page": 16,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": false,
+      "orderOk": true,
+      "notes": "目录为蓝色超链接样式、层级缩进清晰、条目无页码；OCR 与视觉顺序一致"
+    },
+    {
+      "page": 244,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": true,
+      "orderOk": true,
+      "notes": "第8章章首：正文+知识导图（Java类包/内部类分支）；文本层 424 字≈OCR 426 字，导图标签基本齐全"
+    },
+    {
+      "page": 300,
+      "columns": 1,
+      "hasCode": true,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": true,
+      "orderOk": true,
+      "notes": "顶部整块代码图为图片（gt 817 字，文本层仅 135/163 字）+ 正文 + Eclipse 运行结果截图；OCR vs gt CER 0.0041"
+    },
+    {
+      "page": 421,
+      "columns": 1,
+      "hasCode": true,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": true,
+      "orderOk": true,
+      "notes": "整页 Employee 类代码为图片，文本层 0 字，OCR 832 字；代码行右侧贴边，个别长行贴边截断风险"
+    },
+    {
+      "page": 600,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": true,
+      "hasFormula": false,
+      "hasFigure": true,
+      "orderOk": false,
+      "notes": "表19.3 六行全部按序还原；但环绕图19.5 的内联小图标签插进段落（CAP_BUTT→CABUT、CAP_SQUARE→CAA），☑ 符号丢失"
+    }
+  ],
+  "defects": [
+    {
+      "page": 421,
+      "type": "missed_content",
+      "detail": "整页 Java 代码块为图片，文本层 0 字；OCR 实得 832 字，纯文本抽取全丢",
+      "severity": "high"
+    },
+    {
+      "page": 482,
+      "type": "missed_content",
+      "detail": "文本层 0 字，OCR 1213 字，整页内容图片化",
+      "severity": "high"
+    },
+    {
+      "page": 547,
+      "type": "missed_content",
+      "detail": "文本层 0 字，OCR 1371 字（样页最大缺口）",
+      "severity": "high"
+    },
+    {
+      "page": 609,
+      "type": "missed_content",
+      "detail": "文本层 0 字，OCR 1005 字",
+      "severity": "high"
+    },
+    {
+      "page": 239,
+      "type": "missed_content",
+      "detail": "文本层仅 31 字标题碎片，OCR 597 字，正文整体图片化",
+      "severity": "high"
+    },
+    {
+      "page": 494,
+      "type": "missed_content",
+      "detail": "文本层仅 12 字，OCR 303 字（章末图片化内容）",
+      "severity": "high"
+    },
+    {
+      "page": 430,
+      "type": "missed_content",
+      "detail": "文本层 129 字 vs OCR 648 字，缺约 500 字图片内容",
+      "severity": "medium"
+    },
+    {
+      "page": 300,
+      "type": "missed_content",
+      "detail": "文本层 135/163 字，缺顶部代码块图（gt 817 字）；OCR vs gt CER 0.0041 可补救",
+      "severity": "medium"
+    },
+    {
+      "page": 700,
+      "type": "missed_content",
+      "detail": "文本层 270/314 字 vs OCR 707 字，缺 400+ 字图片内容",
+      "severity": "medium"
+    },
+    {
+      "page": 1,
+      "type": "missed_content",
+      "detail": "封面无文本层，OCR 231 字可还原关键信息（正常现象）",
+      "severity": "low"
+    },
+    {
+      "page": 300,
+      "type": "code",
+      "detail": "代码图 OCR 符号保真差：String[] args→String args、new Date();→new Date():，[]/;易丢",
+      "severity": "medium"
+    },
+    {
+      "page": 600,
+      "type": "garble",
+      "detail": "图19.5 内联小图标签误识：CAP_BUTT→CABUT、CAP_SQUARE→CAA；列表符号 ☑ 全部丢失",
+      "severity": "low"
+    },
+    {
+      "page": 600,
+      "type": "order",
+      "detail": "环绕图小图标签插入段落中间，视觉阅读序与 OCR 顺序局部不一致",
+      "severity": "low"
+    },
+    {
+      "page": 365,
+      "type": "order",
+      "detail": "章首知识导图散点标签阅读序不稳（vs rapid3 CER 0.0856，正文部分逐字一致）",
+      "severity": "low"
+    },
+    {
+      "page": 32,
+      "type": "order",
+      "detail": "章首导图标签顺序差异（vs rapid3 CER 0.018）",
+      "severity": "low"
+    },
+    {
+      "page": 16,
+      "type": "other",
+      "detail": "目录为超链接样式无页码，inventory tocLike/tocCandidatePages 启发式漏报（返回空），需按文本层回填 p16-32",
+      "severity": "low"
+    },
+    {
+      "page": 0,
+      "type": "missed_content",
+      "detail": "全书级：文本层 266,878 字 vs rapid3 全页 OCR 422,929 字，缺 156,051 字（36.9%）；344 页缺口>150 字；20 个零文本页实含 17,630 字；重灾章节 ch23(缺27.0k/51页)、ch18(20.1k/35页)、ch14(14.9k)、ch11(12.7k)、ch16(12.1k)、ch2(8.8k)，与 Go 书同款『文本层+图片混排漏图块』模式且更重",
+      "severity": "high"
+    }
+  ],
+  "conclusions": "RapidOCR 引擎本身质量优秀且可复现：21 样页 vs rapid3 参考 mean CER 0.0085、字符差仅 +10；vs 视觉真值 p300 CER 0.0041、p600 0.0422；速度 1765 ms/页（0.57 页/s），全书 775 页约 23 分钟。vs 文本层 mean CER 0.31 的高值不是 OCR 错误，而是文本层系统性缺内容：全书文本层仅 266,878 字，比全页 OCR 少 156,051 字（36.9%），344 页存在>150 字缺口，20 个零文本页实为整页图片（代码块/软件截图），代码重灾章 ch18/ch23 缺口最大（合计 47k 字）。样页 OCR 可完整找回这些内容，但对代码图有符号保真问题（[]/;易丢），章首导图散点标签阅读序不稳、环绕图标签局部乱序。结论：本书必须走『文本层+OCR 融合』管线，纯文本层会丢约 37% 内容；inventory 的目录启发式（tocLike）与 suspRatio 在本书全部空转，选样需依赖零文本/低字数信号。"
+}

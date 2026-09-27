@@ -1,0 +1,329 @@
+{
+  "book": "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf",
+  "slug": "深度学习_Deep_Learning_花书_Ian_Goodfellow_Yoshua_Bengio_Aaron_Cou",
+  "pages": 738,
+  "needsOcrPages": 8,
+  "zeroTextPages": 0,
+  "tocCandidatePages": [],
+  "chHeadPages": 373,
+  "samples": {
+    "ocrPages": [
+      1,
+      2,
+      3,
+      5,
+      28,
+      29,
+      53,
+      100,
+      146,
+      171,
+      179,
+      225,
+      247,
+      332,
+      347,
+      404,
+      441,
+      442,
+      445,
+      456,
+      587,
+      698
+    ],
+    "visualPages": [
+      5,
+      100,
+      179,
+      247,
+      332
+    ],
+    "reasons": "封面版权(1,2)；目录(3,5,28尾)；章首6个(29/100公式章/225/347/445/587)；低字数中段4页(404,332,441,456，位于全书30%-80%)；suspRatio最高2页(247矩阵公式,179图6.3)；随机3页(146,698,332重叠计1)；并全覆盖8个needsOcr页(1,2,28,53,171,179,247,442)，合计22页"
+  },
+  "ocrSampleStats": {
+    "n": 22,
+    "avgMs": 1192.1,
+    "pagesPerS": 0.839,
+    "avgChars": 380.1
+  },
+  "cerVsTextlayer": {
+    "n": 21,
+    "mean": 0.0175,
+    "worst": [
+      {
+        "page": 247,
+        "cer": 0.1483
+      },
+      {
+        "page": 332,
+        "cer": 0.1356
+      },
+      {
+        "page": 179,
+        "cer": 0.0653
+      },
+      {
+        "page": 100,
+        "cer": 0.0053
+      },
+      {
+        "page": 587,
+        "cer": 0.0038
+      }
+    ]
+  },
+  "cerVsRapid3Ref": {
+    "n": 21,
+    "mean": 0.0064,
+    "worst": [
+      {
+        "page": 247,
+        "cer": 0.0898
+      },
+      {
+        "page": 146,
+        "cer": 0.0228
+      },
+      {
+        "page": 179,
+        "cer": 0.0145
+      }
+    ],
+    "charDelta": 72
+  },
+  "chapters": [
+    {
+      "page": 3,
+      "title": "目录",
+      "pattern": "目录页眉+点引导条目（p3-28，共26页）"
+    },
+    {
+      "page": 29,
+      "title": "第一章 引言",
+      "pattern": "章首大标题“第X章+章名”+正文"
+    },
+    {
+      "page": 53,
+      "title": "第一部分 应用数学与机器学习基础",
+      "pattern": "Part 分隔页（独立短页，仅标题+书页码）"
+    },
+    {
+      "page": 55,
+      "title": "第二章 线性代数",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 75,
+      "title": "第三章 概率与信息论",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 100,
+      "title": "第四章 数值计算",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 115,
+      "title": "第五章 机器学习基础",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 171,
+      "title": "第二部分 深度网络：现代实践",
+      "pattern": "Part 分隔页"
+    },
+    {
+      "page": 173,
+      "title": "第六章 深度前馈网络",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 225,
+      "title": "第七章 深度学习中的正则化",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 263,
+      "title": "第八章 深度模型中的优化",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 309,
+      "title": "第九章 卷积网络",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 347,
+      "title": "第十章 序列建模：循环和递归网络",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 387,
+      "title": "第十一章 实践方法论",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 405,
+      "title": "第十二章 应用",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 442,
+      "title": "第三部分 深度学习研究",
+      "pattern": "Part 分隔页"
+    },
+    {
+      "page": 445,
+      "title": "第十三章 线性因子模型",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 457,
+      "title": "第十四章 自编码器",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 477,
+      "title": "第十五章 表示学习",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 503,
+      "title": "第十六章 深度学习中的结构化概率模型",
+      "pattern": "章首大标题（标题在文本层内被折行截断）"
+    },
+    {
+      "page": 530,
+      "title": "第十七章 蒙特卡罗方法",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 544,
+      "title": "第十八章 直面配分函数",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 566,
+      "title": "第十九章 近似推断",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 587,
+      "title": "第二十章 深度生成模型",
+      "pattern": "章首大标题"
+    },
+    {
+      "page": 643,
+      "title": "参考文献",
+      "pattern": "页眉“参考文献”（p643-706）"
+    },
+    {
+      "page": 707,
+      "title": "术语（索引）",
+      "pattern": "页眉“术语”（p707-738）"
+    }
+  ],
+  "visualFindings": [
+    {
+      "page": 5,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": false,
+      "orderOk": true,
+      "notes": "点引导目录页，单栏；OCR 丢点引导符但保留标题与页码；无水印无倾斜"
+    },
+    {
+      "page": 100,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": true,
+      "hasFigure": false,
+      "orderOk": true,
+      "notes": "第四章章首，大标题+正文，含∞/-∞等行内符号，识别无损；版式为原生数字排印"
+    },
+    {
+      "page": 179,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": true,
+      "hasFigure": true,
+      "orderOk": true,
+      "notes": "图6.3(ReLU曲线)+矩阵公式(6.7)-(6.9)；旋转y轴标签未进OCR检测框，公式本体识别正常"
+    },
+    {
+      "page": 247,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": true,
+      "hasFigure": false,
+      "orderOk": false,
+      "notes": "全页最密公式页：两个6x6大矩阵等式+范数/求和公式；矩阵行序错乱、括号定界丢失，为全书最大质量风险"
+    },
+    {
+      "page": 332,
+      "columns": 1,
+      "hasCode": false,
+      "hasTable": false,
+      "hasFormula": false,
+      "hasFigure": true,
+      "orderOk": true,
+      "notes": "整页大图(图9.15)；竖排图内标签碎裂；文本层顺序与视觉序不一致而OCR序与视觉一致"
+    }
+  ],
+  "defects": [
+    {
+      "page": 247,
+      "type": "formula",
+      "detail": "大矩阵公式(7.46)/(7.47)：OCR 把列向量 y=[18,5,15,-9,-3] 的各元素拆散混入 A 矩阵行间、行序错乱；大括号定界符全丢（文本层含116个PUA括号片，OCR 0个）；原始字符 1107->927（-180,-16%），CER vs 文本层 0.148（纯文本页约0.000-0.005）",
+      "severity": "high"
+    },
+    {
+      "page": 179,
+      "type": "formula",
+      "detail": "图6.3 旋转90度的 y 轴标签 g(z)=max{0,z} 未被 OCR 检出（文本层有）；CER vs 文本层 0.065、vs rapid3 0.015；正文矩阵(6.7)-(6.9)识别正常",
+      "severity": "medium"
+    },
+    {
+      "page": 332,
+      "type": "order",
+      "detail": "图9.15 整页仅图+图注：图内标签输出序 Output->Input 与视觉一致，但竖排 Channel coordinates 碎裂为 coordinates|Channel 两框；注意文本层自身顺序(Input->Output)反而与视觉不符",
+      "severity": "medium"
+    },
+    {
+      "page": 3,
+      "type": "missed_content",
+      "detail": "目录页点引导符与对齐版式被 OCR 压平（848->308 原始字符，-64%），页码-标题对应关系丢失；word 级 CER≈0；p5 同类（1929->569）",
+      "severity": "low"
+    },
+    {
+      "page": 3,
+      "type": "other",
+      "detail": "inventory 的 tocCandidatePages 为空：tocLike 检测对中文点引导目录失效（p3-28 共26页目录全部漏标），下游若依赖该字段选目录页会漏",
+      "severity": "medium"
+    },
+    {
+      "page": 404,
+      "type": "other",
+      "detail": "needsOcr 边界漏标：该页仅44字符（章末短页），高于约40字符阈值未标 needsOcr，而同类的 442(13字符) 已标；阈值附近短页有漏检风险",
+      "severity": "low"
+    },
+    {
+      "page": 29,
+      "type": "other",
+      "detail": "inventory chHeadPages=373 虚高：每页页眉“第X章 章名”都被计为 chHeads，无法直接区分真章首（实际20个）",
+      "severity": "low"
+    },
+    {
+      "page": 146,
+      "type": "garble",
+      "detail": "随机样页 vs rapid3 参考 CER 0.0228（样页第二差）：OCR 多出+44字符，如插入 distribution)，p( 等，属识别模型小差异，无实质损失",
+      "severity": "low"
+    }
+  ],
+  "conclusions": "本书为原生数字版PDF（30.8MB/738页）：无水印、无倾斜、无扫描噪声，文本层覆盖730/738页且质量极高（word级CER vs OCR mean=0.0175；除公式/图注页外均≈0）。最优管线即 Round B 的 text_layer_full（78.3万字符/21.9s），OCR仅需对8个needsOcr短页兜底（多为Part分隔页/封面/目录尾）。样页OCR速度1192ms/页(0.84页/s)，全书OCR约需15分钟且无必要。唯一系统性风险是公式密集页：矩阵类公式行序错乱+定界符丢失（p247字符损失16%，CER 0.148为纯文本页30倍以上），图内旋转标签易漏检；目录页点引导符在OCR下不可恢复（文本层可完整保留）。inventory的toc检测失效与chHeads虚高需在上游修正。"
+}

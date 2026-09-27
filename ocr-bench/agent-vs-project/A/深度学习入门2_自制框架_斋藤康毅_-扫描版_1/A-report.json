@@ -1,0 +1,71 @@
+{
+  "book": "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF",
+  "slug": "深度学习入门2_自制框架_斋藤康毅_-扫描版_1",
+  "pages": 504,
+  "needsOcrPages": 10,
+  "zeroTextPages": 9,
+  "tocCandidatePages": [13, 14, 15, 16, 17, 18, 19, 20, 21],
+  "chHeadPages": 0,
+  "samples": {
+    "ocrPages": [1, 2, 13, 15, 25, 38, 83, 106, 118, 120, 168, 185, 200, 236, 255, 300, 400, 401, 450],
+    "visualPages": [25, 255, 200, 400, 450],
+    "reasons": "封面/版权: p1,p2；目录候选: p13,p15（inventory tocLike=0 漏检，人工从文本层发现目录实为 p13-21）；章首候选: p25,p83,p185,p255,p400,p401（zeroText 页 + 第5阶段导言页）；低字数页: p38,p106,p118,p200（p200 兼为 GT 真值页）；suspRatio 全书恒为 0.0 无法取最高，改取样页字符数最高的 2 个高密度代码页 p168(791c),p236(820c) 替代并记录；随机 3: p120,p300,p450（p450 兼为 GT 真值相邻代码页）。p400 为 gt-vision 真值页必选。共 19 页 ≤22。"
+  },
+  "ocrSampleStats": {
+    "n": 19,
+    "avgMs": 1016.0,
+    "pagesPerS": 0.98,
+    "avgChars": 309.0
+  },
+  "cerVsTextlayer": {
+    "n": 13,
+    "mean": 0.2023,
+    "worst": [
+      { "page": 450, "cer": 0.5118 },
+      { "page": 200, "cer": 0.3952 },
+      { "page": 13, "cer": 0.343 },
+      { "page": 106, "cer": 0.2422 },
+      { "page": 168, "cer": 0.2295 }
+    ]
+  },
+  "cerVsRapid3Ref": {
+    "n": 19,
+    "mean": 0.0725,
+    "worst": [
+      { "page": 255, "cer": 0.8667 },
+      { "page": 450, "cer": 0.3351 },
+      { "page": 200, "cer": 0.0872 },
+      { "page": 2, "cer": 0.0519 },
+      { "page": 168, "cer": 0.0163 }
+    ],
+    "charDelta": 78
+  },
+  "chapters": [
+    { "page": 24, "title": "第1阶段 自动微分", "pattern": "第X阶段导言页(标题+导言同页)+空白反面页；含步骤1-10，书页1-58" },
+    { "page": 82, "title": "第2阶段 用自然的代码表达", "pattern": "同上；步骤11-24，书页59-160" },
+    { "page": 184, "title": "第3阶段 实现高阶导数", "pattern": "同上；步骤25-36，书页161-244" },
+    { "page": 266, "title": "第4阶段 创建神经网络", "pattern": "同上；步骤37-51，书页245-376" },
+    { "page": 400, "title": "第5阶段 DeZero高级挑战", "pattern": "同上；步骤52-60，书页377-462；后有专栏与参考文献 p483-502" }
+  ],
+  "visualFindings": [
+    { "page": 25, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "近空白反面页：仅左上角反向透印幽灵字迹（可辨「阶段/自动微分」残影），RapidOCR 检测为空属正常。zeroText≠内容丢失，实为空白页。" },
+    { "page": 255, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "整页巨幅计算图插图（Mul/Add 节点密布，无题注无正文），文本层 0 字符合理；OCR 仅得 15 字符噪声(COX/A/1716)。" },
+    { "page": 200, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "单栏。页眉「步骤26 计算图的可视化(2)|177」+整页图26-3 Goldstein-Price计算图+图注+末尾2行正文。扫描干净无倾斜。OCR 与文本层均把图内 Mul/Add/Pow 节点标签读入正文流，造成对 GT 的 CER 虚高(0.38/0.18)。" },
+    { "page": 400, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "第5阶段章首导言页：蓝色大字标题「第5阶段 DeZero高级挑战」+单栏导言。扫描干净。视觉阅读序=OCR顺序=文本层顺序，OCR 与 GT 完全一致(CER 0.0000)。证实阶段标题印在导言页上，其后 p401 为空白反面页。" },
+    { "page": 450, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "单栏。上下两幅矩阵示意图(图57-4 im2col 展开、图57-5 pooling 流程)夹约3行正文。图内大量数字矩阵被 OCR/文本层读入 → myOCR vs TL CER 0.51、vs rapid3 0.34，皆为图内数字噪声而非真实乱码。" }
+  ],
+  "defects": [
+    { "page": 2, "type": "garble", "detail": "文本层书名误识为「深度学习入门8:」(应为入门2)，数字级错误出现在版权/书名页", "severity": "medium" },
+    { "page": 1, "type": "missed_content", "detail": "封面完全无文本层(chars=0)；视觉 OCR 可读出 オライリー・ジャパン/TURING 丛书名/书名/出版社等 136 字符。隐藏层整页漏识", "severity": "medium" },
+    { "page": 5, "type": "garble", "detail": "文本层 O'Reilly 介绍页大面积乱码（如「米孜fì J - bL lílJ」「分.;r:创新知识」），近乎不可读（证据来自只读 textlayer 参考）", "severity": "high" },
+    { "page": 13, "type": "garble", "detail": "目录页(实为 p13-21，inventory tocLike=0 漏检)：罗马数字页码乱码(IIIJ I气/XVIJ)、引导点噪声、条目替换错(变茧←变量、的数←函数)", "severity": "medium" },
+    { "page": 24, "type": "garble", "detail": "第1阶段导言页标题被文本层误识为「第4 阶段」(正文明确是进入第1阶段)，若用文本层抽章节目录将得到错误章名", "severity": "medium" },
+    { "page": 236, "type": "code", "detail": "文本层系统性损坏代码标识符：__init__.py→「一init__.py」、core.py→「corc.py」、「|大| 为」←因为；同页视觉 OCR 全部正确。编程书中隐藏文本层的代码/标识符不可信", "severity": "high" },
+    { "page": 200, "type": "figure", "detail": "图密集页：计算图节点标签(Mul/Add/Pow)被文本层与 OCR 当正文读入，CER vs GT 分别 0.180/0.380；缺图区过滤", "severity": "high" },
+    { "page": 450, "type": "figure", "detail": "矩阵示意图数字被大量读入正文流（myOCR 622 字符中图内数字约占一半），vs TL CER 0.51，实际正文仅3行", "severity": "high" },
+    { "page": 255, "type": "figure", "detail": "整页巨幅计算图插图无题注、无任何文本元数据，文本层/OCR 均无法描述该图内容", "severity": "low" },
+    { "page": 25, "type": "other", "detail": "空白反面页带反向透印幽灵字迹，inventory 误标 needsOcr=true；同类页 83/185/399/401（及疑似 256/267）。needsOcr=10 实为 9 空白/整页图 + 1 封面，全页 OCR 不丢内容但浪费算力", "severity": "low" },
+    { "page": 2, "type": "other", "detail": "全书核对：文本层总量实测 231,097 字符(459/页) < rapid3 参考 292,012(579/页)，与 Round B「textlayer 33.8万 > rapid3 23万」结论相反；Round B 计数口径需复核", "severity": "low" }
+  ],
+  "conclusions": "本书确为「带隐藏 OCR 文本层的可搜索扫描版」（504页，TL覆盖495/504页）。隐藏层质量分层明显：常规正文页接近可用（GT p400 CER=0.0115，但存在 巾←中、1'5←书、入门8←入门2 等系统性替换错），代码标识符系统性损坏（__init__→一init__，编程书硬伤），章首艺术标题与目录页码噪声大，封面整页漏识，9 个 zeroText 页实为空白反面页/整页图（非内容丢失）。GT 裁定：干净正文页视觉 OCR 略优于文本层（p400 0.0000 vs 0.0115；p236 代码 OCR 全对），图密集页两者都被图内标签污染、文本层反而更接近 GT（p200 0.18 vs 0.38）只因它读得更少而非更准。文本层总量实测 23.1万 < rapid3 29.2万，Round B 的 33.8万>23万 不成立，text_layer_full 标签技术上为真但具误导性。结论：这种书不应盲信文本层——可作检索/目录骨架，但正文本体应以 OCR 为准（zoom1.5 实测 0.98 页/s，全书约 8.6 分钟，成本低），并需增加图区过滤以消除节点标签/矩阵数字对正文流的污染；目录与章名建议以 OCR+人工校对重建，勿直接采信文本层。"
+}

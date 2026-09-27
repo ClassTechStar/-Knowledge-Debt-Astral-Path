@@ -1,0 +1,85 @@
+{
+  "book": "Python编程：从入门到实践（第3版）.pdf",
+  "slug": "Python编程_从入门到实践_第3版",
+  "pages": 732,
+  "needsOcrPages": 13,
+  "zeroTextPages": 4,
+  "tocCandidatePages": [],
+  "chHeadPages": 104,
+  "samples": {
+    "ocrPages": [1, 3, 4, 19, 46, 150, 164, 284, 339, 340, 388, 407, 452, 551, 604, 608, 622, 633, 650, 663, 728],
+    "visualPages": [4, 46, 340, 452, 604],
+    "reasons": "封面/版权：1(零文本封面)、3(版权页)；目录候选：4、19（inventory tocLike 未识别，实际目录在 4-23 页，视觉已证实）；章首 6：46(ch1)/164(ch6)/284(ch10)/339(第二部分分隔)/552(ch18)/633(ch20)；低字数 4（中段并优先纳入上轮 worst 名单）：407、452、604、650；suspRatio 全书为 0，无候选，改取 needsOcr/零文本替补：340、551；随机 3：150、388、622；另补上轮 worst 608、663 与末尾 needsOcr 728。共 21 页 ≤22。"
+  },
+  "ocrSampleStats": {
+    "n": 21,
+    "avgMs": 1457.6,
+    "pagesPerS": 0.686,
+    "avgChars": 375.5
+  },
+  "cerVsTextlayer": {
+    "n": 15,
+    "mean": 0.0912,
+    "worst": [
+      {"page": 608, "cer": 0.5322},
+      {"page": 604, "cer": 0.3515},
+      {"page": 663, "cer": 0.3296},
+      {"page": 3, "cer": 0.1529},
+      {"page": 284, "cer": 0.0014}
+    ]
+  },
+  "cerVsRapid3Ref": {
+    "n": 20,
+    "mean": 0.0046,
+    "worst": [
+      {"page": 604, "cer": 0.0478},
+      {"page": 1, "cer": 0.0435}
+    ],
+    "charDelta": 8
+  },
+  "chapters": [
+    {"page": 44, "title": "第一部分　基础知识", "pattern": "第X部分　标题"},
+    {"page": 46, "title": "第 1 章　起步", "pattern": "第X章　标题"},
+    {"page": 62, "title": "第 2 章　变量和简单的数据类型", "pattern": "第X章　标题"},
+    {"page": 87, "title": "第 3 章　列表简介", "pattern": "第X章　标题"},
+    {"page": 107, "title": "第 4 章　操作列表", "pattern": "第X章　标题"},
+    {"page": 137, "title": "第 5 章　if 语句", "pattern": "第X章　标题"},
+    {"page": 164, "title": "第 6 章　字典", "pattern": "第X章　标题"},
+    {"page": 192, "title": "第 7 章　用户输入和 while 循环", "pattern": "第X章　标题"},
+    {"page": 212, "title": "第 8 章　函数", "pattern": "第X章　标题"},
+    {"page": 249, "title": "第 9 章　类", "pattern": "第X章　标题"},
+    {"page": 284, "title": "第 10 章　文件和异常", "pattern": "第X章　标题"},
+    {"page": 318, "title": "第 11 章　测试代码", "pattern": "第X章　标题"},
+    {"page": 339, "title": "第二部分　项目", "pattern": "第X部分　标题"},
+    {"page": 342, "title": "项目 1（第 12 章　武装飞船）", "pattern": "项目N + 第X章　标题"},
+    {"page": 383, "title": "第 13 章　外星人", "pattern": "第X章　标题"},
+    {"page": 417, "title": "第 14 章　记分", "pattern": "第X章　标题"},
+    {"page": 452, "title": "项目 2　数据可视化", "pattern": "项目N　标题"},
+    {"page": 453, "title": "第 15 章　生成数据", "pattern": "第X章　标题"},
+    {"page": 492, "title": "第 16 章　下载数据", "pattern": "第X章　标题"},
+    {"page": 527, "title": "第 17 章　使用 API", "pattern": "第X章　标题"},
+    {"page": 551, "title": "项目 3　Web 应用程序", "pattern": "项目N　标题"},
+    {"page": 552, "title": "第 18 章　Django 入门", "pattern": "第X章　标题"},
+    {"page": 592, "title": "第 19 章　用户账户", "pattern": "第X章　标题"},
+    {"page": 633, "title": "第 20 章　设置应用程序的样式", "pattern": "第X章　标题"}
+  ],
+  "visualFindings": [
+    {"page": 4, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "目录首页（蓝紫色字），条目带缩进层级，无页码/点线（原书即如此）；文本层与视觉完全一致，OCR 顺序正确"},
+    {"page": 46, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "第1章章首页：大标题+蟒蛇图标插图+导语段；OCR 标题与正文顺序正确"},
+    {"page": 340, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "纯空白页（零文本），为书内空白页而非内容丢失"},
+    {"page": 452, "columns": 1, "hasCode": false, "hasTable": false, "hasFormula": false, "hasFigure": false, "orderOk": true, "notes": "项目分隔页，仅一行标题“项目 2　数据可视化”，文本层 8 字符属正常"},
+    {"page": 604, "columns": 1, "hasCode": true, "hasTable": false, "hasFormula": false, "hasFigure": true, "orderOk": true, "notes": "代码块(HTML 模板)+正文+浏览器截图(图19-2)；截图内英文为光栅文本、不在文本层，OCR 可读出；OCR 将 </ul> 误为 </u1>；视觉阅读序=OCR 序"}
+  ],
+  "defects": [
+    {"page": 608, "type": "missed_content", "detail": "文本层缺失页面中部浏览器截图（图 19-3）内的光栅文本约 850 字符：文本层仅 359 字符，OCR 读出 1210 字符；两轮 OCR（本测与 rapid3）内容一致，证实是文本层缺图内文字而非 OCR 错误", "severity": "high"},
+    {"page": 604, "type": "missed_content", "detail": "文本层缺失图 19-2 浏览器截图内文本（文本层 284 vs OCR 561 字符），纯文本层管线会丢整块截图内容", "severity": "high"},
+    {"page": 663, "type": "missed_content", "detail": "文本层缺失终端交互截图的部分文本（文本层 529 vs OCR 907 字符，platform.sh 部署交互）", "severity": "medium"},
+    {"page": 1, "type": "other", "detail": "封面无文本层（零文本页）；OCR 可完整识别但阅读顺序略乱：封面广告语“热销超过 250 万册”与“陶俊杰审”文本框交错", "severity": "low"},
+    {"page": 604, "type": "garble", "detail": "代码块中 </ul> 被 OCR 识别为 </u1>（字母 l 与数字 1 混淆），代码页此类混淆风险中等", "severity": "low"},
+    {"page": 663, "type": "garble", "detail": "终端截图中的序号符号 ❷❸ 被 OCR 识别为 0/e，特殊符号还原失真", "severity": "low"},
+    {"page": 340, "type": "blank", "detail": "整页空白（书内空白页），零文本层属正常", "severity": "low"},
+    {"page": 36, "type": "blank", "detail": "仅含不换行空格的近空白页（前言前过渡页）", "severity": "low"},
+    {"page": 732, "type": "blank", "detail": "末页零文本（封底/空白页）", "severity": "low"}
+  ],
+  "conclusions": "本书为原生数字版 PDF（5.8MB，732 页），文本层覆盖 719/732 页，仅 13 页低字数（多为项目分隔页/空白页/封面），inventory 未识别出目录页（实际目录在 4-23 页，视觉证实）。文本层质量极高：15 个有文本样页中 11 页与 OCR 的 CER=0，平均 0.0912 全部由 3 个截图页拉高。p589-663 区（第 18-20 章 Django/部署内容）存在浏览器/终端截图，其内部英文为光栅文本、不在文本层——这正是 Round B 该区域 worst CER≈0.34 的成因：对比基准（文本层）本身缺内容，两轮 OCR 结果高度一致（vs rapid3 平均 CER 0.0046，字符差仅 +8）。OCR 速度 0.69 页/s（zoom 1.5，平均 1458ms/页，平均 375 字符/页）。结论：以文本层为主提取即可覆盖正文；需 OCR 补充的仅为 13 个 needsOcr 页及第 18-20 章截图内文本；整体评级 A-（扣分项：截图区文本层缺失、代码 l/1 混淆、封面无文本层）。"
+}

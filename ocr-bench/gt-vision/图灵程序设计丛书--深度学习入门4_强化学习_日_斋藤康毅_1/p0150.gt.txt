@@ -1,0 +1,9 @@
+5.3 蒙特卡洛方法的实现 | 131
+step 方法会将行动作为参数。env.step(action) 这行代码会对环境执行行动 action，执行结果是得到 next_state、reward 和 done 这 3 个值。next_state 是下一个状态，reward 是奖励，done 是回合是否结束的标志位。结合图 5-11，可以更清晰地了解 state、action、reward 和 next_state 之间的关系。
+图5-11 代码和数学式之间的对应关系
+如图 5-11 所示，设当前时刻为 t，S_t 对应于 state，A_t 对应于 action。智能代理在时刻 t 采取行动，获得奖励 R_t，并进入下一个状态 S_{t+1}。此时获得的奖励 R_t 对应于 reward，下一个状态 S_{t+1} 对应于 next_state。
+在 3×4 网格世界中，状态迁移是确定性的，但也有随机性的情况（例如，当智能代理采取向右前进的行动时，有 80% 的概率会向右移动，20% 的概率会留在原地）。在随机性状态迁移的情况下，即使在同一状态下执行相同的行动，step 方法每次返回的值也不同。
+GridWorld 类通过 step 方法使智能代理采取行动，以获得样本数据。GridWorld 类还提供了 reset 方法。这个方法被用来将环境重置为初始状态。下面是 reset 方法的使用示例。
+env = GridWorld()
+state = env.reset()
+如上述代码所示，reset 方法会返回初始状态（state）。以上是对 GridWorld 类的补充说明。

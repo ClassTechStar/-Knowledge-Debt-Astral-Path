@@ -1,0 +1,158 @@
+{
+ "Kotlin编程实践：Kotlin从入门到实战.pdf": {
+  "ok": true,
+  "elapsed_s": 4.2,
+  "chars": 178208,
+  "mode": "pdfium",
+  "ocrPages": null,
+  "notes": [
+   "extractor:pdfium_only",
+   "targeted_ocr:targets=51_merged=1_cap=600",
+   "text_layer_full",
+   "deep_parse:ch=13,sec=89,q=141"
+  ]
+ },
+ "Go语言从入门到精通.pdf": {
+  "ok": true,
+  "elapsed_s": 67.2,
+  "chars": 178366,
+  "mode": "pdfium",
+  "ocrPages": null,
+  "notes": [
+   "extractor:pdfium_only",
+   "targeted_ocr:targets=85_merged=77_cap=600",
+   "text_layer_full",
+   "deep_parse:ch=19,sec=240,q=316"
+  ]
+ },
+ "大模型应用开发：动手做 AI Agent (黄佳) .pdf": {
+  "ok": true,
+  "elapsed_s": 342.3,
+  "chars": 355228,
+  "mode": "pdfium",
+  "ocrPages": null,
+  "notes": [
+   "extractor:pdfium_only",
+   "text_layer_sparse:density=0.0",
+   "targeted_ocr:targets=290_merged=290_cap=600",
+   "deep_parse:ch=10,sec=240,q=280"
+  ]
+ },
+ "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF": {
+  "ok": true,
+  "elapsed_s": 25.0,
+  "chars": 294011,
+  "mode": "pdfium",
+  "ocrPages": null,
+  "notes": [
+   "extractor:pdfium_only",
+   "overlay_suspect:sim=0.85",
+   "targeted_ocr:targets=35_merged=10_cap=600",
+   "text_layer_full",
+   "deep_parse:ch=52,sec=240,q=448"
+  ]
+ },
+ "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf": {
+  "ok": true,
+  "elapsed_s": 14.4,
+  "chars": 213860,
+  "mode": "pdfium",
+  "ocrPages": null,
+  "notes": [
+   "extractor:pdfium_only",
+   "targeted_ocr:targets=14_merged=5_cap=600",
+   "text_layer_full",
+   "deep_parse:ch=10,sec=188,q=228"
+  ]
+ },
+ "C#从入门到精通（第7版）+(明日科技)+.pdf": {
+  "ok": true,
+  "elapsed_s": 121.0,
+  "chars": 342066,
+  "mode": "pdfium",
+  "ocrPages": null,
+  "notes": [
+   "extractor:pdfium_only",
+   "targeted_ocr:targets=149_merged=136_cap=600",
+   "text_layer_full",
+   "deep_parse:ch=25,sec=240,q=340"
+  ]
+ },
+ "深度学习进阶：自然语言处理 (斋藤康毅) .pdf": {
+  "ok": true,
+  "elapsed_s": 17.9,
+  "chars": 277745,
+  "mode": "pdfium",
+  "ocrPages": null,
+  "notes": [
+   "extractor:pdfium_only",
+   "radical_fix:pages=10",
+   "targeted_ocr:targets=24_merged=6_cap=600",
+   "deep_parse:ch=8,sec=231,q=263"
+  ]
+ },
+ "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf": {
+  "ok": true,
+  "elapsed_s": 37.7,
+  "chars": 225993,
+  "mode": "pdfium",
+  "ocrPages": null,
+  "notes": [
+   "extractor:pdfium_only",
+   "targeted_ocr:targets=43_merged=8_cap=600",
+   "text_layer_full",
+   "deep_parse:ch=23,sec=11,q=103"
+  ]
+ },
+ "Java从入门到精通（第6版） (明日科技) .pdf": {
+  "ok": true,
+  "elapsed_s": 98.1,
+  "chars": 350516,
+  "mode": "pdfium",
+  "ocrPages": null,
+  "notes": [
+   "extractor:pdfium_only",
+   "targeted_ocr:targets=108_merged=95_cap=600",
+   "text_layer_full",
+   "deep_parse:ch=23,sec=240,q=332"
+  ]
+ },
+ "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf": {
+  "ok": true,
+  "elapsed_s": 28.6,
+  "chars": 776097,
+  "mode": "pdfium",
+  "ocrPages": null,
+  "notes": [
+   "extractor:pdfium_only",
+   "targeted_ocr:targets=32_merged=2_cap=600",
+   "text_layer_full",
+   "deep_parse:ch=20,sec=240,q=320"
+  ]
+ },
+ "Python编程：从入门到实践（第3版）.pdf": {
+  "ok": true,
+  "elapsed_s": 50.4,
+  "chars": 468296,
+  "mode": "pdfium",
+  "ocrPages": null,
+  "notes": [
+   "extractor:pdfium_only",
+   "targeted_ocr:targets=74_merged=5_cap=600",
+   "text_layer_full",
+   "deep_parse:ch=20,sec=240,q=320"
+  ]
+ },
+ "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf": {
+  "ok": true,
+  "elapsed_s": 17.2,
+  "chars": 202680,
+  "mode": "pdfium",
+  "ocrPages": null,
+  "notes": [
+   "extractor:pdfium_only",
+   "targeted_ocr:targets=22_merged=5_cap=600",
+   "deep_parse:ch=8,sec=240,q=272"
+  ]
+ }
+}

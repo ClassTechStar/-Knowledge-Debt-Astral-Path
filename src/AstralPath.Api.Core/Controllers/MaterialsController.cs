@@ -192,7 +192,7 @@ public sealed class MaterialsController : ControllerBase
         if (candidates.Count == 0)
             return new UploadOutcome(null, rejected);
 
-        if (ocr is not ("none" or "quick" or "standard"))
+        if (ocr is not ("none" or "quick" or "standard" or "full"))
             ocr = "standard";
 
         var created = new List<MaterialDoc>();
@@ -302,6 +302,16 @@ public sealed class MaterialsController : ControllerBase
             return missing;
         }
         var payload = await MaterialPipeline.RunOcrAsync(material.Path, material.OcrMode ?? "standard");
+        // P4-4：ok:false（python 内部异常被 catch 后仍写出 payload）→ 登记 failed 并返回，不生成/入库图谱
+        if (payload.ValueKind == JsonValueKind.Object
+            && payload.TryGetProperty("ok", out var okEl)
+            && okEl.ValueKind == JsonValueKind.False)
+        {
+            var errMsg = payload.TryGetProperty("error", out var er) ? er.GetString() : null;
+            var failedDoc = MaterialPipeline.ToDto(material.Id, material.Name, material.Path, material.SizeBytes, payload, material.OcrMode ?? "standard");
+            MaterialRegistry.UpsertMaterial(failedDoc);
+            return failedDoc with { Error = string.IsNullOrWhiteSpace(errMsg) ? "OCR 管线返回 ok=false" : errMsg };
+        }
         var doc = MaterialPipeline.ToDto(material.Id, material.Name, material.Path, material.SizeBytes, payload, material.OcrMode ?? "standard");
         var graph = MaterialPipeline.ToGraph(doc, payload);
         var tasks = MaterialTaskGenerator.GenerateFromGraph(graph, material.Name, 6);
@@ -323,7 +333,11 @@ public sealed class MaterialsController : ControllerBase
                 tasks = TextbookQuestionBank.ToTodayTasks(material.Name.Replace("C_", "C#"), 6);
         }
         MaterialRegistry.UpsertMaterial(doc);
-        MaterialRegistry.UpsertGraph(graph, tasks);
+        // P4-4：空图谱（0 节点 0 边）不入库，避免前端把空壳当成功
+        if (graph.Nodes.Count > 0 || graph.Edges.Count > 0)
+        {
+            MaterialRegistry.UpsertGraph(graph, tasks);
+        }
         MaterialRegistry.MergeLatestTasks(material.Name, tasks);
         return doc;
     }
