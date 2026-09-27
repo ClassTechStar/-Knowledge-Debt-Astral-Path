@@ -275,6 +275,47 @@ def extract_terms_weighted(text: str, chapter_offsets: list[tuple[int, str]], li
                 if k >= 0:
                     ch_counts[term][bound_names[k]] += 1
 
+    # P6-5 词典双通道：jieba 高频中文词通道**始终运行**——词典是 CS 领域词表，
+    # 对数学/文史/传记类书覆盖≈0，而「词典命中数」类门控会被通用词命中骗过
+    # （传记书里 变量/类型/对象 也能凑够 14 个）。补位词不带词典加成（dom_w=1），
+    # 天然排在词典词之后；与既有术语去重（tok in counts 跳过）；jieba 缺失则跳过。
+    try:
+        import jieba
+
+        jieba.setLogLevel(60)
+        _CN_STOP = {
+            "我们", "一个", "这个", "什么", "没有", "可以", "进行", "使用", "通过",
+            "如果", "因此", "但是", "然后", "以及", "或者", "对于", "其中", "需要",
+            "时候", "现在", "可能", "应该", "如何", "这些", "那些", "本章", "小结",
+            "习题", "参考", "文献", "目录", "前言", "后记", "附录", "出版", "章节",
+            "如下", "以下", "上面", "下面", "出现", "表示", "定义", "方法", "问题",
+            "结果", "时间", "顺序", "方式", "情况", "例如", "说明", "介绍", "讲解",
+                "学习", "开始", "结束", "所以", "因为", "只是", "还是", "认为",
+                "甚至", "然而", "这样", "这种", "就是", "当时", "说道", "这一",
+                "不过", "如今", "一次", "之后", "以前", "成了", "成为", "来到",
+            }
+        sample = text[:150000]
+        cand: dict[str, int] = defaultdict(int)
+        for tok in jieba.lcut(sample):
+            if 2 <= len(tok) <= 12 and re.fullmatch(r"[一-鿿]{2,12}", tok) and tok not in _CN_STOP:
+                cand[tok] += 1
+        added = 0
+        for tok, c in sorted(cand.items(), key=lambda kv: (-kv[1], kv[0])):
+            if c < 3 or tok in counts:
+                continue
+            pos = text.find(tok)
+            counts[tok] = c
+            first_pos.setdefault(tok, pos if pos >= 0 else 10**9)
+            if bound_offs and pos >= 0:
+                k = bisect.bisect_right(bound_offs, pos) - 1
+                if k >= 0:
+                    ch_counts[tok][bound_names[k]] += c
+            added += 1
+            if added >= limit:
+                break
+    except Exception:
+        pass  # jieba 不可用：词典通道结果照常返回
+
     def score(term: str) -> float:
         freq = counts[term]
         pos = first_pos.get(term, 10**9)
@@ -285,8 +326,21 @@ def extract_terms_weighted(text: str, chapter_offsets: list[tuple[int, str]], li
         return freq * pos_w * dom_w * len_w
 
     ranked = sorted(counts.keys(), key=lambda t: (-score(t), t))
+    # P6-5 中文配额：jieba 补位词分数天然低于词典/专名词，纯按分数会全部落榜、
+    # 非中文书图谱依旧「全英文」。强制保留 ≥ max(8, limit//3) 个中文术语，
+    # 用低分非中文术语换入分数最高的中文补位词。
+    cn_quota = max(8, limit // 3)
+    selected = ranked[:limit]
+    cn_in = [t for t in selected if any("一" <= c <= "鿿" for c in t)]
+    if len(cn_in) < cn_quota:
+        cn_extra = [t for t in ranked[limit:] if any("一" <= c <= "鿿" for c in t)]
+        need = min(cn_quota - len(cn_in), len(cn_extra))
+        drop = [t for t in reversed(selected) if not any("一" <= c <= "鿿" for c in t)][:need]
+        for t in drop:
+            selected.remove(t)
+        selected = sorted(selected + cn_extra[:need], key=lambda t: (-score(t), t))
     out = []
-    for t in ranked[:limit]:
+    for t in selected:
         # 归属章节：首次出现所在章节
         host = None
         pos = first_pos.get(t, 0)

@@ -2,7 +2,7 @@
 
 日期：2026-09-28 · 范围：`C:\Users\18948\Downloads\PDF TEST` 全部 12 本 PDF（6,362 页）
 前置：P0–P3 十七项已落地（见 `docs/ocr-p0-p3-completion.md`）——本轮为 P0–P3 之后的第一轮全量复核与新一轮任务清单。
-**➤ 实施结果（P4–P6）已全部执行完毕，见文末「九、实施结果」——终版覆盖率 100.5%，门禁 PASS。**
+**➤ 实施结果（P4–P6 含全部遗留项）已执行完毕，见文末「九、实施结果」——终版覆盖率 100.5%，门禁 PASS；P6-1/2/3/8 与 P5-5/P6-5 遗留亦已清零。**
 
 ---
 
@@ -190,18 +190,18 @@ python tools/zc_compare_round2.py
 | P5-2 章节抽取统一 | ✅（就地统一，非共享模块） | 对方（deep_chapters + kg_algorithm 双侧同模式表） | 自制框架 ch=1→**55**；强化学习 ch=1→**10** |
 | P5-3 章节标题清洗 | ✅ | 对方（clean_chapter_title 扩展 + 截断符表） | 抽查标题无粘连 |
 | P5-4 魔法数显式上报 | ✅ | 对方（cap 上报）+ 本会话（`deepStats.chaptersTotal/sectionsTotal/sectionsCapped`） | Java：549 节抽到/240 入库/`sectionsCapped=true` |
-| P5-5 静默降级显式化 | ✅ 部分 | 对方（extractor/full_page_ocr/targeted_ocr/overlay 等 notes 全显式） | 快速路径 `quick_capped`、`ocrUsed` 子串误判、RapidOCR 惰性探针仍遗留 |
+| P5-5 静默降级显式化 | ✅ | 对方（notes 全显式）+ 本会话收尾（`quick_capped:N/M`、`ocrUsed` 改 `detail["ocrUsed"]` 显式布尔、RapidOCR 惰性实例化探针失败回落 tesseract） | 合成用例 + 193 测试绿 |
 | P5-6 性能修复 | ✅ 部分 | 对方（超时按模式参数化 20/40min；rapid 路径 finally 清理 PNG） | tesseract 双跑、PdfDocument 复用仍遗留（tesseract 已非默认引擎，低优先） |
-| P5-7 缓存版本化 | ✅ | 对方（key 含 engine/scale/preprocess，`~/.astralpath/ocr-cache/prod`） | 换引擎/倍率自动失效 |
+| P5-7 缓存版本化 | ✅ | 对方（key 含 engine/scale/preprocess）+ 本会话二轮（补 `PIPELINE_VERSION=3.2`，通道/纠错规则变更整体失效） | 换引擎/倍率/版本自动失效 |
 | P5-8 硬编码路径 | ✅ | 对方（XiaomiMiMo 旧路径移除，仓库相对优先） | grep 无残留 |
 | P6-4 kg 环处理/分词/边强度 | ✅ | 本会话（kg_builder：jieba+停用词、TextRank 收敛判据、强边替换弱边、remove_cycles 按 (edgeType,weight) 破环、词挂章取最高频章） | 合成环 3 用例过；强化学习术语从 `in/for` → `老虎机/贝尔曼方程/策略`；jieba 装入双环境 |
-| P6-5 术语词典双通道 | ◐ 部分 | 对方（P2-13 按章分布）；jieba 兜底由本会话在 kg_builder 实现 | kg_algorithm 词典硬编码仍遗留 |
+| P6-5 术语词典双通道 | ✅ | 对方（P2-13 按章分布）+ 本会话二轮（kg_algorithm 始终运行 jieba 中文通道 + 中文配额 max(8, limit//3)） | 黄仁勋传记 cn 0→26（黄仁勋/芯片/人工智能/团队）；强化学习 cn 24（策略/状态/贝尔曼/老虎机） |
 | P6-6 出题洗牌 | ✅ | 本会话（以 qid 哈希为种子的确定性洗牌，幂等） | 27 题 correctIndex 分布 4/8/10/5，重跑完全一致 |
 | P6-7 buildPlan 40min | ✅ | 本会话（每日累计上限+溢出顺延+同日去重；三份 index.html 同步 md5 一致） | 顺带修复 C3 XSS 回归（`.map(title)` 未转义，三份镜像同毒） |
-| P6-8 稳定哈希/重复 id | ❌ 未做 | — | 遗留 |
+| P6-8 稳定哈希/重复 id | ✅ | 本会话（PreviewDebts 改 SHA256 派生种子；ValidateGenerated/ExportGraphExtras 三处 ToDictionary 改 GroupBy 去重计 issues，重复 id 不再 500） | 193 测试绿 |
 | P6-9 对拍回归门禁 | ✅ | 本会话（`zc_compare_round2.py --gate`，<85% 红灯退出码 1） | 终版跑 PASS |
 | P6-10 探测工具自修 | ✅ | 本会话（TOC 三形态：章号点线/空格点线/成片页码尾；章首剔除页眉「页码行首」与页码尾行） | 花书 tocCand 0→15、chHead 373→84 |
-| P6-1/2/3 公式/代码/旋转通道 | ❌ 未做 | — | 遗留（见 9.4） |
+| P6-1/2/3 公式/代码/旋转通道 | ✅ | 本会话（二轮：代码页缩进重建+保守 token 纠错；公式密集页升倍率重试；±90° 旋转重试/增量附加；页缓存版本号 3.2 失效旧缓存） | Kotlin p180 CER 0.048→**0**、p89→**0.0094**（20 行缩进保留）；合成旋转页 849 字完整恢复；花书 p247 重试触发（TL 自带 PUA 伪字形，CER 0.17 为文本层缺陷上限） |
 
 ### 9.2 终版对拍（Round B' = 新管线 12 本重跑）
 
@@ -232,10 +232,22 @@ python tools/zc_compare_round2.py
 - `python tools/zc_compare_round2.py --gate` → **GATE PASS**
 - kg_builder 合成环 3 用例 + 真书图谱回归通过；出题洗牌幂等性验证通过
 
-### 9.4 遗留（下一轮候选）
+### 9.4 遗留清零（2026-09-28 二轮全部完成）
 
-1. **P6-1/2/3 内容专项通道**（公式矩阵/代码保真/旋转标签）——引擎层增强，需版面分类分流，建议独立立项；
-2. **P6-8** PreviewDebts 稳定哈希播种 + 重复节点 id 走 issues；
-3. P5-5 遗留三项：`quick_capped` 提示、`ocrUsed` 由显式布尔替代 notes 子串反推、RapidOCR 惰性实例化探针（失败回落 tesseract）；
-4. P6-5 kg_algorithm 术语词典仍为 ~30 词硬编码（jieba 兜底已在 kg_builder 生效，可平移）；
-5. 秒级抽查建议：大模型耗时 1.1s 说明**页缓存键未含 pipeline 版本**——管线大改后建议手动清 `~/.astralpath/ocr-cache` 或在 key 中加入管线版本常量。
+原 5 项遗留全部落地：
+
+1. **P6-1/2/3 内容专项通道** ✅（`ocr_pipeline.py`，PIPELINE_VERSION→3.2）
+   - **P6-2 代码保真**：`_looks_like_code`（代码标记行≥3）→ `_rapid_result_to_text(code=True)` 按行首 x 重建缩进（unit=0.5×词高中位数，60% 容差）→ `_fix_code_tokens` 保守纠错（圈码/©→①②③、词尾 O→0、数字夹 l/I→1）；`fix_ocr_text`/`clean_ocr_text` 改 rstrip 保缩进、缩进行禁软合并。实测：Kotlin p180 CER 0.048→0、p89→0.0094、p89 保留 20 行缩进。
+   - **P6-1 公式重试**：`_formula_dense`（数学符号≥12 且占比≥1.5%）→ `_one()` 内升倍率（≤3.2×）重识别，按（词字符+2×符号数）取优。花书 p247 重试触发；该页 CER 0.17 的剩余误差来自文本层自身 116 个 PUA 伪字形（对照基准本身失真），非通道缺陷。
+   - **P6-3 旋转文本**：`_vertical_box_count`（h>2.5w 且>页高 8%）→ ±90° 重试：整页更优（>1.15×）整体替换，竖排标签增量行附加（封顶 5 行防垃圾）。合成旋转页 849 字完整恢复；花书 p179 无回归（0.0676）。
+2. **P6-8** ✅：PreviewDebts `GetHashCode`→SHA256 派生种子（跨重启可复现）；`ValidateGenerated`/`ExportGraphExtras` 三处 `ToDictionary` 改 GroupBy 首个获胜 + 重复 id 计入 issues（不再 500）。
+3. **P5-5 三小项** ✅：`quick_capped:N/M` notes；`detail["ocrUsed"]` 显式布尔（`tesseract_unavailable` 不再误判 true）；`rapid_engine_usable()` 惰性探针失败回落 tesseract。
+4. **P6-5 kg_algorithm 词典双通道** ✅：jieba 中文通道**始终运行**（门控会被词典通用词骗过——传记里 变量/类型 也能凑数）+ 中文配额 `max(8, limit//3)` 强制保留。黄仁勋 cn 0→26、强化学习 cn 24。
+5. **页缓存管线版本** ✅：`PIPELINE_VERSION="3.2"` 进缓存 key——大模型 1.1s 全命中旧缓存的教训闭环，管线行为变更自动失效。
+
+### 9.5 二轮新增验证
+
+- `import ocr_pipeline`（系统/venv 双环境）+ 合成用例：token 纠错、代码检测正反例、缩进重建、公式判定正反例、竖排框计数
+- 真实页面：Kotlin p89/p180（代码）、花书 p247（公式重试）、合成旋转页 + 花书 p179（旋转）
+- `extract_terms_weighted` 双书验证：传记/强化学习中文术语 0→26/24
+- `dotnet build` 0 错误 + 5 测试项目 **193/193 绿**（含 P6-8 后回归）

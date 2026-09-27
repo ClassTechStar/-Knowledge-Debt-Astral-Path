@@ -473,7 +473,10 @@ public sealed class MaterialsController : ControllerBase
             return HttpResults.Fail(404, ErrorCodes.ResourceNotFound, "学生不存在");
 
         var inputs = new List<(string, string, string, string, double, double, int, int, double)>();
-        var rnd = new Random(studentId.GetHashCode());
+        // P6-8：稳定哈希播种——string.GetHashCode 进程间随机化（.NET 跨重启不同），
+        // 同一学生每次重启会得到不同的「知识债」预览；改用 SHA256 派生种子保证可复现。
+        var seedBytes = System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(studentId ?? ""));
+        var rnd = new Random(BitConverter.ToInt32(seedBytes, 0));
         foreach (var edge in graph.Edges)
         {
             var fromNode = graph.Nodes.FirstOrDefault(n => n.Id == edge.From);

@@ -279,6 +279,14 @@ public static class MaterialPipeline
         var ids = nodes.Select(n => n.Id).ToHashSet(StringComparer.Ordinal);
         var cycles = new List<string>();
 
+        // P6-8：重复节点 id 不再抛 ArgumentException（此前 ToDictionary 直抛 → GetGraph 500），
+        // 计入 issues 并按首个节点去重继续校验
+        var dupIds = nodes.GroupBy(n => n.Id, StringComparer.Ordinal)
+                          .Where(g => g.Count() > 1).Select(g => g.Key).ToList();
+        foreach (var d in dupIds)
+            issues.Add($"重复节点 id: {d}");
+        var distinctNodes = nodes.GroupBy(n => n.Id, StringComparer.Ordinal).Select(g => g.First()).ToList();
+
         // 自动教材图谱：只要求无环 + 节点/边合法，不套用会计课程包「≥40 边」口径
         if (nodes.Count < 1)
             issues.Add("节点数为 0");
@@ -290,8 +298,8 @@ public static class MaterialPipeline
                 issues.Add($"边权重非法: {e.From}->{e.To} weight={e.Weight}");
         }
 
-        // 无环检测（Kahn）
-        var adj = nodes.ToDictionary(n => n.Id, _ => new List<string>(), StringComparer.Ordinal);
+        // 无环检测（Kahn）——用去重后的节点表构建，重复 id 已计入 issues
+        var adj = distinctNodes.ToDictionary(n => n.Id, _ => new List<string>(), StringComparer.Ordinal);
         var indeg = ids.ToDictionary(i => i, _ => 0);
         foreach (var e in edges)
         {
@@ -325,7 +333,9 @@ public static class MaterialPipeline
     /// <summary>导出三元组/属性图/思维导图树（对齐 KnowledgeGraph 与 mind-map）。</summary>
     public static GraphExtras ExportGraphExtras(AutoKnowledgeGraph graph)
     {
-        var nameOf = graph.Nodes.ToDictionary(n => n.Id, n => n.Name, StringComparer.Ordinal);
+        // P6-8：重复 id 去重后构建（首个获胜），不抛 ArgumentException
+        var nameOf = graph.Nodes.GroupBy(n => n.Id, StringComparer.Ordinal)
+                                .ToDictionary(g => g.Key, g => g.First().Name, StringComparer.Ordinal);
         var triples = graph.Edges.Select(e => new
         {
             subject = nameOf.GetValueOrDefault(e.From, e.From),
@@ -355,7 +365,8 @@ public static class MaterialPipeline
             }).ToList()
         };
 
-        var children = graph.Nodes.ToDictionary(n => n.Id, _ => new List<string>(), StringComparer.Ordinal);
+        var children = graph.Nodes.GroupBy(n => n.Id, StringComparer.Ordinal)
+                                  .ToDictionary(g => g.Key, _ => new List<string>(), StringComparer.Ordinal);
         var parent = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (var e in graph.Edges)
         {
