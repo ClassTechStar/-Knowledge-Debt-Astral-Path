@@ -1,0 +1,89 @@
+[
+  {
+    "chars_a": 1035,
+    "chars_b": 1035,
+    "miss": 0,
+    "extra": 0,
+    "recall_b": 1.0,
+    "precision_b": 1.0,
+    "f1": 1.0,
+    "sections": {
+      "body": {
+        "miss": 31,
+        "extra": 0
+      },
+      "caption": {
+        "miss": 0,
+        "extra": 31
+      },
+      "math": {
+        "miss": 0,
+        "extra": 0
+      }
+    },
+    "book": "Kotlin编程实践：Kotlin从入门到实战.pdf",
+    "pages": [
+      20,
+      80,
+      150
+    ]
+  },
+  {
+    "chars_a": 1538,
+    "chars_b": 1545,
+    "miss": 28,
+    "extra": 21,
+    "recall_b": 0.9819,
+    "precision_b": 0.9863,
+    "f1": 0.9841,
+    "sections": {
+      "body": {
+        "miss": 152,
+        "extra": 19
+      },
+      "caption": {
+        "miss": 0,
+        "extra": 126
+      },
+      "math": {
+        "miss": 0,
+        "extra": 0
+      }
+    },
+    "book": "大模型应用开发：动手做 AI Agent (黄佳) .pdf",
+    "pages": [
+      10,
+      50,
+      100
+    ]
+  },
+  {
+    "chars_a": 1295,
+    "chars_b": 1732,
+    "miss": 437,
+    "extra": 0,
+    "recall_b": 0.7477,
+    "precision_b": 1.0,
+    "f1": 0.8556,
+    "sections": {
+      "body": {
+        "miss": 654,
+        "extra": 0
+      },
+      "caption": {
+        "miss": 0,
+        "extra": 217
+      },
+      "math": {
+        "miss": 0,
+        "extra": 0
+      }
+    },
+    "book": "Java从入门到精通（第6版） (明日科技) .pdf",
+    "pages": [
+      40,
+      200,
+      400
+    ]
+  }
+]

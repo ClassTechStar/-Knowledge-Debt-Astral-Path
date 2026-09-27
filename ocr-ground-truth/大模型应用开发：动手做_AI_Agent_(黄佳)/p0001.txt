@@ -1,0 +1,1 @@
+异步图书咖哥AI www.epubit.com 大模型应用开发 ent 黄佳丨著基于OpenAlAssistantsAPl、 LangChain、Llamalndex和 MetaGPT的智能体构建指南咖哥AI教学之旅继续吴恩达总结的四大Agent认知框架的代码实现 7个实战案例，一步一步动手构建智能体人民邮电出版社中国工信出版集团 POSTS&TELECOMPRESS

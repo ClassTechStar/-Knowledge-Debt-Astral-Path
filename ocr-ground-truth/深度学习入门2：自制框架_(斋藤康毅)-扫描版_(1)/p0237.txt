@@ -1,0 +1,1 @@
+214  I 第3 阶段实现高阶导数 214 第3阶段实现高阶导数斟_simple.py冲用中啊一 j core_simple.py中没有修改的类和函数也被复制到了dezero/core.py中虫如口Fu川nction 类幸相口uS J.ng旦一C∞onfi吨9 函数等。如Function类和usingconfig函数等本步骤到此结束。在下一个步骤，我们将使用新的DeZero 自动计算高本步骤到此结束。在下一个步骤，我们将使用新的DeZero自动计算高阶导数。阶导数。

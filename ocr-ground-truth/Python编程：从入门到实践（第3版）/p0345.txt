@@ -1,0 +1,1 @@
+12.2　安装 Pygame 开始写程序前，需要安装 Pygame。这里将像第 11 章安装 pytest 那样安装 Pygame——使用 pip。如果你跳过了第 11 章，或者需要复习 pip 的用法，请参阅 11.1 节。通过如下终端命令即可安装 Pygame： $ python -m pip install --user pygame 如果你在运行程序或启动终端会话时使用的命令不是 python，而是 python3，务必将上述命令中的 python 替换为 python3。

@@ -1,0 +1,1 @@
+def _update_screen(self):          --snip--          self.ship.blitme()          self.aliens.draw(self.screen)          pygame.display.flip()  当对编组调用 draw() 时，Pygame 将把编组中的每个元素绘制到属性 rect 指定的位置上。方法 draw() 接受一个参数，这个参数指定了要将编组中的元素绘制到哪个 surface 上。图 13-2 显示了在屏幕上现身的第一个外星人。 000 ASenlmasion 图 13-2　第一个外星人现身第一个外星人已经被正确地绘制在屏幕上了，下面来编写绘制一个外星舰队的代码。

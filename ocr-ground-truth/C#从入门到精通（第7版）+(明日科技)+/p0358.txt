@@ -1,0 +1,1 @@
+Form1 ab Button Label SplitB utton DropDownButton Separator ComboBox TextB ox ab] ProgressBar 图10.43 添加工具栏项目  Button：包含文本和图像中可让用户选择的项。  Label：包含文本和图像的项，不可以让用户选择，可以显示超链接。  SplitButton：在Button的基础上增加了一个下拉菜单。  DropDownButton：用于下拉菜单选择项。  Separator：分隔符。  ComboBox：显示一个ComboBox的项。

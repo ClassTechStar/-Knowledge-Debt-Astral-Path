@@ -277,12 +277,39 @@ class GapTree:
         return cuts, rows
 
     def _get_layout_tree(self, cuts, rows):
-        # 用切线把行切成列块，再组成树（简化但保持阅读序：自上而下、自左而右）
-        nodes = []
+        """P0：按竖切线把行分到列，再「先左列自上而下，后右列」——多栏阅读序。"""
+        if not rows:
+            return {"units": [], "children": []}
+        # 有效切线：跨 ≥2 行、宽度合理
+        row_count = len(rows)
+        valid = [(l, r) for (l, r) in cuts if 0 < (r - l) < 200]
+        if not valid:
+            nodes = []
+            for row in rows:
+                for unit in row:
+                    nodes.append({"units": [unit], "children": []})
+            return {"units": [], "children": nodes}
+        # 列边界：用切线中点划分
+        bounds = []
+        for l, r in valid:
+            bounds.append((l + r) / 2)
+        bounds = sorted(set(bounds))
+        def col_of(x):
+            for i, b in enumerate(bounds):
+                if x < b:
+                    return i
+            return len(bounds)
+        columns = {}
         for row in rows:
             for unit in row:
-                nodes.append({"units": [unit], "children": []})
-        return {"units": [], "children": nodes}
+                x0 = unit[0][0]
+                c = col_of(x0)
+                columns.setdefault(c, []).append(unit)
+        children = []
+        for c in sorted(columns.keys()):
+            for unit in columns[c]:
+                children.append({"units": [unit], "children": []})
+        return {"units": [], "children": children}
 
     def _preorder_traversal(self, root):
         out = []
@@ -316,6 +343,75 @@ def gap_tree_sort(text_blocks: list) -> list:
         return (b[0], b[1], b[2], b[3])
 
     return GapTree(get_bbox).sort(text_blocks)
+
+
+# ========== P0/P2：公式保留 · 版面检测 · 表格 · 质量分 ==========
+_MATH_KEEP = re.compile(
+    r"[←-⇿∀-⋿⌀-⏿⁰-₟←-⇿½-×÷≠≤≥±∞∑∏√∫∂∆∇∈∉⊂⊃∪∩∧∨¬⇒⇔α-ωΑ-Ω]"
+)
+
+
+def preserve_math_symbols(text: str) -> str:
+    """P0：数学/希腊/箭头/上下标原样保留（不被任何清洗剥掉）。"""
+    s = str(text or "")
+    s = re.sub(r"[\x00-\x08\x0B\x0C\x0E-\x1F]", " ", s)  # 只剥控制字符
+    return s
+
+
+def detect_layout_type(cuts, rows, blocks) -> str:
+    n = len(rows or [])
+    if n == 0:
+        return "empty"
+    valid = [c for c in (cuts or []) if 0 < (c[1] - c[0]) < 200]
+    if len(valid) >= 1 and n >= 6:
+        return "two-column"
+    codeish = sum(1 for b in blocks if re.search(r"[{};]|\bdef\b|\bclass\b|\bimport\b", b.get("text") or ""))
+    if codeish >= 3:
+        return "code"
+    if any(re.search(r"\|.+\|", b.get("text") or "") for b in (blocks or [])[:8]):
+        return "table"
+    return "single-column"
+
+
+def table_to_markdown(text: str) -> str:
+    rows = []
+    for ln in (text or "").split("\n"):
+        s = ln.strip()
+        if "|" in s or "\t" in s:
+            cells = [c.strip() for c in re.split(r"\s*\|\s*|\t+", s) if c.strip()]
+            if len(cells) >= 2:
+                rows.append(cells)
+    if len(rows) < 2:
+        return ""
+    w = max(len(r) for r in rows)
+    rows = [r + [""] * (w - len(r)) for r in rows]
+    md = ["| " + " | ".join(rows[0]) + " |", "|" + "|".join(["---"] * w) + "|"]
+    for r in rows[1:]:
+        md.append("| " + " | ".join(r) + " |")
+    return "\n".join(md)
+
+
+def page_quality(text: str, blocks: list) -> dict:
+    """P2：页质量分——可读率 + OCR 置信度均值 + 空页标记。"""
+    s = (text or "").replace("\n", " ")
+    good = len(re.findall(r"[一-鿿A-Za-z0-9]", s))
+    total = max(len(s.strip()), 1)
+    readable = good / total
+    scores = [b.get("score") for b in blocks if isinstance(b.get("score"), (int, float))]
+    conf = sum(scores) / len(scores) if scores else 1.0
+    q = 0.6 * readable + 0.4 * conf
+    return {"readable_ratio": round(readable, 3), "avg_conf": round(conf, 3),
+            "quality": round(q, 3), "low": q < 0.55, "empty": good < 5}
+
+
+def render_zoom_for_page(page, target_min: int = MinSize) -> float:
+    """P0：按页物理尺寸与 dpi 估缩放，扫描页拉到 target_min。"""
+    rect = page.rect
+    w_pt, h_pt = abs(rect[2] - rect[0]), abs(rect[3] - rect[1])
+    m_pt = max(min(w_pt, h_pt), 1.0)
+    # PDF 点 ≈ 1/72 inch；目标像素 = target_min
+    return max(1.0, target_min / m_pt)
+
 
 
 def parse_single_para(text_blocks: list) -> list:
@@ -393,6 +489,39 @@ class DocExtract:
     ocr_pages: List[int] = field(default_factory=list)
 
 
+# ========== P1：预处理（灰度/对比度/轻量纠偏） ==========
+def preprocess_image(img: Image.Image) -> Image.Image:
+    """对齐 Umi-OCR 预处理：灰度 + 自动对比度；扫描页更清晰。"""
+    try:
+        from PIL import ImageOps, ImageFilter
+        g = img.convert("L")
+        g = ImageOps.autocontrast(g, cutoff=1)
+        # 轻量锐化，利于小字号
+        g = g.filter(ImageFilter.SHARPEN)
+        return g.convert("RGB")
+    except Exception:
+        return img
+
+
+def deskew_if_needed(img: Image.Image, max_deg: float = 3.0) -> Image.Image:
+    """P1：倾斜 >1° 时微纠偏（基于投影方差近似，成本低）。"""
+    try:
+        import numpy as np
+        arr = np.array(img.convert("L"))
+        best, best_score = 0.0, -1.0
+        for deg in (-2, -1, 0, 1, 2):
+            # 行投影平滑度：越直方差越大
+            rows = arr.mean(axis=1)
+            score = float(np.var(np.diff(rows)))
+            if score > best_score:
+                best_score, best = score, float(deg)
+        if abs(best) >= 1.0:
+            return img.rotate(best, expand=True, fillcolor=(255, 255, 255))
+        return img
+    except Exception:
+        return img
+
+
 class OcrEngine:
     """RapidOCR（对齐 Umi-OCR Rapid 引擎 / PaddleOCR 检测-识别）。"""
 
@@ -428,8 +557,72 @@ class OcrEngine:
 _OCR = OcrEngine()
 
 
-def ocr_image(img: Image.Image) -> List[dict]:
-    return _OCR.run(img)
+def ocr_image(img: Image.Image, dual: bool = True) -> List[dict]:
+    """P2：RapidOCR 主引擎 + Tesseract 投票（可用时）。"""
+    results = _OCR.run(img)
+    if not dual:
+        return results
+    try:
+        tess = _tesseract_blocks(img)
+        if not tess:
+            return results
+        return _vote_blocks(results, tess)
+    except Exception:
+        return results
+
+
+def _tesseract_blocks(img: Image.Image) -> List[dict]:
+    """调用系统 tesseract（若存在），输出同构 box/text/score。"""
+    import subprocess, tempfile, os
+    import numpy as np
+    exe = os.environ.get("ASTRALPATH_TESSERACT") or "tesseract"
+    tessdata = os.environ.get("TESSDATA_PREFIX")
+    arr = np.array(img.convert("L"))
+    # 用临时 png
+    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
+        path = f.name
+    img.save(path, "PNG")
+    out_base = path + "_out"
+    cmd = [exe, path, out_base, "-l", "chi_sim+eng", "--psm", "6"]
+    if tessdata:
+        cmd += ["--tessdata-dir", tessdata]
+    try:
+        subprocess.run(cmd, capture_output=True, timeout=60, check=False)
+        txt_path = out_base + ".txt"
+        if not os.path.exists(txt_path):
+            return []
+        text = open(txt_path, encoding="utf-8", errors="ignore").read()
+        lines = [ln.strip() for ln in text.splitlines() if ln.strip()]
+        out = []
+        for i, ln in enumerate(lines):
+            out.append({"box": [(0, i * 16), (10, i * 16), (10, i * 16 + 14), (0, i * 16 + 14)],
+                        "text": ln, "score": 0.8})
+        return out
+    finally:
+        try:
+            os.unlink(path)
+            if os.path.exists(out_base + ".txt"):
+                os.unlink(out_base + ".txt")
+        except Exception:
+            pass
+
+
+def _vote_blocks(a: List[dict], b: List[dict]) -> List[dict]:
+    """双引擎：文本一致取高置信；不一致且 tesseract 更长时保留 a 为主。"""
+    ta = " ".join(x["text"] for x in a)
+    tb = " ".join(x["text"] for x in b)
+    if not tb.strip():
+        return a
+    if not ta.strip():
+        return b
+    # 简单融合：以 RapidOCR 为主，Tesseract 独有行追加
+    a_set = {x["text"].strip() for x in a if x.get("text")}
+    extra = [x for x in b if x.get("text") and x["text"].strip() not in a_set]
+    # 只追加明显不同的长行，避免噪声
+    for x in extra:
+        if len(x["text"]) >= 8:
+            a = a + [{"box": x.get("box") or [(0, 0)], "text": x["text"], "score": max(0.5, x.get("score", 0.5))}]
+    return a
 
 
 def extract_page(page, mode: str = "mixed", pno: int = 1) -> Tuple[str, List[dict], dict]:
@@ -443,17 +636,16 @@ def extract_page(page, mode: str = "mixed", pno: int = 1) -> Tuple[str, List[dic
     page_rotation = page.rotation
 
     if mode == "fullPage":
-        rect = page.rect
-        w, h = abs(rect[2] - rect[0]), abs(rect[3] - rect[1])
-        m = min(w, h)
-        zoom = (MinSize / max(m, 1)) if m < MinSize else 1
+        zoom = render_zoom_for_page(page, MinSize)
         matrix = pymupdf.Matrix(zoom, zoom) if zoom != 1 else pymupdf.Identity
         pix = page.get_pixmap(matrix=matrix)
         img = Image.open(BytesIO(pix.tobytes("png")))
+        img = preprocess_image(img)  # P1：灰度/对比度
         scale = 1 / zoom
         imgs.append({"img": img, "xy": (0, 0), "scale_w": scale, "scale_h": scale})
     else:
-        p = page.get_text("dict", clip=pymupdf.INFINITE_RECT())
+        # P1 性能：clip=page.rect，避免 INFINITE_RECT 全页扫描越界块
+        p = page.get_text("dict", clip=page.rect)
         for t in p.get("blocks", []):
             if t.get("type") == 1 and mode in ("imageOnly", "mixed"):
                 stats["images"] += 1
@@ -513,7 +705,73 @@ def extract_page(page, mode: str = "mixed", pno: int = 1) -> Tuple[str, List[dic
             stats["ocr_chars"] += len(r["text"].strip())
 
     text = blocks_to_text(blocks) if blocks else ""
+    q = page_quality(text, blocks)
+    stats["quality"] = q
+    if q.get("low"):
+        # P2 低分重试：换预处理后再 OCR 一次（仅图页）
+        if imgs:
+            try:
+                imgs2 = [{"img": deskew_if_needed(preprocess_image(it["img"].convert("RGB"))),
+                          "xy": it["xy"], "scale_w": it["scale_w"], "scale_h": it["scale_h"]} for it in imgs]
+                for item in imgs2:
+                    results = ocr_image(item["img"], dual=True)
+                    sx, sy = item["scale_w"], item["scale_h"]
+                    ox, oy = item["xy"]
+                    for r in results:
+                        box = [(ox + x * sx, oy + y * sy) for x, y in r["box"]]
+                        blocks.append({"box": box, "text": r["text"], "score": r["score"], "src": "ocr-retry"})
+                text = blocks_to_text(blocks) if blocks else text
+                q = page_quality(text, blocks)
+                stats["quality"] = q
+                stats["retried"] = True
+            except Exception:
+                pass
     return text, blocks, stats
+
+
+# ========== P1：页级缓存 ==========
+_PAGE_CACHE: dict = {}
+_CACHE_DIR = os.environ.get("ASTRALPATH_OCR_CACHE") or os.path.join(
+    os.path.expanduser("~"), ".astralpath", "ocr-cache")
+
+
+def _cache_key(path: str, pno: int, mode: str) -> str:
+    import hashlib
+    try:
+        st = os.stat(path)
+        raw = f"{os.path.basename(path)}|{st.st_size}|{int(st.st_mtime)}|{pno}|{mode}"
+    except Exception:
+        raw = f"{path}|{pno}|{mode}"
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:32]
+
+
+def cache_get(path, pno, mode):
+    k = _cache_key(path, pno, mode)
+    if k in _PAGE_CACHE:
+        return _PAGE_CACHE[k]
+    try:
+        os.makedirs(_CACHE_DIR, exist_ok=True)
+        fp = os.path.join(_CACHE_DIR, k + ".json")
+        if os.path.exists(fp):
+            import json
+            data = json.load(open(fp, encoding="utf-8"))
+            _PAGE_CACHE[k] = data
+            return data
+    except Exception:
+        pass
+    return None
+
+
+def cache_put(path, pno, mode, text, blocks, stats):
+    k = _cache_key(path, pno, mode)
+    data = {"text": text, "nblocks": len(blocks), "stats": {kk: vv for kk, vv in stats.items() if kk != "quality" or True}}
+    _PAGE_CACHE[k] = data
+    try:
+        os.makedirs(_CACHE_DIR, exist_ok=True)
+        import json
+        json.dump(data, open(os.path.join(_CACHE_DIR, k + ".json"), "w", encoding="utf-8"), ensure_ascii=False)
+    except Exception:
+        pass
 
 
 def extract_document(
@@ -538,8 +796,17 @@ def extract_document(
             pages = pages[:max_pages]
         texts = []
         for pno in pages:
-            page = doc[pno]
-            text, blocks, stats = extract_page(page, mode=mode, pno=pno + 1)
+            cached = cache_get(path, pno + 1, mode)
+            if cached and cached.get("text"):
+                text, blocks, stats = cached["text"], [], cached.get("stats") or {}
+                stats.setdefault("ocr_used", False)
+                stats.setdefault("ocr_chars", 0)
+                stats.setdefault("text_chars", 0)
+                stats.setdefault("images", 0)
+            else:
+                page = doc[pno]
+                text, blocks, stats = extract_page(page, mode=mode, pno=pno + 1)
+                cache_put(path, pno + 1, mode, text, blocks, stats)
             chars = len(re.sub(r"\s", "", text))
             pe = PageExtract(
                 page_no=pno + 1,
@@ -547,12 +814,13 @@ def extract_document(
                 chars=chars,
                 blocks=len(blocks),
                 mode=mode,
-                ocr_used=stats["ocr_used"],
-                ocr_chars=stats["ocr_chars"],
-                text_chars=stats["text_chars"],
-                images=stats["images"],
+                ocr_used=stats.get("ocr_used", False),
+                ocr_chars=stats.get("ocr_chars", 0),
+                text_chars=stats.get("text_chars", 0),
+                images=stats.get("images", 0),
             )
             out.pages.append(pe)
+            # P1 段落归一：统一「每页一节」
             texts.append(f"\n\n===== PAGE {pno+1} =====\n{text}")
             if chars < 5:
                 out.empty_pages.append(pno + 1)

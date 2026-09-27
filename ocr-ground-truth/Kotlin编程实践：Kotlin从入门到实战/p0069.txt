@@ -1,0 +1,1 @@
+fun `ints as colors`() {     val color = Color.MAGENTA     val intColor = colorFromInts(color.alpha,         color.red, color.green, color.blue)     val color1 = Color(intColor, true)  ➊     assertThat(color1, equalTo(color))} ➊ 第二个构造函数参数表示存在alpha值。在本节内容结束时，请思考下面这个关于异或的笑话：“一个驱魔师（xor-cist，双关语，也可以译为异或主义者），消灭了一个精灵（daemon，同双关语，也可以译为守护进程）或者另一个精灵，但不会两个都消灭。”对此我很抱歉，但你可以向朋友随意开个玩笑。

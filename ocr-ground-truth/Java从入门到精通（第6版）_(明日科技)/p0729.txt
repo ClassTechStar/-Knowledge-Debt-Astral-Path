@@ -1,0 +1,1 @@
+全体人脸图像：静态属性IMAGE_MAP用于保存所有员工的人脸照片图像，该属性的类型为HashMap<String, BufferedImage>，其中键为某员工的特征码，值为该员工的人脸照片图像。　全部打卡记录：静态属性RECORD_MAP用于保存所有员工的人脸照片图像，该属性的类型为HashMap<Integer, Set<Date>>，其中键为某员工的编号，值为该员工的打卡日期集合。 Session类除缓存这些数据外，还提供了加载资源的init()方法和释放资源的dispose()方法。项目启动时会自动执行init()方法来加载所有资源，在用户确认关闭程序后会执行dispose()方法释放所有资源。Session类的具体代码如下：
