@@ -45,10 +45,10 @@
 
 | 产物 | 路径 | 说明 |
 |------|------|------|
-| **Web 单体版** | `deploy/monolith-web/index.html` | 全功能、无服务器、浏览器直接打开（2.2，73 KB） |
-| **Windows 单体安装包** | `deploy/win-install/dist/AstralPath-Monolith-Setup-2.2.0.exe` | WebView2 壳 + 同一 HTML；与旧版并存 |
-| **Windows 桌面安装包** | `deploy/win-install/dist/AstralPath-Setup-1.5.0-Desktop.exe` | 全功能桌面端（可选本地 API） |
-| **Android APK** | `src/AstralPath.Native/dist/AstralPath-Android-2.2.0-Store.apk` | WebView 同构 + 离线核心 |
+| **Web 单体版** | `deploy/monolith-web/index.html` | 全功能、无服务器、浏览器直接打开（2.2，~100 KB） |
+| **Windows 单体安装包** | `release/AstralPath-Monolith-Setup-2.2.0.exe` | WebView2 壳 + 同一 HTML；本机安装验收通过 |
+| **Windows 便携版** | `release/AstralPath-Portable-2.2.0/`（+ 同名 .zip） | 免安装解压即用，.NET 10 自包含 |
+| **Android APK** | `release/AstralPath-Android-2.2.0-Store.apk` | WebView 同构 + 离线核心；模拟器安装验收通过 |
 | **100 题库** | `eval/question_bank.json` | 覆盖 34 个知识点（难度 1:21 / 2:51 / 3:28） |
 | **34 点图包** | `graph-packs/astralpath-v2/graph_pack.json` | 34 节点 / 74 边（先修 50 + 迁移缺口 24），无环，三门课 |
 | **13 本教材思维导图** | `kg-deep-test/*.mindmap.{json,md}` | 6,720 页 / 2,519 节点 / 2,662 边 |
@@ -68,21 +68,20 @@
 # Web：双击打开
 deploy\monolith-web\index.html
 
-# Windows：运行安装包后桌面图标启动
-deploy\win-install\dist\AstralPath-Monolith-Setup-2.2.0.exe
+# Windows：安装包或便携版
+release\AstralPath-Monolith-Setup-2.2.0.exe
+# 或解压 release\AstralPath-Portable-2.2.0.zip 后双击 AstralPath.Monolith.exe
 ```
 
 功能：起点/藏书阁/识网/知债/今日/智能体/画像/账户 全部在本机计算，数据存 localStorage，可导出 JSON。
 
 ### 3.2 全功能桌面版（可选本地 API）
 
-```powershell
-deploy\win-install\dist\AstralPath-Setup-1.5.0-Desktop.exe
-```
+历史桌面安装包见 `deploy/win-install/dist/`；日常请用单体版或便携版。
 
 ### 3.3 Android
 
-安装 `src/AstralPath.Native/dist/AstralPath-Android-2.2.0-Store.apk`（商店签名）。无电脑、无 adb 亦可离线使用核心功能。
+安装 `release/AstralPath-Android-2.2.0-Store.apk`（商店签名）。无电脑、无 adb 亦可离线使用核心功能。
 
 ### 3.4 源码构建
 
@@ -157,6 +156,7 @@ tests/                    Core 28 · Persistence 8 · Desktop 47 · API 66 · Ev
 | Eval.Tests | **2/2** | 合成数据回归 |
 | MobileCore.Tests | **84/84** | 图谱构图/布局/学习路径 + OCR 全流程（v3 算法回归） |
 | 单体 HTML 自测 | **41 项** | 结构/算法/页面流转 |
+| MLP 抽样验收 | **12 本 PDF** | OCR / 知识图谱 / 智能体（2026-09-28，`docs/mlp-acceptance-2026-09-28.md`） |
 
 > `dotnet test` 一次只能接一个项目。全量请用一键脚本：
 >
@@ -215,6 +215,18 @@ dotnet publish src/AstralPath.Monolith -c Release -r win-x64 --self-contained -o
 ---
 
 ## 11. 变更日志
+
+### 2.2.0 · 三端 MLP 验收与 OCR 引擎线（2026-09-28）
+- **OCR 引擎**：PaddleOCR vs RapidOCR 平行基准（12 本 PDF 多进程）；RapidOCR v3 / PP-OCRv6 线集成生产管线
+  （页级并行 + 三抽取器交叉验证 + full 全书模式）；`tools/ocr_regression.py` 12/12 PASS
+- **Web 端**：恢复 pdf.js 文本层 + WASM OCR 阶梯（页均密度闸 / 乱码闸）；12 本 PDF 浏览器全流程 MLP 通过
+- **Windows 便携版**：`release/AstralPath-Portable-2.2.0`（免安装）；壳内 `appassets.local` 虚拟域修复
+  （file:// 禁 Worker 导致 pdf.js/WASM 失效）；宿主 OCR 桥超时按模式参数化
+- **Android 2.2.0 验收**：`release/AstralPath-Android-2.2.0-Store.apk` 模拟器安装启动 OK；APK 内 HTML 与源一致
+- **Windows Setup 2.2.0 验收**：`release/AstralPath-Monolith-Setup-2.2.0.exe` 本机静默安装 exit=0，工具链随包可跑
+- **12 本 PDF MLP 抽样**：OCR 12/12 · 知识图谱 12/12 · 智能体 22 意图+危机词通过
+  （`docs/mlp-acceptance-2026-09-28.md`、`docs/mlp-windows-acceptance-2026-09-28.md`）
+- **文档**：Team Tech 八份同步 Android/Windows 验收横幅；三端交付物路径统一到 `release/`
 
 ### 2.2.0 · 审计修复与重构落地（2026-09-26）
 - **安全**：图谱先修链 XSS 转义（三端同源）；清除全部机器硬编码路径；鉴权默认开启 + 教师角色门禁；
