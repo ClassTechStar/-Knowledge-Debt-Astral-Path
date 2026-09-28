@@ -153,9 +153,9 @@ def main() -> int:
                      "JS": "见字面量" if present else "缺失", "C#": cv,
                      "期望": expect, "结果": "OK" if ok else "MISMATCH"})
 
-    # 间隔偏移 {0,2,6}（附加项，不计入 24）
+    # 间隔偏移 {0,2,6}（附加项，不计入 24）：K.SpacingOffsets 常量（P6-7 后唯一形态）
     offsets = cs.get("SpacingOffsets")
-    js_offsets_ok = bool(re.search(r"offs\s*=\s*\[0\s*,\s*2\s*,\s*6\]", html_text))
+    js_offsets_ok = bool(re.search(r"SpacingOffsets\s*[:=]\s*\[\s*0\s*,\s*2\s*,\s*6\s*\]", html_text))
     offsets_ok = offsets == [0.0, 2.0, 6.0] and js_offsets_ok
     if not offsets_ok:
         failed += 1
