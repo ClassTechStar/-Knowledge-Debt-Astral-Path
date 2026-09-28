@@ -3,10 +3,16 @@
 四位成员可按矩阵认领：多会话并发开发时请先 stat 文件 mtime 再动手（教训见 ocr-round2 文档）。最新验证见 docs/mlp-web-e2e-2026-09-28.md、docs/mlp-acceptance-2026-09-28.md。
 
 **Android APK 2.2.0（2026-09-28 验收）**：
-- elease/AstralPath-Android-2.2.0-Store.apk（11MB，包名 com.astralpath.app.v22，versionCode 32）
+- rrelease/AstralPath-Android-2.2.0-Store.apk（11MB，包名 com.astralpath.app.v22，versionCode 32）
 - minSdk 26 / targetSdk 35 · 签名 CN=AstralPath · 模拟器 test35 安装启动 OK
-- APK 内 ssets/www/index.html 与 monolith 源 SHA256 一致；ocr-engine 179 资源随包
+- APK 内 aassets/www/index.html 与 monolith 源 SHA256 一致；ocr-engine 179 资源随包
 - 12 本 PDF MLP 抽样验收：OCR 12/12 · 知识图谱 12/12 · 智能体 22 意图+危机词 通过
+
+**Windows 安装包 2.2.0（2026-09-28 验收）**：
+- `release/AstralPath-Monolith-Setup-2.2.0.exe`（50.5MB，.NET 10 自包含 + Inno Setup 7）
+- 本机静默安装 exit=0 → `C:\AstralPath-Mono22\`，启动「知债：星穹学途 · 单体版」正常
+- 安装内 HTML 与 monolith 源 SHA256 一致；`tools/ocr_pipeline.py`+`kg_builder.py` 随包可跑
+- 12 本 PDF MLP：OCR 12/12 · 知识图谱 12/12 · 智能体路由通过（docs/mlp-windows-acceptance-2026-09-28.md）
 
 **Windows 便携版 exe（2026-09-28 新增）**：
 - `release/AstralPath-Portable-2.2.0/`（582MB，免安装解压即用）+ 同名 .zip；双击 `AstralPath.Monolith.exe` 启动
@@ -1075,4 +1081,5 @@ Code: src/AstralPath.Core/ | Goldens: tests/AstralPath.Mobile.Tests/ (62, tol 1e
 ---
 
 > **使用说明**：本文档供知债：星穹学途（Knowledge Debt: Astral Path）项目团队在竞赛全周期内执行。遇到职责争议时，以「服务 Owner 表 + 交付物验收矩阵」为裁决依据；遇到模块争议时，以「三权分离硬规则」（§8.1 / §8.5 / §8.6）为裁决依据；遇到口径/伦理争议时，以 P1 终审为准。
+
 

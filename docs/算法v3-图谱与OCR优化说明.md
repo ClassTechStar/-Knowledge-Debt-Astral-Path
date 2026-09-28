@@ -4,10 +4,16 @@ Web 端= pdf.js 文本层 + Tesseract WASM（12 本 MLP 实测 12/12 通过）�
 最新基准与结论见 docs/ocr-engine-bench-report.md、docs/mlp-web-e2e-2026-09-28.md。最新验证见 docs/mlp-web-e2e-2026-09-28.md、docs/mlp-acceptance-2026-09-28.md。
 
 **Android APK 2.2.0（2026-09-28 验收）**：
-- elease/AstralPath-Android-2.2.0-Store.apk（11MB，包名 com.astralpath.app.v22，versionCode 32）
+- rrelease/AstralPath-Android-2.2.0-Store.apk（11MB，包名 com.astralpath.app.v22，versionCode 32）
 - minSdk 26 / targetSdk 35 · 签名 CN=AstralPath · 模拟器 test35 安装启动 OK
-- APK 内 ssets/www/index.html 与 monolith 源 SHA256 一致；ocr-engine 179 资源随包
+- APK 内 aassets/www/index.html 与 monolith 源 SHA256 一致；ocr-engine 179 资源随包
 - 12 本 PDF MLP 抽样验收：OCR 12/12 · 知识图谱 12/12 · 智能体 22 意图+危机词 通过
+
+**Windows 安装包 2.2.0（2026-09-28 验收）**：
+- `release/AstralPath-Monolith-Setup-2.2.0.exe`（50.5MB，.NET 10 自包含 + Inno Setup 7）
+- 本机静默安装 exit=0 → `C:\AstralPath-Mono22\`，启动「知债：星穹学途 · 单体版」正常
+- 安装内 HTML 与 monolith 源 SHA256 一致；`tools/ocr_pipeline.py`+`kg_builder.py` 随包可跑
+- 12 本 PDF MLP：OCR 12/12 · 知识图谱 12/12 · 智能体路由通过（docs/mlp-windows-acceptance-2026-09-28.md）
 
 **Windows 便携版 exe（2026-09-28 新增）**：
 - `release/AstralPath-Portable-2.2.0/`（582MB，免安装解压即用）+ 同名 .zip；双击 `AstralPath.Monolith.exe` 启动
@@ -235,4 +241,5 @@ dotnet test src/AstralPath.Mobile.Offline/AstralPath.Mobile.Tests -c Release
 # 全量门禁（222 项）
 powershell -File scripts\verify_all.ps1
 ```
+
 

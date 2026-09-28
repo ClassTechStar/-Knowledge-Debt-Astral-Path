@@ -96,3 +96,5 @@ signing.env
 # Windows 便携版构建产物（582MB，用 release/build-portable.ps1 本地重建）
 release/AstralPath-Portable-*/
 release/AstralPath-Portable-*.zip
+
+src/AstralPath.Monolith/publish/

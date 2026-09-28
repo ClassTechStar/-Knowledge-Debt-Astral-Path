@@ -1,5 +1,5 @@
 {
-  "time": "2026-09-28 13:39:24",
+  "time": "2026-09-28 14:17:41",
   "ocr": {
     "ok": 12,
     "total": 12,
@@ -42,7 +42,7 @@
         "pages": 24,
         "chars": 11462,
         "ocr_pages": 15,
-        "elapsed_s": 0.5
+        "elapsed_s": 0.6
       },
       {
         "name": "大模型应用开发：动手做 AI Agent (黄佳) .pdf",
@@ -162,7 +162,7 @@
         "pages": 24,
         "chars": 21200,
         "ocr_pages": 3,
-        "elapsed_s": 0.9
+        "elapsed_s": 1.0
       },
       {
         "name": "Java从入门到精通（第6版） (明日科技) .pdf",
@@ -222,7 +222,7 @@
         "pages": 24,
         "chars": 6860,
         "ocr_pages": 1,
-        "elapsed_s": 0.3
+        "elapsed_s": 0.5
       },
       {
         "name": "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf",
@@ -256,7 +256,7 @@
         "ok": true,
         "nodes": 50,
         "edges": 127,
-        "elapsed_s": 0.0
+        "elapsed_s": 0.1
       },
       {
         "name": "Go语言从入门到精通.pdf",
@@ -264,7 +264,7 @@
         "ok": true,
         "nodes": 51,
         "edges": 106,
-        "elapsed_s": 0.0
+        "elapsed_s": 0.1
       },
       {
         "name": "大模型应用开发：动手做 AI Agent (黄佳) .pdf",
@@ -272,7 +272,7 @@
         "ok": true,
         "nodes": 51,
         "edges": 114,
-        "elapsed_s": 0.0
+        "elapsed_s": 0.1
       },
       {
         "name": "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF",
@@ -288,7 +288,7 @@
         "ok": true,
         "nodes": 50,
         "edges": 93,
-        "elapsed_s": 0.0
+        "elapsed_s": 0.1
       },
       {
         "name": "C#从入门到精通（第7版）+(明日科技)+.pdf",
@@ -296,7 +296,7 @@
         "ok": true,
         "nodes": 50,
         "edges": 105,
-        "elapsed_s": 0.0
+        "elapsed_s": 0.1
       },
       {
         "name": "深度学习进阶：自然语言处理 (斋藤康毅) .pdf",
@@ -304,7 +304,7 @@
         "ok": true,
         "nodes": 51,
         "edges": 113,
-        "elapsed_s": 0.0
+        "elapsed_s": 0.1
       },
       {
         "name": "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf",
@@ -312,7 +312,7 @@
         "ok": true,
         "nodes": 30,
         "edges": 47,
-        "elapsed_s": 0.0
+        "elapsed_s": 0.1
       },
       {
         "name": "Java从入门到精通（第6版） (明日科技) .pdf",
@@ -320,7 +320,7 @@
         "ok": true,
         "nodes": 51,
         "edges": 103,
-        "elapsed_s": 0.0
+        "elapsed_s": 0.1
       },
       {
         "name": "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf",
@@ -336,7 +336,7 @@
         "ok": true,
         "nodes": 50,
         "edges": 132,
-        "elapsed_s": 0.0
+        "elapsed_s": 0.1
       },
       {
         "name": "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf",
@@ -344,7 +344,7 @@
         "ok": true,
         "nodes": 50,
         "edges": 133,
-        "elapsed_s": 0.0
+        "elapsed_s": 0.1
       }
     ]
   },

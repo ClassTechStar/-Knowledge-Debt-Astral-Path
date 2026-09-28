@@ -11,10 +11,16 @@ ocr-max-vs-production / mlp-web-e2e 等报告）。
 （常量对齐 26 项 / 意图四方对拍 22 项 / 三镜像同步 / verify_all 一键验收）
 
 **Android APK 2.2.0（2026-09-28 验收通过）**：
-- elease/AstralPath-Android-2.2.0-Store.apk · 包名 com.astralpath.app.v22 · versionCode 32 / 2.2.0
+- rrelease/AstralPath-Android-2.2.0-Store.apk · 包名 com.astralpath.app.v22 · versionCode 32 / 2.2.0
 - minSdk 26 / targetSdk 35 · 签名 v1/v2/v3（CN=AstralPath）· 模拟器 test35 安装启动成功
-- 三端同源：APK 内 ssets/www/index.html 与 monolith 源 SHA256 一致；ocr-engine 179 资源随包
+- 三端同源：APK 内 aassets/www/index.html 与 monolith 源 SHA256 一致；ocr-engine 179 资源随包
 - 12 本 PDF MLP 抽样验收（docs/mlp-acceptance-2026-09-28.md）：OCR 12/12 · 知识图谱 12/12 · 智能体 22 意图+危机词通过
+
+**Windows 安装包 2.2.0（2026-09-28 验收）**：
+- elease/AstralPath-Monolith-Setup-2.2.0.exe（50.5MB，.NET 10 自包含 + Inno Setup 7）
+- 本机静默安装 exit=0 → C:\AstralPath-Mono22\，启动「知债：星穹学途 · 单体版」正常
+- 安装内 HTML 与 monolith 源 SHA256 一致；	ools/ocr_pipeline.py+kg_builder.py 随包可跑
+- 12 本 PDF MLP：OCR 12/12 · 知识图谱 12/12 · 智能体路由通过（docs/mlp-windows-acceptance-2026-09-28.md）
 
 **OCR（重大更新）**：
 - 引擎评估与集成：本地 RapidOCR 仓库 v3 线（PP-OCRv6 模型）胜出并集成生产管线，
@@ -30111,10 +30117,10 @@ ed74f8c 知识图谱+OCR 工具链与 13 本 PDF 思维导图产物   ← HEAD
 | 文件 | 大小 | md5 | 说明 |
 |---|---:|---|---|
 | `deploy/monolith-web/index.html` | 73,504 | `8e368b1ebd0aa11fa1a32094cbb38277` | ★ 单体版事实源（无微服务，2.2） |
-| `src/AstralPath.Native/app/src/main/assets/www/index.html` | 73,504 | `8e368b1ebd0aa11fa1a32094cbb38277` | ✅ 与单体版同源（安卓壳） |
+| `src/AstralPath.Native/app/src/main/aaassets/www/index.html` | 73,504 | `8e368b1ebd0aa11fa1a32094cbb38277` | ✅ 与单体版同源（安卓壳） |
 | `src/AstralPath.Api/wwwroot/index.html` | 163,153 | `e01934a8a6a4a236c69077ef5d999435` | 全功能 Web 版（依赖 API，2.0 系） |
 | `src/AstralPath.Mobile.Offline/index.html` | 163,292 | `74cb174638838665c967fa0f0b5be3b7` | 移动端离线版（2.0 系） |
-| `src/AstralPath.Android/app/src/main/assets/www/index.html` | 150,825 | — | 旧安卓工程（1.3 系，已由 Native 取代） |
+| `src/AstralPath.Android/app/src/main/aaassets/www/index.html` | 150,825 | — | 旧安卓工程（1.3 系，已由 Native 取代） |
 
 > ⚠️ **已知待办 #1**：`src/AstralPath.Monolith/Resources/index.html` 需与单体版同源。
 > 发布流程（见 §32.3）必须先复制再打包。
@@ -30235,7 +30241,7 @@ python scripts/verify_constants.py
 |---|---|---|
 | `src/AstralPath.Desktop/` | Avalonia/WinForms 桌面端 | `App.axaml.cs`、`Views/MainWindow.axaml.cs`、`Demo/DemoRunner.cs` |
 | `src/AstralPath.Monolith/` | 无微服务 Windows 壳 | `Program.cs`（WebView2，1280×840）、`setup-monolith.iss` |
-| `src/AstralPath.Native/` | 安卓 WebView 壳（Kotlin） | `MainActivity.kt`、`app/build.gradle.kts`、`assets/www/index.html` |
+| `src/AstralPath.Native/` | 安卓 WebView 壳（Kotlin） | `MainActivity.kt`、`app/build.gradle.kts`、`aaassets/www/index.html` |
 | `src/AstralPath.AndroidApp/` | .NET for Android 形态 | `MainActivity.cs`、`EmbeddedWebApi.cs` |
 | `src/AstralPath.Mobile.Offline/` | Avalonia + SQLite 离线单体 | `Views/RootView.cs`、`Services/LocalServices.cs`、`Assets/` |
 | `src/AstralPath.Shared/` | 12 个 axaml 页 + ViewModel | `Views/*.axaml`、`ViewModels/*.cs`、`Controls/GraphCanvas.cs` |
@@ -30566,4 +30572,6 @@ RACI 与模块治理详见 `docs/附录-四人分工详细矩阵(RACI-模块-风
 ---
 
 **本篇结束 · 复刻篇版本 `replication-v1.0`（2026-09-25）**
+
+
 
