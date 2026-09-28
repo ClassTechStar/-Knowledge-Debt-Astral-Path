@@ -67,7 +67,13 @@ internal sealed class MainForm : Form
             // ★ OCR 宿主桥：页面 postMessage({type:"astralpath.ocr",...}) → 本壳跑管线 → 回传文本
             _web.CoreWebView2.WebMessageReceived += OnWebMessage;
             // 本地单体：禁止页面再依赖远程 API；脚本即全部能力
-            _web.CoreWebView2.Navigate(new Uri(html).AbsoluteUri);
+            // 虚拟域映射（P0 修复 2026-09-28）：file:// 下 Chromium 禁 Worker/fetch 本地资源，
+            // pdf.js worker 与 WASM OCR 引擎全部失效 → 文本层回退裸解析器 → 乱码被当成功接受。
+            // 映射 https://appassets.local → 应用根目录后，worker/WASM 与宿主桥(postMessage)均可用。
+            var appRoot = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
+            _web.CoreWebView2.SetVirtualHostNameToFolderMapping(
+                "appassets.local", appRoot, CoreWebView2HostResourceAccessKind.Allow);
+            _web.CoreWebView2.Navigate("https://appassets.local/Resources/index.html");
         }
         catch (Exception ex)
         {

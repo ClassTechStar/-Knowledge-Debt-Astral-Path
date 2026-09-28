@@ -453,6 +453,7 @@ async function readFileAsText(file){
     const g=garbledPages(text);
     if(readable<40)return {text:text,ok:false,reason:"PDF 文本层不足（扫描件或无 Unicode 映射的内嵌字体）",chars:readable,ratio:ratio,needOcr:true,pages:[],garbled:g};
     if(g.dense||g.flaggedPages.length)return {text:text,ok:false,reason:"PDF 文本层存在字体乱码（行级命中 "+g.flagLines+" 行）",chars:readable,ratio:ratio,needOcr:true,pages:[],garbled:g};
+    if(ratio<0.70)return {text:text,ok:false,reason:"PDF 文本层疑似乱码（可读率 "+Math.round(ratio*100)+"%，多为内嵌字体缺少 ToUnicode 映射）",chars:readable,ratio:ratio,needOcr:true,pages:[],garbled:g};
     return {text:text,ok:true,chars:readable,ratio:ratio};
   }
   let text="";
@@ -788,9 +789,12 @@ function makeBookFromFile(name,text,mode,kind){
   book.qs=generateQuestions(book);
   return book;
 }
+let _parsing=false;
 async function parseFiles(fileList,mode){
+  if(_parsing)throw new Error("已有解析任务在进行中，请等待完成（或换用 quick 模式）");
+  _parsing=true;
   const files=Array.prototype.slice.call(fileList||[]);
-  if(!files.length)throw new Error("请先选择文件");
+  if(!files.length){_parsing=false;throw new Error("请先选择文件");}
   const results=[],errors=[];
   $("parseProg").hidden=false;
   for(let i=0;i<files.length;i++){
@@ -804,8 +808,12 @@ async function parseFiles(fileList,mode){
         // ② WASM 引擎：浏览器/安卓（tesseract.js LSTM，chi_sim+eng、OEM=1、PSM=3、采样策略与 python 管线对齐）
         setMatStatus("","「"+f.name+"」"+(r.reason||"文本层不可用")+"，自动转 OCR 识别（大文件可能需要几分钟）…");
         let o=null,ocrErr=null,ocrEngine="";
+        // OCR 桥无流式进度：显示已等待秒数，避免"像卡死"导致重复点击（2026-09-28 实测教训）
+        const _ocrT0=Date.now();
+        const _ocrTick=setInterval(function(){setMatStatus("","「"+f.name+"」OCR 运行中，已等待 "+Math.round((Date.now()-_ocrT0)/1000)+" 秒…（标准模式全书 OCR 最长约 15 分钟）");},3000);
         try{o=await ocrViaHost(f,mode,r.pages);if(o)ocrEngine="宿主桥（python+tesseract"+(r.pages&&r.pages.length?"·定向 "+r.pages.length+" 页":"")+"）";}
         catch(e){ocrErr=(e&&e.message)||String(e);}
+        clearInterval(_ocrTick);
         if(!o&&window.__AP_WASM_OCR__){
           try{
             window.__AP_WASM_OCR__.setProgress(function(m){setMatStatus("",m);});
@@ -844,7 +852,7 @@ async function parseFiles(fileList,mode){
     }catch(e){errors.push({name:f.name,reason:e.message||String(e)});}
     $("parseProgBar").style.width=Math.round((i+1)/files.length*100)+"%";
   }
-  $("parseProg").hidden=true;$("parseProgBar").style.width="0%";
+  $("parseProg").hidden=true;$("parseProgBar").style.width="0%";_parsing=false;
   return {results:results,errors:errors};
 }
 
@@ -1466,6 +1474,8 @@ $("btnSeed").onclick=$("btnSeed2").onclick=()=>{
 $("btnUpload").onclick=async()=>{
   const fs=$("fileInput").files;const mode=$("ocrMode").value||"standard";
   if(!fs||!fs.length){setMatStatus("warn","请先选择文件");return;}
+  if($("btnUpload").disabled){setMatStatus("warn","解析进行中，请稍候…");return;}
+  $("btnUpload").disabled=true;
   setMatStatus("","本机解析 "+fs.length+" 个文件…");
   try{
     const rr=await parseFiles(fs,mode);
@@ -1477,6 +1487,7 @@ $("btnUpload").onclick=async()=>{
       setTimeout(()=>go("graph"),300);
     }else setMatStatus("err","解析失败："+rr.errors.map(e=>e.name+"："+e.reason).join("；")+"。可用「粘贴正文」兜底。");
   }catch(e){setMatStatus("err","解析异常："+(e.message||e));}
+  $("btnUpload").disabled=false;
 };
 $("btnPasteParse").onclick=()=>{
   const text=($("pasteText").value||"").trim();

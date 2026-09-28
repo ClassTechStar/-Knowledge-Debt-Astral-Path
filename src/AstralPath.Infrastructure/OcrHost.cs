@@ -39,6 +39,22 @@ public static class OcrHost
         return FindTool(Path.Combine("tools", "ocr_pipeline.py"));
     }
 
+
+    /// <summary>P0-5：OCR 超时按模式参数化——full 全书 OCR 需要长超时；
+    /// ASTRALPATH_OCR_TIMEOUT_SECONDS 可整体覆盖（秒）。与 MaterialPipeline 保持一致。</summary>
+    private static int ResolveTimeoutMinutes(string ocrMode)
+    {
+        var env = Environment.GetEnvironmentVariable("ASTRALPATH_OCR_TIMEOUT_SECONDS");
+        if (double.TryParse(env, out var sec) && sec > 0)
+            return Math.Max(1, (int)Math.Ceiling(sec / 60.0));
+        return ocrMode switch
+        {
+            "full" => 40,
+            "standard" => 20,
+            _ => 3,
+        };
+    }
+
     /// <summary>定位 Python 解释器：环境变量 → tools 旁专用 venv → 系统 PATH 上的 python。</summary>
     public static string ResolvePython()
     {
@@ -73,7 +89,7 @@ public static class OcrHost
 
     /// <summary>
     /// 执行 OCR 管线：写入临时 PDF → python 管线 → 读取 fullText JSON。
-    /// 10 分钟看门狗，超时杀进程树；临时文件在 finally 中清理。
+    /// 看门狗按模式参数化（ResolveTimeoutMinutes），超时杀进程树；临时文件在 finally 中清理。
     /// </summary>
     public static async Task<string> RunAsync(string name, string mode, string? pages, string base64)
     {
@@ -125,13 +141,15 @@ public static class OcrHost
             using var proc = Start(python, psi);
             var stdoutTask = proc.StandardOutput.ReadToEndAsync();
             var stderrTask = proc.StandardError.ReadToEndAsync();
-            // OCR 大书可能要几分钟：10 分钟看门狗，超时杀进程树（对齐后端管线的防死锁经验）
-            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(10));
+            // P0-5 对齐 MaterialPipeline：超时按模式（full 40min / standard 20min / 其他 3min），
+            // ASTRALPATH_OCR_TIMEOUT_SECONDS 可整体覆盖；扫描书/图文书 standard 全页 OCR 需 >10 分钟
+            var timeoutMinutes = ResolveTimeoutMinutes(mode);
+            using var cts = new CancellationTokenSource(TimeSpan.FromMinutes(timeoutMinutes));
             try { await proc.WaitForExitAsync(cts.Token); }
             catch (OperationCanceledException)
             {
                 try { proc.Kill(entireProcessTree: true); } catch { /* ignore */ }
-                throw new TimeoutException("OCR 超时（10 分钟）；可改用 quick 模式或拆分文件");
+                throw new TimeoutException($"OCR 超时({timeoutMinutes}min)；可改用 quick 模式或拆分文件");
             }
             var stderr = await stderrTask;
             if (!File.Exists(outFile))
