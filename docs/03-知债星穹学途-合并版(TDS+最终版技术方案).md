@@ -1,3 +1,49 @@
+<!-- ═══════════ 2026-09-28 项目最新状态速览（由开发会话自动更新） ═══════════
+本文件主体为 2026-09-25 版本；以下横幅汇总 09-26 至 09-28 的全部进展。最新细节以
+GitHub 仓库 docs/ 目录为准（ocr-engine-bench-report / ocr-p0-p3-round2-completion /
+ocr-max-vs-production / mlp-web-e2e 等报告）。
+-->
+
+# 项目最新状态速览（2026-09-28）
+
+**版本**：单体版 2.2.x（Web/Windows 壳/Android 壳三镜像逐字节一致，md5 门禁）
+**质量门**：.NET 测试 193/193 绿（Core62/Desktop51/Api70/Persistence8/Eval2）+ 四道静态门禁全绿
+（常量对齐 26 项 / 意图四方对拍 22 项 / 三镜像同步 / verify_all 一键验收）
+
+**Android APK 2.2.0（2026-09-28 验收通过）**：
+- elease/AstralPath-Android-2.2.0-Store.apk · 包名 com.astralpath.app.v22 · versionCode 32 / 2.2.0
+- minSdk 26 / targetSdk 35 · 签名 v1/v2/v3（CN=AstralPath）· 模拟器 test35 安装启动成功
+- 三端同源：APK 内 ssets/www/index.html 与 monolith 源 SHA256 一致；ocr-engine 179 资源随包
+- 12 本 PDF MLP 抽样验收（docs/mlp-acceptance-2026-09-28.md）：OCR 12/12 · 知识图谱 12/12 · 智能体 22 意图+危机词通过
+
+**OCR（重大更新）**：
+- 引擎评估与集成：本地 RapidOCR 仓库 v3 线（PP-OCRv6 模型）胜出并集成生产管线，
+  1.45 页/s = 3.5× 旧 rapidocr_onnxruntime 1.4.4 = 13.9× PaddleOCR（质量三家持平）
+- 并行：页级多线程（渲染串行 + OCR 4 线程并行）；受内存带宽限制单机吞吐上限 ~1.3–1.6 页/s
+- 生产侧 P0 缺陷全部修复：抽取器三路交叉验证、康熙部首还原、图片化代码书全书 OCR、
+  --ocr full 全书模式、C# 超时按模式参数化（full 40min/standard 20min）、wide-garble 逐页回填
+- 回归门 `tools/ocr_regression.py`：12 本 PDF 12/12 PASS（字符量达基线 99.3–106%，
+  页级探针覆盖 75%→98.8%，康熙部首伪字 0）
+
+**知识图谱**：kg_builder jieba 分词/破环/强边、deep_chapters 目录页集中解析与章节模式扩展
+（强化学习 1 章→10 章、自制框架 1 章→60 章）、KG 输入质量闸标记
+
+**智能体**：22 意图 JSON/JS/C# 三方逐字对拍 ALL GREEN、危机词安全路径（11 词，转人工话术）、
+RoleMask 多角色、P4-4 假成功修复、出题确定性洗牌
+
+**Windows 便携版 exe（2026-09-28 新增）**：
+- `release/AstralPath-Portable-2.2.0/`（582MB，免安装解压即用）+ 同名 .zip；双击 `AstralPath.Monolith.exe` 启动
+  （.NET 10 自包含，目标机无需装 .NET；WebView2 用系统自带）
+- 宿主 OCR 桥：页面 → WebView2 postMessage → `tools/ocr_pipeline.py`（随包，RapidOCR v3 + 4 线程并行）→ 回传文本；
+  超时按模式参数化（full 40min / standard 20min / 其他 3min，OcrHost 与 MaterialPipeline 已对齐）
+- 关键修复：壳内页面从 file:// 改挂 `https://appassets.local` 虚拟域（WebView2 SetVirtualHostNameToFolderMapping）——
+  file:// 下 Chromium 禁 Worker，pdf.js 与 WASM 全部失效，乱码文本曾被当成功接受；恢复"可读率<0.70 判乱码"闸
+- 真窗口实测（12 本 PDF，standard 模式）：pdf.js 文本层书秒级解析；扫描/图文书宿主桥 OCR（回归门同源 CLI 已 12/12 PASS）
+
+**Web 端 MLP 实测（09-28）**：12 本 PDF 全流程 12/12 通过——11 本 pdf.js 文本层直读 2–7 秒/本，
+纯扫描书自动降级 WASM OCR（Tesseract chi_sim+eng，59 秒）；修复了 09-27 一次镜像同步
+意外覆盖丢失的整个浏览器解析栈（详见 docs/mlp-web-e2e-2026-09-28.md）
+
 # 知债：星穹学途（Knowledge Debt: Astral Path）· 跨课程知识债诊断与修复智能体（契约 + 跨端客户端版）
 
 > **项目名称规范（全文唯一口径）**
@@ -30520,3 +30566,4 @@ RACI 与模块治理详见 `docs/附录-四人分工详细矩阵(RACI-模块-风
 ---
 
 **本篇结束 · 复刻篇版本 `replication-v1.0`（2026-09-25）**
+

@@ -1,0 +1,376 @@
+{
+  "time": "2026-09-28 13:39:24",
+  "ocr": {
+    "ok": 12,
+    "total": 12,
+    "rows": [
+      {
+        "name": "Kotlin编程实践：Kotlin从入门到实战.pdf",
+        "exists": true,
+        "page_count": 294,
+        "sample_chars": [
+          0,
+          184,
+          666,
+          6,
+          503
+        ],
+        "avg_chars": 271.8,
+        "likely_scanned": false,
+        "ok": true,
+        "mode": "mixed",
+        "pages": 24,
+        "chars": 14130,
+        "ocr_pages": 6,
+        "elapsed_s": 0.2
+      },
+      {
+        "name": "Go语言从入门到精通.pdf",
+        "exists": true,
+        "page_count": 506,
+        "sample_chars": [
+          0,
+          361,
+          473,
+          254,
+          1379
+        ],
+        "avg_chars": 493.4,
+        "likely_scanned": false,
+        "ok": true,
+        "mode": "mixed",
+        "pages": 24,
+        "chars": 11462,
+        "ocr_pages": 15,
+        "elapsed_s": 0.5
+      },
+      {
+        "name": "大模型应用开发：动手做 AI Agent (黄佳) .pdf",
+        "exists": true,
+        "page_count": 290,
+        "sample_chars": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "avg_chars": 0.0,
+        "likely_scanned": true,
+        "ok": true,
+        "mode": "mixed",
+        "pages": 24,
+        "chars": 14782,
+        "ocr_pages": 24,
+        "elapsed_s": 0.1
+      },
+      {
+        "name": "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF",
+        "exists": true,
+        "page_count": 504,
+        "sample_chars": [
+          0,
+          538,
+          403,
+          635,
+          602
+        ],
+        "avg_chars": 435.6,
+        "likely_scanned": false,
+        "ok": true,
+        "mode": "mixed",
+        "pages": 24,
+        "chars": 20200,
+        "ocr_pages": 24,
+        "elapsed_s": 0.1
+      },
+      {
+        "name": "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf",
+        "exists": true,
+        "page_count": 333,
+        "sample_chars": [
+          0,
+          204,
+          631,
+          464,
+          0
+        ],
+        "avg_chars": 259.8,
+        "likely_scanned": false,
+        "ok": true,
+        "mode": "mixed",
+        "pages": 24,
+        "chars": 20041,
+        "ocr_pages": 24,
+        "elapsed_s": 0.1
+      },
+      {
+        "name": "C#从入门到精通（第7版）+(明日科技)+.pdf",
+        "exists": true,
+        "page_count": 868,
+        "sample_chars": [
+          0,
+          673,
+          21,
+          68,
+          0
+        ],
+        "avg_chars": 152.4,
+        "likely_scanned": false,
+        "ok": true,
+        "mode": "mixed",
+        "pages": 24,
+        "chars": 9340,
+        "ocr_pages": 16,
+        "elapsed_s": 0.3
+      },
+      {
+        "name": "深度学习进阶：自然语言处理 (斋藤康毅) .pdf",
+        "exists": true,
+        "page_count": 427,
+        "sample_chars": [
+          0,
+          734,
+          516,
+          599,
+          0
+        ],
+        "avg_chars": 369.8,
+        "likely_scanned": false,
+        "ok": true,
+        "mode": "mixed",
+        "pages": 24,
+        "chars": 12131,
+        "ocr_pages": 5,
+        "elapsed_s": 0.1
+      },
+      {
+        "name": "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf",
+        "exists": true,
+        "page_count": 201,
+        "sample_chars": [
+          0,
+          1562,
+          1223,
+          1334,
+          1142
+        ],
+        "avg_chars": 1052.2,
+        "likely_scanned": false,
+        "ok": true,
+        "mode": "mixed",
+        "pages": 24,
+        "chars": 21200,
+        "ocr_pages": 3,
+        "elapsed_s": 0.9
+      },
+      {
+        "name": "Java从入门到精通（第6版） (明日科技) .pdf",
+        "exists": true,
+        "page_count": 775,
+        "sample_chars": [
+          0,
+          305,
+          431,
+          422,
+          194
+        ],
+        "avg_chars": 270.4,
+        "likely_scanned": false,
+        "ok": true,
+        "mode": "mixed",
+        "pages": 24,
+        "chars": 8007,
+        "ocr_pages": 11,
+        "elapsed_s": 0.1
+      },
+      {
+        "name": "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf",
+        "exists": true,
+        "page_count": 738,
+        "sample_chars": [
+          13,
+          812,
+          605,
+          901,
+          587
+        ],
+        "avg_chars": 583.6,
+        "likely_scanned": false,
+        "ok": true,
+        "mode": "mixed",
+        "pages": 24,
+        "chars": 10568,
+        "ocr_pages": 0,
+        "elapsed_s": 0.1
+      },
+      {
+        "name": "Python编程：从入门到实践（第3版）.pdf",
+        "exists": true,
+        "page_count": 732,
+        "sample_chars": [
+          0,
+          849,
+          817,
+          228,
+          0
+        ],
+        "avg_chars": 378.8,
+        "likely_scanned": false,
+        "ok": true,
+        "mode": "mixed",
+        "pages": 24,
+        "chars": 6860,
+        "ocr_pages": 1,
+        "elapsed_s": 0.3
+      },
+      {
+        "name": "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf",
+        "exists": true,
+        "page_count": 314,
+        "sample_chars": [
+          0,
+          612,
+          324,
+          570,
+          251
+        ],
+        "avg_chars": 351.4,
+        "likely_scanned": false,
+        "ok": true,
+        "mode": "mixed",
+        "pages": 24,
+        "chars": 12146,
+        "ocr_pages": 4,
+        "elapsed_s": 0.1
+      }
+    ]
+  },
+  "kg": {
+    "ok": 12,
+    "total": 12,
+    "rows": [
+      {
+        "name": "Kotlin编程实践：Kotlin从入门到实战.pdf",
+        "text_chars": 16464,
+        "ok": true,
+        "nodes": 50,
+        "edges": 127,
+        "elapsed_s": 0.0
+      },
+      {
+        "name": "Go语言从入门到精通.pdf",
+        "text_chars": 13574,
+        "ok": true,
+        "nodes": 51,
+        "edges": 106,
+        "elapsed_s": 0.0
+      },
+      {
+        "name": "大模型应用开发：动手做 AI Agent (黄佳) .pdf",
+        "text_chars": 17225,
+        "ok": true,
+        "nodes": 51,
+        "edges": 114,
+        "elapsed_s": 0.0
+      },
+      {
+        "name": "深度学习入门2：自制框架 (斋藤康毅)-扫描版 (1).PDF",
+        "text_chars": 27203,
+        "ok": true,
+        "nodes": 50,
+        "edges": 103,
+        "elapsed_s": 0.1
+      },
+      {
+        "name": "图灵程序设计丛书--深度学习入门4：强化学习 ([日] 斋藤康毅) (1).pdf",
+        "text_chars": 32338,
+        "ok": true,
+        "nodes": 50,
+        "edges": 93,
+        "elapsed_s": 0.0
+      },
+      {
+        "name": "C#从入门到精通（第7版）+(明日科技)+.pdf",
+        "text_chars": 11268,
+        "ok": true,
+        "nodes": 50,
+        "edges": 105,
+        "elapsed_s": 0.0
+      },
+      {
+        "name": "深度学习进阶：自然语言处理 (斋藤康毅) .pdf",
+        "text_chars": 21915,
+        "ok": true,
+        "nodes": 51,
+        "edges": 113,
+        "elapsed_s": 0.0
+      },
+      {
+        "name": "黄仁勋：英伟达之芯_【美】斯蒂芬·威特.pdf",
+        "text_chars": 23933,
+        "ok": true,
+        "nodes": 30,
+        "edges": 47,
+        "elapsed_s": 0.0
+      },
+      {
+        "name": "Java从入门到精通（第6版） (明日科技) .pdf",
+        "text_chars": 10078,
+        "ok": true,
+        "nodes": 51,
+        "edges": 103,
+        "elapsed_s": 0.0
+      },
+      {
+        "name": "深度学习 Deep Learning [花书] (Ian Goodfellow,Yoshua Bengio,Aaron Courville) .pdf",
+        "text_chars": 29067,
+        "ok": true,
+        "nodes": 50,
+        "edges": 84,
+        "elapsed_s": 0.1
+      },
+      {
+        "name": "Python编程：从入门到实践（第3版）.pdf",
+        "text_chars": 9732,
+        "ok": true,
+        "nodes": 50,
+        "edges": 132,
+        "elapsed_s": 0.0
+      },
+      {
+        "name": "深度学习入门：基于Python的理论与实现+(斋藤康毅)+.pdf",
+        "text_chars": 22962,
+        "ok": true,
+        "nodes": 50,
+        "edges": 133,
+        "elapsed_s": 0.0
+      }
+    ]
+  },
+  "agent": {
+    "intents_ok": true,
+    "crisis_ok": true,
+    "routes": [
+      {
+        "label": "诊断",
+        "ok": true
+      },
+      {
+        "label": "计划",
+        "ok": true
+      },
+      {
+        "label": "图谱",
+        "ok": true
+      },
+      {
+        "label": "危机",
+        "ok": true
+      }
+    ],
+    "intent_count": 22,
+    "crisis_hits": 4
+  },
+  "mlp_pass": true
+}

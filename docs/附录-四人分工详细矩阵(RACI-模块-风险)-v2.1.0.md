@@ -1,3 +1,23 @@
+<!-- 2026-09-28 状态更新横幅：分工矩阵主体仍有效。当前里程碑：M-OCR（引擎评估/集成/生产修复/
+回归门）与 M-WEB（浏览器解析栈修复 + 12 本 MLP 实测）已由开发会话完成并推送 GitHub；
+四位成员可按矩阵认领：多会话并发开发时请先 stat 文件 mtime 再动手（教训见 ocr-round2 文档）。最新验证见 docs/mlp-web-e2e-2026-09-28.md、docs/mlp-acceptance-2026-09-28.md。
+
+**Android APK 2.2.0（2026-09-28 验收）**：
+- elease/AstralPath-Android-2.2.0-Store.apk（11MB，包名 com.astralpath.app.v22，versionCode 32）
+- minSdk 26 / targetSdk 35 · 签名 CN=AstralPath · 模拟器 test35 安装启动 OK
+- APK 内 ssets/www/index.html 与 monolith 源 SHA256 一致；ocr-engine 179 资源随包
+- 12 本 PDF MLP 抽样验收：OCR 12/12 · 知识图谱 12/12 · 智能体 22 意图+危机词 通过
+
+**Windows 便携版 exe（2026-09-28 新增）**：
+- `release/AstralPath-Portable-2.2.0/`（582MB，免安装解压即用）+ 同名 .zip；双击 `AstralPath.Monolith.exe` 启动
+  （.NET 10 自包含，目标机无需装 .NET；WebView2 用系统自带）
+- 宿主 OCR 桥：页面 → WebView2 postMessage → `tools/ocr_pipeline.py`（随包，RapidOCR v3 + 4 线程并行）→ 回传文本；
+  超时按模式参数化（full 40min / standard 20min / 其他 3min，OcrHost 与 MaterialPipeline 已对齐）
+- 关键修复：壳内页面从 file:// 改挂 `https://appassets.local` 虚拟域（WebView2 SetVirtualHostNameToFolderMapping）——
+  file:// 下 Chromium 禁 Worker，pdf.js 与 WASM 全部失效，乱码文本曾被当成功接受；恢复"可读率<0.70 判乱码"闸
+- 真窗口实测（12 本 PDF，standard 模式）：pdf.js 文本层书秒级解析；扫描/图文书宿主桥 OCR（回归门同源 CLI 已 12/12 PASS）
+-->
+
 # 知债：星穹学途（Knowledge Debt: Astral Path）· 四人项目团队分工方案
 
 > **项目**：知债：星穹学途（Knowledge Debt: Astral Path） · 跨课程知识债诊断与修复智能体
@@ -1055,3 +1075,4 @@ Code: src/AstralPath.Core/ | Goldens: tests/AstralPath.Mobile.Tests/ (62, tol 1e
 ---
 
 > **使用说明**：本文档供知债：星穹学途（Knowledge Debt: Astral Path）项目团队在竞赛全周期内执行。遇到职责争议时，以「服务 Owner 表 + 交付物验收矩阵」为裁决依据；遇到模块争议时，以「三权分离硬规则」（§8.1 / §8.5 / §8.6）为裁决依据；遇到口径/伦理争议时，以 P1 终审为准。
+
