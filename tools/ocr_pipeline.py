@@ -23,6 +23,12 @@ import traceback
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from table_extract import extract_markdown_tables  # P1-3
+except Exception:  # pragma: no cover
+    extract_markdown_tables = None  # type: ignore
+
 # ---------------------------------------------------------------------------
 # tesseract 路径与 tessdata（完全对齐 tesseract 安装布局）
 # ---------------------------------------------------------------------------
@@ -1175,6 +1181,15 @@ def process_file(path: Path, ocr_mode: str = "standard", force_pages: list[int] 
     result["garblePages"] = detail.get("garbledPages", [])
     result["ocrPages"] = detail.get("ocrPages", [])
     result["ocrUsed"] = bool(detail.get("ocrUsed"))  # P5-5：显式布尔（此前 notes 子串反推，「tesseract_unavailable」也误判 true）
+        # P1-3 表格抽取：识别区转 Markdown
+    if extract_markdown_tables is not None and text:
+        try:
+            text, tables = extract_markdown_tables(text)
+            if tables:
+                result["tables"] = tables
+                result["notes"].append("tables:%d" % len(tables))
+        except Exception as e:
+            result["notes"].append("tables_error:%s" % str(e)[:60])
     result["fullText"] = text  # 供 API 存章节全文
     result["textSample"] = text[:4000]
 
