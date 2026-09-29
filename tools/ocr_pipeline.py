@@ -1885,6 +1885,12 @@ def rapid_pdf_pages_detail(path: Path, page_indexes: list[int], scale: float = 2
 
     used = sum(1 for v in pages_out.values() if v.strip())
     text = "\n".join(pages_out[i] for i in sorted(pages_out) if pages_out[i].strip())
+    # P0-2 流式进度：宿主桥读 stderr 的 PROGRESS 行
+    try:
+        sys.stderr.write("PROGRESS ocr %d/%d\\n" % (used, min(max_pages, total)))
+        sys.stderr.flush()
+    except Exception:
+        pass
     note = f"rapidocr:{used}/{min(max_pages, total)} workers={workers} intra={_rapid_intra()}"
     if _failed:
         note += f" fail={len(_failed)}"

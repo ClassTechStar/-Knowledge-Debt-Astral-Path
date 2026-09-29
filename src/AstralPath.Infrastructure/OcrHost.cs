@@ -90,8 +90,10 @@ public static class OcrHost
     /// <summary>
     /// 执行 OCR 管线：写入临时 PDF → python 管线 → 读取 fullText JSON。
     /// 看门狗按模式参数化（ResolveTimeoutMinutes），超时杀进程树；临时文件在 finally 中清理。
+    /// <paramref name="onProgress"/> 接收 stderr 中的 <c>PROGRESS …</c> 行（P0-2 流式进度）。
     /// </summary>
-    public static async Task<string> RunAsync(string name, string mode, string? pages, string base64)
+    public static async Task<string> RunAsync(string name, string mode, string? pages, string base64,
+        Action<string>? onProgress = null)
     {
         var script = ResolveScript() ??
             throw new InvalidOperationException("未找到 tools\\ocr_pipeline.py（请完整安装，或设置 ASTRALPATH_OCR_SCRIPT）");
@@ -118,7 +120,7 @@ public static class OcrHost
             psi.ArgumentList.Add(script);
             psi.ArgumentList.Add(tmp);
             psi.ArgumentList.Add("--ocr");
-            psi.ArgumentList.Add(mode is "quick" or "standard" or "none" ? mode : "standard");
+            psi.ArgumentList.Add(mode is "quick" or "standard" or "full" or "none" ? mode : "standard");
             if (!string.IsNullOrWhiteSpace(pages))
             {
                 psi.ArgumentList.Add("--pages");
@@ -140,7 +142,17 @@ public static class OcrHost
 
             using var proc = Start(python, psi);
             var stdoutTask = proc.StandardOutput.ReadToEndAsync();
-            var stderrTask = proc.StandardError.ReadToEndAsync();
+            // P0-2：边读 stderr 边上抛 PROGRESS 行
+            var stderrBuilder = new System.Text.StringBuilder();
+            var stderrTask = Task.Run(async () =>
+            {
+                while (await proc.StandardError.ReadLineAsync() is { } line)
+                {
+                    stderrBuilder.AppendLine(line);
+                    if (onProgress is not null && line.StartsWith("PROGRESS", StringComparison.Ordinal))
+                        onProgress(line);
+                }
+            });
             // P0-5 对齐 MaterialPipeline：超时按模式（full 40min / standard 20min / 其他 3min），
             // ASTRALPATH_OCR_TIMEOUT_SECONDS 可整体覆盖；扫描书/图文书 standard 全页 OCR 需 >10 分钟
             var timeoutMinutes = ResolveTimeoutMinutes(mode);
@@ -151,7 +163,8 @@ public static class OcrHost
                 try { proc.Kill(entireProcessTree: true); } catch { /* ignore */ }
                 throw new TimeoutException($"OCR 超时({timeoutMinutes}min)；可改用 quick 模式或拆分文件");
             }
-            var stderr = await stderrTask;
+            await stderrTask;
+            var stderr = stderrBuilder.ToString();
             if (!File.Exists(outFile))
                 throw new InvalidOperationException("OCR 输出缺失 exit=" + proc.ExitCode + " " + Truncate(stderr, 200));
 
@@ -175,6 +188,19 @@ public static class OcrHost
         {
             throw new InvalidOperationException("未找到 Python（" + python + "）。请安装 Python，或设置 ASTRALPATH_OCR_PYTHON 指向 python.exe", ex);
         }
+    }
+
+    /// <summary>P3-4：清理本地 OCR 页缓存（~/.astralpath/ocr-cache）。</summary>
+    public static int ClearOcrCache()
+    {
+        var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".astralpath", "ocr-cache");
+        if (!Directory.Exists(dir)) return 0;
+        var n = 0;
+        foreach (var f in Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories))
+        {
+            try { File.Delete(f); n++; } catch { /* ignore */ }
+        }
+        return n;
     }
 
     private static string Truncate(string? s, int n)

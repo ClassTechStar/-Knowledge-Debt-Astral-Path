@@ -92,6 +92,16 @@ internal sealed class MainForm : Form
         OcrRequest? req;
         try { req = JsonSerializer.Deserialize<OcrRequest>(e.WebMessageAsJson, JsonOpts); }
         catch { return; } // 非 JSON 消息一律忽略
+        if (req is { Type: "astralpath.cache.clear" } && !string.IsNullOrEmpty(req.Id))
+        {
+            var cid = req.Id!;
+            _ = Task.Run(() =>
+            {
+                try { OcrHost.ClearOcrCache(); } catch { /* ignore */ }
+                Reply(cid, "ok", "");
+            });
+            return;
+        }
         if (req is not { Type: "astralpath.ocr" } || string.IsNullOrEmpty(req.Id) || string.IsNullOrEmpty(req.Data)) return;
 
         var id = req.Id;
@@ -104,7 +114,26 @@ internal sealed class MainForm : Form
     {
         string? text = null;
         var error = "";
-        try { text = await OcrHost.RunAsync(name, mode, pages, base64); }
+        try
+        {
+            text = await OcrHost.RunAsync(name, mode, pages, base64, onProgress: line =>
+            {
+                // P0-2 流式进度：把 PROGRESS 行回传页面，驱动 OCR 进度文案
+                var payload = new Dictionary<string, object?>
+                {
+                    ["type"] = "astralpath.ocr.progress",
+                    ["id"] = id,
+                    ["message"] = line
+                };
+                var json = JsonSerializer.Serialize(payload, JsonOpts);
+                void Post()
+                {
+                    try { _web.CoreWebView2?.PostWebMessageAsJson(json); }
+                    catch { /* ignore */ }
+                }
+                if (InvokeRequired) BeginInvoke((Action)Post); else Post();
+            });
+        }
         catch (Exception ex) { error = ex.Message; }
         Reply(id, text, error);
     }
