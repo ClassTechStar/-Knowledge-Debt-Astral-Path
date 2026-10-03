@@ -1,0 +1,8 @@
+# Cloudflare Pages 路由 · 知债：星穹学途
+# 单体版是单页应用，仅 index.html 一个入口；其余路径回退到首页由前端处理
+# ocr-engine/ 下的静态资源必须直出，不能回退到 index.html
+
+/ocr-engine/*
+  200 /ocr-engine/:splat
+
+/*  /index.html  200

@@ -98,3 +98,10 @@ release/AstralPath-Portable-*/
 release/AstralPath-Portable-*.zip
 
 src/AstralPath.Monolith/publish/
+
+# Cloudflare Pages 部署产物（11MB，用 .cloudflare/sync.sh 同步 deploy/monolith-web 后上传）
+# 排除大体积产物，但保留 _headers / _redirects（Pages 路由与响应头配置，入库才生效）
+.cloudflare/pages/*
+!.cloudflare/pages/_headers
+!.cloudflare/pages/_redirects
+.cloudflare/.wrangler/
