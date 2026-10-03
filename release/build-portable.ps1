@@ -22,7 +22,11 @@ New-Item -ItemType Directory -Force (Join-Path $out "tools") | Out-Null
 foreach ($f in @("ocr_pipeline.py", "deep_chapters.py", "kg_algorithm.py", "kg_builder.py", "agent-intents.json", "table_extract.py")) {
     Copy-Item "$repo\tools\$f" "$out\tools\" -Force
 }
-Copy-Item "$repo\tools\tessdata" "$out\tools\tessdata" -Recurse -Force
+if (Test-Path "$repo\tools\tessdata") {
+    Copy-Item "$repo\tools\tessdata" "$out\tools\tessdata" -Recurse -Force
+} else {
+    Write-Host "WARN: tools\tessdata not found (rapid engine does not need it)" -ForegroundColor Yellow
+}
 robocopy "$repo\tools\ocr-venv" "$out\tools\ocr-venv" /E /R:1 /W:1 /NFL /NDL /NP /XD __pycache__ tests test | Out-Null
 if ($LASTEXITCODE -ge 8) { throw "ocr-venv copy failed" }
 
