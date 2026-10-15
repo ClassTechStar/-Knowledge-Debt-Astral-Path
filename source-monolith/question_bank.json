@@ -1,0 +1,1602 @@
+[
+  {
+    "id": "Q001",
+    "kp_id": "N01",
+    "stem": "会计的基本职能包括？",
+    "answer_kind": "choice",
+    "options": [
+      "核算与监督",
+      "只有核算",
+      "只有监督",
+      "只有预测"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q002",
+    "kp_id": "N01",
+    "stem": "会计对象是？",
+    "answer_kind": "choice",
+    "options": [
+      "资金运动",
+      "企业人员",
+      "办公设备",
+      "合同文本"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q003",
+    "kp_id": "N02",
+    "stem": "下列属于会计要素的是？",
+    "answer_kind": "choice",
+    "options": [
+      "资产",
+      "温度",
+      "速度",
+      "颜色"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q004",
+    "kp_id": "N02",
+    "stem": "会计要素共分几类？",
+    "answer_kind": "choice",
+    "options": [
+      "六类",
+      "三类",
+      "九类",
+      "十二类"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q005",
+    "kp_id": "N02",
+    "stem": "收入属于哪一类要素？",
+    "answer_kind": "choice",
+    "options": [
+      "收入类",
+      "资产类",
+      "负债类",
+      "成本类"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q006",
+    "kp_id": "N03",
+    "stem": "会计等式正确的是？",
+    "answer_kind": "choice",
+    "options": [
+      "资产=负债+所有者权益",
+      "资产=负债",
+      "资产=收入",
+      "负债=收入"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q007",
+    "kp_id": "N03",
+    "stem": "所有者权益=？",
+    "answer_kind": "choice",
+    "options": [
+      "资产-负债",
+      "资产+负债",
+      "收入-费用",
+      "资产-收入"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q008",
+    "kp_id": "N03",
+    "stem": "反映财务状况的等式是？",
+    "answer_kind": "choice",
+    "options": [
+      "资产=负债+权益",
+      "收入=费用+利润",
+      "资产=收入",
+      "负债=费用"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q009",
+    "kp_id": "N04",
+    "stem": "会计科目是对什么的分类？",
+    "answer_kind": "choice",
+    "options": [
+      "会计要素",
+      "会计凭证",
+      "会计报表",
+      "会计人员"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q010",
+    "kp_id": "N04",
+    "stem": "下列属于资产类科目的是？",
+    "answer_kind": "choice",
+    "options": [
+      "银行存款",
+      "实收资本",
+      "主营业务收入",
+      "管理费用"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q011",
+    "kp_id": "N05",
+    "stem": "账户的贷方登记？",
+    "answer_kind": "choice",
+    "options": [
+      "负债与权益增加",
+      "资产增加",
+      "费用增加",
+      "资产减少"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q012",
+    "kp_id": "N05",
+    "stem": "期末余额=？",
+    "answer_kind": "choice",
+    "options": [
+      "期初+本期增加-本期减少",
+      "期初+本期减少",
+      "期初×2",
+      "本期增加"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q013",
+    "kp_id": "N06",
+    "stem": "借贷记账法的记账符号是？",
+    "answer_kind": "choice",
+    "options": [
+      "借贷",
+      "增减",
+      "收支",
+      "进出"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q014",
+    "kp_id": "N06",
+    "stem": "资产增加记？",
+    "answer_kind": "choice",
+    "options": [
+      "借方",
+      "贷方",
+      "双方",
+      "不记账"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q015",
+    "kp_id": "N06",
+    "stem": "负债增加记？",
+    "answer_kind": "choice",
+    "options": [
+      "贷方",
+      "借方",
+      "红字",
+      "不记账"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q016",
+    "kp_id": "N06",
+    "stem": "费用增加记？",
+    "answer_kind": "choice",
+    "options": [
+      "借方",
+      "贷方",
+      "借或贷",
+      "从不"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q017",
+    "kp_id": "N07",
+    "stem": "会计分录不包括？",
+    "answer_kind": "choice",
+    "options": [
+      "记账颜色",
+      "账户名称",
+      "记账方向",
+      "金额"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q018",
+    "kp_id": "N07",
+    "stem": "复合分录是指？",
+    "answer_kind": "choice",
+    "options": [
+      "一借多贷等",
+      "只有借",
+      "只有贷",
+      "无金额"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q019",
+    "kp_id": "N08",
+    "stem": "试算平衡检查？",
+    "answer_kind": "choice",
+    "options": [
+      "借方合计=贷方合计",
+      "收入=资产",
+      "负债=费用",
+      "人员=编制"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q020",
+    "kp_id": "N08",
+    "stem": "试算平衡表平衡则记账？",
+    "answer_kind": "choice",
+    "options": [
+      "基本无误",
+      "一定正确",
+      "一定错误",
+      "无需审核"
+    ],
+    "correct_index": 1,
+    "difficulty": 3,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q021",
+    "kp_id": "N09",
+    "stem": "原始凭证的作用是？",
+    "answer_kind": "choice",
+    "options": [
+      "记录经济业务发生",
+      "记录账簿页码",
+      "记录会计政策",
+      "记录报表格式"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q022",
+    "kp_id": "N09",
+    "stem": "记账凭证的依据是？",
+    "answer_kind": "choice",
+    "options": [
+      "原始凭证",
+      "会计报表",
+      "会计科目表",
+      "人员名单"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q023",
+    "kp_id": "N10",
+    "stem": "明细账通常采用？",
+    "answer_kind": "choice",
+    "options": [
+      "活页式或卡片式",
+      "仅订本式",
+      "仅备查簿",
+      "仅日记账"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q024",
+    "kp_id": "N10",
+    "stem": "日记账属于？",
+    "answer_kind": "choice",
+    "options": [
+      "序时账簿",
+      "分类账簿",
+      "备查账簿",
+      "联合账簿"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q025",
+    "kp_id": "N11",
+    "stem": "财产清查的目的是？",
+    "answer_kind": "choice",
+    "options": [
+      "账实相符",
+      "增加利润",
+      "减少税收",
+      "更换账簿"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q026",
+    "kp_id": "N11",
+    "stem": "银行存款清查采用？",
+    "answer_kind": "choice",
+    "options": [
+      "银行对账单核对",
+      "实地盘点",
+      "技术推算",
+      "函证核对"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q027",
+    "kp_id": "N11",
+    "stem": "库存现金清查采用？",
+    "answer_kind": "choice",
+    "options": [
+      "实地盘点",
+      "技术推算",
+      "抽样估计",
+      "账账核对"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q028",
+    "kp_id": "N12",
+    "stem": "资产负债表反映？",
+    "answer_kind": "choice",
+    "options": [
+      "财务状况",
+      "经营成果",
+      "现金流量",
+      "人员构成"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q029",
+    "kp_id": "N12",
+    "stem": "利润表反映？",
+    "answer_kind": "choice",
+    "options": [
+      "经营成果",
+      "财务状况",
+      "市场份额",
+      "股东人数"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q030",
+    "kp_id": "N12",
+    "stem": "资产负债表是？",
+    "answer_kind": "choice",
+    "options": [
+      "静态报表",
+      "动态报表",
+      "统计报表",
+      "税务报表"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q031",
+    "kp_id": "N03",
+    "stem": "收入-费用=？",
+    "answer_kind": "choice",
+    "options": [
+      "利润",
+      "资产",
+      "负债",
+      "权益"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q032",
+    "kp_id": "N06",
+    "stem": "借贷记账法的记账规则是？",
+    "answer_kind": "choice",
+    "options": [
+      "有借必有贷，借贷必相等",
+      "有借无贷",
+      "只记借",
+      "只记贷"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q033",
+    "kp_id": "N05",
+    "stem": "账户的基本结构分？",
+    "answer_kind": "choice",
+    "options": [
+      "左右两方",
+      "上下两方",
+      "三方",
+      "四方"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q034",
+    "kp_id": "N08",
+    "stem": "发生额试算平衡的依据是？",
+    "answer_kind": "choice",
+    "options": [
+      "借贷记账法记账规则",
+      "会计等式",
+      "会计准则",
+      "公司章程"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "会计基础教材",
+    "why": "教材原文/课后题"
+  },
+  {
+    "id": "Q035",
+    "kp_id": "P01",
+    "stem": "Python 中定义整数变量用？",
+    "answer_kind": "choice",
+    "options": [
+      "x = 1",
+      "int x = 1;",
+      "var x = 1;",
+      "let x = 1"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q036",
+    "kp_id": "P01",
+    "stem": "type(3.14) 是？",
+    "answer_kind": "choice",
+    "options": [
+      "float",
+      "int",
+      "str",
+      "bool"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q037",
+    "kp_id": "P01",
+    "stem": "下列是合法变量名？",
+    "answer_kind": "choice",
+    "options": [
+      "my_var",
+      "1var",
+      "my-var",
+      "class"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q038",
+    "kp_id": "P02",
+    "stem": "Python 的整除运算符是？",
+    "answer_kind": "choice",
+    "options": [
+      "//",
+      "/",
+      "%",
+      "**"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q039",
+    "kp_id": "P02",
+    "stem": "取余运算符是？",
+    "answer_kind": "choice",
+    "options": [
+      "%",
+      "//",
+      "/",
+      "*"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q040",
+    "kp_id": "P02",
+    "stem": "2 ** 3 的值是？",
+    "answer_kind": "choice",
+    "options": [
+      "8",
+      "6",
+      "9",
+      "5"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q041",
+    "kp_id": "P03",
+    "stem": "Python 用什么缩进表示块？",
+    "answer_kind": "choice",
+    "options": [
+      "空格/Tab 一致",
+      "大括号",
+      "begin/end",
+      "缩进可任意混用"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q042",
+    "kp_id": "P03",
+    "stem": "if 语句的正确写法是？",
+    "answer_kind": "choice",
+    "options": [
+      "if x>1:",
+      "if (x>1) {}",
+      "if x>1 then",
+      "if x>1"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q043",
+    "kp_id": "P03",
+    "stem": "elif 的含义是？",
+    "answer_kind": "choice",
+    "options": [
+      "否则如果",
+      "结束",
+      "循环",
+      "函数"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q044",
+    "kp_id": "P04",
+    "stem": "for i in range(3) 循环几次？",
+    "answer_kind": "choice",
+    "options": [
+      "3 次",
+      "2 次",
+      "无限次",
+      "0 次"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q045",
+    "kp_id": "P04",
+    "stem": "while 循环的条件为 True 表示？",
+    "answer_kind": "choice",
+    "options": [
+      "无限循环直到 break",
+      "循环 0 次",
+      "语法错误",
+      "只循环一次"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q046",
+    "kp_id": "P04",
+    "stem": "break 的作用是？",
+    "answer_kind": "choice",
+    "options": [
+      "跳出当前循环",
+      "跳出函数",
+      "重启程序",
+      "跳过本次并继续"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q047",
+    "kp_id": "P05",
+    "stem": "列表的类型是？",
+    "answer_kind": "choice",
+    "options": [
+      "list",
+      "dict",
+      "set",
+      "tuple"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q048",
+    "kp_id": "P05",
+    "stem": "字典的类型是？",
+    "answer_kind": "choice",
+    "options": [
+      "dict",
+      "list",
+      "tuple",
+      "str"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q049",
+    "kp_id": "P05",
+    "stem": "元组的特点是？",
+    "answer_kind": "choice",
+    "options": [
+      "不可变",
+      "可变",
+      "可增删",
+      "总是字典"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q050",
+    "kp_id": "P05",
+    "stem": "len([1,2,3]) 是？",
+    "answer_kind": "choice",
+    "options": [
+      "3",
+      "2",
+      "1",
+      "0"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q051",
+    "kp_id": "P05",
+    "stem": "字典取值用？",
+    "answer_kind": "choice",
+    "options": [
+      "d['key']",
+      "d(0)",
+      "d[0] 必然",
+      "d.key()"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q052",
+    "kp_id": "P06",
+    "stem": "定义函数用？",
+    "answer_kind": "choice",
+    "options": [
+      "def f():",
+      "func f() {}",
+      "function f()",
+      "fn f():"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q053",
+    "kp_id": "P06",
+    "stem": "函数返回值用？",
+    "answer_kind": "choice",
+    "options": [
+      "return",
+      "yield 仅此",
+      "print",
+      "echo"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q054",
+    "kp_id": "P06",
+    "stem": "默认参数写在？",
+    "answer_kind": "choice",
+    "options": [
+      "形参列表",
+      "调用时",
+      "全局",
+      "类里才可"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q055",
+    "kp_id": "P07",
+    "stem": "打开文件用？",
+    "answer_kind": "choice",
+    "options": [
+      "open()",
+      "file()",
+      "read()",
+      "load()"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q056",
+    "kp_id": "P07",
+    "stem": "写入文件的模式是？",
+    "answer_kind": "choice",
+    "options": [
+      "w",
+      "r",
+      "rb",
+      "r+"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q057",
+    "kp_id": "P07",
+    "stem": "读取全部文本的方法是？",
+    "answer_kind": "choice",
+    "options": [
+      "read()",
+      "readline() 仅一行",
+      "write()",
+      "close()"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q058",
+    "kp_id": "P08",
+    "stem": "导入模块用？",
+    "answer_kind": "choice",
+    "options": [
+      "import",
+      "include",
+      "require",
+      "using"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q059",
+    "kp_id": "P08",
+    "stem": "from math import sqrt 表示？",
+    "answer_kind": "choice",
+    "options": [
+      "导入 sqrt 函数",
+      "导入整个 math 重命名",
+      "删除 math",
+      "导入 sqrt 变量"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q060",
+    "kp_id": "P09",
+    "stem": "捕获异常用？",
+    "answer_kind": "choice",
+    "options": [
+      "try/except",
+      "if/else",
+      "for/range",
+      "def/return"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q061",
+    "kp_id": "P09",
+    "stem": "finally 的作用是？",
+    "answer_kind": "choice",
+    "options": [
+      "无论如何都执行",
+      "只在成功时",
+      "只在失败时",
+      "等价于 except"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q062",
+    "kp_id": "P09",
+    "stem": "raise 的作用是？",
+    "answer_kind": "choice",
+    "options": [
+      "抛出异常",
+      "捕获异常",
+      "忽略异常",
+      "打印异常"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q063",
+    "kp_id": "P10",
+    "stem": "定义类用？",
+    "answer_kind": "choice",
+    "options": [
+      "class",
+      "struct",
+      "type",
+      "def class"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q064",
+    "kp_id": "P10",
+    "stem": "构造方法名是？",
+    "answer_kind": "choice",
+    "options": [
+      "__init__",
+      "__new__",
+      "__del__",
+      "__build__"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q065",
+    "kp_id": "P10",
+    "stem": "self 表示？",
+    "answer_kind": "choice",
+    "options": [
+      "实例自身",
+      "类对象",
+      "模块",
+      "全局"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q066",
+    "kp_id": "P10",
+    "stem": "继承的写法是？",
+    "answer_kind": "choice",
+    "options": [
+      "class B(A):",
+      "class B extends A",
+      "class B implements A",
+      "class B inherits A"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q067",
+    "kp_id": "P02",
+    "stem": "比较等于用？",
+    "answer_kind": "choice",
+    "options": [
+      "==",
+      "=",
+      "===",
+      "!="
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "Python 入门教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q068",
+    "kp_id": "D01",
+    "stem": "神经元的输出经过？",
+    "answer_kind": "choice",
+    "options": [
+      "激活函数",
+      "损失函数",
+      "优化器",
+      "池化"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q069",
+    "kp_id": "D01",
+    "stem": "常用激活函数不包括？",
+    "answer_kind": "choice",
+    "options": [
+      "均方误差",
+      "ReLU",
+      "Sigmoid",
+      "Tanh"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q070",
+    "kp_id": "D01",
+    "stem": "ReLU 的表达式是？",
+    "answer_kind": "choice",
+    "options": [
+      "max(0,x)",
+      "1/(1+e^-x)",
+      "tanh(x)",
+      "x^2"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q071",
+    "kp_id": "D02",
+    "stem": "分类任务常用损失是？",
+    "answer_kind": "choice",
+    "options": [
+      "交叉熵",
+      "MSE",
+      "MAE",
+      "Huber"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q072",
+    "kp_id": "D02",
+    "stem": "回归任务常用损失是？",
+    "answer_kind": "choice",
+    "options": [
+      "均方误差",
+      "交叉熵",
+      "铰链损失",
+      "CTC"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q073",
+    "kp_id": "D02",
+    "stem": "交叉熵衡量？",
+    "answer_kind": "choice",
+    "options": [
+      "预测分布与真实分布差异",
+      "参数大小",
+      "学习率",
+      "batch 大小"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q074",
+    "kp_id": "D03",
+    "stem": "梯度下降用于？",
+    "answer_kind": "choice",
+    "options": [
+      "最小化损失",
+      "最大化损失",
+      "数据增强",
+      "归一化"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q075",
+    "kp_id": "D03",
+    "stem": "学习率过大会？",
+    "answer_kind": "choice",
+    "options": [
+      "震荡/不收敛",
+      "必然收敛更快",
+      "无影响",
+      "自动调参"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q076",
+    "kp_id": "D03",
+    "stem": "SGD 是？",
+    "answer_kind": "choice",
+    "options": [
+      "随机梯度下降",
+      "一种激活",
+      "一种卷积",
+      "一种正则"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q077",
+    "kp_id": "D04",
+    "stem": "反向传播的本质是？",
+    "answer_kind": "choice",
+    "options": [
+      "链式法则求梯度",
+      "前向传播",
+      "随机初始化",
+      "数据洗牌"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q078",
+    "kp_id": "D04",
+    "stem": "梯度消失常见于？",
+    "answer_kind": "choice",
+    "options": [
+      "深层网络",
+      "输入层",
+      "输出标签",
+      "数据加载"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q079",
+    "kp_id": "D05",
+    "stem": "卷积核的作用是？",
+    "answer_kind": "choice",
+    "options": [
+      "提取局部特征",
+      "归一化",
+      "优化参数",
+      "生成标签"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q080",
+    "kp_id": "D05",
+    "stem": "卷积层的参数量主要取决于？",
+    "answer_kind": "choice",
+    "options": [
+      "核大小与通道数",
+      "batch size",
+      "学习率",
+      "轮数"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q081",
+    "kp_id": "D05",
+    "stem": "步长 stride 增大则输出？",
+    "answer_kind": "choice",
+    "options": [
+      "尺寸变小",
+      "尺寸变大",
+      "不变",
+      "通道变多"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q082",
+    "kp_id": "D06",
+    "stem": "池化的目的是？",
+    "answer_kind": "choice",
+    "options": [
+      "降维/平移鲁棒",
+      "增加参数",
+      "提高学习率",
+      "生成数据"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q083",
+    "kp_id": "D06",
+    "stem": "最大池化取？",
+    "answer_kind": "choice",
+    "options": [
+      "窗口最大值",
+      "窗口平均",
+      "窗口最小",
+      "窗口求和"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q084",
+    "kp_id": "D07",
+    "stem": "RNN 擅长？",
+    "answer_kind": "choice",
+    "options": [
+      "序列数据",
+      "图像分类",
+      "目标检测",
+      "点云"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q085",
+    "kp_id": "D07",
+    "stem": "LSTM 用于缓解？",
+    "answer_kind": "choice",
+    "options": [
+      "梯度消失/长依赖",
+      "过拟合完全消除",
+      "数据缺失",
+      "过曝"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q086",
+    "kp_id": "D08",
+    "stem": "Transformer 的核心是？",
+    "answer_kind": "choice",
+    "options": [
+      "自注意力",
+      "最大池化",
+      "批归一化",
+      "随机森林"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q087",
+    "kp_id": "D08",
+    "stem": "注意力权重表示？",
+    "answer_kind": "choice",
+    "options": [
+      "相关程度",
+      "学习率",
+      "batch 大小",
+      "文件路径"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q088",
+    "kp_id": "D08",
+    "stem": "位置编码解决？",
+    "answer_kind": "choice",
+    "options": [
+      "序列顺序信息",
+      "标签泄漏",
+      "过拟合必然发生",
+      "显存不足"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q089",
+    "kp_id": "D09",
+    "stem": "过拟合表现为？",
+    "answer_kind": "choice",
+    "options": [
+      "训练好测试差",
+      "训练差测试好",
+      "两者都好",
+      "两者都差"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q090",
+    "kp_id": "D09",
+    "stem": "Dropout 的作用是？",
+    "answer_kind": "choice",
+    "options": [
+      "正则化防过拟合",
+      "增加层数",
+      "加速 IO",
+      "生成标签"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q091",
+    "kp_id": "D09",
+    "stem": "L2 正则又称？",
+    "answer_kind": "choice",
+    "options": [
+      "权重衰减",
+      "Dropout",
+      "数据增强",
+      "批归一化"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q092",
+    "kp_id": "D10",
+    "stem": "数据增强可以？",
+    "answer_kind": "choice",
+    "options": [
+      "扩充训练分布",
+      "修改标签语义",
+      "替换损失",
+      "改优化器"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q093",
+    "kp_id": "D10",
+    "stem": "图像常用增强不包括？",
+    "answer_kind": "choice",
+    "options": [
+      "改变标签编号",
+      "翻转",
+      "裁剪",
+      "颜色抖动"
+    ],
+    "correct_index": 0,
+    "difficulty": 2,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q094",
+    "kp_id": "D11",
+    "stem": "BatchNorm 的作用是？",
+    "answer_kind": "choice",
+    "options": [
+      "稳定训练/加速收敛",
+      "生成数据",
+      "存储权重",
+      "打印日志"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q095",
+    "kp_id": "D11",
+    "stem": "BN 通常加在？",
+    "answer_kind": "choice",
+    "options": [
+      "激活前/后",
+      "损失函数内",
+      "输出标签上",
+      "数据文件里"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q096",
+    "kp_id": "D12",
+    "stem": "Adam 结合了？",
+    "answer_kind": "choice",
+    "options": [
+      "动量与自适应学习率",
+      "只有 SGD",
+      "只有 AdaGrad",
+      "随机森林"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q097",
+    "kp_id": "D12",
+    "stem": "权重初始化常用？",
+    "answer_kind": "choice",
+    "options": [
+      "Xavier/Kaiming",
+      "全 0 必然最佳",
+      "全 1",
+      "NaN"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q098",
+    "kp_id": "D03",
+    "stem": "mini-batch 的优点是？",
+    "answer_kind": "choice",
+    "options": [
+      "更快更稳的梯度估计",
+      "必然全局最优",
+      "无需损失",
+      "自动标注"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q099",
+    "kp_id": "D01",
+    "stem": "深度学习属于？",
+    "answer_kind": "choice",
+    "options": [
+      "机器学习子领域",
+      "纯统计报表",
+      "数据库系统",
+      "操作系统"
+    ],
+    "correct_index": 0,
+    "difficulty": 1,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  },
+  {
+    "id": "Q100",
+    "kp_id": "D05",
+    "stem": "卷积权值共享的好处是？",
+    "answer_kind": "choice",
+    "options": [
+      "减少参数/平移等变",
+      "增加过拟合",
+      "降低准确率",
+      "删除通道"
+    ],
+    "correct_index": 0,
+    "difficulty": 3,
+    "source": "深度学习概论教材",
+    "why": "教材正文/习题"
+  }
+]
