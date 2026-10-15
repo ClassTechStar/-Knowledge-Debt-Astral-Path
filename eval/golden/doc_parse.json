@@ -1,0 +1,89 @@
+{
+  "docxCases": [
+    {
+      "id": "G-DP-DOCX-1",
+      "description": "标题样式 Heading1/2 + 正文段落 → markdown 井号层级",
+      "documentXml": "<w:document xmlns:w=\"http://schemas.openxmlformats.org/wordprocessingml/2006/main\"><w:body><w:p><w:pPr><w:pStyle w:val=\"Heading1\"/></w:pPr><w:r><w:t>第一章 概述</w:t></w:r></w:p><w:p><w:r><w:t>这是概述正文内容。</w:t></w:r></w:p><w:p><w:pPr><w:pStyle w:val=\"Heading2\"/></w:pPr><w:r><w:t>1.1 背景</w:t></w:r></w:p><w:p><w:r><w:t>背景正文。</w:t></w:r></w:p></w:body></w:document>",
+      "expectEngine": "docx",
+      "expectContains": ["# 第一章 概述", "这是概述正文内容。", "## 1.1 背景"]
+    },
+    {
+      "id": "G-DP-DOCX-2",
+      "description": "中文 Word 样式纯数字 '1' → 一级标题",
+      "documentXml": "<w:document xmlns:w=\"x\"><w:body><w:p><w:pPr><w:pStyle w:val=\"1\"/></w:pPr><w:r><w:t>第二章 存储</w:t></w:r></w:p><w:p><w:r><w:t>存储正文。</w:t></w:r></w:p></w:body></w:document>",
+      "expectEngine": "docx",
+      "expectContains": ["# 第二章 存储", "存储正文。"]
+    },
+    {
+      "id": "G-DP-DOCX-3",
+      "description": "缺 word/document.xml → 尽力模式空文本",
+      "documentXml": null,
+      "expectEngine": "docx",
+      "expectBestEffort": true,
+      "expectContains": []
+    }
+  ],
+  "pptxCases": [
+    {
+      "id": "G-DP-PPTX-1",
+      "description": "两页幻灯片 + 备注 → [slide N]/[备注 N] 块",
+      "slides": {
+        "ppt/slides/slide1.xml": "<a:txBody xmlns:a=\"x\"><a:p><a:r><a:t>第一张幻灯片</a:t></a:r></a:p></a:txBody>",
+        "ppt/slides/slide2.xml": "<a:txBody xmlns:a=\"x\"><a:p><a:r><a:t>第二张幻灯片</a:t></a:r></a:p></a:txBody>"
+      },
+      "notes": {
+        "ppt/notesSlides/notesSlide1.xml": "<a:txBody xmlns:a=\"x\"><a:p><a:r><a:t>备注一</a:t></a:r></a:p></a:txBody>"
+      },
+      "expectEngine": "pptx",
+      "expectContains": ["[slide 1]", "第一张幻灯片", "[slide 2]", "第二张幻灯片", "[备注 1]", "备注一"]
+    }
+  ],
+  "epubCases": [
+    {
+      "id": "G-DP-EPUB-1",
+      "description": "container.xml → OPF manifest/spine → 按阅读顺序拼接 XHTML",
+      "container": "<?xml version=\"1.0\"?><container><rootfiles><rootfile full-path=\"OEBPS/content.opf\"/></rootfiles></container>",
+      "opf": "<package><manifest><item id=\"c1\" href=\"ch1.xhtml\"/><item id=\"c2\" href=\"ch2.xhtml\"/></manifest><spine><itemref idref=\"c2\"/><itemref idref=\"c1\"/></spine></package>",
+      "xhtml": {
+        "OEBPS/ch1.xhtml": "<html><body><p>第一章内容</p></body></html>",
+        "OEBPS/ch2.xhtml": "<html><body><p>第二章内容</p></body></html>"
+      },
+      "expectEngine": "epub",
+      "expectContains": ["第二章内容", "第一章内容"],
+      "expectOrder": ["第二章内容", "第一章内容"]
+    },
+    {
+      "id": "G-DP-EPUB-2",
+      "description": "缺 container.xml → 抛错",
+      "container": null,
+      "expectThrows": true
+    }
+  ],
+  "legacyCases": [
+    {
+      "id": "G-DP-LEGACY-1",
+      "description": "UTF-16LE 文本游程提取 + 序列噪声过滤",
+      "textRuns": ["这是旧版文档正文", "更多正文内容ABC123"],
+      "noiseRuns": ["阿啊爱安按把"],
+      "expectEngine": "legacy-binary",
+      "expectBestEffort": true,
+      "expectContains": ["这是旧版文档正文", "更多正文内容ABC123"],
+      "expectNotContains": []
+    }
+  ],
+  "htmlCases": [
+    {
+      "id": "G-DP-HTML-1",
+      "description": "HTML 去标签 + script/style 剥离 + 实体解码",
+      "input": "<html><head><style>p{color:red}</style></head><body><p>标题 &amp; 正文</p><script>alert(1)</script><p>第二段&lt;标记&gt;</p></body></html>",
+      "expectEngine": "html",
+      "expectContains": ["标题 & 正文", "第二段<标记>"],
+      "expectNotContains": ["alert(1)", "color:red"]
+    }
+  ],
+  "countReadableCases": [
+    { "id": "G-DP-CR-1", "input": "abc 123 汉字", "expect": 8 },
+    { "id": "G-DP-CR-2", "input": "！！！  ……", "expect": 0 },
+    { "id": "G-DP-CR-3", "input": "", "expect": 0 }
+  ]
+}

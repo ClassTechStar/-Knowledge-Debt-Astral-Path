@@ -1,0 +1,125 @@
+{
+  "cases": [
+    {
+      "id": "G-MIMO-SSE-1",
+      "kind": "sse",
+      "description": "标准 SSE 流式：三片正文 + [DONE] 单独一行",
+      "response": "data: {\"model\":\"mimo-v2.6-pro\",\"choices\":[{\"delta\":{\"content\":\"学\"}}]}\ndata: {\"choices\":[{\"delta\":{\"content\":\"而\"}}]}\ndata: {\"choices\":[{\"delta\":{\"content\":\"时习\"}}]}\ndata: [DONE]\n",
+      "contentType": "text/event-stream",
+      "status": 200,
+      "expect": { "text": "学而时习", "model": "mimo-v2.6-pro" }
+    },
+    {
+      "id": "G-MIMO-SSE-2",
+      "kind": "sse",
+      "description": "[DONE] 不带换行尾（P2-1 修复②）：须显式终止读取",
+      "response": "data: {\"choices\":[{\"delta\":{\"content\":\"温故\"}}]}\ndata: [DONE]",
+      "contentType": "text/event-stream",
+      "status": 200,
+      "expect": { "text": "温故" }
+    },
+    {
+      "id": "G-MIMO-SSE-3",
+      "kind": "sse",
+      "description": "网关发完 [DONE] 不关流（P2-1 修复①）：后面还有数据不得拼入正文",
+      "response": "data: {\"choices\":[{\"delta\":{\"content\":\"知新\"}}]}\ndata: [DONE]\ndata: {\"choices\":[{\"delta\":{\"content\":\"多余\"}}]}\n",
+      "contentType": "text/event-stream",
+      "status": 200,
+      "expect": { "text": "知新" }
+    },
+    {
+      "id": "G-MIMO-REASON-1",
+      "kind": "sse",
+      "description": "推理型思维链收集 + 正文（T13）：reasoning_content 不入正文，正文正常",
+      "response": "data: {\"choices\":[{\"delta\":{\"reasoning_content\":\"先想一步\"}}]}\ndata: {\"choices\":[{\"delta\":{\"reasoning_content\":\"再想一步\"}}]}\ndata: {\"choices\":[{\"delta\":{\"content\":\"答案\"}}]}\ndata: [DONE]\n",
+      "contentType": "text/event-stream",
+      "status": 200,
+      "expect": { "text": "答案", "reasoning": "先想一步再想一步" }
+    },
+    {
+      "id": "G-MIMO-REASON-2",
+      "kind": "sse",
+      "description": "正文为空时思维链兜底（T13）：正文为空但 reasoning>=4 字符 → 以思维链为正文",
+      "response": "data: {\"choices\":[{\"delta\":{\"reasoning_content\":\"直接给结论\"}}]}\ndata: [DONE]\n",
+      "contentType": "text/event-stream",
+      "status": 200,
+      "expect": { "text": "直接给结论", "reasoning": "直接给结论" }
+    },
+    {
+      "id": "G-MIMO-NONSTREAM-1",
+      "kind": "json",
+      "description": "非流式 JSON 兜底：content 直接返回",
+      "response": "{\"model\":\"mimo-v2.6-pro\",\"choices\":[{\"message\":{\"content\":\"你好呀\"}}]}",
+      "contentType": "application/json",
+      "status": 200,
+      "expect": { "text": "你好呀", "model": "mimo-v2.6-pro" }
+    },
+    {
+      "id": "G-MIMO-NONSTREAM-2",
+      "kind": "json",
+      "description": "非流式推理型兜底：content 空、reasoning_content 非空 → 取 reasoning",
+      "response": "{\"choices\":[{\"message\":{\"content\":\"\",\"reasoning_content\":\"推理结论\"}}]}",
+      "contentType": "application/json",
+      "status": 200,
+      "expect": { "text": "推理结论" }
+    },
+    {
+      "id": "G-MIMO-ERR-1",
+      "kind": "error",
+      "description": "HTTP 错误：抛 HttpRequestException 且消息含 HTTP 500",
+      "response": "server error",
+      "contentType": "text/plain",
+      "status": 500,
+      "expect": { "throws": true, "messageContains": "HTTP 500" }
+    },
+    {
+      "id": "G-MIMO-ERR-2",
+      "kind": "empty",
+      "description": "空内容：流式与非流式均无文本 → 抛错（模型内容类，不触发冷却）",
+      "response": "data: {\"choices\":[{\"delta\":{}}]}\ndata: [DONE]\n",
+      "contentType": "text/event-stream",
+      "status": 200,
+      "expect": { "throws": true, "messageContains": "空内容" }
+    }
+  ],
+  "jsonLooseCases": [
+    {
+      "id": "G-JSON-1",
+      "description": "裸 JSON 直接解析",
+      "input": "{\"a\":1,\"b\":\"x\"}",
+      "expect": { "ok": true, "a": 1, "b": "x" }
+    },
+    {
+      "id": "G-JSON-2",
+      "description": "代码围栏包裹（```json … ```）",
+      "input": "```json\n{\"a\":2}\n```",
+      "expect": { "ok": true, "a": 2 }
+    },
+    {
+      "id": "G-JSON-3",
+      "description": "围栏外有前后杂文 → 截取大括号",
+      "input": "好的，结果如下：\n{\"a\":3}\n以上。",
+      "expect": { "ok": true, "a": 3 }
+    },
+    {
+      "id": "G-JSON-4",
+      "description": "数组输出 → 截取方括号",
+      "input": "结果：[1,2,3] 完毕",
+      "expect": { "ok": true, "isArray": true, "len": 3 }
+    },
+    {
+      "id": "G-JSON-5",
+      "description": "完全非 JSON → 返回 null",
+      "input": "这不是结构化输出",
+      "expect": { "ok": false }
+    }
+  ],
+  "cooldownCases": [
+    { "id": "G-CD-1", "message": "HTTP 502 Bad Gateway", "expectTransport": true },
+    { "id": "G-CD-2", "message": "Failed to fetch", "expectTransport": true },
+    { "id": "G-CD-3", "message": "The operation was aborted due to timeout", "expectTransport": true },
+    { "id": "G-CD-4", "message": "请求超时", "expectTransport": true },
+    { "id": "G-CD-5", "message": "模型返回空内容（流式与非流式均无文本）", "expectTransport": false },
+    { "id": "G-CD-6", "message": "JSON 解析失败", "expectTransport": false }
+  ]
+}

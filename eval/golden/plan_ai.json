@@ -1,0 +1,92 @@
+{
+  "draftParseCases": [
+    {
+      "id": "G-PA-DRAFT-1",
+      "description": "标准草案 JSON",
+      "input": "{\"strategy\":\"先补先修再推目标\",\"items\":[{\"day\":1,\"kp\":\"缓存映射\",\"type\":\"concept\",\"difficulty\":2,\"est_min\":10,\"why\":\"从「内存寻址」先垫一步，再检验「缓存映射」\",\"from_kp\":\"内存寻址\"},{\"day\":1,\"kp\":\"缓存映射\",\"type\":\"drill\",\"difficulty\":3,\"est_min\":8,\"why\":\"从「内存寻址」先垫一步练习\",\"from_kp\":\"内存寻址\"}],\"tips\":\"每天固定时段练习\",\"deferred\":\"TLB 相关债边延至下一周期\"}",
+      "expect": { "ok": true, "items": 2, "strategyContains": "先修" }
+    },
+    {
+      "id": "G-PA-DRAFT-2",
+      "description": "非法 type 归一为 concept；难度/时长钳制",
+      "input": "{\"strategy\":\"\",\"items\":[{\"day\":0,\"kp\":\"X\",\"type\":\"未知类型\",\"difficulty\":99,\"est_min\":999,\"why\":\"\"}]}",
+      "expect": { "ok": true, "items": 1, "type": "concept", "difficulty": 5, "estMin": 60, "day": 1 }
+    },
+    {
+      "id": "G-PA-DRAFT-3",
+      "description": "缺 items / 空 items → null",
+      "input": "{\"strategy\":\"只有策略\"}",
+      "expect": { "ok": false }
+    },
+    {
+      "id": "G-PA-DRAFT-4",
+      "description": "非 JSON → null",
+      "input": "我没法生成计划",
+      "expect": { "ok": false }
+    }
+  ],
+  "orchestrationCases": [
+    {
+      "id": "G-PA-ORCH-1",
+      "description": "合法草案 → AI 计划，K3 why 回填先修名，K1-K5 通过",
+      "draftResponse": "{\"strategy\":\"先补先修\",\"items\":[{\"day\":1,\"kp\":\"缓存映射\",\"type\":\"concept\",\"difficulty\":2,\"est_min\":10,\"why\":\"理解概念\",\"from_kp\":\"内存寻址\"},{\"day\":2,\"kp\":\"虚拟内存\",\"type\":\"quiz\",\"difficulty\":4,\"est_min\":6,\"why\":\"检验目标点\",\"from_kp\":\"缓存映射\"}],\"tips\":\"\",\"deferred\":\"\"}",
+      "kpWhitelist": ["内存寻址", "缓存映射", "虚拟内存"],
+      "debts": [
+        { "fromKp": "k1", "fromName": "内存寻址", "toKp": "k2", "toName": "缓存映射", "impact": 0.8, "estMin": 10 },
+        { "fromKp": "k2", "fromName": "缓存映射", "toKp": "k3", "toName": "虚拟内存", "impact": 0.7, "estMin": 10 }
+      ],
+      "dayBudgetMin": 40,
+      "horizonDays": 14,
+      "expect": { "fromAi": true, "constraintChecked": true, "dayCount": 2, "k3Backfill": true }
+    },
+    {
+      "id": "G-PA-ORCH-2",
+      "description": "幻觉条目（白名单外）剔除；剩余合法条目仍出 AI 计划",
+      "draftResponse": "{\"strategy\":\"\",\"items\":[{\"day\":1,\"kp\":\"不存在的知识点\",\"type\":\"concept\",\"difficulty\":2,\"est_min\":10,\"why\":\"x\",\"from_kp\":\"\"},{\"day\":1,\"kp\":\"缓存映射\",\"type\":\"concept\",\"difficulty\":2,\"est_min\":10,\"why\":\"理解概念\",\"from_kp\":\"内存寻址\"}]}",
+      "kpWhitelist": ["内存寻址", "缓存映射"],
+      "debts": [
+        { "fromKp": "k1", "fromName": "内存寻址", "toKp": "k2", "toName": "缓存映射", "impact": 0.8, "estMin": 10 }
+      ],
+      "dayBudgetMin": 40,
+      "horizonDays": 14,
+      "expect": { "fromAi": true, "constraintChecked": true, "dayCount": 1 }
+    },
+    {
+      "id": "G-PA-ORCH-3",
+      "description": "全部条目幻觉 → 回退本地规则计划（fromAi=false）",
+      "draftResponse": "{\"strategy\":\"\",\"items\":[{\"day\":1,\"kp\":\"假知识点\",\"type\":\"concept\",\"difficulty\":2,\"est_min\":10,\"why\":\"x\",\"from_kp\":\"\"}]}",
+      "kpWhitelist": ["内存寻址", "缓存映射"],
+      "debts": [
+        { "fromKp": "k1", "fromName": "内存寻址", "toKp": "k2", "toName": "缓存映射", "impact": 0.8, "estMin": 10 }
+      ],
+      "dayBudgetMin": 40,
+      "horizonDays": 14,
+      "expect": { "fromAi": false, "constraintChecked": true }
+    },
+    {
+      "id": "G-PA-ORCH-4",
+      "description": "模型传输失败 → 回退本地规则计划，不阻塞",
+      "draftError": "HTTP 500 server error",
+      "kpWhitelist": ["内存寻址", "缓存映射"],
+      "debts": [
+        { "fromKp": "k1", "fromName": "内存寻址", "toKp": "k2", "toName": "缓存映射", "impact": 0.8, "estMin": 10 }
+      ],
+      "dayBudgetMin": 40,
+      "horizonDays": 14,
+      "expect": { "fromAi": false, "constraintChecked": true }
+    },
+    {
+      "id": "G-PA-ORCH-5",
+      "description": "K1 超预算草案 → 自动压缩后通过（不超 40 分钟）",
+      "draftResponse": "{\"strategy\":\"\",\"items\":[{\"day\":1,\"kp\":\"缓存映射\",\"type\":\"concept\",\"difficulty\":2,\"est_min\":25,\"why\":\"理解概念\",\"from_kp\":\"内存寻址\"},{\"day\":1,\"kp\":\"虚拟内存\",\"type\":\"drill\",\"difficulty\":3,\"est_min\":30,\"why\":\"练习目标\",\"from_kp\":\"缓存映射\"}]}",
+      "kpWhitelist": ["内存寻址", "缓存映射", "虚拟内存"],
+      "debts": [
+        { "fromKp": "k1", "fromName": "内存寻址", "toKp": "k2", "toName": "缓存映射", "impact": 0.8, "estMin": 10 },
+        { "fromKp": "k2", "fromName": "缓存映射", "toKp": "k3", "toName": "虚拟内存", "impact": 0.7, "estMin": 10 }
+      ],
+      "dayBudgetMin": 40,
+      "horizonDays": 14,
+      "expect": { "fromAi": true, "constraintChecked": true, "dayMinutesWithin": 40 }
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+  "levelRotation": [
+    { "count": 0, "expect": "概念理解" },
+    { "count": 1, "expect": "因果分析" },
+    { "count": 2, "expect": "对比辨析" },
+    { "count": 3, "expect": "应用场景" },
+    { "count": 4, "expect": "错误辨析" },
+    { "count": 5, "expect": "概念理解" },
+    { "count": 7, "expect": "对比辨析" },
+    { "count": -1, "expect": "错误辨析" }
+  ],
+  "normalizeCases": [
+    { "id": "G-Q-NORM-1", "input": "Ａ Ｂ　Ｃ", "expect": "a b c" },
+    { "id": "G-Q-NORM-2", "input": "下列说法正确的是？！", "expect": "下列说法正确的是?!" },
+    { "id": "G-Q-NORM-3", "input": "  多   空格  ", "expect": "多 空格" },
+    { "id": "G-Q-NORM-4", "input": "Mixed CASE Stem", "expect": "mixed case stem" },
+    { "id": "G-Q-NORM-5", "input": "", "expect": "" }
+  ],
+  "dedupKeyCases": [
+    { "id": "G-Q-KEY-1", "input": "关于缓存映射的说法", "expect": "关于缓存映射的说法" },
+    { "id": "G-Q-KEY-2", "input": "0123456789012345678901234567890123456789012345678901234567890123456789", "expect": "012345678901234567890123456789012345678901234567890123456789" },
+    { "id": "G-Q-KEY-3", "input": "ＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺａｂｃｄｅｆｇｈｉｊ", "expect": "abcdefghijklmnopqrstuvwxyzabcdefghij" }
+  ],
+  "parseQuizCases": [
+    {
+      "id": "G-Q-PARSE-1",
+      "description": "标准输出，数字答案",
+      "input": "{\"stem\":\"CPU 的作用是什么？\",\"options\":[\"执行指令\",\"存储数据\",\"传输信号\",\"显示图像\"],\"answer\":0,\"explain\":\"解析：CPU 负责执行指令。\"}",
+      "expect": { "ok": true, "ci": 0, "optionCount": 4 }
+    },
+    {
+      "id": "G-Q-PARSE-2",
+      "description": "字母大写答案 B → 下标 1",
+      "input": "{\"stem\":\"题干\",\"options\":[\"a\",\"b\",\"c\",\"d\"],\"answer\":\"B\",\"explain\":\"\"}",
+      "expect": { "ok": true, "ci": 1 }
+    },
+    {
+      "id": "G-Q-PARSE-3",
+      "description": "字母小写答案 d → 下标 3",
+      "input": "{\"stem\":\"题干\",\"options\":[\"a\",\"b\",\"c\",\"d\"],\"answer\":\"d\"}",
+      "expect": { "ok": true, "ci": 3 }
+    },
+    {
+      "id": "G-Q-PARSE-4",
+      "description": "数字答案字符串 \"2\" → 下标 2",
+      "input": "{\"stem\":\"题干\",\"options\":[\"a\",\"b\",\"c\",\"d\"],\"answer\":\"2\"}",
+      "expect": { "ok": true, "ci": 2 }
+    },
+    {
+      "id": "G-Q-PARSE-5",
+      "description": "越界数字答案 5 → 钳制为 0",
+      "input": "{\"stem\":\"题干\",\"options\":[\"a\",\"b\",\"c\",\"d\"],\"answer\":5}",
+      "expect": { "ok": true, "ci": 0 }
+    },
+    {
+      "id": "G-Q-PARSE-6",
+      "description": "负数答案 -1 → 钳制为 0",
+      "input": "{\"stem\":\"题干\",\"options\":[\"a\",\"b\",\"c\",\"d\"],\"answer\":-1}",
+      "expect": { "ok": true, "ci": 0 }
+    },
+    {
+      "id": "G-Q-PARSE-7",
+      "description": "选项数不足 4 → null",
+      "input": "{\"stem\":\"题干\",\"options\":[\"a\",\"b\",\"c\"],\"answer\":0}",
+      "expect": { "ok": false }
+    },
+    {
+      "id": "G-Q-PARSE-8",
+      "description": "缺 stem → null",
+      "input": "{\"options\":[\"a\",\"b\",\"c\",\"d\"],\"answer\":0}",
+      "expect": { "ok": false }
+    },
+    {
+      "id": "G-Q-PARSE-9",
+      "description": "空 stem → null",
+      "input": "{\"stem\":\"   \",\"options\":[\"a\",\"b\",\"c\",\"d\"],\"answer\":0}",
+      "expect": { "ok": false }
+    },
+    {
+      "id": "G-Q-PARSE-10",
+      "description": "代码围栏包裹的合法输出 → 正常解析（jsonLoose 通道）",
+      "input": "```json\n{\"stem\":\"围栏题\",\"options\":[\"a\",\"b\",\"c\",\"d\"],\"answer\":3,\"explain\":\"【拓展】解析\"}\n```",
+      "expect": { "ok": true, "ci": 3, "explainPrefix": "【拓展】" }
+    },
+    {
+      "id": "G-Q-PARSE-11",
+      "description": "完全非 JSON → null",
+      "input": "抱歉我无法生成题目",
+      "expect": { "ok": false }
+    }
+  ],
+  "poolCases": [
+    {
+      "id": "G-Q-POOL-1",
+      "description": "重复题干（全角/大小写差异）不入池",
+      "adds": [
+        { "stem": "关于缓存映射的说法", "expectAdded": true },
+        { "stem": "关于缓存映射的说法！", "expectAdded": true },
+        { "stem": "关于缓存映射的说法", "expectAdded": false }
+      ]
+    },
+    {
+      "id": "G-Q-POOL-2",
+      "description": "上限 300：超出后从头截断（保新题）",
+      "capTest": { "addCount": 305, "expectCount": 300, "expectFirstIndex": 5 }
+    }
+  ],
+  "contextCases": [
+    {
+      "id": "G-Q-CTX-1",
+      "description": "含节点：知识点正文 + 所在章节全文 + 全书目录",
+      "book": {
+        "name": "计算机基础",
+        "sourceText": "这是教材摘录内容。",
+        "chapters": [
+          { "id": "c1", "title": "第一章 概述", "body": "概述章节正文内容。", "index": 0 },
+          { "id": "c2", "title": "第二章 存储", "body": "存储章节正文：缓存映射是重点。", "index": 1 }
+        ]
+      },
+      "node": { "id": "n1", "title": "缓存映射", "body": "缓存映射决定主存块与缓存行的对应关系。", "chId": "c2", "ch": 1 },
+      "expect": {
+        "containsAll": ["【知识点】缓存映射", "【所在章节全文】第二章 存储", "【全书目录】第一章 概述；第二章 存储"],
+        "maxChars": 3800
+      }
+    },
+    {
+      "id": "G-Q-CTX-2",
+      "description": "无节点：全书目录 + 各章节摘录 + 教材摘录",
+      "book": {
+        "name": "计算机基础",
+        "sourceText": "这是教材摘录内容。",
+        "chapters": [
+          { "id": "c1", "title": "第一章 概述", "body": "概述章节正文内容。", "index": 0 }
+        ]
+      },
+      "node": null,
+      "expect": {
+        "containsAll": ["【全书目录】第一章 概述", "【第一章 概述】", "【教材摘录】"],
+        "maxChars": 3800
+      }
+    }
+  ]
+}

@@ -1,31 +1,530 @@
 {
   "_comment": "受约束智能体意图登记表 · 唯一事实源（分工方案 §8.2/§44.2 指定 tools/ 下登记表为准；格式用 JSON 以便 verify 脚本零依赖解析）。四方对拍：本文件 ↔ deploy/monolith-web/index.html 的 INTENTS/CRISIS/BANNED/NEGATIVE 字面量 ↔ src/AstralPath.Core/Agent/AgentRouter.cs 的 DefaultAgentIntents.Table（P5-1 起即运行时表，DefaultIntents() 委托它）↔ src/AstralPath.Core/Formula/FormulaWeights.cs 的 BannedWords（伦理禁语，登记于 bannedEthics）。改动任何一方必须同步另几方并跑 scripts/verify_agent_intents.py。P5-1 统一时锚点两处定向调整：material.parse 补「藏书」（对齐旧 JS，只增不抢）；sale.check「条件」→「销账条件」（K-15 弱锚点从严，运行时随登记表收紧）。",
-  "crisis": ["不想活", "自杀", "轻生", "结束生命", "自残", "伤害自己", "跳楼", "上吊", "suicide", "kill myself", "活不下去"],
-  "banned": ["身份证", "银行卡密码", "详细住址"],
-  "bannedEthics": ["不适合", "太笨", "比别人差", "没救", "别学了", "处分", "废物", "无可救药", "智商"],
-  "negative": ["哈哈", "呵呵", "随便", "没事了", "thanks", "thank you", "ok", "好的"],
+  "crisis": [
+    "不想活",
+    "自杀",
+    "轻生",
+    "结束生命",
+    "自残",
+    "伤害自己",
+    "跳楼",
+    "上吊",
+    "suicide",
+    "kill myself",
+    "活不下去"
+  ],
+  "banned": [
+    "身份证",
+    "银行卡密码",
+    "详细住址"
+  ],
+  "bannedEthics": [
+    "不适合",
+    "太笨",
+    "比别人差",
+    "没救",
+    "别学了",
+    "处分",
+    "废物",
+    "无可救药",
+    "智商"
+  ],
+  "negative": [
+    "哈哈",
+    "呵呵",
+    "随便",
+    "没事了",
+    "thanks",
+    "thank you",
+    "ok",
+    "好的"
+  ],
   "intents": [
-    { "id": "crisis.handoff",  "roles": ["student", "teacher", "admin", "demo"], "anchors": [], "requiredSlots": [], "description": "危机转介" },
-    { "id": "debt.diagnose",   "roles": ["student", "demo"], "anchors": ["知识债", "债边", "诊断", "红边", "薄弱"], "requiredSlots": [], "description": "知识债诊断" },
-    { "id": "debt.explain",    "roles": ["student", "teacher", "demo"], "anchors": ["解释", "为什么", "怎么来的", "公式"], "requiredSlots": [], "description": "债边解释" },
-    { "id": "plan.create",     "roles": ["student", "demo"], "anchors": ["计划", "14天", "安排", "复习计划"], "requiredSlots": [], "description": "生成修复计划" },
-    { "id": "plan.rebalance",  "roles": ["student", "demo"], "anchors": ["减负", "重排", "调整计划", "太重"], "requiredSlots": [], "description": "计划减负" },
-    { "id": "today.tasks",     "roles": ["student", "demo"], "anchors": ["今日", "今天做", "今日任务"], "requiredSlots": [], "description": "今日任务" },
-    { "id": "practice.start",  "roles": ["student", "demo"], "anchors": ["练习", "做题", "小测", "测验"], "requiredSlots": [], "description": "开始练习" },
-    { "id": "progress.check",  "roles": ["student", "demo"], "anchors": ["进度", "销账", "进展", "streak"], "requiredSlots": [], "description": "销账进度" },
-    { "id": "graph.view",      "roles": ["student", "teacher", "demo"], "anchors": ["图谱", "识网", "知识图谱", "思维导图"], "requiredSlots": [], "description": "查看图谱" },
-    { "id": "material.parse",  "roles": ["student", "teacher", "demo"], "anchors": ["解析资料", "上传", "OCR", "教材", "藏书"], "requiredSlots": [], "description": "解析资料" },
-    { "id": "kb.search",       "roles": ["student", "teacher", "demo"], "anchors": ["知识库", "检索", "查资料", "文档"], "requiredSlots": [], "description": "知识库检索" },
-    { "id": "kb.ingest",       "roles": ["teacher", "admin"], "anchors": ["入库", "上传文档", "发布知识"], "requiredSlots": [], "description": "知识入库" },
-    { "id": "profile.view",    "roles": ["student", "demo"], "anchors": ["画像", "我的标签", "学习画像"], "requiredSlots": [], "description": "查看画像" },
-    { "id": "profile.optout",  "roles": ["student", "demo"], "anchors": ["退出画像", "关闭画像", "opt-out"], "requiredSlots": [], "description": "画像退出" },
-    { "id": "teacher.hotspots", "roles": ["teacher", "admin", "demo"], "anchors": ["热点", "班级", "共性问题"], "requiredSlots": [], "description": "班级热点" },
-    { "id": "consent.grant",   "roles": ["student", "demo"], "anchors": ["授权", "同意可见", "consent"], "requiredSlots": [], "description": "授权教师可见" },
-    { "id": "consent.revoke",  "roles": ["student", "demo"], "anchors": ["撤销", "取消授权", "关闭可见"], "requiredSlots": [], "description": "撤销授权" },
-    { "id": "whatif.simulate", "roles": ["student", "teacher", "demo"], "anchors": ["what-if", "如果", "模拟", "假设"], "requiredSlots": [], "description": "What-if 模拟" },
-    { "id": "narrative.read",  "roles": ["student", "demo"], "anchors": ["故事", "叙事", "讲解"], "requiredSlots": [], "description": "叙事讲解" },
-    { "id": "sale.check",      "roles": ["student", "demo"], "anchors": ["销账检查", "能否销账", "销账条件"], "requiredSlots": [], "description": "销账检查" },
-    { "id": "meta.help",       "roles": ["student", "teacher", "admin", "demo"], "anchors": ["帮助", "怎么用", "说明"], "requiredSlots": [], "description": "帮助" },
-    { "id": "meta.feedback",   "roles": ["student", "teacher", "demo"], "anchors": ["反馈", "建议", "不好用"], "requiredSlots": [], "description": "反馈" }
+    {
+      "id": "crisis.handoff",
+      "roles": [
+        "student",
+        "teacher",
+        "admin",
+        "demo"
+      ],
+      "anchors": [],
+      "requiredSlots": [],
+      "description": "危机转介"
+    },
+    {
+      "id": "debt.diagnose",
+      "roles": [
+        "student",
+        "demo"
+      ],
+      "anchors": [
+        "知识债",
+        "债边",
+        "诊断",
+        "红边",
+        "薄弱",
+        "搞不清",
+        "漏洞",
+        "哪里不会",
+        "哪里薄弱",
+        "帮我分析"
+      ],
+      "requiredSlots": [],
+      "description": "知识债诊断"
+    },
+    {
+      "id": "debt.explain",
+      "roles": [
+        "student",
+        "teacher",
+        "demo"
+      ],
+      "anchors": [
+        "解释",
+        "为什么",
+        "怎么来的",
+        "公式",
+        "讲解",
+        "怎么回事",
+        "什么意思",
+        "怎么理解",
+        "什么原理"
+      ],
+      "requiredSlots": [],
+      "description": "债边解释"
+    },
+    {
+      "id": "plan.create",
+      "roles": [
+        "student",
+        "demo"
+      ],
+      "anchors": [
+        "计划",
+        "14天",
+        "安排",
+        "复习计划",
+        "做个计划",
+        "怎么安排",
+        "复习规划"
+      ],
+      "requiredSlots": [],
+      "description": "生成修复计划"
+    },
+    {
+      "id": "plan.rebalance",
+      "roles": [
+        "student",
+        "demo"
+      ],
+      "anchors": [
+        "减负",
+        "重排",
+        "调整计划",
+        "太重",
+        "换个计划",
+        "改一下计划"
+      ],
+      "requiredSlots": [],
+      "description": "计划减负"
+    },
+    {
+      "id": "today.tasks",
+      "roles": [
+        "student",
+        "demo"
+      ],
+      "anchors": [
+        "今日",
+        "今天做",
+        "今日任务",
+        "今天学什么",
+        "现在学什么",
+        "该学什么",
+        "今天干什么"
+      ],
+      "requiredSlots": [],
+      "description": "今日任务"
+    },
+    {
+      "id": "practice.start",
+      "roles": [
+        "student",
+        "demo"
+      ],
+      "anchors": [
+        "练习",
+        "做题",
+        "小测",
+        "测验",
+        "来几道",
+        "出几道",
+        "出个题",
+        "刷几道",
+        "做几道",
+        "练一下"
+      ],
+      "requiredSlots": [],
+      "description": "开始练习"
+    },
+    {
+      "id": "progress.check",
+      "roles": [
+        "student",
+        "demo"
+      ],
+      "anchors": [
+        "进度",
+        "销账",
+        "进展",
+        "streak",
+        "学得怎么样",
+        "看看进度",
+        "掌握怎么样"
+      ],
+      "requiredSlots": [],
+      "description": "销账进度"
+    },
+    {
+      "id": "graph.view",
+      "roles": [
+        "student",
+        "teacher",
+        "demo"
+      ],
+      "anchors": [
+        "图谱",
+        "识网",
+        "知识图谱",
+        "思维导图",
+        "关系图",
+        "知识网",
+        "看看图"
+      ],
+      "requiredSlots": [],
+      "description": "查看图谱"
+    },
+    {
+      "id": "material.parse",
+      "roles": [
+        "student",
+        "teacher",
+        "demo"
+      ],
+      "anchors": [
+        "解析资料",
+        "上传",
+        "OCR",
+        "教材",
+        "藏书",
+        "解析文件",
+        "导入教材",
+        "上传课本"
+      ],
+      "requiredSlots": [],
+      "description": "解析资料"
+    },
+    {
+      "id": "material.list",
+      "roles": [
+        "student",
+        "teacher",
+        "demo"
+      ],
+      "anchors": [
+        "列出资料",
+        "教材列表",
+        "藏书",
+        "有哪些书",
+        "书单",
+        "几本书",
+        "已解析教材",
+        "有什么教材"
+      ],
+      "requiredSlots": [],
+      "description": "列出教材"
+    },
+    {
+      "id": "material.switch",
+      "roles": [
+        "student",
+        "teacher",
+        "demo"
+      ],
+      "anchors": [
+        "切换教材",
+        "换书",
+        "切书",
+        "切换到",
+        "换一本",
+        "切到",
+        "切过去",
+        "换个教材",
+        "换本书"
+      ],
+      "requiredSlots": [],
+      "description": "切换教材"
+    },
+    {
+      "id": "kb.search",
+      "roles": [
+        "student",
+        "teacher",
+        "demo"
+      ],
+      "anchors": [
+        "知识库",
+        "检索",
+        "什么是",
+        "查资料",
+        "文档",
+        "搜索",
+        "搜一下",
+        "查一下",
+        "找找",
+        "章节",
+        "帮我找",
+        "找找看",
+        "查一查",
+        "讲一下",
+        "知识点",
+        "介绍",
+        "概要",
+        "概述",
+        "概括"
+      ],
+      "requiredSlots": [],
+      "description": "知识库检索"
+    },
+    {
+      "id": "kb.ingest",
+      "roles": [
+        "teacher",
+        "admin"
+      ],
+      "anchors": [
+        "入库",
+        "上传文档",
+        "发布知识"
+      ],
+      "requiredSlots": [],
+      "description": "知识入库"
+    },
+    {
+      "id": "profile.view",
+      "roles": [
+        "student",
+        "demo"
+      ],
+      "anchors": [
+        "画像",
+        "我的标签",
+        "学习画像",
+        "我的情况"
+      ],
+      "requiredSlots": [],
+      "description": "查看画像"
+    },
+    {
+      "id": "profile.optout",
+      "roles": [
+        "student",
+        "demo"
+      ],
+      "anchors": [
+        "退出画像",
+        "关闭画像",
+        "opt-out"
+      ],
+      "requiredSlots": [],
+      "description": "画像退出"
+    },
+    {
+      "id": "teacher.hotspots",
+      "roles": [
+        "teacher",
+        "admin",
+        "demo"
+      ],
+      "anchors": [
+        "热点",
+        "班级",
+        "共性问题",
+        "大家的情况"
+      ],
+      "requiredSlots": [],
+      "description": "班级热点"
+    },
+    {
+      "id": "consent.grant",
+      "roles": [
+        "student",
+        "demo"
+      ],
+      "anchors": [
+        "授权",
+        "同意可见",
+        "consent",
+        "允许查看"
+      ],
+      "requiredSlots": [],
+      "description": "授权教师可见"
+    },
+    {
+      "id": "consent.revoke",
+      "roles": [
+        "student",
+        "demo"
+      ],
+      "anchors": [
+        "撤销",
+        "取消授权",
+        "关闭可见"
+      ],
+      "requiredSlots": [],
+      "description": "撤销授权"
+    },
+    {
+      "id": "whatif.simulate",
+      "roles": [
+        "student",
+        "teacher",
+        "demo"
+      ],
+      "anchors": [
+        "what-if",
+        "如果",
+        "模拟",
+        "假设",
+        "假如",
+        "要是",
+        "试想"
+      ],
+      "requiredSlots": [],
+      "description": "What-if 模拟"
+    },
+    {
+      "id": "narrative.read",
+      "roles": [
+        "student",
+        "demo"
+      ],
+      "anchors": [
+        "故事",
+        "叙事",
+        "讲解",
+        "讲个故事",
+        "举个例子",
+        "给我讲讲",
+        "讲一讲"
+      ],
+      "requiredSlots": [],
+      "description": "叙事讲解"
+    },
+    {
+      "id": "sale.check",
+      "roles": [
+        "student",
+        "demo"
+      ],
+      "anchors": [
+        "销账检查",
+        "能否销账",
+        "销账条件",
+        "能销账吗",
+        "销账了没"
+      ],
+      "requiredSlots": [],
+      "description": "销账检查"
+    },
+    {
+      "id": "chapter.read",
+      "roles": [
+        "student",
+        "teacher",
+        "demo"
+      ],
+      "anchors": [
+        "目录",
+        "读一下",
+        "讲了什么",
+        "讲了啥",
+        "章节",
+        "这一章",
+        "内容是什么",
+        "翻到",
+        "第几章",
+        "前几章",
+        "本章",
+        "这章",
+        "有什么内容",
+        "不明白",
+        "不懂",
+        "不理解",
+        "不清楚"
+      ],
+      "requiredSlots": [],
+      "description": "章节内容问答"
+    },
+    {
+      "id": "graph.path",
+      "roles": [
+        "student",
+        "teacher",
+        "demo"
+      ],
+      "anchors": [
+        "什么关系",
+        "怎么联系",
+        "有没有关",
+        "路径",
+        "谁先",
+        "先后",
+        "前置",
+        "怎么到",
+        "怎么学",
+        "学习顺序",
+        "什么联系",
+        "有关吗",
+        "先后顺序"
+      ],
+      "requiredSlots": [],
+      "description": "先修路径"
+    },
+    {
+      "id": "meta.help",
+      "roles": [
+        "student",
+        "teacher",
+        "admin",
+        "demo"
+      ],
+      "anchors": [
+        "帮助",
+        "怎么用",
+        "说明",
+        "你能干什么",
+        "你会什么",
+        "功能有哪些"
+      ],
+      "requiredSlots": [],
+      "description": "帮助"
+    },
+    {
+      "id": "meta.feedback",
+      "roles": [
+        "student",
+        "teacher",
+        "demo"
+      ],
+      "anchors": [
+        "反馈",
+        "建议",
+        "不好用"
+      ],
+      "requiredSlots": [],
+      "description": "反馈"
+    }
   ]
 }

@@ -1,0 +1,131 @@
+{
+  "normalizeCases": [
+    { "id": "G-GM-NORM-1", "input": "缓存映射", "expect": "缓存映射" },
+    { "id": "G-GM-NORM-2", "input": "缓存　映射 ！", "expect": "缓存 映射 !" },
+    { "id": "G-GM-NORM-3", "input": "ＡＩ Ｇｒａｐｈ", "expect": "ai graph" },
+    { "id": "G-GM-NORM-4", "input": "  大小写 MiXeD  ", "expect": "大小写 mixed" },
+    { "id": "G-GM-NORM-5", "input": "", "expect": "" }
+  ],
+  "extractCases": [
+    {
+      "id": "G-GM-EXT-1",
+      "description": "标准构图 JSON",
+      "input": "{\"concepts\":[{\"title\":\"缓存映射\",\"ch\":1,\"def\":\"主存块与缓存行的对应关系\"},{\"title\":\"虚拟内存\",\"ch\":2,\"def\":\"地址空间抽象\"}],\"prereqs\":[{\"from\":\"缓存映射\",\"to\":\"虚拟内存\",\"w\":1.2}]}",
+      "expect": { "ok": true, "concepts": 2, "prereqs": 1 }
+    },
+    {
+      "id": "G-GM-EXT-2",
+      "description": "代码围栏包裹",
+      "input": "```json\n{\"concepts\":[{\"title\":\"A\",\"ch\":0,\"def\":\"d\"}],\"prereqs\":[]}\n```",
+      "expect": { "ok": true, "concepts": 1, "prereqs": 0 }
+    },
+    {
+      "id": "G-GM-EXT-3",
+      "description": "只有 prereqs 无 concepts → 仍可用",
+      "input": "{\"concepts\":[],\"prereqs\":[{\"from\":\"A\",\"to\":\"B\",\"w\":1.0}]}",
+      "expect": { "ok": true, "concepts": 0, "prereqs": 1 }
+    },
+    {
+      "id": "G-GM-EXT-4",
+      "description": "空概念标题跳过",
+      "input": "{\"concepts\":[{\"title\":\"\",\"ch\":0,\"def\":\"\"},{\"title\":\"有效\",\"ch\":1,\"def\":\"x\"}],\"prereqs\":[]}",
+      "expect": { "ok": true, "concepts": 1, "prereqs": 0 }
+    },
+    {
+      "id": "G-GM-EXT-5",
+      "description": "非 JSON → null",
+      "input": "无法完成构图",
+      "expect": { "ok": false }
+    }
+  ],
+  "mergeCases": [
+    {
+      "id": "G-GM-MERGE-1",
+      "description": "新增概念与先修边；同名概念跳过；自环/未知端点跳过",
+      "nodes": [
+        { "id": "n1", "title": "缓存映射", "body": "", "ch": 0, "kind": "term", "src": "rule" },
+        { "id": "n2", "title": "虚拟内存", "body": "", "ch": 1, "kind": "term", "src": "rule" }
+      ],
+      "edges": [
+        { "from": "n1", "to": "n2", "w": 1.0, "etype": "prerequisite", "conf": 0.8, "src": "rule" }
+      ],
+      "ai": {
+        "concepts": [
+          { "title": "缓存映射", "ch": 0, "def": "同名重复" },
+          { "title": "页面置换", "ch": 1, "def": "缺页时的替换策略" },
+          { "title": "TLB", "ch": 1, "def": "地址转换缓存" }
+        ],
+        "prereqs": [
+          { "from": "缓存映射", "to": "页面置换", "w": 1.2 },
+          { "from": "TLB", "to": "TLB", "w": 1.0 },
+          { "from": "不存在的概念", "to": "TLB", "w": 1.0 },
+          { "from": "页面置换", "to": "TLB", "w": 1.2 }
+        ]
+      },
+      "chMax": 5,
+      "expect": { "addedN": 2, "addedE": 2, "cut": 0, "nodeCount": 4, "edgeCount": 3 }
+    },
+    {
+      "id": "G-GM-MERGE-2",
+      "description": "无任何新增（全部同名/非法）→ null 保留原图谱",
+      "nodes": [
+        { "id": "n1", "title": "概念A", "body": "", "ch": 0, "kind": "term", "src": "rule" }
+      ],
+      "edges": [],
+      "ai": {
+        "concepts": [{ "title": "概念A", "ch": 0, "def": "同名" }],
+        "prereqs": [{ "from": "X", "to": "Y", "w": 1.0 }]
+      },
+      "chMax": 5,
+      "expect": { "null": true }
+    },
+    {
+      "id": "G-GM-MERGE-3",
+      "description": "成环先修 → 拓扑清环裁剪回边",
+      "nodes": [
+        { "id": "a", "title": "A", "body": "", "ch": 0, "kind": "term", "src": "rule" },
+        { "id": "b", "title": "B", "body": "", "ch": 0, "kind": "term", "src": "rule" },
+        { "id": "c", "title": "C", "body": "", "ch": 0, "kind": "term", "src": "rule" }
+      ],
+      "edges": [],
+      "ai": {
+        "concepts": [],
+        "prereqs": [
+          { "from": "A", "to": "B", "w": 1.0 },
+          { "from": "B", "to": "C", "w": 1.0 },
+          { "from": "C", "to": "A", "w": 1.0 }
+        ]
+      },
+      "chMax": 5,
+      "expect": { "addedN": 0, "addedE": 3, "cut": 1, "nodeCount": 3, "edgeCount": 2, "acyclic": true }
+    }
+  ],
+  "poolPreserveCases": [
+    {
+      "id": "G-GM-POOL-1",
+      "description": "整池重建保留 layer=ai 题置前（T15）",
+      "pool": [
+        { "id": "r1", "layer": "auto" },
+        { "id": "ai1", "layer": "ai" },
+        { "id": "r2", "layer": "auto" },
+        { "id": "ai2", "layer": "ai" }
+      ],
+      "rebuilt": [
+        { "id": "n1", "layer": "auto" },
+        { "id": "n2", "layer": "auto" }
+      ],
+      "cap": 300,
+      "expect": { "order": ["ai1", "ai2", "n1", "n2"], "count": 4 }
+    },
+    {
+      "id": "G-GM-POOL-2",
+      "description": "超上限从头截断（保 AI 题置前顺序）",
+      "pool": [{ "id": "ai1", "layer": "ai" }],
+      "rebuilt": [
+        { "id": "n1", "layer": "auto" }, { "id": "n2", "layer": "auto" }, { "id": "n3", "layer": "auto" }
+      ],
+      "cap": 2,
+      "expect": { "order": ["ai1", "n1"], "count": 2 }
+    }
+  ]
+}

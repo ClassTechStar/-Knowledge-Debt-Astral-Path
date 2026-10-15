@@ -1,0 +1,160 @@
+{
+  "structureCases": [
+    {
+      "id": "G-EX-STRUCT-1",
+      "description": "标准试卷：板块 + 题头 + 独立选项行 + 答案行（单题归属）",
+      "input": "一、单项选择题\n1. 会计的基本职能是？\nA. 核算与监督\nB. 预测与决策\nC. 计划与控制\nD. 组织与协调\n答案：A\n2. 下列属于资产的是？\nA. 应付账款\nB. 银行存款\nC. 实收资本\nD. 主营业务收入\n答案：B",
+      "expect": {
+        "items": 2,
+        "sections": ["一、单项选择题"],
+        "types": ["choice", "choice"],
+        "answers": ["A", "B"],
+        "options0": ["A.核算与监督", "B.预测与决策", "C.计划与控制", "D.组织与协调"]
+      }
+    },
+    {
+      "id": "G-EX-STRUCT-2",
+      "description": "答案批量分发：\"1.A 2.B\" 形式按编号匹配",
+      "input": "1. 题干一\nA. 甲\nB. 乙\nC. 丙\nD. 丁\n2. 题干二\nA. 甲\nB. 乙\nC. 丙\nD. 丁\n参考答案：1.A 2.D",
+      "expect": { "items": 2, "answers": ["A", "D"] }
+    },
+    {
+      "id": "G-EX-STRUCT-3",
+      "description": "顺序兜底：无当前题时答案入池，无编号答案数与未答题目数相等 → 按顺序分发",
+      "input": "答案：A\n答案：B\n1. 题干一\nA. 甲\nB. 乙\n2. 题干二\nA. 甲\nB. 乙",
+      "expect": { "items": 2, "answers": ["A", "B"] }
+    },
+    {
+      "id": "G-EX-STRUCT-4",
+      "description": "同行内联选项：选项与题干同行时补切（选项前须有空白，与源语义一致）",
+      "input": "1. 会计基本职能是？ A. 核算 B. 预测 C. 计划 D. 组织\n2. 惯例题 A. 甲 B. 乙 C. 丙 D. 丁",
+      "expect": { "items": 2, "types": ["choice", "choice"], "options0Count": 4, "options0": ["A.核算", "B.预测", "C.计划", "D.组织"] }
+    },
+    {
+      "id": "G-EX-STRUCT-4b",
+      "description": "首个选项与题干无空白分隔（如「题？A. 选项」）：源语义下首选项并入题干，仅切出 3 个选项",
+      "input": "1. 会计基本职能是？A. 核算 B. 预测 C. 计划 D. 组织",
+      "expect": { "items": 1, "options0Count": 3, "headContains": "核算" }
+    },
+    {
+      "id": "G-EX-STRUCT-5",
+      "description": "题型推断：无选项 + 板块含「填空」→ blank；含「判断」→ judge；含「解答」→ solve",
+      "input": "一、填空题\n1. 会计等式是______。\n二、判断题\n2. 借贷记账法是正确的。\n三、解答题\n3. 请计算本期利润。",
+      "expect": { "items": 3, "types": ["blank", "judge", "solve"], "sections": ["一、填空题", "二、判断题", "三、解答题"] }
+    },
+    {
+      "id": "G-EX-STRUCT-6",
+      "description": "OCR 页标记剥离：$[page 3]$ 前缀不计入题干",
+      "input": "[page 3] 1. 页面标记题目\nA. 甲\nB. 乙\n[slide 2] 题干续行内容",
+      "expect": { "items": 1, "stemContains": "页面标记题目", "stemNotContains": "[page", "rawNotContains": "[slide" }
+    },
+    {
+      "id": "G-EX-STRUCT-7",
+      "description": "题头多形态：1、/ (2) / 第3题",
+      "input": "1、第一题\nA. 甲\nB. 乙\n(2) 第二题\nA. 甲\nB. 乙\n第3题：第三题\nA. 甲\nB. 乙",
+      "expect": { "items": 3, "rawNos": [1, 2, 3] }
+    },
+    {
+      "id": "G-EX-STRUCT-8",
+      "description": "无板块 → 默认板块「全部题目」；无选项且无题型关键词 → unknown",
+      "input": "1. 题干一句话",
+      "expect": { "items": 1, "sections": ["全部题目"], "type0": "unknown" }
+    }
+  ],
+  "sectionCases": [
+    { "id": "G-EX-SEC-1", "input": "一、单项选择题", "expect": true },
+    { "id": "G-EX-SEC-2", "input": "（二）多选题", "expect": true },
+    { "id": "G-EX-SEC-3", "input": "第二部分 阅读理解", "expect": true },
+    { "id": "G-EX-SEC-4", "input": "选择题", "expect": true },
+    { "id": "G-EX-SEC-5", "input": "1. 这其实是题干？", "expect": false },
+    { "id": "G-EX-SEC-6", "input": "一、这是短句", "expect": true },
+    { "id": "G-EX-SEC-7", "input": "这是一句很长的普通正文内容超过二十六个字符所以不算板块标题", "expect": false },
+    { "id": "G-EX-SEC-8", "input": "一、这是一句没有题型词的说明文字", "expect": false },
+    { "id": "G-EX-SEC-9", "input": "1. 这其实是题干？", "expect": false }
+  ],
+  "matchKpCases": [
+    {
+      "id": "G-EX-KP-1",
+      "description": "长词优先（会计等式先于会计）+ 位置不重叠（同一词不同位置各计一次）",
+      "lex": [
+        { "title": "会计", "w": 1.6 },
+        { "title": "会计等式", "w": 2.2 },
+        { "title": "资产", "w": 1.6 }
+      ],
+      "text": "会计等式是资产等于负债加所有者权益，会计科目需分类。",
+      "limit": 4,
+      "expect": { "titles": ["会计等式", "会计", "资产"] }
+    },
+    {
+      "id": "G-EX-KP-2",
+      "description": "单题上限 4 个知识点",
+      "lex": [
+        { "title": "AAA", "w": 1 }, { "title": "BBB", "w": 1 }, { "title": "CCC", "w": 1 },
+        { "title": "DDD", "w": 1 }, { "title": "EEE", "w": 1 }
+      ],
+      "text": "AAA BBB CCC DDD EEE",
+      "limit": 4,
+      "expect": { "count": 4 }
+    },
+    {
+      "id": "G-EX-KP-3",
+      "description": "空文本或无词库 → 空结果",
+      "lex": [{ "title": "会计", "w": 1.6 }],
+      "text": "   ",
+      "limit": 4,
+      "expect": { "count": 0 }
+    }
+  ],
+  "kgCases": [
+    {
+      "id": "G-EX-KG-1",
+      "description": "三层节点 + 四类边：主题(KP归属)/知识点/题目 + attach/tested/related",
+      "paperName": "会计基础试卷",
+      "lex": [
+        { "title": "会计等式", "w": 2.2, "chTitle": "第一章 会计概述", "chId": "c1", "nodeId": "n1" },
+        { "title": "资产", "w": 1.6, "nodeId": "n2" }
+      ],
+      "items": [
+        { "stem": "会计等式是什么？", "options": ["A.甲", "B.乙"], "answer": "A", "section": "一、单项选择题", "qtype": "choice" },
+        { "stem": "资产的定义？会计等式与资产的关系？", "options": [], "answer": "", "section": "一、单项选择题", "qtype": "solve" }
+      ],
+      "expect": {
+        "topicCount": 2,
+        "kpCount": 2,
+        "itemNodes": 2,
+        "edgeTypesContain": ["attach", "tested", "related"],
+        "acyclic": true
+      }
+    },
+    {
+      "id": "G-EX-KG-2",
+      "description": "题目节点上限 120：150 题仅渲染 120 个题目节点但统计为 150",
+      "paperName": "大题量试卷",
+      "lex": [{ "title": "会计", "w": 1.6, "nodeId": "n1" }],
+      "itemCount": 150,
+      "expect": { "itemNodes": 120, "statItems": 150, "shownItems": 120 }
+    },
+    {
+      "id": "G-EX-KG-3",
+      "description": "继承教材先修边 → prerequisite 类型（两知识点不在同题共现，避免 related 屏蔽）",
+      "paperName": "会计基础试卷",
+      "lex": [
+        { "title": "会计等式", "w": 2.2, "nodeId": "n1" },
+        { "title": "资产", "w": 1.6, "nodeId": "n2" }
+      ],
+      "items": [
+        { "stem": "会计等式是什么？", "options": [], "answer": "", "section": "一、单项选择题", "qtype": "unknown" },
+        { "stem": "资产的定义是什么？", "options": [], "answer": "", "section": "一、单项选择题", "qtype": "unknown" }
+      ],
+      "bookEdges": [{ "from": "n1", "to": "n2", "tg": true }],
+      "expect": { "edgeTypesContain": ["prerequisite"], "acyclic": true }
+    }
+  ],
+  "qtypeLabelCases": [
+    { "id": "G-EX-LABEL-1", "input": "choice", "expect": "选择题" },
+    { "id": "G-EX-LABEL-2", "input": "blank", "expect": "填空题" },
+    { "id": "G-EX-LABEL-3", "input": "judge", "expect": "判断题" },
+    { "id": "G-EX-LABEL-4", "input": "solve", "expect": "解答题" },
+    { "id": "G-EX-LABEL-5", "input": "weird", "expect": "题目" }
+  ]
+}

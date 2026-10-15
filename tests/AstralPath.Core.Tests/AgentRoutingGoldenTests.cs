@@ -80,16 +80,32 @@ public class AgentRoutingGoldenTests
     }
 
     [Fact]
-    public void DefaultTable_Covers_All_22_Documented_Intents()
+    public void DefaultTable_Covers_All_26_Documented_Intents()
     {
         var expected = new[]
         {
             "crisis.handoff", "debt.diagnose", "debt.explain", "plan.create", "plan.rebalance",
             "today.tasks", "practice.start", "progress.check", "graph.view", "material.parse",
+            "material.list", "material.switch",
             "kb.search", "kb.ingest", "profile.view", "profile.optout", "teacher.hotspots",
             "consent.grant", "consent.revoke", "whatif.simulate", "narrative.read", "sale.check",
+            "chapter.read", "graph.path",
             "meta.help", "meta.feedback"
         };
         Assert.Equal(expected, DefaultAgentIntents.Table.Select(i => i.IntentId).ToArray());
+    }
+
+    /// <summary>P2 扩容的 4 个意图须真实可达（锚点命中即路由到对应意图）。</summary>
+    [Theory]
+    [InlineData("切换教材到Python", "material.switch")]
+    [InlineData("教材列表", "material.list")]
+    [InlineData("讲讲这一章的目录", "chapter.read")]
+    [InlineData("缓存和虚拟内存什么关系", "graph.path")]
+    public void NewlyAddedIntents_AreRoutable(string utterance, string expected)
+    {
+        var router = AgentRouter.CreateDefault();
+        var result = router.Classify(utterance, "student");
+        Assert.True(string.Equals(result.IntentId, expected, StringComparison.Ordinal),
+            $"'{utterance}' 期望 {expected}，实际 {result.IntentId}（trace: {result.Trace}）");
     }
 }
