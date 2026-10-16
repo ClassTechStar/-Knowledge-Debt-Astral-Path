@@ -9,8 +9,8 @@ android {
         applicationId = "com.astralpath.app.v22"
         minSdk = 26
         targetSdk = 35
-        versionCode = 32
-        versionName = "2.2.0"
+        versionCode = 36
+        versionName = "2.6.0"
     }
     signingConfigs {
         // P3-16 密钥轮换（2026-09-24）：口令/路径一律环境变量；仓库内不存密钥

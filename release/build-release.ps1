@@ -5,6 +5,19 @@
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
 
+
+# 0-0. 发布签名环境自动加载（P3-16：口令不入库，本机 ~/.android/astralpath-signing/signing.env）
+# 说明：signing.env 为 $env:NAME=value 文本；用正则解析注入进程环境变量
+#（dot-source 在部分受限环境不可靠，2026-10-17 T17 修复）
+$signEnv = Join-Path $env:USERPROFILE '.android\astralpath-signing\signing.env'
+if ((Test-Path $signEnv) -and -not $env:ASTRALPATH_KEYSTORE) {
+    $signRaw = Get-Content $signEnv -Raw
+    foreach ($m in [regex]::Matches($signRaw, '(?m)^\s*\$env:(\w+)\s*=\s*(.+)$')) {
+        [Environment]::SetEnvironmentVariable($m.Groups[1].Value, $m.Groups[2].Value.Trim().Trim('"'), 'Process')
+    }
+    Write-Host 'signing env loaded from signing.env' -ForegroundColor Cyan
+}
+
 # 某些受限 shell/自动化环境缺失 ProgramFiles 变量，会导致 NuGet 静态初始化崩溃
 # （Value cannot be null. Parameter 'path1'），此处显式补齐。
 if (-not $env:ProgramFiles) { $env:ProgramFiles = 'C:\Program Files' }
@@ -39,6 +52,18 @@ Get-ChildItem $engSrc -Recurse -File | Where-Object { $_.Name -notin @("download
 }
 if (-not (Test-Path "$engDst\cmaps")) { Write-Host "WARN: ocr-engine/cmaps 未同步，pdf.js cMapUrl 将 404（非致命）" }
 Copy-Item "$repo\deploy\monolith-web\serve.ps1" "$repo\src\AstralPath.Native\app\src\main\assets\www\" -Force
+# 0-2. tessdata 保障（iss 打包 tools\tessdata；*.traineddata 不入库，缺失时从 ocr-engine 复制）
+#（2026-10-17 T17 修复：此前缺失会导致 ISCC 编译直接失败）
+$tessDir = "$repo\tools\tessdata"
+foreach ($tf in @('chi_sim.traineddata', 'eng.traineddata')) {
+    $dst = Join-Path $tessDir $tf
+    if (-not (Test-Path $dst)) {
+        $src = "$repo\deploy\monolith-web\ocr-engine\$tf"
+        if (Test-Path $src) { New-Item -ItemType Directory -Force $tessDir | Out-Null; Copy-Item $src $dst -Force; Write-Host "tessdata 补齐: $tf" }
+        else { Write-Host "WARN: 缺 $tf 且无源可复制（ISCC 可能失败）" -ForegroundColor Yellow }
+    }
+}
+
 # 0c. 新增（2026-09-26）：三端同源守卫 —— 防止源文件被回退后再打包，静默把补丁覆盖回旧版。
 #     1) 三份 index.html 的 SHA256 必须一致；2) 源文件必须带 pdf.js 文本层补丁，否则直接失败。
 $htmlTargets = @(
@@ -65,10 +90,10 @@ dotnet restore "$repo\src\AstralPath.Monolith\AstralPath.Monolith.csproj" -r win
 # 2. Android：gradle assembleRelease（工程自带 release 签名配置）+ 归档到 dist
 Push-Location "$repo\src\AstralPath.Native"
 try { & C:\Gradle\bin\gradle.bat assembleRelease --console=plain } finally { Pop-Location }
-Copy-Item "$repo\src\AstralPath.Native\app\build\outputs\apk\release\app-release.apk" "$repo\src\AstralPath.Native\dist\AstralPath-Android-2.2.0-Store.apk" -Force
+Copy-Item "$repo\src\AstralPath.Native\app\build\outputs\apk\release\app-release.apk" "$repo\src\AstralPath.Native\dist\AstralPath-Android-2.6.0-Store.apk" -Force
 
 # 3. 汇总到 release/
 New-Item -ItemType Directory -Force "$repo\release" | Out-Null
-Copy-Item "$repo\deploy\win-install\dist\AstralPath-Monolith-Setup-2.2.0.exe" "$repo\release\" -Force
-Copy-Item "$repo\src\AstralPath.Native\dist\AstralPath-Android-2.2.0-Store.apk" "$repo\release\" -Force
+Copy-Item "$repo\deploy\win-install\dist\AstralPath-Monolith-Setup-2.6.0.exe" "$repo\release\" -Force
+Copy-Item "$repo\src\AstralPath.Native\dist\AstralPath-Android-2.6.0-Store.apk" "$repo\release\" -Force
 Write-Host '双端安装包构建完成，见 release\ 目录'

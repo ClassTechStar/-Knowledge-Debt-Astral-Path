@@ -6,7 +6,7 @@
 # 说明：不改动源码；发布后随包 tools\（管线 + tessdata + ocr-venv 瘦身）与 Resources\ocr-engine\。
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
-$version = "2.2.0"
+$version = "2.6.0"
 $out = Join-Path $repo "release\AstralPath-Portable-$version"
 
 Write-Host ">>> [1/4] dotnet publish (self-contained win-x64)" -ForegroundColor Cyan

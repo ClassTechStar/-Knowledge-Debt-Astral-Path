@@ -2,7 +2,7 @@
 
 跨课程**知识债**诊断与修复智能体：用确定性公式找出你「欠」了哪门课的先修债，用约束满足生成可完成的还债计划，用受约束智能体陪伴销账，并守住教育伦理底线。
 
-> **2026 iCAN AI / DuMate 竞赛实现** · 版本 **2.2.0**（contract-v2.2.0-algo-v2） · Windows 10/11 · Android 8.0+
+> **2026 iCAN AI / DuMate 竞赛实现** · 版本 **2.6.0**（contract-v2.2.0-algo-v2） · Windows 10/11 · Android 8.0+
 >
 > **项目名称规范**：全称「知债：星穹学途（Knowledge Debt: Astral Path）」；中文简称「知债：星穹学途」；代码标识 **AstralPath**。禁止旧名「知债图 / ZhiZhaiTu」。
 
@@ -46,9 +46,9 @@
 | 产物 | 路径 | 说明 |
 |------|------|------|
 | **Web 单体版** | `deploy/monolith-web/index.html` | 全功能、无服务器、浏览器直接打开（2.2，~100 KB） |
-| **Windows 单体安装包** | `release/AstralPath-Monolith-Setup-2.2.0.exe` | WebView2 壳 + 同一 HTML；本机安装验收通过 |
-| **Windows 便携版** | `release/AstralPath-Portable-2.2.0/`（+ 同名 .zip） | 免安装解压即用，.NET 10 自包含 |
-| **Android APK** | `release/AstralPath-Android-2.2.0-Store.apk` | WebView 同构 + 离线核心；模拟器安装验收通过 |
+| **Windows 单体安装包** | `release/AstralPath-Monolith-Setup-2.6.0.exe` | WebView2 壳 + 同一 HTML；本机安装验收通过 |
+| **Windows 便携版** | `release/AstralPath-Portable-2.6.0/`（+ 同名 .zip） | 免安装解压即用，.NET 10 自包含 |
+| **Android APK** | `release/AstralPath-Android-2.6.0-Store.apk` | WebView 同构 + 离线核心；模拟器安装验收通过 |
 | **100 题库** | `eval/question_bank.json` | 覆盖 34 个知识点（难度 1:21 / 2:51 / 3:28） |
 | **34 点图包** | `graph-packs/astralpath-v2/graph_pack.json` | 34 节点 / 74 边（先修 50 + 迁移缺口 24），无环，三门课 |
 | **13 本教材思维导图** | `kg-deep-test/*.mindmap.{json,md}` | 6,720 页 / 2,519 节点 / 2,662 边 |
@@ -69,8 +69,8 @@
 deploy\monolith-web\index.html
 
 # Windows：安装包或便携版
-release\AstralPath-Monolith-Setup-2.2.0.exe
-# 或解压 release\AstralPath-Portable-2.2.0.zip 后双击 AstralPath.Monolith.exe
+release\AstralPath-Monolith-Setup-2.6.0.exe
+# 或解压 release\AstralPath-Portable-2.6.0.zip 后双击 AstralPath.Monolith.exe
 ```
 
 功能：起点/藏书阁/识网/知债/今日/智能体/画像/账户 全部在本机计算，数据存 localStorage，可导出 JSON。
@@ -81,7 +81,7 @@ release\AstralPath-Monolith-Setup-2.2.0.exe
 
 ### 3.3 Android
 
-安装 `release/AstralPath-Android-2.2.0-Store.apk`（商店签名）。无电脑、无 adb 亦可离线使用核心功能。
+安装 `release/AstralPath-Android-2.6.0-Store.apk`（商店签名）。无电脑、无 adb 亦可离线使用核心功能。
 
 ### 3.4 源码构建
 
@@ -135,7 +135,7 @@ AstralPath.Core/          纯函数：公式 / 图 / OCR / 画像 / 销账 / 计
 AstralPath.Api/           ASP.NET Core（Web/Windows 共用）+ wwwroot/index.html
 AstralPath.Desktop/       WebView2 壳
 AstralPath.Native/        Android WebView 壳（~2.8MB）
-AstralPath.Monolith/      无微服务 Windows 壳（Setup-2.2.0）
+AstralPath.Monolith/      无微服务 Windows 壳（Setup-2.6.0）
 AstralPath.Mobile.Offline/Avalonia 11 + SQLite 离线单体
 AstralPath.Persistence/  Postgres（默认）+ memory 回退
 tests/                    Core 28 · Persistence 8 · Desktop 47 · API 66 · Eval 2 · **MobileCore 84（图谱/OCR）**
