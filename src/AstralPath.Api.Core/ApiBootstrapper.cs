@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using AstralPath.Core.Diagnostics;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -445,7 +446,10 @@ public sealed class ApiBootstrapper
                             else if (doc.RootElement.TryGetProperty("detail", out var d) && d.ValueKind == JsonValueKind.String)
                                 message = d.GetString() ?? message;
                         }
-                        catch { /* 解析失败用默认文案 */ }
+                        catch (Exception ex)
+                        {
+                            Diag.Recover(ex, "ApiBootstrapper");
+                        }
                     }
 
                     var code = context.Response.StatusCode switch
@@ -572,6 +576,16 @@ public sealed class ApiBootstrapper
                     ["students"] = store.Students.Count.ToString(),
                     ["packId"] = store.PackId,
                     ["graphVersion"] = store.Graph.GraphVersion.ToString()
+                },
+                // P13：把「被吞掉的错误」暴露成可观测数据（最近 5 条 + 累计条数）。
+                // 纯内存环形缓冲（容量 50），不写盘、不上报，符合本地优先约束。
+                diagnostics = new
+                {
+                    errorsTotal = AstralPath.Core.Diagnostics.Diag.Total,
+                    recent = AstralPath.Core.Diagnostics.Diag.Snapshot()
+                        .Take(5)
+                        .Select(d => new { at = d.At, kind = d.Kind, scope = d.Scope, message = d.Message })
+                        .ToArray()
                 }
             });
         });

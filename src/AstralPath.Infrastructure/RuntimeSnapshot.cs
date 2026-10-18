@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using AstralPath.Core.Diagnostics;
 using System.Text;
 using System.Text.Json;
 using Microsoft.Data.Sqlite;
@@ -204,7 +205,10 @@ public sealed class RuntimeSnapshotStore : IDisposable
                     _conn ??= OpenConnection();
                     WriteSnapshotLocked(legacy.SavedAt, legacy.PackId, legacyJson);
                     _lastHash = HashOf(legacyJson);
-                    try { File.Move(_legacyFile, _legacyFile + ".migrated", overwrite: true); } catch { /* 改名失败不致命 */ }
+                    try { File.Move(_legacyFile, _legacyFile + ".migrated", overwrite: true); } catch (Exception ex)
+                    {
+                        Diag.Recover(ex, "RuntimeSnapshot");
+                    }
                     return new SnapshotLoadResult(true, true,
                         legacy.Store.Students.Count,
                         legacy.Modules.KbDocs.Count,
@@ -345,7 +349,10 @@ public sealed class RuntimeSnapshotStore : IDisposable
             _timer = null;
             _sweep?.Dispose();
             _sweep = null;
-            try { _conn?.Dispose(); } catch { /* ignore */ }
+            try { _conn?.Dispose(); } catch (Exception ex)
+            {
+                Diag.Recover(ex, "RuntimeSnapshot");
+            }
             _conn = null;
         }
     }

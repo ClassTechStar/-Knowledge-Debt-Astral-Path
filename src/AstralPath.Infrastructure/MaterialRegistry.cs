@@ -1,4 +1,5 @@
 using AstralPath.Contracts;
+using AstralPath.Core.Diagnostics;
 using System.Text.Json;
 
 namespace AstralPath.Infrastructure;
@@ -80,7 +81,10 @@ public static class MaterialRegistry
                             if (!string.IsNullOrWhiteSpace(metaName)) display = metaName!;
                         }
                     }
-                    catch { /* fall back to safeName */ }
+                    catch (Exception ex)
+                    {
+                        Diag.Recover(ex, "MaterialRegistry");
+                    }
                 }
                 else
                 {
@@ -97,7 +101,10 @@ public static class MaterialRegistry
                         info.LastWriteTimeUtc, info.LastWriteTimeUtc, null);
                     added++;
                 }
-                catch { /* skip unreadable */ }
+                catch (Exception ex)
+                {
+                    Diag.Recover(ex, "MaterialRegistry");
+                }
             }
         }
         return added;

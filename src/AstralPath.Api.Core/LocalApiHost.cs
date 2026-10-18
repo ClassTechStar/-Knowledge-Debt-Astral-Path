@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Builder;
+using AstralPath.Core.Diagnostics;
 
 namespace AstralPath.Api;
 
@@ -83,9 +84,9 @@ public static class LocalApiHost
                 var resp = await http.GetAsync("/health/ready");
                 if (resp.IsSuccessStatusCode) return true;
             }
-            catch
+            catch (Exception ex)
             {
-                // 服务可能还在绑定，继续等
+                Diag.Recover(ex, "LocalApiHost");
             }
             await Task.Delay(300);
         }
@@ -104,9 +105,9 @@ public static class LocalApiHost
                 _app.StopAsync(cts.Token).GetAwaiter().GetResult();
                 _app.DisposeAsync().AsTask().GetAwaiter().GetResult();
             }
-            catch
+            catch (Exception ex)
             {
-                // 进程即将退出时失败也无所谓
+                Diag.Recover(ex, "LocalApiHost");
             }
             _app = null;
             BaseUrl = string.Empty;

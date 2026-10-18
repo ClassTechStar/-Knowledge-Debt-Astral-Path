@@ -28,11 +28,14 @@
 })(typeof self !== "undefined" ? self : this, function () {
   "use strict";
 
-  var ESC_MAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
-
+  // 注意：esc 保持「自包含」——映射表内联在函数体内，不依赖模块级变量。
+  // 这样 scripts/gen_frontend_regions.py 可以按符号把单个函数抽进 index.html
+  // 的生成区（页面作用域里没有 ESC_MAP），行为与旧内联实现逐字一致。
   /** 纯文本转义：与 index.html 内 esc() 逐字一致 */
   function esc(s) {
-    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return ESC_MAP[c]; });
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
   }
 
   // 白名单标签：正则只允许**无属性**的开闭标签；<b onclick=…> 这类不会被匹配，

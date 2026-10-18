@@ -89,6 +89,18 @@ jobs:
           node scripts/gen-shared-core.js --check
           python scripts/verify_core.py
 
+      # ⑧b 前端构建合并：index.html 的 AP 生成区与 shared/ 逐字一致（方案 P2 阶段二）
+      - name: verify frontend regions
+        run: python scripts/gen_frontend_regions.py --check
+
+      # ⑧c state 分片存储：黄金用例 10 例 + 页面接入校验（方案 P6）
+      - name: verify store shards
+        run: python scripts/verify_store.py
+
+      # ⑨ 空 catch 门禁：每个 catch 必须有记录或降级动作
+      - name: verify no empty catch
+        run: python scripts/verify_no_empty_catch.py
+
       # ⑧ 命名规范扫描（旧名残留；脚本内置「政策声明语境」判定）
       - name: naming consistency
         run: python scripts/naming_consistency.py --check

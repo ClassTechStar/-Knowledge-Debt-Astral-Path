@@ -64,10 +64,13 @@ dotnet_style_qualification_for_property = false:suggestion
 dotnet_style_qualification_for_method = false:suggestion
 dotnet_sort_system_directives_first = true
 
-# 诊断：禁止空 catch 吞错（方案 P13 的 CI 配套）
-dotnet_diagnostic.CA1031.severity = warning      # 不要捕获常规异常类型
-dotnet_diagnostic.IDE0055.severity = warning     # 格式化
-dotnet_diagnostic.IDE0005.severity = warning     # 多余 using
+# 诊断：空 catch 吞错（方案 P13）
+# CA1031 只做 IDE 提示：全仓有 40+ 处**刻意**的防御性 catch-all（OCR / 文件 IO / AI 网关），
+# 一刀切禁止会产生大量噪声。真正的门禁是 scripts/verify_no_empty_catch.py——
+# 断言「每个 catch 必须有记录或降级动作」，比 CA1031 更贴合意图且零误伤。
+dotnet_diagnostic.CA1031.severity = suggestion    # 不要捕获常规异常类型（仅提示）
+dotnet_diagnostic.IDE0055.severity = warning      # 格式化
+dotnet_diagnostic.IDE0005.severity = warning      # 多余 using
 
 # ── JavaScript / 前端单体 ───────────────────────────────────────────
 [*.js]

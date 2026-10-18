@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using AstralPath.Core.Diagnostics;
 using System.Text.Json;
 
 namespace AstralPath.Infrastructure;
@@ -160,7 +161,10 @@ public static class OcrHost
             try { await proc.WaitForExitAsync(cts.Token); }
             catch (OperationCanceledException)
             {
-                try { proc.Kill(entireProcessTree: true); } catch { /* ignore */ }
+                try { proc.Kill(entireProcessTree: true); } catch (Exception ex)
+                {
+                    Diag.Recover(ex, "OcrHost");
+                }
                 throw new TimeoutException($"OCR 超时({timeoutMinutes}min)；可改用 quick 模式或拆分文件");
             }
             await stderrTask;
@@ -176,8 +180,14 @@ public static class OcrHost
         }
         finally
         {
-            try { if (File.Exists(tmp)) File.Delete(tmp); } catch { /* ignore */ }
-            try { if (File.Exists(outFile)) File.Delete(outFile); } catch { /* ignore */ }
+            try { if (File.Exists(tmp)) File.Delete(tmp); } catch (Exception ex)
+            {
+                Diag.Recover(ex, "OcrHost");
+            }
+            try { if (File.Exists(outFile)) File.Delete(outFile); } catch (Exception ex)
+            {
+                Diag.Recover(ex, "OcrHost");
+            }
         }
     }
 
@@ -198,7 +208,10 @@ public static class OcrHost
         var n = 0;
         foreach (var f in Directory.EnumerateFiles(dir, "*", SearchOption.AllDirectories))
         {
-            try { File.Delete(f); n++; } catch { /* ignore */ }
+            try { File.Delete(f); n++; } catch (Exception ex)
+            {
+                Diag.Recover(ex, "OcrHost");
+            }
         }
         return n;
     }

@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+using AstralPath.Core.Diagnostics;
 using System.Text;
 using System.Text.Json;
 
@@ -190,15 +191,18 @@ public sealed class MimoClient
                 if (onDelta != null) SafeDelta(onDelta, outText.ToString(), false);
             }
         }
-        catch (JsonException)
+        catch (JsonException ex)
         {
-            // 单片损坏：跳过，不中断整流
+            Diag.Recover(ex, "MimoClient");
         }
     }
 
     private static void SafeDelta(Action<string, bool> onDelta, string text, bool thinking)
     {
-        try { onDelta(text, thinking); } catch { /* 流式回调异常不影响主流程 */ }
+        try { onDelta(text, thinking); } catch (Exception ex)
+        {
+            Diag.Recover(ex, "MimoClient");
+        }
     }
 
     private static string Limit(string s, int n) => s.Length <= n ? s : s.Substring(0, n);

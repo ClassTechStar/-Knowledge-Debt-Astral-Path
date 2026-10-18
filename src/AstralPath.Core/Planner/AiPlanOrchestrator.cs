@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AstralPath.Core.Diagnostics;
 using System.Text.RegularExpressions;
 using AstralPath.Core.Agent;
 
@@ -129,9 +130,9 @@ public sealed class AiPlanOrchestrator
         {
             throw;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // 传输/内容故障：回退本地（T9：模型失败不阻塞主流程）
+            Diag.Recover(ex, "AiPlanOrchestrator");
         }
 
         if (draft == null)

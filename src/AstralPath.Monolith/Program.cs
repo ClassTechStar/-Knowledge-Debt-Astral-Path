@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using AstralPath.Core.Diagnostics;
 using System.Text.Json;
 using AstralPath.Infrastructure;
 using Microsoft.Web.WebView2.Core;
@@ -38,7 +39,10 @@ internal sealed class MainForm : Form
             var ico = Path.Combine(AppContext.BaseDirectory, "Resources", "astralpath-icon.ico");
             if (File.Exists(ico)) Icon = new Icon(ico);
         }
-        catch { /* icon optional */ }
+        catch (Exception ex)
+        {
+            Diag.Recover(ex, "Program");
+        }
 
         Controls.Add(_web);
         Shown += async (_, _) => await BootAsync();
@@ -97,7 +101,10 @@ internal sealed class MainForm : Form
             var cid = req.Id!;
             _ = Task.Run(() =>
             {
-                try { OcrHost.ClearOcrCache(); } catch { /* ignore */ }
+                try { OcrHost.ClearOcrCache(); } catch (Exception ex)
+                {
+                    Diag.Recover(ex, "Program");
+                }
                 Reply(cid, "ok", "");
             });
             return;
@@ -129,7 +136,10 @@ internal sealed class MainForm : Form
                 void Post()
                 {
                     try { _web.CoreWebView2?.PostWebMessageAsJson(json); }
-                    catch { /* ignore */ }
+                    catch (Exception ex)
+                    {
+                        Diag.Recover(ex, "Program");
+                    }
                 }
                 if (InvokeRequired) BeginInvoke((Action)Post); else Post();
             });
@@ -154,7 +164,10 @@ internal sealed class MainForm : Form
         void Post()
         {
             try { _web.CoreWebView2?.PostWebMessageAsJson(json); }
-            catch { /* 页面已关闭，忽略 */ }
+            catch (Exception ex)
+            {
+                Diag.Recover(ex, "Program");
+            }
         }
         if (InvokeRequired) BeginInvoke((Action)Post); else Post();
     }

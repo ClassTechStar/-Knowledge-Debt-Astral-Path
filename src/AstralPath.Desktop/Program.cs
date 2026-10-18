@@ -32,7 +32,10 @@ public sealed class MainForm : Form
             var iconPath = Path.Combine(AppContext.BaseDirectory, "Resources", "astralpath-icon.ico");
             if (File.Exists(iconPath)) Icon = new Icon(iconPath);
         }
-        catch { /* 图标缺失不影响启动 */ }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("[diag] " + ex);
+        }
         StartPosition = FormStartPosition.CenterScreen;
         MinimumSize = new Size(960, 640);
         Controls.Add(_web);
@@ -117,7 +120,10 @@ public sealed class MainForm : Form
                     await File.AppendAllTextAsync(_logPath,
                         $"[{DateTime.Now:O}] stdout:{so}\nstderr:{se}\n");
                 }
-                catch { /* ignore */ }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine("[diag] " + ex);
+                }
             });
             _status.Text = $"本地服务启动中 · http://127.0.0.1:{_port} · 首次启动可能需要数秒";
 
@@ -183,7 +189,10 @@ public sealed class MainForm : Form
         {
             _status.Text = "启动失败：" + ex.Message;
             _retry.Visible = true;
-            try { await File.AppendAllTextAsync(_logPath, $"[{DateTime.Now:O}] desktop:{ex}\n"); } catch { }
+            try { await File.AppendAllTextAsync(_logPath, $"[{DateTime.Now:O}] desktop:{ex}\n"); } catch (Exception logEx)
+            {
+                System.Diagnostics.Debug.WriteLine("[diag] " + logEx);
+            }
             MessageBox.Show(this, ex.ToString(), "启动失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
@@ -210,7 +219,10 @@ public sealed class MainForm : Form
                 var resp = await http.GetAsync(url);
                 if (resp.IsSuccessStatusCode) return true;
             }
-            catch { /* retry */ }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[diag] " + ex);
+            }
             await Task.Delay(400);
         }
         return false;
@@ -222,7 +234,10 @@ public sealed class MainForm : Form
         try
         {
             using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };
-            try { await http.PostAsync(baseUrl.TrimEnd('/') + "/api/services/warmup", null); } catch { /* best-effort */ }
+            try { await http.PostAsync(baseUrl.TrimEnd('/') + "/api/services/warmup", null); } catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("[diag] " + ex);
+            }
             var json = await http.GetStringAsync(baseUrl.TrimEnd('/') + "/api/services");
             using var doc = System.Text.Json.JsonDocument.Parse(json);
             var root = doc.RootElement;
@@ -240,7 +255,10 @@ public sealed class MainForm : Form
                 return string.Join(" · ", parts);
             }
         }
-        catch { /* non-fatal */ }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("[diag] " + ex);
+        }
         return "";
     }
 
@@ -254,7 +272,10 @@ public sealed class MainForm : Form
                 _api.WaitForExit(3000);
             }
         }
-        catch { /* ignore */ }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine("[diag] " + ex);
+        }
         _api?.Dispose();
         _api = null;
     }

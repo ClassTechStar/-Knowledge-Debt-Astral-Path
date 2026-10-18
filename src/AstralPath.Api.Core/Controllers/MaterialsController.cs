@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using AstralPath.Core.Diagnostics;
 using System.Text.Json;
 using AstralPath.Contracts;
 using AstralPath.Infrastructure;
@@ -68,11 +69,17 @@ public sealed class MaterialsController : ControllerBase
                 var target = Path.Combine(newDir, Path.GetFileName(f));
                 // 注意：控制器继承自 ControllerBase，裸写 File 会解析到 File(...) 方法而非 System.IO.File
                 if (System.IO.File.Exists(target)) continue;
-                try { System.IO.File.Copy(f, target); } catch { /* 单个失败跳过 */ }
+                try { System.IO.File.Copy(f, target); } catch (Exception ex)
+                {
+                    Diag.Recover(ex, "MaterialsController");
+                }
             }
             MaterialRegistry.HydrateFromDirectory(newDir);
         }
-        catch { /* 迁移是尽力而为，不得影响新上传 */ }
+        catch (Exception ex)
+        {
+            Diag.Recover(ex, "MaterialsController");
+        }
     }
 
     [HttpGet("/v1/materials")]
@@ -236,7 +243,10 @@ public sealed class MaterialsController : ControllerBase
                 await System.IO.File.WriteAllTextAsync(dest + ".meta.json",
                     System.Text.Json.JsonSerializer.Serialize(new { id, name = displayName, size = file.Length }));
             }
-            catch { /* meta is best-effort */ }
+            catch (Exception ex)
+            {
+                Diag.Recover(ex, "MaterialsController");
+            }
 
             var doc = new MaterialDoc(id, displayName, dest, file.Length, "parsing", ocr, false, 0, 0, 0, 0,
                 null, "batch-upload", DateTime.UtcNow, DateTime.UtcNow, null);
@@ -568,7 +578,10 @@ public sealed class MaterialsController : ControllerBase
                     var m = MaterialRegistry.GetMaterial(id);
                     if (m == null) continue;
                     try { await ParseAndRegisterAsync(m); }
-                    catch { /* keep list */ }
+                    catch (Exception ex)
+                    {
+                        Diag.Recover(ex, "MaterialsController");
+                    }
                 }
             });
         }

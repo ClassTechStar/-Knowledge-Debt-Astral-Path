@@ -84,6 +84,21 @@ if (Test-Path scripts/verify_core.py) {
     Step "shared-core-equivalence" { python scripts/verify_core.py }
 }
 
+# 6d-2) 前端构建合并：index.html 的 AP 生成区与 shared/ 逐字一致（方案 P2 阶段二）
+if (Test-Path scripts/gen_frontend_regions.py) {
+    Step "frontend-regions" { python scripts/gen_frontend_regions.py --check }
+}
+
+# 6d-3) state 分片存储：黄金用例 + 页面接入校验（方案 P6）
+if (Test-Path scripts/verify_store.py) {
+    Step "store-shards" { python scripts/verify_store.py }
+}
+
+# 6e) 空 catch 门禁（方案 P13）：每个 catch 必须有记录或降级动作
+if (Test-Path scripts/verify_no_empty_catch.py) {
+    Step "no-empty-catch" { python scripts/verify_no_empty_catch.py }
+}
+
 # 7) 命名规范扫描（含旧名残留；脚本内置「政策声明语境」判定，
 #    "禁止再使用旧名…"这类声明句不会误报 —— 勿再用朴素 Select-String 重复实现）
 if (Test-Path scripts/naming_consistency.py) {

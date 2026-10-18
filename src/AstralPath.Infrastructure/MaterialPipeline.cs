@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AstralPath.Core.Diagnostics;
 using AstralPath.Contracts;
 using AstralPath.Graph;
 
@@ -65,7 +66,10 @@ public static class MaterialPipeline
 
         // P3-15：优先仓库内 tools/ocr-venv（跟随工作目录/部署目录/脚本目录），失效的用户级硬编码路径已移除
         string? scriptDir = null;
-        try { scriptDir = Path.GetDirectoryName(ResolveOcrScript()); } catch { /* script 未找到时跳过该候选 */ }
+        try { scriptDir = Path.GetDirectoryName(ResolveOcrScript()); } catch (Exception ex)
+        {
+            Diag.Recover(ex, "MaterialPipeline");
+        }
         var candidates = new[]
         {
             Environment.GetEnvironmentVariable("MIMO_PYTHON") ?? "",
@@ -99,7 +103,10 @@ public static class MaterialPipeline
         var env = Environment.GetEnvironmentVariable("TESSDATA_PREFIX");
         if (!string.IsNullOrWhiteSpace(env) && Directory.Exists(env)) return env;
         string? scriptDir = null;
-        try { scriptDir = Path.GetDirectoryName(ResolveOcrScript()); } catch { /* ignore */ }
+        try { scriptDir = Path.GetDirectoryName(ResolveOcrScript()); } catch (Exception ex)
+        {
+            Diag.Recover(ex, "MaterialPipeline");
+        }
         var candidates = new[]
         {
             scriptDir is not null ? Path.Combine(scriptDir, "tessdata") : "",
@@ -196,7 +203,10 @@ public static class MaterialPipeline
             }
             catch (OperationCanceledException)
             {
-                try { proc.Kill(entireProcessTree: true); } catch { /* ignore */ }
+                try { proc.Kill(entireProcessTree: true); } catch (Exception ex)
+                {
+                    Diag.Recover(ex, "MaterialPipeline");
+                }
                 throw new TimeoutException($"OCR 超时({timeoutMinutes}min)：{Path.GetFileName(filePath)} mode={ocrMode}");
             }
             var stdout = await stdoutTask;
@@ -211,7 +221,10 @@ public static class MaterialPipeline
         }
         finally
         {
-            try { if (File.Exists(outFile)) File.Delete(outFile); } catch { /* ignore */ }
+            try { if (File.Exists(outFile)) File.Delete(outFile); } catch (Exception ex)
+            {
+                Diag.Recover(ex, "MaterialPipeline");
+            }
         }
     }
 

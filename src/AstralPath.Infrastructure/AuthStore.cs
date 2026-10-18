@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using AstralPath.Core.Diagnostics;
 
 namespace AstralPath.Infrastructure;
 
@@ -187,9 +188,9 @@ public sealed class AuthStore
             if (FindByEmail("teacher@astralpath.local") == null)
                 Register("teacher@astralpath.local", "teacher123", "演示教师", "demo-student-b");
         }
-        catch
+        catch (Exception ex)
         {
-            // ignore duplicate seed races
+            Diag.Recover(ex, "AuthStore");
         }
     }
 

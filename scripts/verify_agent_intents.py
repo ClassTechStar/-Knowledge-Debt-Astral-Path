@@ -25,6 +25,9 @@ ROOT = Path(__file__).resolve().parent.parent
 INTENTS_JSON = ROOT / "tools" / "agent-intents.json"
 INDEX_HTML = ROOT / "deploy" / "monolith-web" / "index.html"
 AGENT_ROUTER = ROOT / "src" / "AstralPath.Core" / "Agent" / "AgentRouter.cs"
+# P7（2026-10-18）：登记表从 AgentRouter.cs 拆到独立文件（单文件单职责），
+# 运行时词表仍在 AgentRouter.CreateDefault() 内联，故两个文件分别对拍。
+DEFAULT_INTENTS = ROOT / "src" / "AstralPath.Core" / "Agent" / "DefaultAgentIntents.cs"
 FORMULA_WEIGHTS = ROOT / "src" / "AstralPath.Core" / "Formula" / "FormulaWeights.cs"
 # P3：第四方 JS 副本（受控目录；p0/p1 不定义路由常量，故只校验定义了的一方）
 P2_JS = ROOT / "shared" / "integrations" / "p2-ai-integration.js"
@@ -90,9 +93,12 @@ def main():
 
     # ── ② C# 登记表（=运行时表）：锚点 + 角色 + 描述逐字对拍 ──
     cs = AGENT_ROUTER.read_text(encoding="utf-8")
-    table = re.search(r"DefaultAgentIntents[\s\S]*?Table\s*=\s*\{([\s\S]*?)\n    \};", cs)
+    tbl_src = DEFAULT_INTENTS.read_text(encoding="utf-8") if DEFAULT_INTENTS.exists() else cs
+    table = re.search(r"DefaultAgentIntents[\s\S]*?Table\s*=\s*\{([\s\S]*?)\n    \};", tbl_src)
+    if not table and tbl_src is not cs:
+        table = re.search(r"Table\s*=\s*\{([\s\S]*?)\n    \};", tbl_src)
     if not table:
-        fail("AgentRouter.cs 中找不到 DefaultAgentIntents.Table")
+        fail(f"找不到 DefaultAgentIntents.Table（查过 {DEFAULT_INTENTS.name} 与 {AGENT_ROUTER.name}）")
     # P5-1：RoleMask 允许逗号多角色（旧正则 "(\w+)" 只认单角色，是检测盲区）
     entries = re.findall(
         r'new\(\s*(\d+)\s*,\s*"([a-z.]+)"\s*,\s*"([\w,]+)"\s*,\s*'

@@ -1,4 +1,5 @@
 using Android.App;
+using AstralPath.Core.Diagnostics;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
@@ -58,7 +59,10 @@ public class MainActivity : Activity
                 | SystemUiFlags.LightStatusBar
                 | SystemUiFlags.LightNavigationBar);
         }
-        catch { /* 旧系统忽略 */ }
+        catch (Exception ex)
+        {
+            Diag.Recover(ex, "MainActivity");
+        }
 
         var root = new FrameLayout(this);
         root.SetFitsSystemWindows(true);
@@ -183,7 +187,10 @@ public class MainActivity : Activity
                 var intent = new Intent(Intent.ActionView, Android.Net.Uri.Parse(url));
                 view!.Context!.StartActivity(intent);
             }
-            catch { /* 无浏览器时忽略 */ }
+            catch (Exception ex)
+            {
+                Diag.Recover(ex, "MainActivity");
+            }
             return true;
         }
     }

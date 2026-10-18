@@ -59,7 +59,7 @@ OUT = os.path.join(ROOT, "deploy", "monolith-web", "astralpath-monolith.html")
 # 2026-10-18 T20（方案 P4）：XSS 收口——renderTrend 的 SVG 文本节点 d.label 与
 # 学情报告 rowsTrend 表格首列改走 esc()（原为裸插，虽当前取值是日期串不可利用，
 # 但属未收口直插面），基座字节变化故重打基线。
-EXPECTED_MD5 = "19c28009a4bc7e39fc9b714067a9633a"
+EXPECTED_MD5 = "2a4fa2681dff926cf46b700ab0f54ff4"
 
 # 唯一放行的外部 CDN 引用（页面内有 onerror 哨兵，缺失时自动降级）
 ALLOWED_EXTERNAL_PREFIX = "https://cdn.jsdelivr.net/npm/onnxruntime-web"
