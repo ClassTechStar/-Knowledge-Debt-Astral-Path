@@ -1,12 +1,17 @@
 # 知债：星穹学途 · 一键验收（ALL GREEN / FAILED）
 # 用法：powershell -File scripts\verify_all.ps1
+#       powershell -File scripts\verify_all.ps1 -Json   # 机器可读结果（CI 断言用）
 # 退出码：0 = ALL GREEN；非 0 = FAILED
+param(
+    [switch]$Json
+)
 
 $ErrorActionPreference = "Continue"
 $root = Split-Path -Parent $PSScriptRoot
 Set-Location $root
 
 $failed = @()
+$results = New-Object System.Collections.ArrayList
 
 # 统一输出编码，并把 dotnet CLI 切英文，避免控制台中文乱码
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -17,7 +22,12 @@ $env:DOTNET_NOLOGO = "1"
 function Step($name, $cmd) {
     Write-Host "`n=== $name ===" -ForegroundColor Cyan
     & $cmd
-    if ($LASTEXITCODE -ne 0) { $script:failed += $name }
+    if ($LASTEXITCODE -ne 0) {
+        $script:failed += $name
+        [void]$script:results.Add([pscustomobject]@{ name = $name; status = "failed"; exit = $LASTEXITCODE })
+    } else {
+        [void]$script:results.Add([pscustomobject]@{ name = $name; status = "passed"; exit = 0 })
+    }
 }
 
 # 1) 常量对齐：JS 的 K 对象 ↔ C# 的 FormulaConstants.cs
@@ -56,7 +66,25 @@ Step "test-MobileCore"  { dotnet test src/AstralPath.Mobile.Offline/AstralPath.M
 # 5) 三端 HTML 同源 + C3 XSS 回归哨兵（统一由同步脚本提供）
 Step "monolith-html-sync" { powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sync-monolith-html.ps1 -Check }
 
-# 6) 命名规范扫描（含旧名残留；脚本内置「政策声明语境」判定，
+# 6b) 前端 JS 语法门禁（独立脚本 + HTML 内联块；方案 P1）
+if (Test-Path tools/check-js.js) {
+    Step "check-js" { node tools/check-js.js }
+}
+
+# 6c) XSS 黄金用例 + 直插点哨兵（方案 P4）
+if (Test-Path scripts/verify_xss.py) {
+    Step "xss-cases" { python scripts/verify_xss.py }
+}
+
+# 6d) 共享内核：常量块与 JSON 一致 + 与旧实现行为等价双跑（方案 P2/P3）
+if (Test-Path scripts/gen-shared-core.js) {
+    Step "shared-core-generated" { node scripts/gen-shared-core.js --check }
+}
+if (Test-Path scripts/verify_core.py) {
+    Step "shared-core-equivalence" { python scripts/verify_core.py }
+}
+
+# 7) 命名规范扫描（含旧名残留；脚本内置「政策声明语境」判定，
 #    "禁止再使用旧名…"这类声明句不会误报 —— 勿再用朴素 Select-String 重复实现）
 if (Test-Path scripts/naming_consistency.py) {
     Step "naming" { python scripts/naming_consistency.py --check }
@@ -64,6 +92,15 @@ if (Test-Path scripts/naming_consistency.py) {
 
 # 结论
 Write-Host "`n" ("=" * 60)
+if ($Json) {
+    $summary = [pscustomobject]@{
+        total  = $results.Count
+        passed = @($results | Where-Object { $_.status -eq "passed" }).Count
+        failed = $failed
+        items  = $results
+    }
+    $summary | ConvertTo-Json -Depth 4
+}
 if ($failed.Count -eq 0) {
     Write-Host "ALL GREEN" -ForegroundColor Green
     exit 0

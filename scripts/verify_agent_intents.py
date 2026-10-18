@@ -10,6 +10,10 @@
 #      —— K-03：危机词漏词曾是检测盲区（后端缺「活不下去」无人报警）
 #   ④ src/AstralPath.Core/Formula/FormulaWeights.cs 的 BannedWords ↔ JSON bannedEthics
 #      —— 路由禁语（伦理）与 JS BANNED（隐私）是两类，分别登记、分别对拍
+#   ⑤ shared/integrations/p2-ai-integration.js 的 CRISIS/BANNED/NEGATIVE/INTENTS
+#      —— P3（2026-10-18）：22→26 意图扩容时该副本漏同步（kb.search 少 13 个锚点等
+#         17 处），而 .cloudflare/pages/* 被 gitignore 排除，漂移长期无人发现。
+#         修复后脚本收编进受控目录 shared/integrations/，并纳入本对拍（第四方）。
 # 用法：python scripts/verify_agent_intents.py
 # 退出码：0 = ALL GREEN；1 = 漂移
 import json
@@ -22,6 +26,10 @@ INTENTS_JSON = ROOT / "tools" / "agent-intents.json"
 INDEX_HTML = ROOT / "deploy" / "monolith-web" / "index.html"
 AGENT_ROUTER = ROOT / "src" / "AstralPath.Core" / "Agent" / "AgentRouter.cs"
 FORMULA_WEIGHTS = ROOT / "src" / "AstralPath.Core" / "Formula" / "FormulaWeights.cs"
+# P3：第四方 JS 副本（受控目录；p0/p1 不定义路由常量，故只校验定义了的一方）
+P2_JS = ROOT / "shared" / "integrations" / "p2-ai-integration.js"
+# P2/P3：共享内核 —— 常量块由 build 期 JSON 生成（DO NOT EDIT），仍需对拍防生成器漏跑
+CORE_JS = ROOT / "shared" / "core.js"
 
 
 def fail(msg):
@@ -31,13 +39,13 @@ def fail(msg):
 
 
 def extract_js_array(source, name):
-    m = re.search(r"const " + name + r"=(\[.*?\]);", source, re.S)
+    m = re.search(r"(?:const|var|let)\s+" + name + r"\s*=\s*(\[.*?\]);", source, re.S)
     if not m:
-        fail(f"index.html 中找不到 const {name} 字面量")
+        fail(f"找不到 {name} 字面量（const/var）")
     try:
         return json.loads(m.group(1))
     except json.JSONDecodeError as e:
-        fail(f"const {name} 不是严格 JSON（{e}）；请保持双引号、无尾逗号")
+        fail(f"{name} 不是严格 JSON（{e}）；请保持双引号、无尾逗号")
 
 
 def extract_cs_string_array(source, marker, name):
@@ -128,8 +136,64 @@ def main():
             fail(f"FormulaWeights.BannedWords 与 JSON bannedEthics 不一致\n"
                  f"  json={canon.get('bannedEthics')}\n  cs={cs_banned_ethics}")
 
+    # ── ⑤ 第四方 JS 副本：shared/integrations/p2-ai-integration.js ──
+    p2_map = {}
+    p2_checked = False
+    if P2_JS.exists():
+        p2 = P2_JS.read_text(encoding="utf-8")
+        p2_crisis = extract_js_array(p2, "CRISIS")
+        p2_banned = extract_js_array(p2, "BANNED")
+        p2_negative = extract_js_array(p2, "NEGATIVE")
+        p2_intents = extract_js_array(p2, "INTENTS")
+        if p2_crisis != canon["crisis"]:
+            fail(f"p2 CRISIS 与 JSON 不一致\n  json={canon['crisis']}\n  p2={p2_crisis}")
+        if p2_banned != canon["banned"]:
+            fail(f"p2 BANNED 与 JSON 不一致\n  json={canon['banned']}\n  p2={p2_banned}")
+        if p2_negative != canon["negative"]:
+            fail(f"p2 NEGATIVE 与 JSON 不一致\n  json={canon['negative']}\n  p2={p2_negative}")
+        p2_map = {i[0]: i[1] for i in p2_intents}
+        if list(p2_map) != list(canon_map):
+            fail(f"p2 意图清单不一致\n  仅 json 有: {sorted(set(canon_map) - set(p2_map))}\n"
+                 f"  仅 p2 有: {sorted(set(p2_map) - set(canon_map))}")
+        for k in canon_map:
+            if p2_map[k] != canon_map[k]:
+                fail(f"p2 意图 {k} 锚点不一致（第四方副本漂移）\n  json={canon_map[k]}\n  p2={p2_map[k]}")
+        p2_checked = True
+
+    # ── ⑥ 共享内核 shared/core.js（构建期生成块）──
+    core_map = {}
+    core_checked = False
+    if CORE_JS.exists():
+        core = CORE_JS.read_text(encoding="utf-8")
+        if "DO NOT EDIT" not in core:
+            fail("shared/core.js 缺少 DO NOT EDIT 标记（常量块应来自 scripts/gen-shared-core.js）")
+        c_crisis = extract_js_array(core, "CRISIS")
+        c_banned = extract_js_array(core, "BANNED")
+        c_negative = extract_js_array(core, "NEGATIVE")
+        c_intents = extract_js_array(core, "INTENTS")
+        if c_crisis != canon["crisis"]:
+            fail(f"core.js CRISIS 与 JSON 不一致\n  json={canon['crisis']}\n  core={c_crisis}")
+        if c_banned != canon["banned"]:
+            fail(f"core.js BANNED 与 JSON 不一致\n  json={canon['banned']}\n  core={c_banned}")
+        if c_negative != canon["negative"]:
+            fail(f"core.js NEGATIVE 与 JSON 不一致\n  json={canon['negative']}\n  core={c_negative}")
+        core_map = {i[0]: i[1] for i in c_intents}
+        if list(core_map) != list(canon_map):
+            fail(f"core.js 意图清单不一致\n  仅 json 有: {sorted(set(canon_map) - set(core_map))}\n"
+                 f"  仅 core 有: {sorted(set(core_map) - set(canon_map))}")
+        for k in canon_map:
+            if core_map[k] != canon_map[k]:
+                fail(f"core.js 意图 {k} 锚点不一致（生成器未重跑？）\n  json={canon_map[k]}\n  core={core_map[k]}")
+        core_checked = True
+
     n_ethics = len(canon.get("bannedEthics", []))
-    print(f"ALL GREEN · agent-intents 四方一致（json={len(canon_map)} js={len(js_map)} cs={len(cs_map)} 意图；"
+    extra = []
+    if p2_checked:
+        extra.append(f"p2={len(p2_map)}")
+    if core_checked:
+        extra.append(f"core={len(core_map)}")
+    tail = (" " + " ".join(extra)) if extra else ""
+    print(f"ALL GREEN · agent-intents 多方一致（json={len(canon_map)} js={len(js_map)} cs={len(cs_map)}{tail} 意图；"
           f"crisis={len(js_crisis)} banned={len(js_banned)} negative={len(js_negative)} "
           f"bannedEthics={n_ethics} 词；角色/描述已逐字对拍）")
 

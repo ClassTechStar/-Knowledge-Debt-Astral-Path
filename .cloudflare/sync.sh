@@ -18,6 +18,14 @@ echo ">>> 复制入口与引擎（仅 Web 运行时所需）"
 cp "$SRC/index.html" "$DST/"
 cp -r "$SRC/ocr-engine" "$DST/ocr-engine"
 
+# P3（2026-10-18）：AI 集成脚本的受控源已收编到 shared/integrations/，
+# Pages 目录只保留构建复制件，禁止手工编辑（否则会重演 22→26 扩容漏同步的漂移）
+if [ -d "$REPO/shared/integrations" ]; then
+  echo ">>> 复制 AI 集成脚本（源：shared/integrations/）"
+  mkdir -p "$DST"
+  cp "$REPO"/shared/integrations/*.js "$DST/"
+fi
+
 echo ">>> 排除 Windows 专用文件"
 rm -f "$DST/ocr-engine/dl-vendor.ps1"
 

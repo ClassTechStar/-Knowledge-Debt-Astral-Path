@@ -56,7 +56,10 @@ OUT = os.path.join(ROOT, "deploy", "monolith-web", "astralpath-monolith.html")
 # 2026-10-15 T15 修复（AI 构图/出题失效三连）：complete() SSE 分支 onDelta 未定义致全链路失败、mergeGraphAI 整池覆盖丢 AI 题、垫题 _pendingAi 残留持久化。
 # （主仓库 deploy/monolith-web 门禁 97135d02... 对应更早版本，此副本已含同版
 # OCR/功能改动，重基线前先人工比对确认。）
-EXPECTED_MD5 = "c1d7afcfa4170f49835f181de214c35e"
+# 2026-10-18 T20（方案 P4）：XSS 收口——renderTrend 的 SVG 文本节点 d.label 与
+# 学情报告 rowsTrend 表格首列改走 esc()（原为裸插，虽当前取值是日期串不可利用，
+# 但属未收口直插面），基座字节变化故重打基线。
+EXPECTED_MD5 = "19c28009a4bc7e39fc9b714067a9633a"
 
 # 唯一放行的外部 CDN 引用（页面内有 onerror 哨兵，缺失时自动降级）
 ALLOWED_EXTERNAL_PREFIX = "https://cdn.jsdelivr.net/npm/onnxruntime-web"

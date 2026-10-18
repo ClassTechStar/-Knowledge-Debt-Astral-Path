@@ -7787,7 +7787,7 @@ window.__TINY_INTENTS__={"vocab": ["知识债", "债边", "诊断", "红边", "�
       var x = pad + i * step + 4, y = H - 26 - h;
       return '<rect x="' + x + '" y="' + y + '" width="' + bw + '" height="' + h + '" rx="3" fill="' + (d.n ? "#4f86c6" : "#d8dde3") + '"></rect>'
         + '<text x="' + (x + bw / 2) + '" y="' + (y - 3) + '" font-size="9" text-anchor="middle" fill="#62676c">' + (d.n || "") + '</text>'
-        + '<text x="' + (x + bw / 2) + '" y="' + (H - 10) + '" font-size="9" text-anchor="middle" fill="#8a9096">' + d.label + '</text>';
+        + '<text x="' + (x + bw / 2) + '" y="' + (H - 10) + '" font-size="9" text-anchor="middle" fill="#8a9096">' + esc(d.label) + '</text>';
     }).join("");
     var total = data.reduce(function (a, d) { return a + d.n; }, 0);
     el.innerHTML = '<svg viewBox="0 0 ' + W + ' ' + H + '" style="width:100%;max-width:430px">' + bars + '</svg>'
@@ -7810,7 +7810,7 @@ window.__TINY_INTENTS__={"vocab": ["知识债", "债边", "诊断", "红边", "�
       if (!sugg.length) sugg.push("当前状态平稳：按「今日」任务推进即可。");
       var rowsHot = hot.map(function (n, i) { var s = scoreOf(n.id); return "<tr><td>" + (i + 1) + "</td><td>" + esc(n.title) + "</td><td>" + s.toFixed(3) + "</td><td>" + (s < K.pg ? "低于阈值 0.55（薄弱）" : "—") + "</td></tr>"; }).join("");
       var rowsDebt = ods.slice(0, 8).map(function (d) { return "<tr><td>" + esc(d.fromName) + " → " + esc(d.toName) + "</td><td>" + d.imp.toFixed(3) + "</td><td>" + esc(d.status) + "</td></tr>"; }).join("") || "<tr><td colspan='3'>当前无开放红边</td></tr>";
-      var rowsTrend = tr.map(function (d) { return "<tr><td>" + d.label + "</td><td>" + (d.n || 0) + "</td><td>" + (d.acc == null ? "—" : Math.round(d.acc * 100) + "%") + "</td></tr>"; }).join("");
+      var rowsTrend = tr.map(function (d) { return "<tr><td>" + esc(d.label) + "</td><td>" + (d.n || 0) + "</td><td>" + (d.acc == null ? "—" : Math.round(d.acc * 100) + "%") + "</td></tr>"; }).join("");
       var html = '<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><title>知债 · 学情报告</title><style>'
         + 'body{font-family:"Microsoft YaHei",system-ui,sans-serif;max-width:760px;margin:28px auto;padding:0 18px;color:#222}'
         + 'h1{font-size:22px;margin:0 0 4px}h2{font-size:15px;margin:22px 0 8px;border-left:4px solid #4f86c6;padding-left:8px}'

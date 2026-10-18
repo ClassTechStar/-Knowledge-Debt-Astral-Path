@@ -1,0 +1,113 @@
+{
+  "_meta": {
+    "name": "xss-cases",
+    "purpose": "P4 XSS 收口黄金用例：模型输出 / 用户教材内容进入 DOM 前必须经 shared/safe-dom.js 的 safeRich/esc/sanitizeUrl",
+    "source": "shared/safe-dom.js",
+    "runner": "scripts/verify_xss.py",
+    "created": "2026-10-18",
+    "semantics": "safeRich 采取『转义』而非『剥离』：危险内容失活后仍以文本形式存在。故断言只针对**标记形态**（是否存在可执行的 <tag>、未转义引号、协议），不断言危险子串的字面消失。",
+    "updated": "2026-10-18 修正断言语义：初版误按剥离型消毒器写，导致 9 例假红"
+  },
+  "cases": [
+    {
+      "id": "XSS-01",
+      "name": "img onerror 事件注入",
+      "input": "<img src=x onerror=alert(1)>",
+      "must_not_contain": ["<img", "<"],
+      "must_contain": ["&lt;img"]
+    },
+    {
+      "id": "XSS-02",
+      "name": "script 标签注入",
+      "input": "<script>alert(1)</script>",
+      "must_not_contain": ["<script", "</script"],
+      "must_contain": ["&lt;script"]
+    },
+    {
+      "id": "XSS-03",
+      "name": "svg onload 注入",
+      "input": "<svg onload=alert(1)>",
+      "must_not_contain": ["<svg"],
+      "must_contain": ["&lt;svg"]
+    },
+    {
+      "id": "XSS-04",
+      "name": "裸 javascript: 协议（靠 sanitizeUrl 拦截）",
+      "input": "javascript:alert(1)",
+      "must_not_contain": [],
+      "must_contain": [],
+      "url_must_not_start_with": "javascript:"
+    },
+    {
+      "id": "XSS-05",
+      "name": "a 标签 href 协议注入",
+      "input": "<a href=\"javascript:alert(1)\">点我</a>",
+      "must_not_contain": ["<a ", "<a>"],
+      "must_contain": ["点我"],
+      "url_must_not_start_with": "javascript:"
+    },
+    {
+      "id": "XSS-06",
+      "name": "iframe 嵌套注入",
+      "input": "<iframe src=\"https://evil.example\"></iframe>",
+      "must_not_contain": ["<iframe", "</iframe"],
+      "must_contain": []
+    },
+    {
+      "id": "XSS-07",
+      "name": "白名单标签带事件属性（带属性即整体拒绝）",
+      "input": "<b onclick=\"alert(1)\">粗体</b>",
+      "must_not_contain": ["<b ", "<b>"],
+      "must_contain": ["粗体"]
+    },
+    {
+      "id": "XSS-08",
+      "name": "body onload 注入",
+      "input": "<body onload=alert(1)>",
+      "must_not_contain": ["<body"],
+      "must_contain": []
+    },
+    {
+      "id": "XSS-09",
+      "name": "input autofocus 事件注入",
+      "input": "<input onfocus=alert(1) autofocus>",
+      "must_not_contain": ["<input"],
+      "must_contain": []
+    },
+    {
+      "id": "XSS-10",
+      "name": "mutation XSS（math/mtext 绕过）",
+      "input": "<math><mtext><table><mglyph><style><img src=x onerror=alert(1)>",
+      "must_not_contain": ["<img", "<style", "<math", "<table"],
+      "must_contain": []
+    },
+    {
+      "id": "XSS-11",
+      "name": "属性闭合逃逸（引号必须转义）",
+      "input": "\" onmouseover=\"alert(1)",
+      "must_not_contain": ["\""],
+      "must_contain": ["&quot;"]
+    },
+    {
+      "id": "OK-01",
+      "name": "白名单粗体应保留（不误伤富文本）",
+      "input": "重点：<b>知识债</b> 与 <code>score</code>",
+      "must_not_contain": [],
+      "must_contain": ["<b>", "</b>", "<code>", "知识债"]
+    },
+    {
+      "id": "OK-02",
+      "name": "尖括号转义（不误伤数学表达）",
+      "input": "a < b && c > d",
+      "must_not_contain": ["< b", "> d"],
+      "must_contain": ["&lt;", "&gt;"]
+    },
+    {
+      "id": "OK-03",
+      "name": "换行标签保留",
+      "input": "第一行<br>第二行",
+      "must_not_contain": [],
+      "must_contain": ["<br>", "第一行", "第二行"]
+    }
+  ]
+}

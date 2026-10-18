@@ -1,0 +1,126 @@
+# 知债：星穹学途 · 持续集成门禁（方案 P1）
+# ============================================================
+# 目标：任何 push / PR 自动执行「构建 → 测试 → 对拍 → 语法门禁」，
+#       main 分支全绿才可合并，杜绝「静默漂移」（P2/P3 的根因缓解）。
+# 不变量：golden 契约 17 份全绿、verify_all.ps1 退出码 0、既有测试零回归。
+#
+# 运行环境选 windows-latest：verify_all.ps1 依赖 PowerShell（同步脚本与编码处理），
+# 与本地开发机保持一致，避免 Linux 上出现「本地绿、CI 红」的伪失败。
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# 同一分支上的并发运行自动取消，节省 runner 时间
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  gate:
+    name: build · test · verify
+    runs-on: windows-latest
+    timeout-minutes: 45
+
+    env:
+      DOTNET_NOLOGO: "1"
+      DOTNET_CLI_UI_LANGUAGE: en
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # ① 全解决方案构建（Release）
+      - name: dotnet build
+        run: dotnet build AstralPath.slnx -c Release
+
+      # ② 测试（5 个项目；Mobile.Offline 的图谱/OCR 回归由 verify_all 覆盖）
+      - name: dotnet test
+        run: |
+          dotnet test tests/AstralPath.Core.Tests -c Release --no-build
+          dotnet test tests/AstralPath.Persistence.Tests -c Release --no-build
+          dotnet test tests/AstralPath.Desktop.Tests -c Release --no-build
+          dotnet test tests/AstralPath.Api.Tests -c Release --no-build
+          dotnet test tests/AstralPath.Eval.Tests -c Release --no-build
+
+      # ③ 常量对齐：JS 的 K ↔ C# 的 FormulaConstants
+      - name: verify constants
+        run: python scripts/verify_constants.py
+
+      # ④ 意图表五方对拍（json / 主 HTML / C# 登记表 / C# 运行时词表 / p2 副本）
+      - name: verify agent intents
+        run: python scripts/verify_agent_intents.py
+
+      # ⑤ 公式跨语言对拍
+      - name: verify formulas
+        run: python scripts/verify_formulas.py
+
+      # ⑥ 前端 JS 语法门禁（独立脚本 + HTML 内联块，只解析不执行）
+      - name: check-js
+        run: node tools/check-js.js
+
+      # ⑦ XSS 黄金用例（模型输出/用户内容进入 DOM 前的白名单渲染）
+      - name: verify xss cases
+        run: python scripts/verify_xss.py
+
+      # ⑧ 共享内核：常量块与 JSON 一致 + 与旧实现行为等价双跑
+      - name: verify shared core
+        run: |
+          node scripts/gen-shared-core.js --check
+          python scripts/verify_core.py
+
+      # ⑧ 命名规范扫描（旧名残留；脚本内置「政策声明语境」判定）
+      - name: naming consistency
+        run: python scripts/naming_consistency.py --check
+
+      # ⑨ 一键验收全家桶（三端 HTML 同源 + C3 XSS 回归哨兵 + 剩余测试）
+      - name: verify_all
+        shell: pwsh
+        run: pwsh -NoProfile -File scripts/verify_all.ps1
+
+  # 阶段二起升级为硬门禁；现阶段仅产出报告，不阻断合并（方案 P1：先告警后门禁）
+  coverage:
+    name: coverage report
+    runs-on: windows-latest
+    timeout-minutes: 30
+    continue-on-error: true
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: collect coverage
+        run: >
+          dotnet test tests/AstralPath.Core.Tests
+          -c Release
+          --collect:"XPlat Code Coverage"
+          --results-directory ./artifacts/coverage
+
+      - name: upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: ./artifacts/coverage
+          if-no-files-found: warn

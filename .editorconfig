@@ -1,0 +1,101 @@
+# 知债：星穹学途 · 全仓代码规范基线（方案 P12）
+# 目标：风格零争论、公共 API 契约化、魔法数字收敛
+# 说明：先以「告警」落地（CI: dotnet format --verify-no-changes 仅报告），
+#       待存量格式化完成后再升为硬门禁，避免一次性大 diff 冲击 review。
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# ── C# ──────────────────────────────────────────────────────────────
+[*.cs]
+indent_size = 4
+max_line_length = 200
+
+# 命名
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.severity = warning
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.symbols = interface
+dotnet_naming_rule.interfaces_should_be_prefixed_with_i.style = begins_with_i
+
+dotnet_naming_rule.types_should_be_pascal_case.severity = warning
+dotnet_naming_rule.types_should_be_pascal_case.symbols = types
+dotnet_naming_rule.types_should_be_pascal_case.style = pascal_case
+
+dotnet_naming_rule.non_field_members_should_be_pascal_case.severity = warning
+dotnet_naming_rule.non_field_members_should_be_pascal_case.symbols = non_field_members
+dotnet_naming_rule.non_field_members_should_be_pascal_case.style = pascal_case
+
+dotnet_naming_rule.private_fields_should_be_camel_case_underscore.severity = suggestion
+dotnet_naming_rule.private_fields_should_be_camel_case_underscore.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case_underscore.style = begins_with_underscore
+
+dotnet_naming_symbols.interface.applicable_kinds = interface
+dotnet_naming_symbols.interface.applicable_accessibilities = *
+
+dotnet_naming_symbols.types.applicable_kinds = class, struct, interface, enum, delegate
+dotnet_naming_symbols.types.applicable_accessibilities = *
+
+dotnet_naming_symbols.non_field_members.applicable_kinds = property, method, event
+dotnet_naming_symbols.non_field_members.applicable_accessibilities = *
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.pascal_case.capitalization = pascal_case
+dotnet_naming_style.begins_with_i.required_prefix = I
+dotnet_naming_style.begins_with_i.capitalization = pascal_case
+dotnet_naming_style.begins_with_underscore.required_prefix = _
+dotnet_naming_style.begins_with_underscore.capitalization = camel_case
+
+# 语言偏好
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = true:suggestion
+csharp_prefer_braces = when_multiline:suggestion
+csharp_style_namespace_declarations = file_scoped:suggestion
+dotnet_style_qualification_for_field = false:suggestion
+dotnet_style_qualification_for_property = false:suggestion
+dotnet_style_qualification_for_method = false:suggestion
+dotnet_sort_system_directives_first = true
+
+# 诊断：禁止空 catch 吞错（方案 P13 的 CI 配套）
+dotnet_diagnostic.CA1031.severity = warning      # 不要捕获常规异常类型
+dotnet_diagnostic.IDE0055.severity = warning     # 格式化
+dotnet_diagnostic.IDE0005.severity = warning     # 多余 using
+
+# ── JavaScript / 前端单体 ───────────────────────────────────────────
+[*.js]
+indent_size = 2
+quote_type = double
+ijavascript_keep_blank_lines_in_code = 1
+
+[*.{json,jsonc}]
+indent_size = 2
+insert_final_newline = true
+
+# ── Python（tools/ 与 scripts/ 下的评测与校验脚本）─────────────────
+[*.py]
+indent_size = 4
+max_line_length = 120
+
+# ── 配置与文档 ──────────────────────────────────────────────────────
+[*.{yml,yaml}]
+indent_size = 2
+
+[*.{md,markdown}]
+trim_trailing_whitespace = false
+
+[*.{ps1,psm1}]
+indent_size = 4
+
+# 构建产物与第三方：不参与规范检查
+[*.min.js]
+indent_style = unset
+indent_size = unset
+max_line_length = unset
