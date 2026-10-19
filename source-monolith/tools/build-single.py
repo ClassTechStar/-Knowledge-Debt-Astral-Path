@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 """知债：星穹学途 · 自包含单文件构建
 ================================================================================
-以本目录权威 index.html（单体版 2.5 基座）为唯一事实源，内联全部 OCR 依赖：
+以本目录权威 index.html（单体版 2.6 基座）为唯一事实源，内联全部 OCR 依赖：
 
   A. pdf.js 三件套（v1.x 起，file:// 也可用）
     - ocr-wasm.js                        → 原样内联（IIFE，引擎入口）
@@ -54,9 +54,11 @@ OUT = os.path.join(ROOT, "astralpath-monolith.html")
 # 门禁：基座 index.html 漂移检测。2026-10-12 T11（UX 反馈落地）、2026-10-13 T12（内置演示密钥 AES-256-GCM 密文内嵌）、T13（并发闸/冷却分类/推理兜底/出题预算修复）、T14（AI 随时可用且迅速：思维链流式、垫题秒出+自动替换、命题进度流式、重复重试、冷却 30→8s、建议生成中占位）改动后重打基线。
 # 同日 T10.1 修复 matchExamKps 同题重复命中（重复知识点只计一次）后再次重打基线。
 # 2026-10-15 T15 修复（AI 构图/出题失效三连）：complete() SSE 分支 onDelta 未定义致全链路失败、mergeGraphAI 整池覆盖丢 AI 题、垫题 _pendingAi 残留持久化。
-# （主仓库 deploy/monolith-web 门禁 97135d02... 对应更早版本，此副本已含同版
-# OCR/功能改动，重基线前先人工比对确认。）
-EXPECTED_MD5 = "c1d7afcfa4170f49835f181de214c35e"
+# 2026-10-19 T22 移植主仓库 T20/T21 前端改造（P13 APDiag 错误哨兵、P6 APStore 状态分片+迁移备份、P5 密钥信封 v2 轮换/吊销/失效提示、XSS 转义加固、
+# shared/ 单源生成区 safe-dom#esc / core#removeCyclesTopo / core#parseJsonLoose / core#normalize）后重打基线；本次起基座与主仓库
+# deploy/monolith-web/index.html 逐字节一致（md5 2a4fa268…，CRLF），两树共享同一门禁基线。
+# 注意：EXPECTED_MD5 必须存小写 hexdigest（hashlib.md5().hexdigest() 输出小写；若存大写会门禁误判）。
+EXPECTED_MD5 = "2a4fa2681dff926cf46b700ab0f54ff4"
 
 # 唯一放行的外部 CDN 引用（页面内有 onerror 哨兵，缺失时自动降级）
 ALLOWED_EXTERNAL_PREFIX = "https://cdn.jsdelivr.net/npm/onnxruntime-web"

@@ -50,7 +50,7 @@
 
 </div>
 
-**摘　要：** 针对自学场景中"扫描版教材难以结构化、复习无重点、错题无人分析"的普遍痛点，本设计实现了一个名为"知债：星穹学途"的自学辅导智能应用。应用以"知识债"为核心模型，将教材解析为包含章节、术语与先修关系的知识图谱，通过影响分算法定位学习者的薄弱先修链，并生成十四天间隔修复计划，形成"解析—诊断—计划—练习—销账"的完整学习闭环。应用同时面向练习场景提供试卷、作业与错题的直拍识别：拍照、截图与图片导入均可直接触发识别，结果自动结构化并生成体现知识点层级归属与关联关系的图谱；文档导入扩展至 PPT、Word、HTML、Markdown、TXT 与 EPUB 等格式，解析所得文本同样进入结构化与构图流程。设计的主要内容包括：采用 Tesseract 与 pdf.js 构建 OCR 引擎阶梯并实现引擎全栈内联，使应用以单个 HTML 文件在纯浏览器环境完成扫描版教材的离线识别与结构化；基于 TextRank 加权与点互信息共现实现知识图谱自动构建；设计掌握度、影响分与销账三类可解释算法支撑学习诊断；引入大语言模型实现图谱增强构图、识别文本清洗、个性化学习建议、智能出题与修复计划编排的深度参与，并以五项可校验约束保证修复计划的可行性，设计无密钥演示模式保证零配置可体验；应用遵循"仅限个人学习使用"的合规边界。测试结果表明，应用对二十七本真实教材的解析成功率达百分之百，扫描版识别速度较串行方案提升百分之四十六以上，全部诊断数字由本地公式计算、可解释可复核，知债修复计划在专项实测中五项生成约束校验全部通过。试卷识别与多格式导入经五十五项端到端冒烟断言验证全部通过，样例图像的中文识别置信度达九十。此外，本设计从普通用户视角完成了一轮系统性可用性改进：新增面向教师的只读学情视图（授权门控、薄弱热点与红边清单、近七日作答趋势与示例班级演示）、学情报告一键导出与作业单文件互传，并为学生提供新手引导与术语词典、对话历史本地留存、图谱显示精简与启动加载提示等体验优化；全部改进经二十四项端到端断言验证通过。在此基础上，应用进一步保障了 AI 能力的可用性与响应速度：云端请求采用并发闸与排队机制避免相互阻塞，推理型模型的思维链以流式方式实时呈现，出题链路在题池为空时先给出过渡题并由后台生成的 AI 新题自动替换，失败请求自动重试且故障冷却时间仅为八秒。实测表明，练习首题可在零点二秒内呈现，AI 新题约十九秒完成替换，思考过程在二点六秒内即可见，全流程无运行期错误，并经真实云端链路端到端复验确认。本设计以纯前端形态交付，无需后端服务，为个人自学工具的低成本普及提供了可行方案。
+**摘　要：** 针对自学场景中"扫描版教材难以结构化、复习无重点、错题无人分析"的普遍痛点，本设计实现了一个名为"知债：星穹学途"的自学辅导智能应用。应用以"知识债"为核心模型，将教材解析为包含章节、术语与先修关系的知识图谱，通过影响分算法定位学习者的薄弱先修链，并生成十四天间隔修复计划，形成"解析—诊断—计划—练习—销账"的完整学习闭环。应用同时面向练习场景提供试卷、作业与错题的直拍识别：拍照、截图与图片导入均可直接触发识别，结果自动结构化并生成体现知识点层级归属与关联关系的图谱；文档导入扩展至 PPT、Word、HTML、Markdown、TXT 与 EPUB 等格式，解析所得文本同样进入结构化与构图流程。设计的主要内容包括：采用 Tesseract 与 pdf.js 构建 OCR 引擎阶梯并实现引擎全栈内联，使应用以单个 HTML 文件在纯浏览器环境完成扫描版教材的离线识别与结构化；基于 TextRank 加权与点互信息共现实现知识图谱自动构建；设计掌握度、影响分与销账三类可解释算法支撑学习诊断；引入大语言模型实现图谱增强构图、识别文本清洗、个性化学习建议、智能出题与修复计划编排的深度参与，并以五项可校验约束保证修复计划的可行性，设计无密钥演示模式保证零配置可体验；应用遵循"仅限个人学习使用"的合规边界。测试结果表明，应用对二十七本真实教材的解析成功率达百分之百，扫描版识别速度较串行方案提升百分之四十六以上，全部诊断数字由本地公式计算、可解释可复核，知债修复计划在专项实测中五项生成约束校验全部通过。试卷识别与多格式导入经五十五项端到端冒烟断言验证全部通过，样例图像的中文识别置信度达九十。此外，本设计从普通用户视角完成了一轮系统性可用性改进：新增面向教师的只读学情视图（授权门控、薄弱热点与红边清单、近七日作答趋势与示例班级演示）、学情报告一键导出与作业单文件互传，并为学生提供新手引导与术语词典、对话历史本地留存、图谱显示精简与启动加载提示等体验优化；全部改进经二十四项端到端断言验证通过。在此基础上，应用进一步保障了 AI 能力的可用性与响应速度：云端请求采用并发闸与排队机制避免相互阻塞，推理型模型的思维链以流式方式实时呈现，出题链路在题池为空时先给出过渡题并由后台生成的 AI 新题自动替换，失败请求自动重试且故障冷却时间仅为八秒。实测表明，练习首题可在零点二秒内呈现，AI 新题约十九秒完成替换，思考过程在二点六秒内即可见，全流程无运行期错误，并经真实云端链路端到端复验确认。在工程质量层面，本设计构建了以持续集成门禁、黄金契约用例与编排意图六方对拍为核心的多层保障体系：密钥信封支持轮换与吊销，本地状态按五类分片存储并具备旧版迁移与残缺合并能力，前端共享代码由单一来源生成并纳入门禁校验，运行期错误经诊断缓冲可观测并导出，全部变更须经十七项自动化校验与三百余项单元测试确认无回归。本设计以纯前端形态交付，无需后端服务，同时发布版本一致的 Windows 与 Android 安装包，为个人自学工具的低成本普及提供了可行方案。
 
 **关键词：** 知识债；知识图谱；光学字符识别；受约束智能体；间隔重复
 
@@ -60,7 +60,7 @@
 
 </div>
 
-**Abstract:** To address the common pain points in self-study scenarios, namely that scanned textbooks are hard to structure, revision lacks focus, and wrong answers go unanalyzed, this project designs and implements an intelligent self-study tutoring application named "Knowledge Debt: Astral Path". Centered on a knowledge-debt model, the application parses textbooks into a knowledge graph consisting of chapters, terms and prerequisite relations, locates the learner's weak prerequisite chains through an impact-scoring algorithm, and generates a fourteen-day spaced repair plan, forming a complete learning loop of parsing, diagnosis, planning, practice and debt clearing. The application also covers practice scenarios: exam papers, homework and wrong answers can be recognized directly from photos, screenshots or imported images, and the results are automatically structured into a knowledge-point graph that makes hierarchical attribution and associations explicit; document import is extended to PPT, Word, HTML, Markdown, TXT and EPUB, and parsed content enters the same structuring and graph-building pipeline. The main work includes: building an OCR engine ladder with Tesseract and pdf.js and inlining the full engine stack so that a single HTML file can complete offline recognition and structuring of scanned textbooks in a pure browser environment; realizing automatic knowledge-graph construction based on weighted TextRank and point-wise mutual information co-occurrence; designing three explainable algorithms covering mastery, impact and debt clearing to support learning diagnosis; introducing large language models for deep participation in graph augmentation, recognized-text polishing, personalized suggestions, intelligent question generation and repair-plan orchestration, with every generated plan required to pass five verifiable constraints, together with a key-free demonstration mode that requires zero configuration; and observing the compliance boundary of personal learning use only. Test results show that the application achieves a success rate of one hundred percent on twenty-seven real textbooks, improves scanned-page recognition speed by more than forty-six percent over the serial baseline, and keeps all diagnostic figures computed by local formulas, hence explainable and auditable; all repair plans pass the five-constraint verification in dedicated tests. Fifty-five end-to-end smoke assertions covering exam recognition and multi-format import all pass, with Chinese recognition confidence of ninety on sample images. In addition, a systematic usability pass was carried out from an ordinary-user perspective: a read-only teacher view gated by student consent (weak-point hotspots, a red-edge list, a seven-day activity trend and a sample-class demo), one-click export of a student-learning report and a homework-sheet file hand-off, together with student-side onboarding guidance, a glossary, locally persisted chat history, simplified graph rendering and a first-load screen; all improvements pass twenty-four end-to-end assertions. On top of that, the availability and responsiveness of the AI functions are secured: cloud requests pass a concurrency gate with FIFO queuing so they never block each other, the reasoning trace of the inference model is streamed to the interface in real time, question generation first shows a fallback item when the pool is empty and replaces it with the AI-generated one once ready, failed requests are retried automatically, and the failure cooldown lasts only eight seconds. Measurements show the first practice item appears within 0.2 s, an AI-generated item replaces it in about 19 s, and thinking feedback becomes visible within 2.6 s, with no runtime errors in the whole flow, all confirmed end-to-end against the live gateway. The application is delivered as a pure front-end artifact without any back-end service, providing a feasible low-cost solution for the popularization of personal self-study tools.
+**Abstract:** To address the common pain points in self-study scenarios, namely that scanned textbooks are hard to structure, revision lacks focus, and wrong answers go unanalyzed, this project designs and implements an intelligent self-study tutoring application named "Knowledge Debt: Astral Path". Centered on a knowledge-debt model, the application parses textbooks into a knowledge graph consisting of chapters, terms and prerequisite relations, locates the learner's weak prerequisite chains through an impact-scoring algorithm, and generates a fourteen-day spaced repair plan, forming a complete learning loop of parsing, diagnosis, planning, practice and debt clearing. The application also covers practice scenarios: exam papers, homework and wrong answers can be recognized directly from photos, screenshots or imported images, and the results are automatically structured into a knowledge-point graph that makes hierarchical attribution and associations explicit; document import is extended to PPT, Word, HTML, Markdown, TXT and EPUB, and parsed content enters the same structuring and graph-building pipeline. The main work includes: building an OCR engine ladder with Tesseract and pdf.js and inlining the full engine stack so that a single HTML file can complete offline recognition and structuring of scanned textbooks in a pure browser environment; realizing automatic knowledge-graph construction based on weighted TextRank and point-wise mutual information co-occurrence; designing three explainable algorithms covering mastery, impact and debt clearing to support learning diagnosis; introducing large language models for deep participation in graph augmentation, recognized-text polishing, personalized suggestions, intelligent question generation and repair-plan orchestration, with every generated plan required to pass five verifiable constraints, together with a key-free demonstration mode that requires zero configuration; and observing the compliance boundary of personal learning use only. Test results show that the application achieves a success rate of one hundred percent on twenty-seven real textbooks, improves scanned-page recognition speed by more than forty-six percent over the serial baseline, and keeps all diagnostic figures computed by local formulas, hence explainable and auditable; all repair plans pass the five-constraint verification in dedicated tests. Fifty-five end-to-end smoke assertions covering exam recognition and multi-format import all pass, with Chinese recognition confidence of ninety on sample images. In addition, a systematic usability pass was carried out from an ordinary-user perspective: a read-only teacher view gated by student consent (weak-point hotspots, a red-edge list, a seven-day activity trend and a sample-class demo), one-click export of a student-learning report and a homework-sheet file hand-off, together with student-side onboarding guidance, a glossary, locally persisted chat history, simplified graph rendering and a first-load screen; all improvements pass twenty-four end-to-end assertions. On top of that, the availability and responsiveness of the AI functions are secured: cloud requests pass a concurrency gate with FIFO queuing so they never block each other, the reasoning trace of the inference model is streamed to the interface in real time, question generation first shows a fallback item when the pool is empty and replaces it with the AI-generated one once ready, failed requests are retried automatically, and the failure cooldown lasts only eight seconds. Measurements show the first practice item appears within 0.2 s, an AI-generated item replaces it in about 19 s, and thinking feedback becomes visible within 2.6 s, with no runtime errors in the whole flow, all confirmed end-to-end against the live gateway. On the engineering side, a multi-layer assurance system is built around continuous-integration gates, golden contract cases and six-way intent reconciliation: the key envelope supports rotation and revocation, local state is stored in five shards with legacy migration and partial-merge capability, shared front-end code is generated from a single source and gate-checked, runtime errors are observable through a diagnostic ring buffer and exportable, and every change must pass seventeen automated checks and the unit-test suite without regression. The application is delivered as a pure front-end artifact without any back-end service, and is also published as version-matched Windows and Android installers, providing a feasible low-cost solution for the popularization of personal self-study tools.
 
 **Keywords:** knowledge debt; knowledge graph; optical character recognition; constrained agent; spaced repetition
 
@@ -72,43 +72,44 @@
 
 </div>
 
-1 引　言 ······································ 1
-1.1 选题背景与意义 ······························ 1
-1.2 国内外研究现状 ······························ 1
-1.3 主要研究内容 ································ 2
-2 相关理论与技术基础 ······························ 3
-2.1 知识债与间隔重复理论 ··························· 3
-2.2 光学字符识别与 WebAssembly ······················· 3
-2.3 大语言模型与受约束智能体 ························· 4
-3 需求分析与总体设计 ······························ 5
-3.1 目标用户群体与需求分析 ··························· 5
-3.2 总体架构设计 ································ 5
-3.3 合规与隐私设计 ······························ 6
-3.4 学习体验与教师协作设计 ······························ 6
-4 核心算法与详细设计 ······························ 7
-4.1 知识图谱自动构建 ······························ 7
-4.2 学习诊断与修复计划算法 ··························· 8
-4.3 OCR 引擎阶梯与单文件内联 ·························· 9
-4.4 意图路由与受约束智能体 ··························· 10
-4.5 试卷作业错题识别与多格式导入 ··························· 10
-5 AI 深度参与的设计与实现 ···························· 11
-5.1 通用模型调用层与容错解析 ·························· 11
-5.2 三模块集成设计 ······························· 12
-5.3 无密钥演示模式 ······························· 13
-5.4 修复计划编排与债务解读 ······························ 13
-5.5 AI 可用性与响应体验设计 ······························ 13
-6 系统测试与成果 ································· 14
-6.1 功能测试与降级测试 ····························· 14
-6.2 性能实测 ·································· 14
-6.3 成果材料清单 ································ 15
-7 商业模式与应用前景 ······························ 16
-7.1 商业模式 ··································· 16
-7.2 应用前景 ··································· 16
-8 结　语 ······································ 17
-参考文献 ······································ 18
-致　谢 ······································· 19
-附录A 关键算法参数表 ······························ 20
-附录B 编排可调用工具清单 ···························· 21
+1 引　言 ······················································ 1
+1.1 选题背景与意义 ············································ 1
+1.2 国内外研究现状 ············································ 1
+1.3 主要研究内容 ·············································· 2
+2 相关理论与技术基础 ·········································· 3
+2.1 知识债与间隔重复理论 ······································ 3
+2.2 光学字符识别与 WebAssembly ································ 3
+2.3 大语言模型与受约束智能体 ·································· 4
+3 需求分析与总体设计 ·········································· 5
+3.1 目标用户群体与需求分析 ···································· 5
+3.2 总体架构设计 ·············································· 5
+3.3 合规与隐私设计 ············································ 6
+3.4 学习体验与教师协作设计 ···································· 6
+4 核心算法与详细设计 ·········································· 7
+4.1 知识图谱自动构建 ·········································· 7
+4.2 学习诊断与修复计划算法 ···································· 8
+4.3 OCR 引擎阶梯与单文件内联 ·································· 9
+4.4 意图路由与受约束智能体 ··································· 10
+4.5 试卷作业错题识别与多格式导入 ····························· 10
+5 AI 深度参与的设计与实现 ···································· 11
+5.1 通用模型调用层与容错解析 ································· 11
+5.2 三模块集成设计 ··········································· 12
+5.3 无密钥演示模式 ··········································· 13
+5.4 修复计划编排与债务解读 ··································· 13
+5.5 AI 可用性与响应体验设计 ·································· 13
+6 系统测试与成果 ············································· 14
+6.1 功能测试与降级测试 ······································· 14
+6.2 性能实测 ················································· 14
+6.3 成果材料清单 ············································· 15
+6.4 工程化保障与质量验证 ····································· 16
+7 商业模式与应用前景 ········································· 17
+7.1 商业模式 ················································· 17
+7.2 应用前景 ················································· 17
+8 结　语 ····················································· 18
+参考文献 ····················································· 19
+致　谢 ······················································· 20
+附录A 关键算法参数表 ········································· 21
+附录B 编排可调用工具清单 ····································· 22
 
 <!-- 注：目录页码由 Word 自动生成后替换；目录按三级标题编写。 -->
 
@@ -134,7 +135,7 @@
 
 ### 1.3 主要研究内容
 
-本设计属于软件设计类课题，主要研究内容包括五个方面：一是教材与试卷文档解析流水线设计，覆盖文本层提取、扫描版判定、OCR 引擎阶梯，以及 PPT、Word、HTML、Markdown、TXT、EPUB 多格式导入与试卷、作业、错题的直拍识别；二是知识图谱与知识债算法设计，包括概念抽取、先修关系挖掘、试卷知识点层级图谱、影响分诊断与间隔修复计划；三是受约束智能体设计，包括口语化意图路由、危机干预与输出脱敏；四是大语言模型的受控集成设计，包括通用调用层、业务模块集成（增强构图、清洗、建议、出题与修复计划编排）与无密钥演示模式。五是教师协作与学习体验设计，包括面向教师的只读学情视图（授权与 k-匿名约束）、学情报告导出与作业单文件互传，以及新手引导、术语词典与图谱显示优化等体验改进。六是 AI 可用性与响应体验设计，包括云端请求的并发编排与排队、流式输出（含推理思维链的实时呈现）、失败重试与快速降级，以及题池预热与过渡题自动替换机制。成果要求方面，本设计交付可运行的单文件应用、离线引擎资源、算法参数表与操作演示材料。
+本设计属于软件设计类课题，主要研究内容包括七个方面：一是教材与试卷文档解析流水线设计，覆盖文本层提取、扫描版判定、OCR 引擎阶梯，以及 PPT、Word、HTML、Markdown、TXT、EPUB 多格式导入与试卷、作业、错题的直拍识别；二是知识图谱与知识债算法设计，包括概念抽取、先修关系挖掘、试卷知识点层级图谱、影响分诊断与间隔修复计划；三是受约束智能体设计，包括口语化意图路由、危机干预与输出脱敏；四是大语言模型的受控集成设计，包括通用调用层、业务模块集成（增强构图、清洗、建议、出题与修复计划编排）与无密钥演示模式。五是教师协作与学习体验设计，包括面向教师的只读学情视图（授权与 k-匿名约束）、学情报告导出与作业单文件互传，以及新手引导、术语词典与图谱显示优化等体验改进。六是 AI 可用性与响应体验设计，包括云端请求的并发编排与排队、流式输出（含推理思维链的实时呈现）、失败重试与快速降级，以及题池预热与过渡题自动替换机制。七是工程化保障设计，包括前端共享代码的单一来源与生成区管理、持续集成门禁、黄金契约用例（编排意图六方对拍、输出转义、状态分片迁移）、密钥信封轮换与吊销、本地状态分片存储、巨型文件拆分与运行期诊断。成果要求方面，本设计交付可运行的单文件应用、离线引擎资源、算法参数表与操作演示材料，并发布版本一致的 Windows 与 Android 安装包。
 
 ---
 
@@ -196,7 +197,7 @@
 
 面向首次使用的学习者，本设计补齐三类引导与减负措施。其一是新手帮助中心：首次进入自动给出三步上手说明（导入资料、查看识网、开始任务），并附可随时唤起的术语词典，覆盖知识债、红边、先修、影响分与销账等核心概念。其二是知债空态行动：当尚无红边时，页面解释红边出现条件，并提供「去练三道题（自动开始）」与「载入演示诊断」两条一键路径，后者注入标记为演示数据的错答记录以即时演示红边生成过程，并可一键清除。其三是持久化与显示精简：对话历史在本地留存并支持回放与清空；知识图谱提供「精简/完整」显示开关，默认按权重抽稀为节点数的一点六倍（不少于二十四条）并始终保留全部债务相关边，仅影响绘制而不影响诊断计算。
 
-在边界场景上，本设计同步做了两处加固。其一，针对单文件约十七兆字节带来的首次加载较慢问题，应用增设启动加载屏，明确提示资源体量与加载完成后的离线可用性；其二，演示身份（显示名称与「有债」标签）可配置，使内置演示数据在真实使用场景中的痕迹可被弱化。上述改进均保持原有架构不变，全部计算仍在本机完成。
+在边界场景上，本设计同步做了两处加固。其一，针对单文件约十八兆字节带来的首次加载较慢问题，应用增设启动加载屏，明确提示资源体量与加载完成后的离线可用性；其二，演示身份（显示名称与「有债」标签）可配置，使内置演示数据在真实使用场景中的痕迹可被弱化。上述改进均保持原有架构不变，全部计算仍在本机完成。
 
 ---
 
@@ -232,7 +233,7 @@ I = base·σ(Δm₁)·σ(Δm₂)·w·c·f　　（4-3）
 
 解析流水线遵循"文本层优先"原则：先以双引擎提取 PDF 文本层，当可读字符低于动态门槛或乱码密集时判定为扫描版并转入识别阶梯。识别阶梯依次为宿主桥（本地脚本配合系统识别器）与浏览器内识别引擎，最终回退至手动粘贴。浏览器内识别引擎按采样策略选取待识别页，采用四阶段流水线将渲染、预处理、编码与识别重叠执行，并以页级置信度驱动低置信页的高倍率重识别。
 
-为适配仅托管单个网页文件的平台，引擎采用全栈内联设计：识别工作线程与神经网络计算核心以二进制大对象地址装载，语言模型经压缩后以字节数组随页面携带，运行期零外部请求。该设计使约十七兆字节的自包含页面在手机浏览器中即可完成扫描教材的完整识别。此外，识别引擎提供图像直拍识别入口：照片、截图与画布图像经等比缩放与预处理后走同一识别阶梯，试卷、作业与错题的拍照导入由此获得与扫描页一致的识别质量。
+为适配仅托管单个网页文件的平台，引擎采用全栈内联设计：识别工作线程与神经网络计算核心以二进制大对象地址装载，语言模型经压缩后以字节数组随页面携带，运行期零外部请求。该设计使约十八兆字节的自包含页面在手机浏览器中即可完成扫描教材的完整识别。此外，识别引擎提供图像直拍识别入口：照片、截图与画布图像经等比缩放与预处理后走同一识别阶梯，试卷、作业与错题的拍照导入由此获得与扫描页一致的识别质量。
 
 ### 4.4 意图路由与受约束智能体
 
@@ -268,7 +269,7 @@ I = base·σ(Δm₁)·σ(Δm₂)·w·c·f　　（4-3）
 
 ### 5.1 通用模型调用层与容错解析
 
-应用在模型接入层实现了统一的消息补全接口，支持流式与非流式两种返回、可配置的令牌上限、温度参数与超时控制，并以并发闸控制并行度：至多两路请求同时执行，其余按先进先出排队，后台任务与用户主动操作互不阻塞。针对结构化任务，设计了容错解析函数：依次尝试直接解析、剥离代码围栏后解析与截取首尾括号后解析，三段均失败则返回空值并触发调用方回退。密钥管理采用信封加密：明文密钥经 AES 加密后存入本地存储，数据密钥为不可导出的密码学密钥并存于浏览器索引数据库，二者分离降低了密钥泄露风险。
+应用在模型接入层实现了统一的消息补全接口，支持流式与非流式两种返回、可配置的令牌上限、温度参数与超时控制，并以并发闸控制并行度：至多两路请求同时执行，其余按先进先出排队，后台任务与用户主动操作互不阻塞。针对结构化任务，设计了容错解析函数：依次尝试直接解析、剥离代码围栏后解析与截取首尾括号后解析，三段均失败则返回空值并触发调用方回退。密钥管理采用信封加密：明文密钥经 AES 加密后存入本地存储，数据密钥为不可导出的密码学密钥并存于浏览器索引数据库，二者分离降低了密钥泄露风险。信封格式随后升级至第二版，增加版本号、密钥标识与指纹三类字段，并支持轮换与吊销：轮换后旧信封标记失效并按吊销清单校验，前端账户页对已吊销或已轮换的密钥即时提示重新配置，升级过程不影响其余主流程。
 
 ### 5.2 三模块集成设计
 
@@ -328,13 +329,25 @@ AI 能力的可用性由三层机制共同保障。其一是请求编排：云�
 | 文本层解析耗时 | 中位 5.9 秒，平均 8.0 秒 |
 | 识别流水线提速 | 较串行方案提升 46%～48% |
 | 图谱截断书册数 | 由 10 本降为 0 本 |
-| 端到端回归 | 专项 18 项与业务回归 41 项全部通过 |
+| 质量门禁 | 自动化校验 17 项与单元测试 329 项全部通过 |
 
 资料来源：本项目实测数据整理。
 
 ### 6.3 成果材料清单
 
-本设计成果包括：可运行的单文件应用与离线引擎资源、算法参数表与工具清单（见附录 A、附录 B）、编排蓝图与操作演示材料。应用已部署于单文件托管平台，可通过移动浏览器直接访问验证。
+本设计成果包括：可运行的单文件应用与离线引擎资源、算法参数表与工具清单（见附录 A、附录 B）、编排蓝图与操作演示材料。应用已部署于单文件托管平台，可通过移动浏览器直接访问验证；在纯前端形态之外，本设计同时提供与本应用版本一致的 Windows 与 Android 安装包（版本 2.6.0），面向桌面与移动场景分发，安装后离线可用；安装包以版本标签经 GitHub Release 公开发布，随版本演进持续更新。
+
+### 6.4 工程化保障与质量验证
+
+随着单文件应用与多端安装包并行演进，工程化保障成为质量维护的关键。本设计将前端共享代码（转义、归一化、拓扑排序、容错解析与本地状态存储五个模块）收敛至单一来源目录，页面内的共享代码由脚本生成并标注生成区边界，手工改动生成区将被构建校验拒绝；一键构建脚本按刷新生成区、三端镜像同步、哈希报告的顺序执行，单文件产物以基线校验和准入，未同步基线的改动无法合入。
+
+契约层面为三类高风险逻辑建立黄金用例。其一，编排意图表与页面脚本、双端实现、集成脚本等六方来源逐条对拍，二十六个编排意图全部一致；其二，输出转义用例覆盖十四种跨站脚本注入形态，断言转义后标记失活；其三，本地状态分片用例覆盖旧键迁移、损坏分片、配额回退等十种场景，其中包含同毫秒备份键碰撞与可解析但非对象内容两类真实缺陷的回归用例。静态门禁方面，全部脚本改动经解析级检查（只解析不执行），一百八十一个 C# 源文件不允许出现空捕获块，密钥信封轮换与吊销另有八项单元测试。
+
+密钥与状态的可靠性由专门机制保证。密钥信封升级至第二版后支持轮换与吊销，轮换后的旧信封即时失效并在前端账户页提示重新配置；本地状态按元数据、教材、作答、计划、试卷五类分片存储，写入时仅持久化发生变化的分片，旧版单键数据在首次启动时自动迁移并留底，残缺分片自动合并，配额不足时先清理备份再强制全写重试，迁移与恢复路径均经真实浏览器环境冒烟验证。
+
+代码结构与运行期可观测性同步改善。行数近五百行的意图路由器按职责拆分为模式集、角色、意图、叙事组装与默认意图表五个文件，主文件行数下降约四成；后端诊断以环形缓冲记录运行事件并经就绪接口暴露，前端采集错误与未处理拒绝各五十条并支持一键导出，使纯前端应用的线上问题排查有迹可循。
+
+上述机制全部纳入持续集成流水线：每次提交自动执行十七项自动化校验（覆盖意图对拍、转义黄金用例、分片用例、生成区检查、命名规范与单文件基线）与三百二十九项单元测试。最近一轮全量验收结果为十七项校验全部通过、单元测试零回归，单文件产物体积 18 187 662 字节，三端镜像哈希一致。
 
 ---
 
@@ -360,7 +373,7 @@ AI 能力的可用性由三层机制共同保障。其一是请求编排：云�
 
 </div>
 
-本设计完成了从教材解析、知识图谱构建、学习诊断到智能陪伴的全链路实现，主要工作与结论如下：其一，实现了浏览器端教材级识别，单文件内联设计使扫描版教材的离线结构化成为可能；其二，以三类可解释公式支撑学习诊断，避免了智能学习产品的算法黑箱问题；其三，大语言模型在受约束框架下深度参与图谱、清洗、出题与修复计划编排，并以演示模式实现零配置体验；其四，试卷、作业与错题的直拍识别与 PPT、Word、HTML、Markdown、TXT、EPUB 多格式导入使应用从教材学习延伸至练习诊断场景，识别结果自动结构化并生成知识点层级图谱；其五，从普通用户视角完成了系统性体验改进，并落地面向教师的只读学情视图、学情报告与作业单文件互传，使应用在无服务端的约束下仍具备教学协作的最小闭环。其六，在不更换模型的前提下，通过并发编排、流式输出、题池预热与失败重试等工程手段，使 AI 能力在并发、弱网与故障条件下均保持可用且响应迅速。本设计仍存在局限：长尾学科领域词典覆盖不足，识别引擎对公式与代码的准确率有限，模型增强效果依赖用户网络与密钥配置。后续工作将围绕学科词典扩展、版面分析增强与端侧小型模型引入三个方向展开。
+本设计完成了从教材解析、知识图谱构建、学习诊断到智能陪伴的全链路实现，主要工作与结论如下：其一，实现了浏览器端教材级识别，单文件内联设计使扫描版教材的离线结构化成为可能；其二，以三类可解释公式支撑学习诊断，避免了智能学习产品的算法黑箱问题；其三，大语言模型在受约束框架下深度参与图谱、清洗、出题与修复计划编排，并以演示模式实现零配置体验；其四，试卷、作业与错题的直拍识别与 PPT、Word、HTML、Markdown、TXT、EPUB 多格式导入使应用从教材学习延伸至练习诊断场景，识别结果自动结构化并生成知识点层级图谱；其五，从普通用户视角完成了系统性体验改进，并落地面向教师的只读学情视图、学情报告与作业单文件互传，使应用在无服务端的约束下仍具备教学协作的最小闭环。其六，在不更换模型的前提下，通过并发编排、流式输出、题池预热与失败重试等工程手段，使 AI 能力在并发、弱网与故障条件下均保持可用且响应迅速。其七，建立了以自动化门禁与黄金用例为核心的工程质量保障体系，前端共享代码由单一来源生成、密钥信封可轮换可吊销、本地状态分片可迁移可恢复、运行期错误可观测导出，全部变更须经十七项自动化校验与三百二十九项单元测试确认无回归后方可合入。本设计仍存在局限：长尾学科领域词典覆盖不足，识别引擎对公式与代码的准确率有限，模型增强效果依赖用户网络与密钥配置。后续工作将围绕学科词典扩展、版面分析增强与端侧小型模型引入三个方向展开。
 
 ---
 
@@ -418,7 +431,7 @@ AI 能力的可用性由三层机制共同保障。其一是请求编排：云�
 
 ### A.2 智能参与参数
 
-　　识别清洗：分块 1800 字符（页标记优先定界），预算十二块，温度 0.1，单块超时 30 秒，幻觉保护为块级长度比 0.7～1.6 与整体可读字数 0.9。增强构图：概念八至十五个、先修五至十二条，温度 0.3，超时 60 秒，合并去重键为归一化标题。智能出题：四选一结构，答案下标与字母双形态钳制，温度 0.6，题池上限三百。学习建议：不超过一百二十字，温度 0.5，超时 25 秒，自然日缓存。云端并发上限二路、传输类故障冷却八秒；智能出题预算一千五百令牌与六十秒、学习建议八百令牌与三十五秒；全部调用采用流式输出并实时呈现思维链。
+　　识别清洗：分块 1800 字符（页标记优先定界），预算十二块，温度 0.1，单块超时 30 秒，幻觉保护为块级长度比 0.7～1.6 与整体可读字数 0.9。增强构图：概念八至十五个、先修五至十二条，温度 0.3，超时 60 秒，合并去重键为归一化标题。智能出题：四选一结构，答案下标与字母双形态钳制，温度 0.6，题池上限三百。学习建议：不超过一百二十字，温度 0.5，超时 25 秒，自然日缓存。云端并发上限二路、传输类故障冷却八秒；智能出题预算一千五百令牌与六十秒、学习建议八百令牌与三十五秒；全部调用采用流式输出并实时呈现思维链。密钥信封：第二版格式含版本号、密钥标识与指纹，支持轮换与吊销，前端账户页对失效信封即时提示。本地状态分片：元数据、教材、作答、计划、试卷五类，写入仅持久化变化分片；旧版单键首次启动自动迁移并留底，残缺分片自动合并，配额不足时先清理备份再强制全写。运行期诊断：前端环形缓冲保留最近五十条记录，支持一键导出；后端诊断事件经就绪接口暴露。
 
 ### A.3 试卷结构化与层级图谱参数
 
