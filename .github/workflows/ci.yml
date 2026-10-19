@@ -30,6 +30,10 @@ jobs:
       DOTNET_NOLOGO: "1"
       DOTNET_CLI_UI_LANGUAGE: en
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+      # Windows runner 控制台默认 cp1252：python 校验脚本输出中文与 open() 默认编码
+      # 都会 UnicodeEncodeError/DecodeError（T20/T21 首跑 CI 红根因之一），强制 UTF-8。
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: "utf-8"
 
     steps:
       - name: Checkout

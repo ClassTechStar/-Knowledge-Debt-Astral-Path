@@ -79,13 +79,16 @@ public static class OcrHost
         return candidates.FirstOrDefault(File.Exists);
     }
 
-    /// <summary>定位 tessdata 目录；环境变量 TESSDATA_PREFIX 优先。</summary>
+    /// <summary>定位 tessdata 目录；环境变量 TESSDATA_PREFIX 优先。
+    /// 兜底路径必须做存在性检查：CI/裸机无 Tesseract 安装时返回 null（调用方按缺省降级），
+    /// 而不是返回一个不存在的目录（曾致 ResolveTessdata_Returns_Null_Or_Existing_Directory 在 CI 判红）。</summary>
     public static string? ResolveTessdata()
     {
         var env = Environment.GetEnvironmentVariable("TESSDATA_PREFIX");
         if (!string.IsNullOrWhiteSpace(env) && Directory.Exists(env)) return env;
+        const string installedFallback = @"C:\Program Files\Tesseract-OCR\tessdata";
         return FindToolDir(Path.Combine("tools", "tessdata"))
-            ?? @"C:\Program Files\Tesseract-OCR\tessdata";
+            ?? (Directory.Exists(installedFallback) ? installedFallback : null);
     }
 
     /// <summary>

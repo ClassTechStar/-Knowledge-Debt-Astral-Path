@@ -46,7 +46,9 @@ function renderBlock(doc) {
 
 const doc = JSON.parse(fs.readFileSync(JSON_P, "utf8"));
 const want = renderBlock(doc);
-const src = fs.readFileSync(CORE, "utf8");
+// 行尾归一：工作副本可能因 autocrlf 检出为 CRLF（blob 为 LF），生成块统一按 LF 对比，
+// 否则同一份内容会在「本地绿 / CI 红」或「分支切换后假漂移」之间摇摆。
+const src = fs.readFileSync(CORE, "utf8").replace(/\r\n/g, "\n");
 
 const bi = src.indexOf(BEGIN);
 const ei = src.indexOf(END);
