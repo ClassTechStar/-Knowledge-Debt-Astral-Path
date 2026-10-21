@@ -1,47 +1,46 @@
-# UI 产物拓扑（C2 收敛说明）
+# 知债：星穹学途 · 纯前端单体版（源目录）
 
-> **当前版本状态（Music 独立副本 · 2026-10-12）**
->
-> - **版本**：单体版 **2.6.0**（无微服务）——线上部署（dumate.cn artifacts）与本地标题、`astralpath-skill.md`（v2.6.0）、参赛《应用方案（参赛提交版）.md》版本号一致。
-> - **OCR 引擎 v1.5.0**：tesseract 全栈内联进单体 HTML（约 17.2 MB），只托管单个 HTML 的平台也可完整离线 OCR；T10 起支持照片 / 截图 / 画布图像的图像直拍识别（v1.5.0 新增 recognizeImage，预处理与低置信重识别复用同一参数）。
-> - **AI 深度参与（T8）**：图谱「AI 增强构图」/ OCR 自动清洗 / 今日 AI 建议卡 + AI 出题；`__AP_MIMO__.complete/parseJsonLoose` 通用化。
-> - **无 Key 演示模式（T8.1）**：未配置模型时三处 AI 入口零配置可用（本地规则生成 + 「演示模式」标注），配置 OpenAI 兼容 Key 后无缝切换大模型。
-> - **AI 知债深化（T9，2026-10-10）**：知债模块 AI 升级——AI 计划官（四源输入：教材内容/画像/今日/债边）、红边债务叙事、K1–K5 全量计划合约引擎、自然语言调计划与计划复盘；无 Key 走演示模式同构可用。基线 md5 重打（见 `tools/build-single.py`），`astralpath-monolith.html` 已同步重建。
-> - **试卷作业错题识别（T10，2026-10-12）**：新增「试卷·作业·错题」页——拍照 / 截图 / 图片粘贴 / 文件四类入口；图像走识别引擎（等比缩放 + 预处理 + 低置信 3 倍重识别）；文档支持 PPT / Word / HTML / MD / TXT / EPUB（含 .doc / .ppt 旧版尽力提取，正文过短自动识别内嵌图片）；识别结果经确定性规则结构化（板块 / 题头 / 选项 / 答案批量分发 / 题型推断）并生成主题—知识点—题目三层知识点图谱（归属 / 考查 / 同题共现 / 先修四类边）。55 项端到端冒烟断言全部通过；基线 md5 已重打，`astralpath-monolith.html` 已同步重建。
-> - **UX 反馈落地（T11，2026-10-12）**：以普通用户（学生/教师双视角）实测后落地的 13 项改进——学生侧：知债空态「练 3 道题解锁 / 载入演示诊断」行动、演示模式按知识点作答（结合教材要点与先修链）、建议卡与红边口径统一、帮助浮层（3 步上手 + 术语词典）、对话历史本机落盘与清空、识网「边：精简/完整」切换、演示身份设置（改名/隐藏标签）、启动加载屏；教师侧：新增「教师」页（fail-closed 授权视图 + 薄弱热点/红边/近 7 日趋势 + 示例班级 + k-匿名说明）、学情报告导出（HTML 可打印为 PDF）、教师一页式说明、边界文案、作业单文件互传（教师生成 → 学生导入排入今日）。24 项端到端断言全部通过（0 前端错误）；基线 md5 重打为 b9575df7…，单体已重建。
-> - **内置演示密钥（T12，2026-10-13）**：MiMo API Key 以 AES-256-GCM 密文形态内嵌（`__AP_EMBED__`，运行时解密、明文不落文件）；无自定义密钥时自动启用（默认即真实 AI，离线自动降级），自定义密钥优先、清除后回落内置。index.html md5 `15f3f938…`，单体已重建。
-> - **智能体与 AI 出题缺陷修复（T13，2026-10-13）**：并发闸（上限 2 + 排队，替代单飞拒绝）消除「后台任务与用户操作互踩」导致的误降级；云桥冷却仅对传输类错误生效；推理模型流式输出支持思维链兜底与「正在思考…」即时反馈；AI 出题预算 800→1500 tokens / 40→60 秒；「换一题」排除当前题、不再原题重放。双场景回归探测全绿（出题 layer=ai、并发问答云桥正常、0 报错）。基线 md5 `231ce1d4…`，单体已重建。
-> - **AI 随时可用且迅速（T14，2026-10-13，不更换模型）**：全链路流式——智能体思考阶段实时滚动思维链（2~3 秒即见反馈），AI 出题展示命题思考/题干草稿进度；「开始练习」池空时先秒出过渡题（实测 219ms）并在 AI 新题就绪后自动替换（未作答时），已作答则新题入池供「换一题」秒出；出题解析失败或撞重复自动重试一次；云桥冷却 30s→8s；今日建议生成中显示占位卡（152ms）。回归探测 10/10 全绿、0 报错。基线 md5 `1dfd1886…`，单体已重建。
-> - **合规边界**：仅限个人学习使用——应用内（藏书阁上传区）与参赛文档均已声明版权边界。
-> - **参赛文档**：见 `C:\Users\18948\Desktop\Team Tech file\` 下《应用方案（参赛提交版）.md》与《DuMate编排蓝图与提交证据清单.md》（DuMate 无代码编排为必需提交项）。
+本目录是纯前端交付形态的源目录。应用本体是一个自包含的 HTML 文件，OCR 引擎随文件内联，双击即可用，不需要后端服务、不需要安装、离线也能跑。
 
-> 2026-09-26 审计 C2「UI 四份拷贝三套版本」的最终口径。现状：**两类产物，不再有第三套**。
+## 目录里有什么
 
-## 一、单体版（唯一事实源，交付态）
-
-| 位置 | 角色 |
+| 路径 | 作用 |
 |---|---|
-| `deploy/monolith-web/index.html` | **源**。8 页自包含应用（file:// 双击 / serve.ps1 均可），业务全在页面内 |
-| `src/AstralPath.Monolith/Resources/index.html` | Windows 壳镜像（WebView2 加载） |
-| `src/AstralPath.Native/app/src/main/assets/www/index.html` | Android 壳镜像（WebViewAssetLoader 加载，Kotlin 壳为纯加载器） |
+| `index.html` | 应用源文件，业务逻辑全在这里 |
+| `astralpath-monolith.html` | 自包含单文件产物（18,187,662 字节，OCR 全栈内联），构建产物 |
+| `ocr-engine/` | 离线识别运行时（tesseract WASM 双核、pdf.js、chi_sim 与 eng 语言包，共 11 个文件） |
+| `tools/build-single.py` | 单文件构建脚本，把 OCR 依赖内联进 HTML |
+| `tools/check-js.js` | 前端脚本语法门禁，只解析不执行 |
+| `shared/` | 前端共享代码的单一来源：`core.js`（归一化、容错解析、拓扑破环）、`safe-dom.js`（转义）、`store.js`（状态分片存储） |
+| `scripts/gen_frontend_regions.py` | 把 `shared/` 里的共享函数刷进 `index.html` 的生成区，`--check` 只校验 |
+| `scripts/store_runner.js` 与 `scripts/verify_store.py` | 状态分片存储的黄金用例（10 例）与接入校验 |
+| `serve.ps1`、`启动-知债单体版.bat` | 本地启动脚本 |
+| `astralpath-skill.md` | 论文权威源，同时是 DuMate 编排层的 Skill 说明 |
+| `毕业论文-知债星穹学途（湛江科技学院格式）.docx / .pdf` | 毕业论文 |
+| `项目说明.md`、`graph_pack.json`、`question_bank.json` | 项目说明与静态数据 |
 
-三份**必须逐字节一致**，由 `scripts/sync-monolith-html.ps1` 保证：改源 → 跑脚本同步 → md5 门禁 + C3 XSS 回归哨兵；`verify_all.ps1` 每次校验。配套运行时 `ocr-engine/`（WASM tesseract + pdf.js + traineddata）同样三处部署，同步脚本加 `-IncludeOcrEngine` 可一并更新。
+## 怎么构建
 
-## 二、独立在线版（不同应用，勿混同）
+```
+python tools/build-single.py
+```
 
-| 位置 | 角色 |
-|---|---|
-| `src/AstralPath.Api/wwwroot/index.html` | 面向 AstralPath.Api 的**在线客户端**（登录/学生/资料演示台），由 Api 宿主 UseWebRoot 提供。文件头部有职责标注注释 |
+脚本会先核对 `index.html` 的基线校验和（`tools/build-single.py` 里的 `EXPECTED_MD5`，必须是小写十六进制），不一致直接退出，防止有人在没同步基线的情况下改基座。构建产物是 `astralpath-monolith.html`，除 onnxruntime-web 的 CDN（带降级哨兵，缺失只损失 ONNX 推理）外没有任何外部资源引用。
 
-它有自己的交互与数据流（走 REST + 鉴权），不是单体版的镜像，**不参与** md5 门禁。
+改 `index.html` 后要重打基线，改完 `shared/` 里的共享函数后要跑一次 `python scripts/gen_frontend_regions.py` 刷新生成区。
 
-## 三、历史遗留（已清除）
+## 门禁
 
-| 位置 | 处置 |
-|---|---|
-| `src/AstralPath.Mobile.Offline/index.html` | **已删除**（2026-09-26）：零代码引用的死产物；离线 Avalonia 端（AstralPath.Mobile）使用 XAML 视图，不加载 HTML |
-| `src/AstralPath.Native/.../ocr-engine/ocr-wasm.js.bak-*` | 已删除（提交时剔除） |
+```
+python scripts/gen_frontend_regions.py --check   # 生成区与 shared/ 是否一致
+python scripts/verify_store.py                   # 分片存储 10 例 + 页面是否真的接入
+node tools/check-js.js                           # 前端脚本语法（只解析不执行）
+```
 
-## 重构阶段备注
+## 当前状态
 
-未来 Windows/Android 原生端重构时，单体版 HTML 保留为「行为规格说明书」；原生实现以它为对照基准（见 ADR-0001）。
+版本 2.6.0。`index.html` 为 599,264 字节，md5 `2a4fa2681dff926cf46b700ab0f54ff4`；`astralpath-monolith.html` 为 18,187,662 字节，md5 `d81fb3b681bd0e5b4e85405a70d5f917`。两者与主仓库 `deploy/monolith-web/` 下的同名文件逐字节一致。
+
+主仓库另有 Windows 壳与 Android 壳两份镜像，由主仓库的 `scripts/sync-monolith-html.ps1` 负责同步并做 md5 门禁，镜像不是本目录的编辑对象。
+
+参赛材料在 `C:\Users\18948\Desktop\Team Tech file\`，其中《应用方案（参赛提交版）.md》与《DuMate编排蓝图与提交证据清单.md》是赛事必需提交项。
