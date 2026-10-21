@@ -1,4 +1,4 @@
-<!-- ═══════════ 2026-09-28 项目最新状态速览（由开发会话自动更新） ═══════════
+<!-- ═══════════ 2026-09-28 项目最新状态速览（09-26 至 09-28 进展汇总） ═══════════
 本文件主体为 2026-09-25 版本；以下横幅汇总 09-26 至 09-28 的全部进展。最新细节以
 GitHub 仓库 docs/ 目录为准（ocr-engine-bench-report / ocr-p0-p3-round2-completion /
 ocr-max-vs-production / mlp-web-e2e 等报告）。
@@ -3013,14 +3013,14 @@ infer → [鉴权/配额] → [purpose 路由] → [Prompt 装配]
 
 | 能力 | 错题本 App | 自适应题库 | LLM 答疑 | 知债：星穹学途 |
 |---|---|---|---|---|
-| 跨课因果 | ❌ | 部分（单科内） | 口头推测 | ✅ 先修图 + impact |
-| 可复现公式 | ❌ | 黑盒推荐分 | ❌ | ✅ 金样 1e-6 |
-| 可执行计划 | 弱 | 有 | 有建议无约束 | ✅ K1–K5 强制 |
-| 过程销账 | ❌ | 有练习无债概念 | ❌ | ✅ 状态机 + 证据链 |
-| 教师可见伦理 | 常默认可见 | 不定 | 不定 | ✅ consent 默认不可见 |
-| 情感安全 | 弱 | 弱 | 易幻觉羞辱 | ✅ 禁词 + 槽位 |
-| 跨端离线 | 有 | 有 | 常需在线 | ✅ 队列 + 镜像 |
-| 端上可审计 | ❌ | ❌ | ❌ | ✅ 同一公式手算 |
+| 跨课因果 | 无 | 部分（单科内） | 口头推测 |  先修图 + impact |
+| 可复现公式 | 无 | 黑盒推荐分 | 无 |  金样 1e-6 |
+| 可执行计划 | 弱 | 有 | 有建议无约束 |  K1–K5 强制 |
+| 过程销账 | 无 | 有练习无债概念 | 无 |  状态机 + 证据链 |
+| 教师可见伦理 | 常默认可见 | 不定 | 不定 |  consent 默认不可见 |
+| 情感安全 | 弱 | 弱 | 易幻觉羞辱 |  禁词 + 槽位 |
+| 跨端离线 | 有 | 有 | 常需在线 |  队列 + 镜像 |
+| 端上可审计 | 无 | 无 | 无 |  同一公式手算 |
 
 ### 8.5 三分钟演示脚本（扩写：桌面 + 移动双端）
 
@@ -7120,37 +7120,37 @@ public sealed class PinnedCertificatePolicy
 
 | MASVS 控制项 | 要求摘要 | 知债：星穹学途落地 | 状态 |
 |---|---|---|---|
-| MSTG-STORAGE-1 | 敏感数据不入日志 | 结构化日志脱敏 studentId；attempt 不打正文 | ✅ |
-| MSTG-STORAGE-2 | 设备上不存明文敏感数据 | attempt cipher_blob；tokens 安全存储 | ✅ |
-| MSTG-STORAGE-3 | 不默认共享到云备份 | Android `allowBackup=false` | ✅ |
-| MSTG-STORAGE-4 | 不用键盘缓存敏感字段 | 答案输入 `IsSensitive` | ✅ |
-| MSTG-STORAGE-5 | 剪贴板敏感信息提示 | 导出路径提示 | ✅ |
-| MSTG-STORAGE-6 | 密码学 API 正确使用 | AES-GCM / DPAPI；无 ECB | ✅ |
-| MSTG-STORAGE-7 | 密钥硬编码禁止 | 配置注入 + 安全存储 | ✅ |
-| MSTG-STORAGE-8 | UI 敏感信息遮挡 | 任务切换时模糊（可选） | 🟡 |
-| MSTG-CRYPTO-1 | 不自研算法 | 仅用平台密码学 | ✅ |
-| MSTG-CRYPTO-2 | 算法/密钥可轮换 | 配置化 pin 与 alias | ✅ |
-| MSTG-CRYPTO-3 | 随机数 CSPRNG | Guid / RandomNumberGenerator | ✅ |
-| MSTG-CRYPTO-4 | 废弃算法不用 | SHA-256+；无 MD5 业务用途 | ✅ |
-| MSTG-AUTH-1 | 认证服务端强制 | Gateway 校验；客户端不信任本地角色 | ✅ |
-| MSTG-AUTH-2 | 会话远程可失效 | token 过期/吊销 | ✅ |
-| MSTG-AUTH-3 | 状态页不泄漏敏感 | 教师空态不显示名单 | ✅ |
-| MSTG-NET-1 | TLS 校验 | 系统校验 + pin | ✅ |
-| MSTG-NET-2 | 强 TLS 配置 | TLS1.2+ 优先 1.3 | ✅ |
-| MSTG-NET-3 | 安全层独立于 UI | HttpHandler 统一 | ✅ |
-| MSTG-NET-4 | 不信任用户输入 URL | 固定 ApiBase | ✅ |
-| MSTG-PLATFORM-1 | 权限最小 | 仅网络/通知 | ✅ |
-| MSTG-PLATFORM-2 | 外部输入校验 | deep link 白名单 | ✅ |
-| MSTG-PLATFORM-3 | IPC 安全 | 导出组件 false | ✅ |
-| MSTG-PLATFORM-4 | WebView 限制 | 默认不用 WebView | ✅ |
-| MSTG-CODE-1 | 调试符号/日志 | Release 关详细日志 | ✅ |
-| MSTG-CODE-2 | 反馈不泄堆栈 | 统一错误页 + traceId | ✅ |
-| MSTG-CODE-3 | 第三方库盘点 | 锁版本 + 清单 | ✅ |
-| MSTG-CODE-4 | 恶意代码防护 | 签名安装包 | ✅ |
-| MSTG-RESILIENCE-1 | root/jailbreak 检测 | 演示可选告警不阻断 | 🟡 |
-| MSTG-RESILIENCE-2 | 调试器检测 | Release 可选 | 🟡 |
-| MSTG-RESILIENCE-3 | 完整性校验 | MSIX/AAB 签名 | ✅ |
-| MSTG-RESILIENCE-4 | 侧载宿主风险提示 | 设置页说明 | ✅ |
+| MSTG-STORAGE-1 | 敏感数据不入日志 | 结构化日志脱敏 studentId；attempt 不打正文 | 有 |
+| MSTG-STORAGE-2 | 设备上不存明文敏感数据 | attempt cipher_blob；tokens 安全存储 | 有 |
+| MSTG-STORAGE-3 | 不默认共享到云备份 | Android `allowBackup=false` | 有 |
+| MSTG-STORAGE-4 | 不用键盘缓存敏感字段 | 答案输入 `IsSensitive` | 有 |
+| MSTG-STORAGE-5 | 剪贴板敏感信息提示 | 导出路径提示 | 有 |
+| MSTG-STORAGE-6 | 密码学 API 正确使用 | AES-GCM / DPAPI；无 ECB | 有 |
+| MSTG-STORAGE-7 | 密钥硬编码禁止 | 配置注入 + 安全存储 | 有 |
+| MSTG-STORAGE-8 | UI 敏感信息遮挡 | 任务切换时模糊（可选） | 部分 |
+| MSTG-CRYPTO-1 | 不自研算法 | 仅用平台密码学 | 有 |
+| MSTG-CRYPTO-2 | 算法/密钥可轮换 | 配置化 pin 与 alias | 有 |
+| MSTG-CRYPTO-3 | 随机数 CSPRNG | Guid / RandomNumberGenerator | 有 |
+| MSTG-CRYPTO-4 | 废弃算法不用 | SHA-256+；无 MD5 业务用途 | 有 |
+| MSTG-AUTH-1 | 认证服务端强制 | Gateway 校验；客户端不信任本地角色 | 有 |
+| MSTG-AUTH-2 | 会话远程可失效 | token 过期/吊销 | 有 |
+| MSTG-AUTH-3 | 状态页不泄漏敏感 | 教师空态不显示名单 | 有 |
+| MSTG-NET-1 | TLS 校验 | 系统校验 + pin | 有 |
+| MSTG-NET-2 | 强 TLS 配置 | TLS1.2+ 优先 1.3 | 有 |
+| MSTG-NET-3 | 安全层独立于 UI | HttpHandler 统一 | 有 |
+| MSTG-NET-4 | 不信任用户输入 URL | 固定 ApiBase | 有 |
+| MSTG-PLATFORM-1 | 权限最小 | 仅网络/通知 | 有 |
+| MSTG-PLATFORM-2 | 外部输入校验 | deep link 白名单 | 有 |
+| MSTG-PLATFORM-3 | IPC 安全 | 导出组件 false | 有 |
+| MSTG-PLATFORM-4 | WebView 限制 | 默认不用 WebView | 有 |
+| MSTG-CODE-1 | 调试符号/日志 | Release 关详细日志 | 有 |
+| MSTG-CODE-2 | 反馈不泄堆栈 | 统一错误页 + traceId | 有 |
+| MSTG-CODE-3 | 第三方库盘点 | 锁版本 + 清单 | 有 |
+| MSTG-CODE-4 | 恶意代码防护 | 签名安装包 | 有 |
+| MSTG-RESILIENCE-1 | root/jailbreak 检测 | 演示可选告警不阻断 | 部分 |
+| MSTG-RESILIENCE-2 | 调试器检测 | Release 可选 | 部分 |
+| MSTG-RESILIENCE-3 | 完整性校验 | MSIX/AAB 签名 | 有 |
+| MSTG-RESILIENCE-4 | 侧载宿主风险提示 | 设置页说明 | 有 |
 
 #### 15.8 教育数据合规要点（中国场景）
 
@@ -23722,12 +23722,12 @@ END FUNCTION
 
 | 校验项 | 判据 | 结果 |
 |---|---|---|
-| 债边 Top-K（5000 边） | 集合顺序与 impact 差 < 1e-6 | ✅ 一致 |
-| 计划约束 K1–K5（200 项） | 五维布尔与违规条数一致 | ✅ 一致 |
-| 销账状态机（200 步增量） | `saleable`/`streak`/`need` 全程一致 | ✅ 一致 |
-| RRF 融合 Top-10（§45.4.4） | 顺序与成员完全一致 | ✅ 一致 |
+| 债边 Top-K（5000 边） | 集合顺序与 impact 差 < 1e-6 |  一致 |
+| 计划约束 K1–K5（200 项） | 五维布尔与违规条数一致 |  一致 |
+| 销账状态机（200 步增量） | `saleable`/`streak`/`need` 全程一致 |  一致 |
+| RRF 融合 Top-10（§45.4.4） | 顺序与成员完全一致 |  一致 |
 | 路由判定一致率（97 用例） | v1 vs v2 的 intent+decision | **89.7%**（10 条分歧见 §47.5.3） |
-| 计划/路由金样口径 | 阈值、错误码、字段不变 | ✅ 无需改写 |
+| 计划/路由金样口径 | 阈值、错误码、字段不变 |  无需改写 |
 
 #### §47.5.2 安全属性实测（必须 100%）
 
@@ -23934,14 +23934,14 @@ dotnet run -c Release --project src/AstralPath.Agent.Optimized -- bench/bench-re
 
 | 不变量 | v2 是否保持 | 守护方式 |
 |---|---|---|
-| `INV-1` 数字可溯源至 `calc` | ✅ | 结构化回填把 calc 值**原样注入**；D2 改为字面量白名单判定（更严格） |
-| `INV-2` 交互依赖图无环 | ✅ | 未引入任何计算层 → 智能体的依赖 |
-| `INV-3` 门禁不可跳过 | ✅ | 轮级令牌覆盖本轮计划工具位图；每次 `I-10` 前必有位图判定通过 |
-| `INV-4` 无审计即无输出 | ✅ | `AuditStore` 写入失败仍整体拒绝（fail-closed 未变） |
-| `INV-5` `stateVersion` 单调 | ✅ | 单次 CAS + 陈旧轮次快速拒绝（更强） |
-| `INV-6` 模型出口唯一 | ✅ | 未新增模型调用点 |
-| `INV-7` 写操作幂等 | ✅ | 幂等键算法与 v1 相同（`sha256(turnId|tool|argsFp)[..24]`） |
-| `INV-8` 单轮成本有界 | ✅ | 工具 ≤6、模型 ≤2、门禁预算由 `GateBudgetArbiter` 收紧到 ≤120ms |
+| `INV-1` 数字可溯源至 `calc` | 有 | 结构化回填把 calc 值**原样注入**；D2 改为字面量白名单判定（更严格） |
+| `INV-2` 交互依赖图无环 | 有 | 未引入任何计算层 → 智能体的依赖 |
+| `INV-3` 门禁不可跳过 | 有 | 轮级令牌覆盖本轮计划工具位图；每次 `I-10` 前必有位图判定通过 |
+| `INV-4` 无审计即无输出 | 有 | `AuditStore` 写入失败仍整体拒绝（fail-closed 未变） |
+| `INV-5` `stateVersion` 单调 | 有 | 单次 CAS + 陈旧轮次快速拒绝（更强） |
+| `INV-6` 模型出口唯一 | 有 | 未新增模型调用点 |
+| `INV-7` 写操作幂等 | 有 | 幂等键算法与 v1 相同（`sha256(turnId|tool|argsFp)[..24]`） |
+| `INV-8` 单轮成本有界 | 有 | 工具 ≤6、模型 ≤2、门禁预算由 `GateBudgetArbiter` 收紧到 ≤120ms |
 
 #### §47.8.2 新增开关（唯二的可变面）
 
@@ -30117,12 +30117,12 @@ ed74f8c 知识图谱+OCR 工具链与 13 本 PDF 思维导图产物   ← HEAD
 | 文件 | 大小 | md5 | 说明 |
 |---|---:|---|---|
 | `deploy/monolith-web/index.html` | 73,504 | `8e368b1ebd0aa11fa1a32094cbb38277` | ★ 单体版事实源（无微服务，2.2） |
-| `src/AstralPath.Native/app/src/main/aaassets/www/index.html` | 73,504 | `8e368b1ebd0aa11fa1a32094cbb38277` | ✅ 与单体版同源（安卓壳） |
+| `src/AstralPath.Native/app/src/main/aaassets/www/index.html` | 73,504 | `8e368b1ebd0aa11fa1a32094cbb38277` |  与单体版同源（安卓壳） |
 | `src/AstralPath.Api/wwwroot/index.html` | 163,153 | `e01934a8a6a4a236c69077ef5d999435` | 全功能 Web 版（依赖 API，2.0 系） |
 | `src/AstralPath.Mobile.Offline/index.html` | 163,292 | `74cb174638838665c967fa0f0b5be3b7` | 移动端离线版（2.0 系） |
 | `src/AstralPath.Android/app/src/main/aaassets/www/index.html` | 150,825 | — | 旧安卓工程（1.3 系，已由 Native 取代） |
 
-> ⚠**已知待办 #1**：`src/AstralPath.Monolith/Resources/index.html` 需与单体版同源。
+> **已知待办 #1**：`src/AstralPath.Monolith/Resources/index.html` 需与单体版同源。
 > 发布流程（见 §32.3）必须先复制再打包。
 
 ### 29.4 测试现状（**121 项全绿**，2026-09-25 实测）
@@ -30135,22 +30135,22 @@ ed74f8c 知识图谱+OCR 工具链与 13 本 PDF 思维导图产物   ← HEAD
 | `AstralPath.Api.Tests` | **53** | ~10 s | `dotnet test tests/AstralPath.Api.Tests -c Release` |
 | `AstralPath.Eval.Tests` | **2** | ~72 ms | `dotnet test tests/AstralPath.Eval.Tests -c Release` |
 
-> ⚠**注意**：`dotnet test` 一次只能接**一个**项目。写成一条命令接五个会报 `MSB1008: 只能指定一个项目`。
+> **注意**：`dotnet test` 一次只能接**一个**项目。写成一条命令接五个会报 `MSB1008: 只能指定一个项目`。
 
 ### 29.5 一致性核查清单（2026-09-25 已逐项处理）
 
 | # | 问题 | 状态 | 处理方式 |
 |---:|---|:--:|---|
-| 1 | README 版本号写 `2.0.0-algo-v2`，实际 `2.2.0` | ✅ 已修 | README 第 5 行改为 `2.2.0`（contract-v2.2.0-algo-v2） |
-| 2 | 单体壳 HTML 是否同步 | ✅ 无需修 | 实测 `deploy/monolith-web/index.html` 与 `src/AstralPath.Monolith/Resources/index.html` **md5 已一致**；且 HTML 内零 `fetch`，完全自包含，无需额外 json 副本 |
-| 3 | badge 出现黄色 | ✅ 已修 | `renderMats()` 中 `const cls=st==="error"?"err":""`，ready / partial 均走默认绿，仅 error 用红。已同步三端并复验 md5 |
-| 4 | 金样为 v1 口径 | ⚠有意保留 | `eval/golden/*.json` 用 0–100 制（v1 契约）；产品用 v2（0–1 制）。**勿用 v2 覆盖金样**，新增 v2 金样另开文件 |
-| 5 | README 测试数表述 | ✅ 正确 | Core 11 · Persistence 8 · Desktop 47 · API 53 · Eval 2 = 121 |
-| 6 | 旧安卓工程残留 | ⚠保留 | `src/AstralPath.Android/`（1.3 系）作历史参考，新包走 `AstralPath.Native` |
-| 7 | 主方案版本口径 | ✅ 已修 | 改为 `contract-v2.2.0-algo-v2` |
-| 8 | JS `K` 常量与 C# 常量需人工签字 | ✅ 自动化 | 新增 `scripts/verify_constants.py`，26 项自动比对（21 项直映射 + 3 项语义 + 2 项附加），已 **ALL GREEN**；并接入 `scripts/verify_all.ps1` |
-| 9 | 命名扫描误报 26 处 | ✅ 已修 | 验收清单里"全仓搜 知债图 → 零命中"这类**自指引用**被误判为残留。给 `naming_consistency.py` 增加 `DETECTION_CONTEXT` 判定层，82 → 56 |
-| 10 | §K.8 / §22.2 仍用旧环境变量前缀 `ZZ_*` | ✅ 已修 | 实测 **源码零使用 `ZZ_`**（代码已用 `ASTRALPATH_*`），属文档滞后。纯文档替换 57 处 `ZZ_` → `ASTRALPATH_`、2 处 `zz.event.>` → `astralpath.event.>`。残留 **82 → 0** |
+| 1 | README 版本号写 `2.0.0-algo-v2`，实际 `2.2.0` |  已修 | README 第 5 行改为 `2.2.0`（contract-v2.2.0-algo-v2） |
+| 2 | 单体壳 HTML 是否同步 |  无需修 | 实测 `deploy/monolith-web/index.html` 与 `src/AstralPath.Monolith/Resources/index.html` **md5 已一致**；且 HTML 内零 `fetch`，完全自包含，无需额外 json 副本 |
+| 3 | badge 出现黄色 |  已修 | `renderMats()` 中 `const cls=st==="error"?"err":""`，ready / partial 均走默认绿，仅 error 用红。已同步三端并复验 md5 |
+| 4 | 金样为 v1 口径 | 有意保留 | `eval/golden/*.json` 用 0–100 制（v1 契约）；产品用 v2（0–1 制）。**勿用 v2 覆盖金样**，新增 v2 金样另开文件 |
+| 5 | README 测试数表述 |  正确 | Core 11 · Persistence 8 · Desktop 47 · API 53 · Eval 2 = 121 |
+| 6 | 旧安卓工程残留 | 保留 | `src/AstralPath.Android/`（1.3 系）作历史参考，新包走 `AstralPath.Native` |
+| 7 | 主方案版本口径 |  已修 | 改为 `contract-v2.2.0-algo-v2` |
+| 8 | JS `K` 常量与 C# 常量需人工签字 |  自动化 | 新增 `scripts/verify_constants.py`，26 项自动比对（21 项直映射 + 3 项语义 + 2 项附加），已 **ALL GREEN**；并接入 `scripts/verify_all.ps1` |
+| 9 | 命名扫描误报 26 处 |  已修 | 验收清单里"全仓搜 知债图 → 零命中"这类**自指引用**被误判为残留。给 `naming_consistency.py` 增加 `DETECTION_CONTEXT` 判定层，82 → 56 |
+| 10 | §K.8 / §22.2 仍用旧环境变量前缀 `ZZ_*` |  已修 | 实测 **源码零使用 `ZZ_`**（代码已用 `ASTRALPATH_*`），属文档滞后。纯文档替换 57 处 `ZZ_` → `ASTRALPATH_`、2 处 `zz.event.>` → `astralpath.event.>`。残留 **82 → 0** |
 
 > **当前门禁状态**：`powershell -File scripts\verify_all.ps1` → **ALL GREEN**（退出码 0）
 > 覆盖：常量对齐 26 项 · 5 个测试项目 121 项 · 三端 md5 同源 · 命名残留 0 · （图包/题库校验待 P3 交付 `verify_graph.py` / `verify_bank.py`，当前 `[SKIP]`）
