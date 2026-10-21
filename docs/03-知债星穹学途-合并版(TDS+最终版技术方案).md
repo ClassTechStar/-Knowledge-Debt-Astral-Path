@@ -30122,7 +30122,7 @@ ed74f8c 知识图谱+OCR 工具链与 13 本 PDF 思维导图产物   ← HEAD
 | `src/AstralPath.Mobile.Offline/index.html` | 163,292 | `74cb174638838665c967fa0f0b5be3b7` | 移动端离线版（2.0 系） |
 | `src/AstralPath.Android/app/src/main/aaassets/www/index.html` | 150,825 | — | 旧安卓工程（1.3 系，已由 Native 取代） |
 
-> ⚠️ **已知待办 #1**：`src/AstralPath.Monolith/Resources/index.html` 需与单体版同源。
+> ⚠**已知待办 #1**：`src/AstralPath.Monolith/Resources/index.html` 需与单体版同源。
 > 发布流程（见 §32.3）必须先复制再打包。
 
 ### 29.4 测试现状（**121 项全绿**，2026-09-25 实测）
@@ -30135,7 +30135,7 @@ ed74f8c 知识图谱+OCR 工具链与 13 本 PDF 思维导图产物   ← HEAD
 | `AstralPath.Api.Tests` | **53** | ~10 s | `dotnet test tests/AstralPath.Api.Tests -c Release` |
 | `AstralPath.Eval.Tests` | **2** | ~72 ms | `dotnet test tests/AstralPath.Eval.Tests -c Release` |
 
-> ⚠️ **注意**：`dotnet test` 一次只能接**一个**项目。写成一条命令接五个会报 `MSB1008: 只能指定一个项目`。
+> ⚠**注意**：`dotnet test` 一次只能接**一个**项目。写成一条命令接五个会报 `MSB1008: 只能指定一个项目`。
 
 ### 29.5 一致性核查清单（2026-09-25 已逐项处理）
 
@@ -30144,9 +30144,9 @@ ed74f8c 知识图谱+OCR 工具链与 13 本 PDF 思维导图产物   ← HEAD
 | 1 | README 版本号写 `2.0.0-algo-v2`，实际 `2.2.0` | ✅ 已修 | README 第 5 行改为 `2.2.0`（contract-v2.2.0-algo-v2） |
 | 2 | 单体壳 HTML 是否同步 | ✅ 无需修 | 实测 `deploy/monolith-web/index.html` 与 `src/AstralPath.Monolith/Resources/index.html` **md5 已一致**；且 HTML 内零 `fetch`，完全自包含，无需额外 json 副本 |
 | 3 | badge 出现黄色 | ✅ 已修 | `renderMats()` 中 `const cls=st==="error"?"err":""`，ready / partial 均走默认绿，仅 error 用红。已同步三端并复验 md5 |
-| 4 | 金样为 v1 口径 | ⚠️ 有意保留 | `eval/golden/*.json` 用 0–100 制（v1 契约）；产品用 v2（0–1 制）。**勿用 v2 覆盖金样**，新增 v2 金样另开文件 |
+| 4 | 金样为 v1 口径 | ⚠有意保留 | `eval/golden/*.json` 用 0–100 制（v1 契约）；产品用 v2（0–1 制）。**勿用 v2 覆盖金样**，新增 v2 金样另开文件 |
 | 5 | README 测试数表述 | ✅ 正确 | Core 11 · Persistence 8 · Desktop 47 · API 53 · Eval 2 = 121 |
-| 6 | 旧安卓工程残留 | ⚠️ 保留 | `src/AstralPath.Android/`（1.3 系）作历史参考，新包走 `AstralPath.Native` |
+| 6 | 旧安卓工程残留 | ⚠保留 | `src/AstralPath.Android/`（1.3 系）作历史参考，新包走 `AstralPath.Native` |
 | 7 | 主方案版本口径 | ✅ 已修 | 改为 `contract-v2.2.0-algo-v2` |
 | 8 | JS `K` 常量与 C# 常量需人工签字 | ✅ 自动化 | 新增 `scripts/verify_constants.py`，26 项自动比对（21 项直映射 + 3 项语义 + 2 项附加），已 **ALL GREEN**；并接入 `scripts/verify_all.ps1` |
 | 9 | 命名扫描误报 26 处 | ✅ 已修 | 验收清单里"全仓搜 知债图 → 零命中"这类**自指引用**被误判为残留。给 `naming_consistency.py` 增加 `DETECTION_CONTEXT` 判定层，82 → 56 |
